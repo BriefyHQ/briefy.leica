@@ -1,0 +1,4 @@
+pyramid==1.7.3
+-e git+git@github.com:BriefyHQ/briefy.common.git@master#egg=briefy.common
+-e git+git@github.com:BriefyHQ/briefy.ws.git@master#egg=briefy.ws
+-e .

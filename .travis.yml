@@ -1,0 +1,25 @@
+language: python
+python: 3.5
+sudo: false
+branches:
+  only:
+  - master
+  - develop
+services:
+- docker
+env:
+  global:
+  - AWS_ACCESS_KEY_ID='foo' AWS_DEFAULT_REGION='us-east-1' AWS_SECRET_ACCESS_KEY='bar'
+  matrix:
+  - TOXENV=py35
+install:
+- docker run -d -p 127.0.0.1:5000:5000 --name sqs briefy/aws-test:latest sqs
+- pip install -r requirements/dev.txt
+- pip install flake8
+script:
+- tox -e ${TOXENV}
+- flake8 src/briefy/leica setup.py
+after_success:
+- make docs
+notifications:
+  slack: robyandjack:qxjOPwcrGEtVx3aCQBr812t9
