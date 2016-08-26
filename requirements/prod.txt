@@ -1,4 +1,21 @@
+PasteDeploy==1.5.2
+SQLAlchemy-Utils==0.32.9
+WebOb==1.6.1
+cornice==1.2.1
+mccabe==0.5.2
+newrelic==2.68.0.50
+pyramid-tm==0.12.1
 pyramid==1.7.3
+repoze.lru==0.6
+requests==2.11.1
+s3transfer==0.1.2
+simplejson==3.8.2
+transaction==1.6.1
+venusian==1.0
+waitress==0.9.0
+zope.deprecation==4.1.2
+zope.sqlalchemy==0.7.7
+
 -e git+git@github.com:BriefyHQ/briefy.common.git@master#egg=briefy.common
 -e git+git@github.com:BriefyHQ/briefy.ws.git@master#egg=briefy.ws
 -e .
