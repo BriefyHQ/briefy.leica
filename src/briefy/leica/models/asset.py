@@ -1,4 +1,3 @@
-from .workflows import AssetWorkflow
 from briefy.common.db.mixins import Mixin
 from briefy.common.db.mixins.optin import OptIn
 from briefy.leica.db import Base
@@ -10,6 +9,50 @@ import sqlalchemy_utils as sautils
 
 
 
+from briefy.common.workflow import BriefyWorkflow
+from briefy.common.workflow import WorkflowState
+from briefy.common.workflow import WorkflowTransition
+
+
+class AssetWorkflow(BriefyWorkflow):
+    """Workflow for a Lead."""
+
+    # Optional name for this workflow
+    entity = 'lead'
+    initial_state = 'created'
+
+    # States
+    created = WorkflowState('created', title='Created', description='Asset created')
+    staff_action = WorkflowState('staff_action', title='staff_action_required', description='Staff Action Required')
+    author_action = WorkflowState('author_action', title='author_action_required', description='Author Action Required')
+    aproved = WorkflowState('aproved', title='aproved', description='Asset Aproved')
+    rejected = WorkflowState('rejected', title='Rejected', description='Asset Rejected')
+    delivered = WorkflowState('delivered', title='delivered', description='Asset Delivered')
+
+    # Transitions
+    request_aproval = WorkflowTransition(
+        'request_aproval', title='Request Aproval',
+        description='', category='',
+        state_from=('created', 'author_action'),
+        state_to='staff_action',
+        permissions='qa scout owner'.split(),
+    )
+    request_review = WorkflowTransition(
+        'request_review', title='Request Review',
+        description='', category='',
+        state_from= 'staff_action',
+        state_to='author_action',
+        permissions='qa scout owner'.split(),
+    )
+    #aprove = WorkflowTransition(
+        #'request_review', title='Request Review',
+        #description='', category='',
+        #state_from= 'staff_action',
+        #state_to='author_action',
+        #permissions='qa scout owner'.split(),
+    #)
+
+
 
 
 class Asset(Mixin, Base):
@@ -18,6 +61,8 @@ class Asset(Mixin, Base):
     comments = ''
 
     _workflow = AssetWorkflow
+    __tablename__ = "assets"
+
 
     title = sa.Column(sa.String(255), nullable=False)
     description = sa.Column(sa.Text, nullable=True)

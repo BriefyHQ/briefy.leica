@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 XMLConfig('configure.zcml', leica)()
 
 
-def main(global_config, **settings):
+def main(global_config, debug=False, **settings):
     """Return a Pyramid WSGI application."""
     settings = briefy.ws.expandvars_dict(settings)
     engine = get_engine(settings)
@@ -37,6 +37,7 @@ def main(global_config, **settings):
     config = Configurator(
         settings=settings
     )
+    config.registry['debug'] = debug
     config.registry['db_session_factory'] = Session
     config.add_request_method(get_db, 'db', reify=True)
     config.include('briefy.ws')

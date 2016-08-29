@@ -1,9 +1,3 @@
-from .workflows import AssetWorkflow
+""" Database models to work within the briefy.leica system """
 
-class Asset:
-    version = None
-    url = ''
-    comments = ''
-
-    workflow = AssetWorkflow
-
+from .asset import Asset
