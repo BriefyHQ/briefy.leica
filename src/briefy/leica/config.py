@@ -9,3 +9,6 @@ NEW_RELIC_LICENSE_KEY = config('NEW_RELIC_LICENSE_KEY', default='')
 LEICA_QUEUE = config('LEICA_QUEUE', default='leica-{}'.format(_queue_suffix))
 
 FILE_PICKER_API_KEY = config('FILE_PICKER_API_KEY', default='')
+
+
+S3_CREDENTIALS = config('S3_IMAGE_BUCKET')

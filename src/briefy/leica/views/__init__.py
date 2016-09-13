@@ -32,6 +32,11 @@ def root(request):
     return {'key': FILE_PICKER_API_KEY}
 
 
+@leica.post()
+def get_urls(request):
+    #import pdb; pdb.set_trace()
+    return {'status': 'ok'}
+
 
 #leica = Service(
     #name='Demo',

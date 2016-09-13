@@ -1,24 +1,24 @@
 from briefy.common.db.mixins import Mixin
 from briefy.common.db.mixins.optin import OptIn
+from .workflows.utils import with_workflow
 from briefy.leica.db import Base
 from briefy.leica.db import Session
 from sqlalchemy import orm
+from briefy.common.workflow import BriefyWorkflow
+from briefy.common.workflow import WorkflowState
+from briefy.common.workflow import WorkflowTransition
 
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils
 
 
 
-from briefy.common.workflow import BriefyWorkflow
-from briefy.common.workflow import WorkflowState
-from briefy.common.workflow import WorkflowTransition
-
 
 class AssetWorkflow(BriefyWorkflow):
     """Workflow for a Lead."""
 
     # Optional name for this workflow
-    entity = 'lead'
+    entity = 'asset'
     initial_state = 'created'
 
     # States
@@ -53,6 +53,12 @@ class AssetWorkflow(BriefyWorkflow):
     #)
 
 
+class Comment(Mixin, Base):
+    __tablename__ = "assets"
+    content = sa.Column(sa.Text, nullable=False)
+    comment_order = sa.Column(sa.Integer, nullable=False)
+    author_id = sa.Column(sautils.UUIDType, nullable=False)
+    in_reply_to = sa.Column(sautils.UUIDType, nullable=True)
 
 
 class Asset(Mixin, Base):
@@ -75,7 +81,7 @@ class Asset(Mixin, Base):
     # an asset under copyright law, disregarding whether he is a Briefy systems uer
     owner = sa.Column(sa.String(255), nullable=False)
     # Refers to a system user - reachable trohough microservices/redis
-    author_id = sa.Column(sautils.UUIDType, nullable=True)
+    author_id = sa.Column(sautils.UUIDType, nullable=False)
 
     job_id = sa.Column(sautils.UUIDType, nullable=True)
     job = orm.relationship("Job", back_populates="job")
