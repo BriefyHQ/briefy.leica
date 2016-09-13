@@ -16,6 +16,7 @@ waitress==0.9.0
 zope.deprecation==4.1.2
 zope.sqlalchemy==0.7.7
 
+-e git+git@github.com:BriefyHQ/briefy.knack.git@master#egg=briefy.knack
 -e git+git@github.com:BriefyHQ/briefy.common.git@master#egg=briefy.common
 -e git+git@github.com:BriefyHQ/briefy.ws.git@master#egg=briefy.ws
 -e .
