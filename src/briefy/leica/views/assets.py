@@ -1,4 +1,4 @@
-"""View to handle Leads creation."""
+"""Views to handle Asset handling creation."""
 
 from briefy.leica.models import Asset
 # from briefy.leica.validators import AssetSchema
@@ -21,6 +21,8 @@ asset = Service(
 def get_asset(request):
     """Get content an information about an asset"""
     id = request.matchdict.get('id', '')
+    #import pdb; pdb.set_trace()
+
     return {
         'author': id,
         'url': '',

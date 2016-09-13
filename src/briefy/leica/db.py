@@ -26,7 +26,7 @@ def get_engine(settings):
     :returns: A SQLAlchemy database engine
     :rtype: sqlalchemy.engine.base.Engine
     """
-    engine = create_engine(settings['sqlalchemy_url'], pool_recycle=3600)
+    engine = create_engine(settings['sqlalchemy.url'], pool_recycle=3600)
     return engine
 
 

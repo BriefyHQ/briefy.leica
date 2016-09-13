@@ -49,6 +49,9 @@ setup(
     tests_require=test_requirements,
     install_requires=requires,
     entry_points="""
+    [paste.app_factory]
+     main = briefy.leica:main
+
 
     """,
 )

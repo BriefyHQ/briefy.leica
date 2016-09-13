@@ -34,7 +34,6 @@ def root(request):
 
 @leica.post()
 def get_urls(request):
-    #import pdb; pdb.set_trace()
     return {'status': 'ok'}
 
 

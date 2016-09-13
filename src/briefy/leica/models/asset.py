@@ -15,7 +15,7 @@ import sqlalchemy_utils as sautils
 
 
 class AssetWorkflow(BriefyWorkflow):
-    """Workflow for a Lead."""
+    """Workflow for an Asset."""
 
     # Optional name for this workflow
     entity = 'asset'
@@ -31,17 +31,17 @@ class AssetWorkflow(BriefyWorkflow):
 
     # Transitions
     request_aproval = WorkflowTransition(
-        'request_aproval', title='Request Aproval',
+        name='request_aproval', title='Request Aproval',
         description='', category='',
-        state_from=('created', 'author_action'),
-        state_to='staff_action',
+        state_from=created,
+        state_to=staff_action,
         permissions='qa scout owner'.split(),
     )
     request_review = WorkflowTransition(
-        'request_review', title='Request Review',
+        name='request_review', title='Request Review',
         description='', category='',
-        state_from= 'staff_action',
-        state_to='author_action',
+        state_from= staff_action,
+        state_to=author_action,
         permissions='qa scout owner'.split(),
     )
     #aprove = WorkflowTransition(
@@ -54,7 +54,7 @@ class AssetWorkflow(BriefyWorkflow):
 
 
 class Comment(Mixin, Base):
-    __tablename__ = "assets"
+    __tablename__ = "comments"
     content = sa.Column(sa.Text, nullable=False)
     comment_order = sa.Column(sa.Integer, nullable=False)
     author_id = sa.Column(sautils.UUIDType, nullable=False)
@@ -85,6 +85,16 @@ class Asset(Mixin, Base):
 
     job_id = sa.Column(sautils.UUIDType, nullable=True)
     job = orm.relationship("Job", back_populates="job")
+
+    # history is an unified list where each entry can refer to:
+    # - A  new comment by some user (comments are full objects with workflow)
+    # - A transition on the object workflow
+    # - An editing operation on the mains asset that results in a new binary -
+    #        this can be the result of:
+    #        -  a new upload that superseeds an earlier version,
+    #        - an internal operation (crop, filter, so on)
+    #        -
+    history = sa.Column(sautils.JSONType)
 
 
 
