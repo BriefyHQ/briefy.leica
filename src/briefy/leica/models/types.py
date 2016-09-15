@@ -2,6 +2,7 @@ from enum import Enum
 
 
 class CategoryChoices(Enum):
+    undefined = 'undefined'
     accomodation = 'Accomodation'
     food = 'Food'
     video = 'Video'
@@ -10,6 +11,7 @@ class CategoryChoices(Enum):
 
 
 class ClientJobStatusChoices(Enum):
+    undefined = 'undefined'
     job_received = 'Job received'
     in_scheduling_process = 'In scheduling process'
     scheduled = 'Scheduled'
@@ -27,6 +29,7 @@ class ClientJobStatusChoices(Enum):
     #awaiting_for_submission = 'Awaiting for submission'
 
 class JobContinentChoices(Enum):
+    undefined = 'undefined'
     europe = 'Europe'
     asia = 'Asia'
     north_america = 'North America'
@@ -39,6 +42,7 @@ class JobContinentChoices(Enum):
 
 
 class SchedulingIssuesChoices(Enum):
+    undefined = 'undefined'
     owner_not_responding = 'A1. Owner not responding'
     rejected_by_owner_canceled = 'A2. Rejected by Owner / Canceled'
     owner_not_being_able_to_give_exact_dates = 'A3. Owner not being able to give exact dates'

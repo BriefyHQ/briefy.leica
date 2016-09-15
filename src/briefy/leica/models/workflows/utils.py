@@ -41,7 +41,6 @@ def with_workflow(workflow):
 
         return results
 
-
     def inner(cls):
         nonlocal original_acl, __acl__
         original_acl = getattr(cls, '__acl__', [])

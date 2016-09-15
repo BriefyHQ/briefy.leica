@@ -1,85 +1,50 @@
+"""Briefy Leica Asset model."""
 from briefy.common.db.mixins import Mixin
 from briefy.leica.db import Base
+from briefy.leica.db import Session
+from briefy.leica.models import workflows
 from sqlalchemy import orm
-from briefy.common.workflow import BriefyWorkflow
-from briefy.common.workflow import WorkflowState
-from briefy.common.workflow import WorkflowTransition
 
+
+import colander
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils
 
 
-class AssetWorkflow(BriefyWorkflow):
-    """Workflow for an Asset."""
-
-    # Optional name for this workflow
-    entity = 'asset'
-    initial_state = 'created'
-
-    # States
-    created = WorkflowState('created', title='Created', description='Asset created')
-    staff_action = WorkflowState('staff_action', title='staff_action_required', description='Staff Action Required')
-    author_action = WorkflowState('author_action', title='author_action_required', description='Author Action Required')
-    aproved = WorkflowState('aproved', title='aproved', description='Asset Aproved')
-    rejected = WorkflowState('rejected', title='Rejected', description='Asset Rejected')
-    delivered = WorkflowState('delivered', title='delivered', description='Asset Delivered')
-
-    # Transitions
-    request_aproval = WorkflowTransition(
-        name='request_aproval', title='Request Aproval',
-        description='', category='',
-        state_from=created,
-        state_to=staff_action,
-        permissions='qa scout owner'.split(),
-    )
-    request_review = WorkflowTransition(
-        name='request_review', title='Request Review',
-        description='', category='',
-        state_from= staff_action,
-        state_to=author_action,
-        permissions='qa scout owner'.split(),
-    )
-    #aprove = WorkflowTransition(
-        #'request_review', title='Request Review',
-        #description='', category='',
-        #state_from= 'staff_action',
-        #state_to='author_action',
-        #permissions='qa scout owner'.split(),
-    #)
-
-
-class Comment(Mixin, Base):
-    __tablename__ = "comments"
-    content = sa.Column(sa.Text, nullable=False)
-    comment_order = sa.Column(sa.Integer, nullable=False)
-    author_id = sa.Column(sautils.UUIDType, nullable=False)
-    in_reply_to = sa.Column(sautils.UUIDType, nullable=True)
-
-
 class Asset(Mixin, Base):
-    version = None
-    url = ''
-    comments = ''
 
-    _workflow = AssetWorkflow
+    _workflow = workflows.AssetWorkflow
     __tablename__ = 'assets'
+    __session__ = Session
 
+    __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'history',
+                                               'comments', 'internal_comments', 'job']}
 
     title = sa.Column(sa.String(255), nullable=False)
-    description = sa.Column(sa.Text, nullable=True)
-    asset_url = sa.Column(sa.String(2048), nullable=True)
-    # It may be desirable to embed a thumbnail  of the image along the data
-    # Do NOT use this to store full size images
-    inline_image = sa.Column(sa.LargeBinary, nullable=True)
-    version = sa.Column (sa.Integer, nullable=False, default=0)
+    description = sa.Column(sa.Text, default='')
+    # TODO: ajustar nome e deve ser obrigatório
+    asset_url = sa.Column(sautils.URLType, nullable=True)
+    version = sa.Column(sa.Integer, nullable=False, default=0)
     # Denormalized string with the name of the OWNER of
     # an asset under copyright law, disregarding whether he is a Briefy systems uer
     owner = sa.Column(sa.String(255), nullable=False)
     # Refers to a system user - reachable trohough microservices/redis
-    author_id = sa.Column(sautils.UUIDType, nullable=False)
+    author_id = sa.Column(sautils.UUIDType,
+                          info={'colanderalchemy': {
+                              'title': 'ID',
+                              'validator': colander.uuid,
+                              'typ': colander.String}},
+                          nullable=False)
 
-    job_id = sa.Column(sautils.UUIDType, sa.ForeignKey('jobs.id'))
-    job = sa.orm.relationship('Job', back_populates='assets')
+    job_id = sa.Column(sautils.UUIDType,
+                       sa.ForeignKey('jobs.id'),
+                       nullable=False,
+                       info={'colanderalchemy': {
+                           'title': 'ID',
+                           'validator': colander.uuid,
+                           'typ': colander.String}}
+                       )
+    job = sa.orm.relationship('Job', uselist=False, back_populates='assets')
 
     # history is an unified list where each entry can refer to:
     # - A  new comment by some user (comments are full objects with workflow)
@@ -89,7 +54,16 @@ class Asset(Mixin, Base):
     #        -  a new upload that superseeds an earlier version,
     #        - an internal operation (crop, filter, so on)
     #        -
-    history = sa.Column(sautils.JSONType)
+    history = sa.Column(sautils.JSONType, nullable=True)
+
+    comments = sa.orm.relationship('Comment',
+                                   foreign_keys='Comment.entity_id',
+                                   primaryjoin='Comment.entity_id == Asset.id')
+
+    internal_comments = sa.orm.relationship('InternalComment',
+                                            foreign_keys='InternalComment.entity_id',
+                                            primaryjoin='InternalComment.entity_id == Asset.id')
+
 
 
 

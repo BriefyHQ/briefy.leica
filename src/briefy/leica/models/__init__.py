@@ -1,10 +1,11 @@
 """ Database models to work within the briefy.leica system """
 from .asset import Asset
-from .job import IJob
+from .comment import Comment
+from .comment import InternalComment
 from .job import Job
-from .job import JobLocation
+from .job import IJob
+from .job_location import JobLocation
 from .project import Project
-from .project import IProject
 from .asset import Asset
 
-ALL_MODELS = [Asset, Job, JobLocation, Project]
+ALL_MODELS = [Asset, Comment, InternalComment, Job, JobLocation, Project]
