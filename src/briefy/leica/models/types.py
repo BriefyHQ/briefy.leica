@@ -21,12 +21,12 @@ class ClientJobStatusChoices(Enum):
     resolved = 'Resolved'
 
 
-#class ApprovalStatusChoices(Enum):
-    #awaiting_approval = 'Awaiting Approval'
-    #approved = 'Approved'
-    #not_approved = 'Not Approved'
-    #updated_and_awaiting_for_approval = 'Updated And Awaiting For Approval'
-    #awaiting_for_submission = 'Awaiting for submission'
+# class ApprovalStatusChoices(Enum):
+    # awaiting_approval = 'Awaiting Approval'
+    # approved = 'Approved'
+    # not_approved = 'Not Approved'
+    # updated_and_awaiting_for_approval = 'Updated And Awaiting For Approval'
+    # awaiting_for_submission = 'Awaiting for submission'
 
 class JobContinentChoices(Enum):
     undefined = 'undefined'
@@ -40,14 +40,14 @@ class JobContinentChoices(Enum):
     antarctica = 'Antarctica'
 
 
-
 class SchedulingIssuesChoices(Enum):
     undefined = 'undefined'
     owner_not_responding = 'A1. Owner not responding'
     rejected_by_owner_canceled = 'A2. Rejected by Owner / Canceled'
     owner_not_being_able_to_give_exact_dates = 'A3. Owner not being able to give exact dates'
     owner_not_aware_of_the_service = 'A4. Owner not aware of the service'
-    unable_to_schedule_due_to_property_unavailability = 'B1. Unable to schedule due to property unavailability (i.e. booked)'
+    unable_to_schedule_due_to_property_unavailability = 'B1. Unable to schedule due to' \
+                                                        ' property unavailability (i.e. booked)'
     property_undergoing_renovation = 'B2. Property undergoing renovation'
     property_not_available_anymore = 'B3. Property not available anymore (i.e. sold)'
     property_in_bad_shape = 'B4. Property in bad shape'

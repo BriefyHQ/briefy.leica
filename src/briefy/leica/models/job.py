@@ -1,15 +1,13 @@
 """Briefy Leica Job model."""
+from .types import CategoryChoices
+from .types import ClientJobStatusChoices
+from .types import SchedulingIssuesChoices
 from briefy.common.db.mixins import Mixin
 from briefy.leica.db import Base
 from briefy.leica.db import Session
 from briefy.leica.models import workflows
-from sqlalchemy import orm
 from zope.interface import implementer
 from zope.interface import Interface
-
-from .types import CategoryChoices
-from .types import SchedulingIssuesChoices
-from .types import ClientJobStatusChoices
 
 import colander
 import sqlalchemy as sa

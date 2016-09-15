@@ -3,7 +3,6 @@ from briefy.common.db.mixins import Mixin
 from briefy.leica.db import Base
 from briefy.leica.db import Session
 from briefy.leica.models import workflows
-from sqlalchemy import orm
 
 
 import colander
@@ -63,9 +62,3 @@ class Asset(Mixin, Base):
     internal_comments = sa.orm.relationship('InternalComment',
                                             foreign_keys='InternalComment.entity_id',
                                             primaryjoin='InternalComment.entity_id == Asset.id')
-
-
-
-
-
-

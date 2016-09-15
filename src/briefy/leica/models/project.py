@@ -3,7 +3,6 @@ from briefy.common.db.mixins import Mixin
 from briefy.leica.db import Base
 from briefy.leica.db import Session
 from briefy.leica.models import workflows
-from sqlalchemy import orm
 from zope.interface import Interface
 from zope.interface import implementer
 

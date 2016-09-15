@@ -12,4 +12,3 @@ class CommentService(RESTService):
     model = Comment
     friendly_name = model.__name__
     default_order_by = 'created_at'
-

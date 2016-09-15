@@ -12,4 +12,3 @@ class AssetService(RESTService):
     model = Asset
     friendly_name = Asset.__name__
     default_order_by = 'created_at'
-
