@@ -11,12 +11,20 @@ with open(os.path.join(here, 'HISTORY.rst')) as f:
     CHANGES = f.read()
 
 requires = [
-    'briefy.common',
     'boto3',
-    'geoalchemy2',
+    'briefy.common',
+    'briefy.ws',
+    'colanderalchemy',
+    'cornice',
     'newrelic',
+    'phonenumbers',
+    'pyramid',
+    'pyramid_tm',
     'requests',
     'setuptools',
+    's3transfer==0.1.2',
+    'sqlalchemy',
+    'waitress',
     'wheel',
     'zope.component',
     'zope.configuration',
