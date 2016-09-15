@@ -107,3 +107,20 @@ dist: clean ## builds source and wheel package
 
 install: clean ## install the package to the active Python's site-packages
 	python setup.py install
+
+
+stop_dockers: ## stop and remove docker containers
+	# sqs
+	docker stop sqs
+	docker rm sqs
+	# postgres
+	docker stop briefy-leica-test
+	docker rm briefy-leica-test
+
+run_dockers: ## run docker containers
+	docker run -d -p 127.0.0.1:5000:5000 --name sqs briefy/aws-test:latest sqs
+	export SQS_IP=127.0.0.1 SQS_PORT=5000
+	docker run -d -p 127.0.0.1:9999:5432 -e POSTGRES_PASSWORD=briefy -e POSTGRES_USER=briefy -e POSTGRES_DB=briefy-leica --name briefy-leica-test mdillon/postgis:9.5
+	export DATABASE_URL=postgresql://briefy:briefy@127.0.0.1:9999/briefy-leica
+	sleep 5
+

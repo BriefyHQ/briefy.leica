@@ -8,7 +8,15 @@ from sqlalchemy import orm
 from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import WorkflowState
 from briefy.common.workflow import WorkflowTransition
+from enum import Enum
+from zope.interface import implementer
 from zope.interface import Interface
+
+from .types import CategoryChoices
+from .types import SchedulingIssuesChoices
+from .types import ClientJobStatusChoices
+from .types import JobContinentChoices
+
 
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils
@@ -26,69 +34,11 @@ class JobWorkflow(BriefyWorkflow):
     created = WorkflowState('created', title='Created', description='Asset created')
     aproved = WorkflowState('photoset_is_ok', title='Photoset is ok', description='Photos aproved for delivery')
 
-
-class CategoryChoices(Enum):
-    accomodation = 'Accomodation'
-    food = 'Food'
-    video = 'Video'
-    company = 'Company'
-    restaurant = 'Restaurant'
-
-
-class ClientJobStatusChoices(Enum):
-    job_received = 'Job received'
-    in_scheduling_process = 'In scheduling process'
-    scheduled = 'Scheduled'
-    in_qa_process = 'In QA process'
-    completed = 'Completed'
-    in_revision_ = 'In revision '
-    resolved = 'Resolved'
-
-
-#class ApprovalStatusChoices(Enum):
-    #awaiting_approval = 'Awaiting Approval'
-    #approved = 'Approved'
-    #not_approved = 'Not Approved'
-    #updated_and_awaiting_for_approval = 'Updated And Awaiting For Approval'
-    #awaiting_for_submission = 'Awaiting for submission'
-
-class JobContinentChoices(Enum):
-    europe = 'Europe'
-    asia = 'Asia'
-    north_america = 'North America'
-    africa = 'Africa'
-    caribbean = 'Caribbean'
-    central_and_south_america = 'Central and South America'
-    oceania = 'Oceania'
-    antarctica = 'Antarctica'
-
-
-
-class Scheduling_IssuesChoices(Enum):
-    owner_not_responding = 'A1. Owner not responding'
-    rejected_by_owner_/_canceled = 'A2. Rejected by Owner / Canceled'
-    owner_not_being_able_to_give_exact_dates = 'A3. Owner not being able to give exact dates'
-    owner_not_aware_of_the_service = 'A4. Owner not aware of the service'
-    unable_to_schedule_due_to_property_unavailability = 'B1. Unable to schedule due to property unavailability (i.e. booked)'
-    property_undergoing_renovation = 'B2. Property undergoing renovation'
-    property_not_available_anymore = 'B3. Property not available anymore (i.e. sold)'
-    property_in_bad_shape = 'B4. Property in bad shape'
-    faulty_address_ = 'C1. Faulty address '
-    faulty_contact_details_ = 'C2. Faulty contact details '
-    weather_condition = 'C3. weather condition'
-
-
-
-
-
-
-
 class IJob(Interface):
     """Marker interface for Job"""
 
 
 class JobLocation(Mixin, AddressMixin, Base):
-    implements(IJob)
     version = None
     url = ''
     comments = ''
@@ -98,9 +48,8 @@ class JobLocation(Mixin, AddressMixin, Base):
     __session__ = Session
 
 
-
+@implementer(IJob)
 class Job(Mixin, Base):
-    implements(IJob)
     version = None
     url = ''
     comments = ''
@@ -140,16 +89,15 @@ class Job(Mixin, Base):
         nullable=True)
     client_specific_requirement = sa.Column(sa.String(), nullable=True) # paragraph_text
     # Not an SQLAlchemy foreign key, because company is actually in an external service
-    company_id = sa.Column(sautils.UUIDType(), nullable=True) # connection
+    company_id = sa.Column(sautils.UUIDType, nullable=True) # connection
 
-    contact_person_id = sa.Column(sautils.UUIDType(), nullable=True) # connection
+    contact_person_id = sa.Column(sautils.UUIDType, nullable=True) # connection
 
     currency_payout = sa.Column(sa.String(), nullable=True) # multiple_choice
 
-    finance_manager = sa.Column(sautils.UUIDType(), nullable=True)
+    finance_manager = sa.Column(sautils.UUIDType, nullable=True)
 
-
-    finance_manager_to_payout = sa.Column(sautils.UUIDType(), nullable=True)
+    finance_manager_to_payout = sa.Column(sautils.UUIDType, nullable=True)
 
     invoice_date = sa.Column(sa.DateTime(), nullable=True) # date_time
 
@@ -170,10 +118,10 @@ class Job(Mixin, Base):
     project = sa.orm.relationship('Project')
 
     project_manager_comment = sa.Column(sa.String(), nullable=True)
-    qa_manager = sa.Column(sa.UUIDType(), nullable=True)
+    qa_manager = sa.Column(sautils.UUIDType, nullable=True)
     quality_assurance_feedback = sa.Column(sa.String(), nullable=True)
 
-    responsible_photographer = sa.Column(sa.UUIDType(), nullable=True)
+    responsible_photographer = sa.Column(sautils.UUIDType, nullable=True)
 
     scheduled_shoot_date_time = sa.Column(sa.DateTime(), nullable=True) # date_time
 
@@ -181,13 +129,29 @@ class Job(Mixin, Base):
         SchedulingIssuesChoices, impl=sa.String()),
         nullable=True
     )
-    scouting_manager = sa.Column(sautils.UUIDType(), nullable=True)
+
+    scouting_manager = sa.Column(sautils.UUIDType, nullable=True)
 
     set_price = sa.Column(sa.String(), nullable=True) # number
-    signed_releases_contract = sa.Column((sautils.UUIDType(), nullable=True)) # file
+    signed_releases_contract = sa.Column(sautils.UUIDType, nullable=True) # file
 
     travel_expenses = sa.Column(sa.String(), nullable=True) # number
 
+    assets = sa.orm.relationship('Asset', back_populates='job', secondary='job_assets')
+
+
+
+job_assets = sa.Table(
+    'job_assets', Base.metadata,
+     sa.Column(
+         'job_uid', sautils.UUIDType,
+          sa.ForeignKey('job.id')
+     ),
+     sa.Column(
+         'asset_uid', sautils.UUIDType,
+          sa.ForeignKey('asset.id')
+     )
+)
 
 
 

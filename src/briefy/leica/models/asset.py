@@ -83,8 +83,7 @@ class Asset(Mixin, Base):
     # Refers to a system user - reachable trohough microservices/redis
     author_id = sa.Column(sautils.UUIDType, nullable=False)
 
-    job_id = sa.Column(sautils.UUIDType, nullable=True)
-    job = orm.relationship("Job", back_populates="job")
+    job = sa.orm.relationship('Job', back_populates='assets', secondary='job_assets')
 
     # history is an unified list where each entry can refer to:
     # - A  new comment by some user (comments are full objects with workflow)

@@ -10,18 +10,20 @@ from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import WorkflowState
 from briefy.common.workflow import WorkflowTransition
 from zope.interface import Interface
+from zope.interface import implementer
 
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils
 
 
+class ProjectWorkflow(BriefyWorkflow):
+    pass
 
 class IProject(Interface):
     """Marker interface for Job"""
 
-
+@implementer(IProject)
 class Project(Mixin, Base):
-    implements(IProject)
     version = None
     url = ''
     comments = ''

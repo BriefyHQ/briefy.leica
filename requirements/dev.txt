@@ -1,11 +1,21 @@
 -r prod.txt
+Jinja2==2.8
 Sphinx==1.4.4
 alabaster==0.7.7
 coverage==4.1
-pytest==2.9.2
+flake8
+pytest==3.0.0
+pytest-cov==2.3.0
+pyramid-debugtoolbar==2.4.2
+pyramid_ipython
 snowballstemmer==1.2.1
 sphinx-bootstrap-theme==0.4.8
 sphinx-rtd-theme==0.1.9
+sphinxcontrib-sadisplay
+sphinxcontrib-plantuml
 tox==2.3.1
 flake8==3.0.4
 virtualenv==15.0.3
+WebTest==2.0.20
+
+
