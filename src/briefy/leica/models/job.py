@@ -1,26 +1,20 @@
 from briefy.common.db.mixins import Mixin
 from briefy.common.db.mixins import Address as AddressMixin
-from briefy.common.db.mixins.optin import OptIn
-from .workflows.utils import with_workflow
 from briefy.leica.db import Base
 from briefy.leica.db import Session
 from sqlalchemy import orm
 from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import WorkflowState
-from briefy.common.workflow import WorkflowTransition
-from enum import Enum
 from zope.interface import implementer
 from zope.interface import Interface
 
 from .types import CategoryChoices
 from .types import SchedulingIssuesChoices
 from .types import ClientJobStatusChoices
-from .types import JobContinentChoices
 
 
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils
-
 
 
 class JobWorkflow(BriefyWorkflow):
@@ -34,6 +28,7 @@ class JobWorkflow(BriefyWorkflow):
     created = WorkflowState('created', title='Created', description='Asset created')
     aproved = WorkflowState('photoset_is_ok', title='Photoset is ok', description='Photos aproved for delivery')
 
+
 class IJob(Interface):
     """Marker interface for Job"""
 
@@ -44,7 +39,7 @@ class JobLocation(Mixin, AddressMixin, Base):
     comments = ''
 
     _workflow = JobWorkflow
-    __tablename__ = "job_location"
+    __tablename__ = 'job_locations'
     __session__ = Session
 
 
@@ -55,7 +50,7 @@ class Job(Mixin, Base):
     comments = ''
 
     _workflow = JobWorkflow
-    __tablename__ = "job"
+    __tablename__ = "jobs"
     __session__ = Session
 
     # Fields to update on workflow changes:
@@ -103,7 +98,7 @@ class Job(Mixin, Base):
 
     # job_continent = sa.Column(sautils.ChoiceType(JobContinentChoices, impl=sa.String()), nullable=True)
 
-    job_location_id = sa.Column(sa.ForeignKey('job_location.id'), nullable=True)
+    job_location_id = sa.Column(sa.ForeignKey('job_locations.id'), nullable=True)
     job_location = sa.orm.relationship('JobLocation')
 
     payout_date = sa.Column(sa.DateTime(), nullable=True)
@@ -112,7 +107,6 @@ class Job(Mixin, Base):
     photographer_payout = sa.Column(sa.String(), nullable=True) # number
 
     photographers_comment = sa.Column(sa.String(), nullable=True) # paragraph_text
-
 
     project_id = sa.Column(sa.ForeignKey('project.id'), nullable=False)
     project = sa.orm.relationship('Project')
@@ -137,21 +131,4 @@ class Job(Mixin, Base):
 
     travel_expenses = sa.Column(sa.String(), nullable=True) # number
 
-    assets = sa.orm.relationship('Asset', back_populates='job', secondary='job_assets')
-
-
-
-job_assets = sa.Table(
-    'job_assets', Base.metadata,
-     sa.Column(
-         'job_uid', sautils.UUIDType,
-          sa.ForeignKey('job.id')
-     ),
-     sa.Column(
-         'asset_uid', sautils.UUIDType,
-          sa.ForeignKey('asset.id')
-     )
-)
-
-
-
+    assets = sa.orm.relationship('Asset', back_populates='job')

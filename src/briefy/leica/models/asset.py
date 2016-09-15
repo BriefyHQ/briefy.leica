@@ -1,8 +1,5 @@
 from briefy.common.db.mixins import Mixin
-from briefy.common.db.mixins.optin import OptIn
-from .workflows.utils import with_workflow
 from briefy.leica.db import Base
-from briefy.leica.db import Session
 from sqlalchemy import orm
 from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import WorkflowState
@@ -10,8 +7,6 @@ from briefy.common.workflow import WorkflowTransition
 
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils
-
-
 
 
 class AssetWorkflow(BriefyWorkflow):
@@ -67,7 +62,7 @@ class Asset(Mixin, Base):
     comments = ''
 
     _workflow = AssetWorkflow
-    __tablename__ = "assets"
+    __tablename__ = 'assets'
 
 
     title = sa.Column(sa.String(255), nullable=False)
@@ -83,7 +78,8 @@ class Asset(Mixin, Base):
     # Refers to a system user - reachable trohough microservices/redis
     author_id = sa.Column(sautils.UUIDType, nullable=False)
 
-    job = sa.orm.relationship('Job', back_populates='assets', secondary='job_assets')
+    job_id = sa.Column(sautils.UUIDType, sa.ForeignKey('jobs.id'))
+    job = sa.orm.relationship('Job', back_populates='assets')
 
     # history is an unified list where each entry can refer to:
     # - A  new comment by some user (comments are full objects with workflow)
