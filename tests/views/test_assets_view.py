@@ -21,6 +21,7 @@ class TestAssetView(BaseTestView):
     update_map = {
         'title': 'New Image',
         'owner': 'New Owner',
+        'source_path': 'source/files/jobs/9752.jpg',
         'author_id': 'd39c07c6-7955-489a-afce-483dfc7c9c5b',
         'job_id': '67cbcef9-1354-415a-a1ff-498444647bdd'
     }
