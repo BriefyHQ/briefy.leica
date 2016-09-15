@@ -70,9 +70,9 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr htmlcov/
 
 lint: ## check style with flake8
-	flake8 src/briefy/leica  tests setup.py
+	flake8 src/briefy/leica tests setup.py
 
-test: ## run tests quickly with the default Python
+test: lint ## run tests quickly with the default Python
 	py.test
 
 test-all: ## run tests on every Python version with tox
@@ -94,7 +94,7 @@ docs: ## generate Sphinx HTML documentation, including API docs
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
 
 docs_server: docs
-	@cd $(BUILDDIR)/dirhtml; python3 -m SimpleHTTPServer 8000
+	@cd $(BUILDDIR)/dirhtml; python3 -m http.server 8000
 
 release: clean ## package and upload a release
 	python setup.py sdist upload

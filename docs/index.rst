@@ -14,6 +14,7 @@ Table of Contents
    intro
    contributing
    codebase/index
+   database
    history
 
 Indices and tables

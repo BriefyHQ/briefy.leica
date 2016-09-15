@@ -15,6 +15,8 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
+    'sphinxcontrib.plantuml',
+    'sphinxcontrib.sadisp',
 ]
 
 templates_path = ['_templates']
@@ -54,3 +56,7 @@ html_theme_options = {
     'bootswatch_theme': "cosmo",
     'bootstrap_version': "3",
 }
+
+plantuml = 'java -jar /usr/local/bin/plantuml.jar'.split()
+graphviz = 'dot -Tpng'.split()
+sadisplay_default_render = 'plantuml'
