@@ -1,0 +1,142 @@
+[
+  {
+    "req_size": "1600x1200",
+    "created_at": "2016-09-15T21:23:18.928061",
+    "briefing": "",
+    "req_iso": "",
+    "id": "646e7d0c-215d-4856-9809-e957885f6fe6",
+    "company_id": "136b9dbc-e422-47ee-b8ba-50cd5fa41291",
+    "currency_set_price": "EUR",
+    "release_template": null,
+    "req_aperture": "",
+    "manager": "",
+    "req_resolution": null,
+    "name": "Project X",
+    "updated_at": "2016-09-15T21:23:18.928089",
+    "state_history": [
+      {
+        "to": "created",
+        "transition": "",
+        "actor": null,
+        "date": "2016-09-15T21:23:18.911537+00:00",
+        "from": ""
+      }
+    ],
+    "req_aspect_ratio": "",
+    "abstract": "",
+    "state": "created",
+    "set_price": 100
+  },
+  {
+    "req_size": "1600x1200",
+    "created_at": "2016-09-15T21:23:21.117673",
+    "briefing": "",
+    "req_iso": "",
+    "id": "12800771-c2d6-4c0e-a8b2-85c041aceca3",
+    "company_id": "136b9dbc-e422-47ee-b8ba-50cd5fa41291",
+    "currency_set_price": "EUR",
+    "release_template": null,
+    "req_aperture": "",
+    "manager": "",
+    "req_resolution": null,
+    "name": "Project X",
+    "updated_at": "2016-09-15T21:23:21.117696",
+    "state_history": [
+      {
+        "to": "created",
+        "transition": "",
+        "actor": null,
+        "date": "2016-09-15T21:23:21.116016+00:00",
+        "from": ""
+      }
+    ],
+    "req_aspect_ratio": "",
+    "abstract": "",
+    "state": "created",
+    "set_price": 100
+  },
+  {
+    "req_size": "1600x1200",
+    "created_at": "2016-09-15T21:23:23.258735",
+    "briefing": "",
+    "req_iso": "",
+    "id": "73d3e59b-9ba6-4828-88c3-255a016ff46b",
+    "company_id": "136b9dbc-e422-47ee-b8ba-50cd5fa41291",
+    "currency_set_price": "EUR",
+    "release_template": null,
+    "req_aperture": "",
+    "manager": "",
+    "req_resolution": null,
+    "name": "Project X",
+    "updated_at": "2016-09-15T21:23:23.258754",
+    "state_history": [
+      {
+        "to": "created",
+        "transition": "",
+        "actor": null,
+        "date": "2016-09-15T21:23:23.257319+00:00",
+        "from": ""
+      }
+    ],
+    "req_aspect_ratio": "",
+    "abstract": "",
+    "state": "created",
+    "set_price": 100
+  },
+  {
+    "req_size": "1600x1200",
+    "created_at": "2016-09-15T21:23:25.317533",
+    "briefing": "",
+    "req_iso": "",
+    "id": "ff2e775c-5396-466c-a8f3-7bafd9a3e38b",
+    "company_id": "136b9dbc-e422-47ee-b8ba-50cd5fa41291",
+    "currency_set_price": "EUR",
+    "release_template": null,
+    "req_aperture": "",
+    "manager": "",
+    "req_resolution": null,
+    "name": "Project X",
+    "updated_at": "2016-09-15T21:23:25.317547",
+    "state_history": [
+      {
+        "to": "created",
+        "transition": "",
+        "actor": null,
+        "date": "2016-09-15T21:23:25.316332+00:00",
+        "from": ""
+      }
+    ],
+    "req_aspect_ratio": "",
+    "abstract": "",
+    "state": "created",
+    "set_price": 100
+  },
+  {
+    "req_size": "1600x1200",
+    "created_at": "2016-09-15T21:23:27.227462",
+    "briefing": "",
+    "req_iso": "",
+    "id": "5ae9e8bb-1954-414b-8e60-debfd9120edc",
+    "company_id": "136b9dbc-e422-47ee-b8ba-50cd5fa41291",
+    "currency_set_price": "EUR",
+    "release_template": null,
+    "req_aperture": "",
+    "manager": "",
+    "req_resolution": null,
+    "name": "Project X",
+    "updated_at": "2016-09-15T21:23:27.227480",
+    "state_history": [
+      {
+        "to": "created",
+        "transition": "",
+        "actor": null,
+        "date": "2016-09-15T21:23:27.226191+00:00",
+        "from": ""
+      }
+    ],
+    "req_aspect_ratio": "",
+    "abstract": "",
+    "state": "created",
+    "set_price": 100
+  }
+]
