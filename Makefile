@@ -72,8 +72,8 @@ clean-test: ## remove test and coverage artifacts
 lint: ## check style with flake8
 	flake8 src/briefy/leica tests setup.py
 
-test: lint ## run tests quickly with the default Python
-	py.test
+test: ## run tests quickly with the default Python
+	py.test --cov-report term-missing --cov=briefy.leica tests
 
 test-all: ## run tests on every Python version with tox
 	tox
