@@ -46,7 +46,8 @@ def with_workflow(workflow):
         nonlocal original_acl, __acl__
         original_acl = getattr(cls, '__acl__', [])
         cls.__acl__ = __acl__
-        cls._workflow = workflow_cls
+        # TODO: Review following line
+        # cls._workflow = workflow_cls
         return cls
 
     return inner
