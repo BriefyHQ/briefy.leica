@@ -13,8 +13,12 @@ class AssetWorkflow(BriefyWorkflow):
 
     # States
     created = WorkflowState('created', title='Created', description='Asset created')
-    staff_action = WorkflowState('staff_action', title='staff_action_required', description='Staff Action Required')
-    author_action = WorkflowState('author_action', title='author_action_required', description='Author Action Required')
+    staff_action = WorkflowState(
+        'staff_action', title='staff_action_required', description='Staff Action Required'
+    )
+    author_action = WorkflowState(
+        'author_action', title='author_action_required', description='Author Action Required'
+    )
     aproved = WorkflowState('aproved', title='aproved', description='Asset Aproved')
     rejected = WorkflowState('rejected', title='Rejected', description='Asset Rejected')
     delivered = WorkflowState('delivered', title='delivered', description='Asset Delivered')
@@ -30,17 +34,17 @@ class AssetWorkflow(BriefyWorkflow):
     request_review = WorkflowTransition(
         name='request_review', title='Request Review',
         description='', category='',
-        state_from= staff_action,
+        state_from=staff_action,
         state_to=author_action,
         permissions='qa scout owner'.split(),
     )
-    #aprove = WorkflowTransition(
-        #'request_review', title='Request Review',
-        #description='', category='',
-        #state_from= 'staff_action',
-        #state_to='author_action',
-        #permissions='qa scout owner'.split(),
-    #)
+    # aprove = WorkflowTransition(
+    #     'request_review', title='Request Review',
+    #     description='', category='',
+    #     state_from= 'staff_action',
+    #     state_to='author_action',
+    #     permissions='qa scout owner'.split(),
+    # )
 
 
 class CommentWorkflow(BriefyWorkflow):

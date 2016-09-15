@@ -36,8 +36,9 @@ def with_workflow(workflow):
             # Makes a copy and forces the resulting iterable to be a list:
             results = list(original_acl)
 
-        results.extend((Allow, Everyone, permission)
-                        for permission in self.workflow.permissions())
+        results.extend(
+            (Allow, Everyone, permission) for permission in self.workflow.permissions()
+        )
 
         return results
 
