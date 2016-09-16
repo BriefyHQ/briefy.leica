@@ -1,9 +1,12 @@
 from briefy.common.utils.transformers import to_serializable
+from briefy.ws.config import JWT_EXPIRATION
+from briefy.ws.config import JWT_SECRET
 from briefy.leica.db import Base
 from briefy.leica.db import create_engine
 from briefy.leica.db import Session as DBSession
 from datetime import datetime
 from pyramid import testing
+from pyramid_jwt.policy import JWTAuthenticationPolicy
 from pyramid.paster import get_app
 from webtest import TestApp
 
@@ -136,16 +139,6 @@ class BaseModelTest:
             assert len(wf.transitions) == self.number_of_wf_transtions
 
 
-@pytest.fixture
-def app():
-    """Fixture to create new app instance.
-
-    :return: pyramid wsgi app.
-    """
-    app = get_app('configs/testing.ini#main')
-    return TestApp(app)
-
-
 @pytest.fixture(scope='class')
 def instance_obj(request, session, obj_payload):
     """Create instance object an dependencies using hook methods.
@@ -199,10 +192,10 @@ def create_dependencies(request, session):
     session.flush()
 
 
-@pytest.mark.usefixtures("db_transaction")
+@pytest.mark.usefixtures('db_transaction', 'login')
 class BaseTestView:
     """BaseTestView class"""
-
+    auth_header = None
     base_path = ''
     dependencies = []
     file_path = ''
@@ -210,7 +203,11 @@ class BaseTestView:
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {}
-    headers = {'X-Locale': 'en_GB'}
+
+    @property
+    def headers(self):
+        return {'X-Locale': 'en_GB',
+                'Authorization': 'JWT {token}'.format(token=self.token)}
 
     def test_options(self, app):
         """Test OPTIONS verb."""
@@ -322,3 +319,31 @@ class BaseTestView:
         assert error['name'] == 'id'
         assert error['location'] == 'path'
         assert error['description'] == 'The id informed is not 16 byte uuid valid.'
+
+
+@pytest.fixture()
+def app():
+    """Fixture to create new app instance.
+
+    :return: pyramid wsgi app.
+    """
+    _app = get_app('configs/testing.ini#main')
+    return TestApp(_app)
+
+
+@pytest.fixture('class')
+def login(request):
+    """Login and get JWT token."""
+    user = {
+        "locale": "en_GB",
+        "id": "669a99c2-9bb3-443f-8891-e600a15e3c10",
+        "fullname": "Rudá Filgueiras",
+        "first_name": "Rudá",
+        "email": "rudazz@gmail.com",
+        "last_name": "Filgueiras"
+    }
+    policy = JWTAuthenticationPolicy(private_key=JWT_SECRET,
+                                     expiration=int(JWT_EXPIRATION))
+    token = policy.create_token(user['id'], **user)
+    cls = request.cls
+    cls.token = token

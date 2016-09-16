@@ -22,6 +22,15 @@ logger.addHandler(cs)
 XMLConfig('configure.zcml', leica)()
 
 
+def includeme(config):
+    """Configuration to be included by other services."""
+    config.registry['db_session_factory'] = Session
+    config.add_request_method(get_db, 'db', reify=True)
+    config.include('briefy.ws')
+    briefy.ws.initialize(config, version=__version__, project_name=__name__)
+    config.scan()
+
+
 def main(global_config, debug=False, **settings):
     """Return a Pyramid WSGI application."""
     settings = briefy.ws.expandvars_dict(settings)
@@ -33,11 +42,9 @@ def main(global_config, debug=False, **settings):
     Base.metadata.bind = engine
     config = Configurator(
         settings=settings
+
     )
     config.registry['debug'] = debug
-    config.registry['db_session_factory'] = Session
-    config.add_request_method(get_db, 'db', reify=True)
-    config.include('briefy.ws')
-    briefy.ws.initialize(config, version=__version__, project_name=__name__)
-    config.scan()
+    includeme(config)
     return config.make_wsgi_app()
+
