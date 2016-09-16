@@ -2,16 +2,16 @@
 from briefy.leica import models
 from conftest import BaseTestView
 
-import json
 import pytest
-import os
 
 
 @pytest.mark.usefixtures('create_dependencies')
 class TestAssetComment(BaseTestView):
     """Test Comments for an Asset."""
 
-    base_path = '/jobs/cf326cc7-fe58-46f6-8d78-f4f8f590bad6/assets/073355e3-0988-458e-9216-e882154a9699/comments'
+    base_path = (
+        '/jobs/cf326cc7/assets/073355e3-0988-458e-9216-e882154a9699/comments'
+    )
     dependencies = [
         (models.Project, 'data/projects.json'),
         (models.Job, 'data/jobs.json'),

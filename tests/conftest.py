@@ -88,6 +88,7 @@ class BaseModelTest:
     number_of_wf_transtions = 0
     dependencies = []
     file_path = ''
+    payload_position = 0
     model = None
 
     def setup_method(self, method):
