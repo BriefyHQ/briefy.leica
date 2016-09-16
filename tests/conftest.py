@@ -174,7 +174,7 @@ def obj_payload(request):
         abs_path = os.path.join(__file__.rsplit('/', 1)[0], cls.file_path)
         with open(abs_path) as file:
             data = json.load(file)
-        return data[0]
+        return data[cls.payload_position]
 
 
 @pytest.fixture(scope='class')
@@ -202,6 +202,7 @@ class BaseTestView:
     model = None
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
+    payload_position = 0
     update_map = {}
 
     @property
