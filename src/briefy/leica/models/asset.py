@@ -12,6 +12,7 @@ import sqlalchemy_utils as sautils
 
 
 class Asset(Image, Mixin, Base):
+    """A deliverable asset from a Job."""
 
     _workflow = workflows.AssetWorkflow
     __tablename__ = 'assets'
@@ -21,15 +22,10 @@ class Asset(Image, Mixin, Base):
                                                'raw_metadata',
                                                'comments', 'internal_comments', 'job']}
 
-    _available_sizes = (
-        ('thumb', 120, 120),
-        ('preview', 800, 600),
-        ('original', 0, 0)
-    )
-
     title = sa.Column(sa.String(255), nullable=False)
     description = sa.Column(sa.Text, default='')
     version = sa.Column(sa.Integer, nullable=False, default=0)
+
     # Denormalized string with the name of the OWNER of
     # an asset under copyright law, disregarding whether he is a Briefy systems uer
     owner = sa.Column(sa.String(255), nullable=False)
@@ -73,4 +69,5 @@ class Asset(Image, Mixin, Base):
         """Return a dict representation of this object."""
         data = super().to_dict()
         data['image'] = self.image
+        data['metadata'] = self.metadata_
         return data
