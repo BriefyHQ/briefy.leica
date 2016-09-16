@@ -262,6 +262,15 @@ class BaseTestView:
                     value = to_serializable(value)
                 assert result.get(key) == value
 
+    def test_get(self, app, obj_payload):
+        """Test get a collection of items."""
+        request = app.get('{base}'.format(base=self.base_path),
+                          headers=self.headers, status=200)
+        result = request.json
+        assert 'data' in result
+        assert 'total' in result
+        assert result['total'] == len(result['data'])
+
     def test_successful_update(self, obj_payload, app):
         """Teste put CustomerInfo to existing object."""
         payload = self.update_map
