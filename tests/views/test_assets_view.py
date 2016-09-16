@@ -9,7 +9,7 @@ import pytest
 class TestAssetView(BaseTestView):
     """Test AssetService view."""
 
-    base_path = '/assets'
+    base_path = '/jobs/cf326cc7-fe58-46f6-8d78-f4f8f590bad6/assets'
     dependencies = [
         (models.Project, 'data/projects.json'),
         (models.Job, 'data/jobs.json')
@@ -21,9 +21,75 @@ class TestAssetView(BaseTestView):
     update_map = {
         'title': 'New Image',
         'owner': 'New Owner',
-        'filename': '9752.jpg',
-        'source_path': 'source/files/jobs/9752.jpg',
-        'author_id': 'd39c07c6-7955-489a-afce-483dfc7c9c5b',
-        'job_id': '67cbcef9-1354-415a-a1ff-498444647bdd'
+        'author_id': 'd39c07c6-7955-489a-afce-483dfc7c9c5b'
     }
 
+    def test_get_with_filters(self, app, obj_payload):
+        """Test get a collection of items, filtered."""
+        payload = obj_payload
+        obj_id = payload['id']
+        # Filter by object id
+        params = {
+            'id': obj_id
+        }
+        request = app.get('{base}'.format(base=self.base_path),
+                          params,
+                          headers=self.headers, status=200)
+        result = request.json
+        assert 'data' in result
+        assert 'total' in result
+        assert result['total'] == 1
+        assert result['data'][0]['id'] == obj_id
+
+    def test_get_filtering_state(self, app, obj_payload):
+        """Test get a collection of items, filtered by state."""
+        # Filter by state created
+        params = {
+            'state': 'created'
+        }
+        request = app.get('{base}'.format(base=self.base_path),
+                          params,
+                          headers=self.headers, status=200)
+        result = request.json
+        assert 'data' in result
+        assert 'total' in result
+        assert result['total'] == 1
+        assert result['data'][0]['id'] == '08f9a225-ff27-42aa-921c-e7df6a2fac4c'
+        assert result['data'][0]['state'] == 'created'
+
+    def test_get_with_filters_with_wrong_id(self, app, obj_payload):
+        """Test get a collection, filtering by the wrong id."""
+        # This id is from an asset in a distinct job
+        obj_id = '740323b0-f97f-4c5a-b99a-71663e807051'
+        # Filter by object id
+        params = {
+            'id': obj_id
+        }
+        request = app.get('{base}'.format(base=self.base_path),
+                          params,
+                          headers=self.headers, status=200)
+        result = request.json
+
+        assert result['total'] == 0
+        assert len(result['data']) == 0
+
+    def test_get_with_filters_with_wrong_id_wrong_filter(self, app, obj_payload):
+        """Test get a collection, filtering by the wrong id."""
+        # This id is from an asset in a distinct job
+        obj_id = '740323b0-f97f-4c5a-b99a-71663e807051'
+
+        # Conflicting project_id
+        job_id = '67cbcef9-1354-415a-a1ff-498444647bdd'
+        # Filter by object id
+        params = {
+            'id': obj_id,
+            'job_id': job_id
+        }
+        request = app.get('{base}'.format(base=self.base_path),
+                          params,
+                          headers=self.headers, status=400)
+        result = request.json
+
+        assert result['status'] == 'error'
+        assert 'Unknown filter field' in result['errors'][0]['description']
+        assert 'job_id' in result['errors'][0]['name']
