@@ -24,4 +24,3 @@ class TestCommentView(BaseTestView):
         'author_id': '18d0e257-14d6-4e33-b873-fb506fffb42e',
         'entity_id': '039ff0b8-9504-4b10-865b-c2b67868b233'
     }
-

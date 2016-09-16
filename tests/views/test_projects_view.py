@@ -19,4 +19,3 @@ class TestProjectView(BaseTestView):
         'name': 'Other Name',
         'set_price': 200,
     }
-

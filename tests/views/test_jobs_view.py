@@ -22,4 +22,3 @@ class TestJobView(BaseTestView):
         'internal_job_id': '10',
         'project_id': '5ae9e8bb-1954-414b-8e60-debfd9120edc'
     }
-

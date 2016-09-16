@@ -47,4 +47,3 @@ def main(global_config, debug=False, **settings):
     config.registry['debug'] = debug
     includeme(config)
     return config.make_wsgi_app()
-
