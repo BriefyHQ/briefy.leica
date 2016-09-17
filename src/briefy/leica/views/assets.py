@@ -1,32 +1,51 @@
-"""Views to handle Asset handling creation."""
-
+"""Views to handle Assets creation."""
+from briefy.ws.resources import RESTService
+from briefy.ws.resources import WorkflowAwareResource
 from briefy.leica.models import Asset
-# from briefy.leica.validators import AssetSchema
+from briefy.leica.models import Job
 from briefy.ws import CORS_POLICY
-from cornice import Service
-# from sqlalchemy import event
-# from sqlalchemy import func as sa_func
+from cornice.resource import resource
 
-import transaction
+COLLECTION_PATH = '/jobs/{job_id}/assets'
+PATH = COLLECTION_PATH + '/{id}'
 
-asset = Service(
-    name='asset',
-    path='/asset/{id:.*}',
+
+@resource(
+    collection_path=COLLECTION_PATH,
+    path=PATH,
     cors_policy=CORS_POLICY
 )
+class AssetService(RESTService):
+    """Assets service."""
+
+    model = Asset
+    friendly_name = Asset.__name__
+    default_order_by = 'created_at'
+
+    @property
+    def filter_allowed_fields(self):
+        """List of fields allowed in filtering and sorting."""
+        allowed_fields = super().filter_allowed_fields
+        # Remove job_id
+        allowed_fields.remove('job_id')
+        return allowed_fields
+
+    @property
+    def default_filters(self) -> tuple:
+        """Default filters for this Service."""
+        job_id = self.request.matchdict.get('job_id', '')
+        filters = list(super().default_filters)
+        filters.append((Job.id == job_id))
+        return tuple(filters)
 
 
+@resource(
+    collection_path=PATH + '/transitions',
+    path=PATH + '/transitions/{transition_id}',
+    cors_policy=CORS_POLICY
+)
+class AssetWorkflow(WorkflowAwareResource):
+    """Assets workflow resourve."""
 
-@asset.get()
-def get_asset(request):
-    """Get content an information about an asset"""
-    id = request.matchdict.get('id', '')
-    #import pdb; pdb.set_trace()
-
-    return {
-        'author': id,
-        'url': '',
-        'comments': ['hello', 'world']
-    }
-
-
+    model = Asset
+    friendly_name = Asset.__name__

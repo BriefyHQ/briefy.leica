@@ -3,8 +3,6 @@
 from briefy.common.queue import IQueue
 from briefy.common.queue import Queue as BaseQueue
 from briefy.common.utils.schema import Dictionary
-from briefy.common.utils.schema import List
-from briefy.common.validators import EventName
 from briefy.leica.config import LEICA_QUEUE
 from zope.interface import implementer
 

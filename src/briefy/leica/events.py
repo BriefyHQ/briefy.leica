@@ -3,7 +3,6 @@
 from briefy.common.event import BaseEvent
 from briefy.common.event import IDataEvent
 from briefy.leica import logger
-from zope.interface import implementer
 
 
 class ILeicaEvent(IDataEvent):

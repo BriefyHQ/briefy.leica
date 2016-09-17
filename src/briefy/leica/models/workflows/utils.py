@@ -36,17 +36,18 @@ def with_workflow(workflow):
             # Makes a copy and forces the resulting iterable to be a list:
             results = list(original_acl)
 
-        results.extend((Allow, Everyone, permission)
-                        for permission in self.workflow.permissions())
+        results.extend(
+            (Allow, Everyone, permission) for permission in self.workflow.permissions()
+        )
 
         return results
-
 
     def inner(cls):
         nonlocal original_acl, __acl__
         original_acl = getattr(cls, '__acl__', [])
         cls.__acl__ = __acl__
-        cls._workflow = workflow_cls
+        # TODO: Review following line
+        # cls._workflow = workflow_cls
         return cls
 
     return inner
