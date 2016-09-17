@@ -1,5 +1,6 @@
 """Briefy Leica workflows."""
 from briefy.common.workflow import BriefyWorkflow
+from briefy.common.workflow import Permission
 from briefy.common.workflow import WorkflowState
 from briefy.common.workflow import WorkflowTransition
 
@@ -11,40 +12,63 @@ class AssetWorkflow(BriefyWorkflow):
     entity = 'asset'
     initial_state = 'created'
 
-    # States
+    # States:
     created = WorkflowState('created', title='Created', description='Asset created')
-    staff_action = WorkflowState(
-        'staff_action', title='staff_action_required', description='Staff Action Required'
-    )
-    author_action = WorkflowState(
-        'author_action', title='author_action_required', description='Author Action Required'
-    )
-    aproved = WorkflowState('aproved', title='aproved', description='Asset Aproved')
+    validation = WorkflowState('validation', title='In Validation',
+                               description='Asset under automatic validation')
     rejected = WorkflowState('rejected', title='Rejected', description='Asset Rejected')
-    delivered = WorkflowState('delivered', title='delivered', description='Asset Delivered')
+    pending = WorkflowState('pending', title='Pending Approval',
+                            description='Under verification by internal Q.A.')
+    reserved = WorkflowState('reserved', title='Reserved', description='Reserved for future use')
+    discarded = WorkflowState('discarded', title='Discarded', description='')
+    post_processing = WorkflowState('post_processing', title='Post Processing',
+                                    description='Asset under manual post-processing')
+    approved = WorkflowState('approved', title='Approved', description='Ready for delivery')
+    delivered = WorkflowState('delivered', title='Delivered', description='Delivered to customer')
 
-    # Transitions
-    request_aproval = WorkflowTransition(
-        name='request_aproval', title='Request Aproval',
-        description='', category='',
-        state_from=created,
-        state_to=staff_action,
-        permissions='qa scout owner'.split(),
-    )
-    request_review = WorkflowTransition(
-        name='request_review', title='Request Review',
-        description='', category='',
-        state_from=staff_action,
-        state_to=author_action,
-        permissions='qa scout owner'.split(),
-    )
-    # aprove = WorkflowTransition(
-    #     'request_review', title='Request Review',
-    #     description='', category='',
-    #     state_from= 'staff_action',
-    #     state_to='author_action',
-    #     permissions='qa scout owner'.split(),
-    # )
+    # Transitions:
+    submit = created.transition(state_to=validation, permission='can_submit',
+                                extra_states=(rejected,))
+    invalidate = validation.transition(state_to=rejected, permission='can_invalidate',
+                                    title='Invalidate')
+    validate = validation.transition(state_to=pending, permission='can_validate',
+                                     extra_states=(rejected,))
+
+    discard = pending.transition(state_to=discarded, permission='can_discard',
+                                     extra_states=(delivered,))
+    process = pending.transition(state_to=post_processing, permission='can_start_processing')
+    reserve = pending.transition(state_to=reserved, permission='can_reserve')
+    reject = pending.transition(state_to=rejected, permission='can_reject')
+
+    approve = pending.transition(state_to=approved, permission='can_approve')
+
+    retract = approved.transition(state_to=pending, permission='can_retract',
+                                  extra_states=(discarded, reserved,))
+    deliver = approved.transition(state_to=delivered, permission='can_deliver',)
+    processed = post_processing.transition(state_to=pending, permission='can_end_processing')
+
+    # Permissions:
+    can_submit = Permission().for_roles('professional')
+    can_invalidate = Permission().for_roles('system')
+    can_discard = Permission().for_roles('qa')
+
+    can_reserve = Permission().for_roles('qa')
+    can_approve = Permission().for_roles('qa')
+    can_start_processing = Permission().for_roles('qa')
+    can_reserve = Permission().for_roles('qa')
+    can_reject = Permission().for_roles('qa')
+    can_retract = Permission().for_roles('qa')
+    can_deliver = Permission().for_roles('system')
+    can_end_processing = Permission().for_roles('qa')
+
+    @permission
+    def can_validate(self):
+        if not self.context or not self.context: return False
+        if self.state is self.validation and 'system' in self.context.roles:
+            return True
+        if self.state is self.rejected and 'qa' in self.context.roles:
+            return True
+        return False
 
 
 class CommentWorkflow(BriefyWorkflow):
