@@ -40,3 +40,6 @@ class TestAssetModel(BaseModelTest):
         assert 'aperture' in serialized['metadata']
         assert 'iso' in serialized['metadata']
         assert 'shutter' in serialized['metadata']
+
+    def test_workflow(self):
+        return True

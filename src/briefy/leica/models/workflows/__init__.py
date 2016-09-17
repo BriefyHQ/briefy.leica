@@ -2,7 +2,6 @@
 from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import Permission
 from briefy.common.workflow import WorkflowState
-from briefy.common.workflow import WorkflowTransition
 
 
 class AssetWorkflow(BriefyWorkflow):
@@ -30,12 +29,12 @@ class AssetWorkflow(BriefyWorkflow):
     submit = created.transition(state_to=validation, permission='can_submit',
                                 extra_states=(rejected,))
     invalidate = validation.transition(state_to=rejected, permission='can_invalidate',
-                                    title='Invalidate')
+                                       title='Invalidate')
     validate = validation.transition(state_to=pending, permission='can_validate',
                                      extra_states=(rejected,))
 
     discard = pending.transition(state_to=discarded, permission='can_discard',
-                                     extra_states=(delivered,))
+                                 extra_states=(delivered,))
     process = pending.transition(state_to=post_processing, permission='can_start_processing')
     reserve = pending.transition(state_to=reserved, permission='can_reserve')
     reject = pending.transition(state_to=rejected, permission='can_reject')
@@ -61,9 +60,10 @@ class AssetWorkflow(BriefyWorkflow):
     can_deliver = Permission().for_roles('system')
     can_end_processing = Permission().for_roles('qa')
 
-    @permission
+    @Permission
     def can_validate(self):
-        if not self.context or not self.context: return False
+        if not self.context or not self.context:
+            return False
         if self.state is self.validation and 'system' in self.context.roles:
             return True
         if self.state is self.rejected and 'qa' in self.context.roles:

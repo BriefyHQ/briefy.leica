@@ -93,3 +93,6 @@ class TestAssetView(BaseTestView):
         assert result['status'] == 'error'
         assert 'Unknown filter field' in result['errors'][0]['description']
         assert 'job_id' in result['errors'][0]['name']
+
+    def test_workflow(self):
+        pass
