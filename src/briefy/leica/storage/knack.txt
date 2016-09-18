@@ -49,17 +49,3 @@ update_completed = {'label': 'Update Completed', 'type': 'boolean', 'required': 
 
 
 """
-
-    # Fields to update on workflow changes:
-    # approval_status = sa.Column(sa.String(), nullable=True) # multiple_choice
-    # assigned = sa.Column(sa.String(), nullable=True) # boolean
-    # assignment_date = sa.Column(sa.String(), nullable=True) # date_time
-    # input_date = sa.Column(sa.String(), nullable=True) # date_time
-    # input_person = sa.Column(sa.String(), nullable=True) # connection
-    # input_source = sa.Column(sa.String(), nullable=True) # multiple_choice
-    # internal_comments = sa.Column(sa.String(), nullable=True) # paragraph_text
-    # last_approval_date = sa.Column(sa.String(), nullable=True) # date_time
-    # submission_date = sa.Column(sa.String(), nullable=True) # date_time
-    # update_completed = sa.Column(sa.String(), nullable=True) # boolean
-    # job_continent = sa.Column(sautils.ChoiceType(JobContinentChoices,
-    #                           impl=sa.String), nullable=True)
