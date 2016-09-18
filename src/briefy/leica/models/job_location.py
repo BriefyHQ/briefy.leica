@@ -12,9 +12,8 @@ import sqlalchemy_utils as sautils
 
 class JobLocation(Mixin, AddressMixin, Base):
     """Job location model."""
+
     version = None
-    url = ''
-    comments = ''
 
     _workflow = workflows.JobWorkflow
     __tablename__ = 'job_locations'
@@ -29,3 +28,12 @@ class JobLocation(Mixin, AddressMixin, Base):
                            'typ': colander.String}}
                        )
     job = sa.orm.relationship('Job', uselist=False)
+
+    contact_information = sa.Column(sautils.JSONType,
+                                    nullable=True,
+                                    info={'colanderalchemy': {
+                                          'title': 'Contact ID',
+                                          'validator': colander.uuid,
+                                          'missing': None,
+                                          'typ': colander.String}}
+                                    )

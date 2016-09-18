@@ -2,8 +2,9 @@ from enum import Enum
 
 
 class CategoryChoices(Enum):
+    # TODO: Move to briefy.common
     undefined = 'undefined'
-    accomodation = 'Accomodation'
+    accomodation = 'Accomnodation'
     food = 'Food'
     video = 'Video'
     company = 'Company'

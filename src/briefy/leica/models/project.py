@@ -18,6 +18,7 @@ class IProject(Interface):
 @implementer(IProject)
 class Project(Mixin, Base):
     """Project model."""
+
     version = None
     url = ''
     comments = ''
@@ -29,10 +30,10 @@ class Project(Mixin, Base):
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state']}
 
     briefing = sa.Column(sa.Text, default='')  # file
-    company_id = sa.Column(sautils.UUIDType,
+    customer = sa.Column(sautils.UUIDType,
                            nullable=False,
                            info={'colanderalchemy': {
-                               'title': 'ID',
+                               'title': 'Customer',
                                'validator': colander.uuid,
                                'typ': colander.String}}
                            )
@@ -41,7 +42,7 @@ class Project(Mixin, Base):
     abstract = sa.Column(sa.Text, default='')  # paragraph_text
     manager = sa.Column(sa.String, default='')  # connection
     name = sa.Column(sa.String, nullable=False)  # short_text
-    set_price = sa.Column(sa.Integer, nullable=False)  # number
+    price = sa.Column(sa.Integer, nullable=False)  # number
     release_template = sa.Column(sautils.URLType, nullable=True)  # link to knack for now
 
     # property
