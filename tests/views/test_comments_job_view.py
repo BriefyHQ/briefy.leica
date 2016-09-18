@@ -9,8 +9,9 @@ import pytest
 class TestJobComments(BaseTestView):
     """Test Comments for a Job."""
 
-    base_path = '/jobs/cf326cc7-fe58-46f6-8d78-f4f8f590bad6/comments'
+    base_path = '/jobs/c04dc102-7d3b-4574-a261-4bf72db571db/comments'
     dependencies = [
+        (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
         (models.Job, 'data/jobs.json'),
         (models.Asset, 'data/assets.json')
@@ -22,5 +23,5 @@ class TestJobComments(BaseTestView):
     update_map = {
         'content': 'new message content',
         'author_id': '18d0e257-14d6-4e33-b873-fb506fffb42e',
-        'entity_id': 'cf326cc7-fe58-46f6-8d78-f4f8f590bad6'
+        'entity_id': 'fbf36c64-5ce0-499b-9f99-27b6979a86c5'
     }

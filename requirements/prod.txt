@@ -1,4 +1,4 @@
 -e git+git@github.com:BriefyHQ/briefy.knack.git@develop#egg=briefy.knack
 -e git+git@github.com:BriefyHQ/briefy.common.git@develop#egg=briefy.common[db]
--e git+git@github.com:BriefyHQ/briefy.ws.git@BODY-5-ImplementBaseClassForRESTServices#egg=briefy.ws
+-e git+git@github.com:BriefyHQ/briefy.ws.git@develop#egg=briefy.ws
 -e .

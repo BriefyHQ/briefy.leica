@@ -9,8 +9,9 @@ import pytest
 class TestAssetView(BaseTestView):
     """Test AssetService view."""
 
-    base_path = '/jobs/cf326cc7-fe58-46f6-8d78-f4f8f590bad6/assets'
+    base_path = '/jobs/c04dc102-7d3b-4574-a261-4bf72db571db/assets'
     dependencies = [
+        (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
         (models.Job, 'data/jobs.json')
     ]
@@ -54,7 +55,7 @@ class TestAssetView(BaseTestView):
         assert 'data' in result
         assert 'total' in result
         assert result['total'] == 1
-        assert result['data'][0]['id'] == '08f9a225-ff27-42aa-921c-e7df6a2fac4c'
+        assert result['data'][0]['id'] == '7caa7704-7558-47f6-a00f-f3e18bbc06b6'
         assert result['data'][0]['state'] == 'created'
 
     def test_get_with_filters_with_wrong_id(self, app, obj_payload):

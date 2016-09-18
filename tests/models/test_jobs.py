@@ -10,6 +10,7 @@ class TestJobtModel(BaseModelTest):
     """Test Job."""
 
     dependencies = [
+        (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json')
     ]
     file_path = 'data/jobs.json'
