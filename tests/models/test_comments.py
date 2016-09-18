@@ -10,6 +10,7 @@ class TestCommentModel(BaseModelTest):
     """Test Comment."""
 
     dependencies = [
+        (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
         (models.Job, 'data/jobs.json'),
         (models.Asset, 'data/assets.json'),

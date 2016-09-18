@@ -11,6 +11,7 @@ class TestJobView(BaseTestView):
 
     base_path = '/jobs'
     dependencies = [
+        (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json')
     ]
     file_path = 'data/jobs.json'
@@ -19,6 +20,6 @@ class TestJobView(BaseTestView):
     NOT_FOUND_MESSAGE = ''
     update_map = {
         'title': 'Job Title',
-        'internal_job_id': '10',
-        'project_id': '5ae9e8bb-1954-414b-8e60-debfd9120edc'
+        'job_id': '10',
+        'project_id': '36d359f0-8e92-41bb-8d1c-fedfd60e7046'
     }

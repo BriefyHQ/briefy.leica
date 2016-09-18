@@ -1,6 +1,7 @@
 """Utils to export db data to json."""
 from briefy.leica.models import Asset
 from briefy.leica.models import Comment
+from briefy.leica.models import Customer
 from briefy.leica.models import Job
 from briefy.leica.models import Project
 
@@ -23,5 +24,6 @@ def export_all():
     """Export all data to json files."""
     export_model('assets.json', Asset)
     export_model('comments.json', Comment)
+    export_model('customers.json', Customer)
     export_model('jobs.json', Job)
     export_model('projects.json', Project)

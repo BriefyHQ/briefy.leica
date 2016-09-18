@@ -1,22 +1,22 @@
-"""Views to handle Jobs creation."""
+"""Views to handle Projects creation."""
 from briefy.ws.resources import RESTService
 from briefy.ws.resources import WorkflowAwareResource
-from briefy.leica.models import Job
+from briefy.leica.models import Customer
 from briefy.ws import CORS_POLICY
 from cornice.resource import resource
 
 
-COLLECTION_PATH = '/jobs'
+COLLECTION_PATH = '/customers'
 PATH = COLLECTION_PATH + '/{id}'
 
 
 @resource(collection_path=COLLECTION_PATH,
           path=PATH,
           cors_policy=CORS_POLICY)
-class JobService(RESTService):
-    """Jobs service."""
+class CustomersService(RESTService):
+    """Customers Service."""
 
-    model = Job
+    model = Customer
     friendly_name = model.__name__
     default_order_by = 'created_at'
 
@@ -26,8 +26,8 @@ class JobService(RESTService):
     path=PATH + '/transitions/{transition_id}',
     cors_policy=CORS_POLICY
 )
-class JobWorkflow(WorkflowAwareResource):
-    """Job workflow resource."""
+class CustomerWorkflow(WorkflowAwareResource):
+    """Customer workflow resource."""
 
-    model = Job
-    friendly_name = Job.__name__
+    model = Customer
+    friendly_name = Customer.__name__

@@ -351,7 +351,8 @@ def login(request):
         "fullname": "Rudá Filgueiras",
         "first_name": "Rudá",
         "email": "rudazz@gmail.com",
-        "last_name": "Filgueiras"
+        "last_name": "Filgueiras",
+        "groups": ["g:briefy_qa", "g:briefy_pm"]
     }
     policy = JWTAuthenticationPolicy(private_key=JWT_SECRET,
                                      expiration=int(JWT_EXPIRATION))
