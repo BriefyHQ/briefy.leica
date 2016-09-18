@@ -20,7 +20,6 @@ class IProject(Interface):
 @implementer(IProject)
 class Project(BriefyRoles, BaseMetadata, Mixin, Base):
     """Project model."""
-
     version = None
 
     __tablename__ = "projects"

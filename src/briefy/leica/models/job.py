@@ -31,7 +31,6 @@ class Job(BriefyRoles, Mixin, Base):
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'project',
                                                'comments', 'internal_comments']}
 
-    # Project
     project_id = sa.Column(sautils.UUIDType,
                            sa.ForeignKey('projects.id'),
                            nullable=False,
@@ -69,11 +68,9 @@ class Job(BriefyRoles, Mixin, Base):
     customer_job_id = sa.Column(sa.String, default='')  # Id on the customer database
 
     assets = sa.orm.relationship('Asset', back_populates='job')
-
     comments = sa.orm.relationship('Comment',
                                    foreign_keys='Comment.entity_id',
                                    primaryjoin='Comment.entity_id == Job.id')
-
     internal_comments = sa.orm.relationship('InternalComment',
                                             foreign_keys='InternalComment.entity_id',
                                             primaryjoin='InternalComment.entity_id == Job.id')
