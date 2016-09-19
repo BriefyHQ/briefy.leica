@@ -47,32 +47,42 @@ class AssetWorkflow(BriefyWorkflow):
     processed = post_processing.transition(state_to=pending, permission='can_end_processing')
 
     # Permissions:
+
     can_submit = Permission().for_groups('r:professional')
     can_invalidate = Permission().for_groups('g:system')
-    can_discard = Permission().for_groups('r:qa_manager')
+    can_discard = Permission().for_groups('g:briefy_qa')
 
-    can_reserve = Permission().for_groups('r:qa_manager')
-    can_approve = Permission().for_groups('r:qa_manager')
-    can_start_processing = Permission().for_groups('r:qa_manager')
-    can_reserve = Permission().for_groups('r:qa_manager')
-    can_reject = Permission().for_groups('r:qa_manager')
-    can_retract = Permission().for_groups('r:qa_manager')
+    can_reserve = Permission().for_groups('g:briefy_qa')
+    can_approve = Permission().for_groups('g:briefy_qa')
+    can_start_processing = Permission().for_groups('g:briefy_qa')
+    can_reserve = Permission().for_groups('g:briefy_qa')
+    can_reject = Permission().for_groups('g:briefy_qa')
+    can_retract = Permission().for_groups('g:briefy_qa')
     can_deliver = Permission().for_groups('g:system')
-    can_end_processing = Permission().for_groups('r:qa_manager')
+    can_end_processing = Permission().for_groups('g:briefy_qa')
 
     @Permission
     def can_validate(self):
         if not self.context or not self.context:
             return False
-        if self.state is self.validation and 'system' in self.context.groups:
+        if self.state is self.validation and 'g:system' in self.context.groups:
             return True
-        if self.state is self.rejected and 'qa' in self.context.groups:
+        if self.state is self.rejected and 'g:briefy_qa' in self.context.groups:
             return True
         return False
 
 
+class CustomerWorkflow(BriefyWorkflow):
+    """Workflow for a Customer."""
+
+    entity = 'customers'
+    initial_state = 'created'
+
+    created = WorkflowState('created', title='Created', description='Customer created')
+
+
 class CommentWorkflow(BriefyWorkflow):
-    """Workflow for an Comment."""
+    """Workflow for a Comment."""
 
     entity = 'comments'
     initial_state = 'created'

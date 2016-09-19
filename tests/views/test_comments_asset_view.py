@@ -10,9 +10,10 @@ class TestAssetComment(BaseTestView):
     """Test Comments for an Asset."""
 
     base_path = (
-        '/jobs/cf326cc7/assets/073355e3-0988-458e-9216-e882154a9699/comments'
+        '/jobs/cf326cc7/assets/bf721f30-79ce-4bc7-9887-79b6c53c681d/comments'
     )
     dependencies = [
+        (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
         (models.Job, 'data/jobs.json'),
         (models.Asset, 'data/assets.json')
@@ -27,5 +28,5 @@ class TestAssetComment(BaseTestView):
     update_map = {
         'content': 'new message content',
         'author_id': '18d0e257-14d6-4e33-b873-fb506fffb42e',
-        'entity_id': '073355e3-0988-458e-9216-e882154a9699'
+        'entity_id': '28bd9151-222a-4076-abe0-5867bf22f18d'
     }

@@ -10,6 +10,7 @@ class TestAssetModel(BaseModelTest):
     """Test Asset."""
 
     dependencies = [
+        (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
         (models.Job, 'data/jobs.json')
     ]

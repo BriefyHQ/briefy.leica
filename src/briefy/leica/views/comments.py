@@ -1,11 +1,12 @@
 """Views to handle Comments creation."""
 from briefy.ws.resources import RESTService
+from briefy.ws.resources import WorkflowAwareResource
 from briefy.leica.models import Comment
 from briefy.ws import CORS_POLICY
 from cornice.resource import resource
 
 
-class CommentsService(RESTService):
+class CommentService(RESTService):
     """Comments Service."""
 
     model = Comment
@@ -29,6 +30,12 @@ class CommentsService(RESTService):
         return tuple(filters)
 
 
+class CommentsWorkflowService(WorkflowAwareResource):
+    """Comments workflow service."""
+    model = Comment
+    friendly_name = Comment.__name__
+
+
 JOB_PATH = '/jobs/{job_id}'
 
 COLLECTION_PATH = '/jobs/{entity_id}/comments'
@@ -40,8 +47,17 @@ PATH = COLLECTION_PATH + '/{id}'
     path=PATH,
     cors_policy=CORS_POLICY
 )
-class JobCommentService(CommentsService):
+class JobCommentService(CommentService):
     """Comments for a Job."""
+
+
+@resource(
+    collection_path=PATH + '/transitions',
+    path=PATH + '/transitions/{transition_id}',
+    cors_policy=CORS_POLICY
+)
+class JobCommentWorkflowService(CommentsWorkflowService):
+    """JobComment workflow resource."""
 
 
 COLLECTION_PATH = JOB_PATH + '/assets/{entity_id}/comments'
@@ -53,5 +69,14 @@ PATH = COLLECTION_PATH + '/{id}'
     path=PATH,
     cors_policy=CORS_POLICY
 )
-class AssetCommentService(CommentsService):
+class AssetCommentService(CommentService):
     """Comments for an asset."""
+
+
+@resource(
+    collection_path=PATH + '/transitions',
+    path=PATH + '/transitions/{transition_id}',
+    cors_policy=CORS_POLICY
+)
+class AssetCommentWorkflowService(CommentsWorkflowService):
+    """AssetComment workflow resource."""
