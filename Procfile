@@ -1,1 +1,1 @@
-cmd: /app/docker/worker.sh
+cmd: /app/docker/api.sh
