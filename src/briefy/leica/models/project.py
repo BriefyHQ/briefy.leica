@@ -27,7 +27,6 @@ class Project(BriefyRoles, BaseMetadata, Mixin, Base):
     _workflow = workflows.ProjectWorkflow
 
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'customer']}
-
     customer_id = sa.Column(sautils.UUIDType,
                             sa.ForeignKey('customers.id'),
                             nullable=False,

@@ -3,16 +3,36 @@ from briefy.ws.resources import RESTService
 from briefy.ws.resources import WorkflowAwareResource
 from briefy.leica.models import Job
 from briefy.ws import CORS_POLICY
+from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
+from pyramid.security import Allow
 
 
 COLLECTION_PATH = '/jobs'
 PATH = COLLECTION_PATH + '/{id}'
 
 
+class JobFactory(BaseFactory):
+    """Job context factory."""
+
+    model = Job
+
+    @property
+    def __base_acl__(self) -> list:
+        """Hook to be use by subclasses to define default ACLs in context.
+        :return: list of ACLs
+        :rtype: list
+        """
+        _acls = [
+            (Allow, 'g:briefy_pm', ['add', 'delete', 'edit', 'list', 'view'])
+        ]
+        return _acls
+
+
 @resource(collection_path=COLLECTION_PATH,
           path=PATH,
-          cors_policy=CORS_POLICY)
+          cors_policy=CORS_POLICY,
+          factory=JobFactory)
 class JobService(RESTService):
     """Jobs service."""
 
