@@ -63,7 +63,7 @@ class AssetWorkflow(BriefyWorkflow):
 
     @Permission
     def can_validate(self):
-        if not self.context or not self.context:
+        if not self.context or not self.document:
             return False
         if self.state is self.validation and 'g:system' in self.context.groups:
             return True
