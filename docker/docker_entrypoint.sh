@@ -1,2 +1,2 @@
 #!/bin/sh
-# Nothing to see here
+alembic upgrade head
