@@ -26,6 +26,8 @@ def configure():
     Session.configure(bind=engine)
     return Session
 
+Session = configure()  # noQA
+
 
 def get_model_and_data(model_name):
     """Load model and data dump from Knack"""
@@ -42,13 +44,8 @@ class Auto:
         for k, v in attrs.items():
             setattr(self, k, v)
 
-def import_projects()
 
-def main():
-    """Handles all the stuff"""
-    # Initialize pycountry
-    len(pycountry.countries)
-    Session = configure()  # noQA
+def import_projects():
 
     KProject, all_projects = get_model_and_data('Project')
     project_dict = {}
@@ -74,20 +71,22 @@ def main():
                 Session.add(lproject)
                 Session.flush()
             except Exception as error:
-                logging.error('Could not import project "{}". Error {}'.format(project.project_name, error))
+                logging.error('Could not import project "{}". Error {}'.format(
+                    project.project_name, error))
                 Session.rollback()
                 continue
 
             count += 1
         project_dict[project.id] = proj_id
-        print(proj_id)
     logging.info('{} new projects imported into Leica'.format(count))
 
-    # If the projects are already imported, the needed project_dictionary can
-    # be queried with this
-    # project_dict={p.external_id: p.id for p in LProject.query().all()  }
-    KJob, all_jobs = get_model_and_data('Job')
+    return project_dict
 
+
+def import_jobs(project_dict):
+
+    KJob, all_jobs = get_model_and_data('Job')
+    count = 0
     for i, job in enumerate(all_jobs):
         # TODO: create a smart enum that can retrieve enum members by value:
         category = CategoryChoices.accommodation
@@ -97,7 +96,6 @@ def main():
             continue
         project = LProject.query().get(project_id)
 
-        customer = project.customer
         klocation = Auto(**job.__dict__['job_location'])
         extra_location_info = {}
         if hasattr(klocation, 'latitude') and hasattr(klocation, 'longitude'):
@@ -119,8 +117,6 @@ def main():
             postal_code=klocation.zip
         )
 
-
-
         location = JobLocation(
             country=country_id,
             info=info,
@@ -131,11 +127,11 @@ def main():
         Session.add(location)
         try:
             ljob = LJob(
-                title=job.job_name,
+                title=job.job_name or job.id,
                 category=category,
                 project=project,
                 customer_job_id=job.job_id,
-                job_id=job.job_id,
+                job_id=job.job_id or job.job_name or job.id,
                 external_id=job.id,
 
                 job_requirements=job.client_specific_requirement,
@@ -166,6 +162,7 @@ def main():
             try:
                 Session.add(ljob)
                 Session.flush()
+                logger.debug(ljob.title)
             except Exception as error:
                 logging.error('Could not import job "{}". Error {}'.format(ljob.title, error))
                 Session.rollback()
@@ -174,6 +171,18 @@ def main():
             count += 1
 
     logging.info('{0} new jobs imported into Leica'.format(count))
+
+
+def main():
+    """Handles all the stuff"""
+    # Initialize pycountry
+    len(pycountry.countries)
+
+    project_dict = import_projects()
+    # If the projects are already imported, the needed project_dictionary can
+    # be queried with this
+    # project_dict={p.external_id: p.id for p in LProject.query().all()  }
+    import_jobs(project_dict)
 
 if __name__ == '__main__':
     main()

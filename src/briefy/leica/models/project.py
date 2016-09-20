@@ -39,6 +39,14 @@ class Project(BriefyRoles, BaseMetadata, Mixin, Base):
 
     external_id = sa.Column(sa.String)
 
+    """
+    {
+    "dimensions": "3000x2000",
+    #TODO: formalize these
+
+    }
+
+    """
     tech_requirements = sa.Column(sautils.JSONType,
                                   info={'colanderalchemy': {
                                        'title': 'Required Resolution',
