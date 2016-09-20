@@ -96,6 +96,11 @@ class Job(BriefyRoles, Mixin, Base):
             price = self.project.price
         return price
 
+    @price.setter
+    def price(self, value):
+        """Sets the price for this job"""
+        self._price = value
+
     @property
     def external_status(self) -> str:
         """Status of this job to be displayed to the customer.
@@ -105,3 +110,6 @@ class Job(BriefyRoles, Mixin, Base):
         # TODO: Use a mapping
         status = self.workflow.state.name
         return status
+
+    # Job ID on knack
+    external_id = sa.Column(sa.String)

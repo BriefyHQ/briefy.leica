@@ -26,10 +26,10 @@ def monkey_uuid_type(*args,length=None,  **kw):
 sqlalchemy_utils.types.uuid.UUIDType = monkey_uuid_type
 
 
-original_timezone_type=types.timezone.TimezoneType
+original_timezone_type=sqlalchemy_utils.types.timezone.TimezoneType
 def monkey_timezone_type(*args,length=None,  **kw):
     return original_timezone_type(*args, **kw)
-sqlalchemy_utils.types.uuid.TimezoneType=monkey_timezone_type
+sqlalchemy_utils.types.timezone.TimezoneType=monkey_timezone_type
 
 
 def upgrade():
