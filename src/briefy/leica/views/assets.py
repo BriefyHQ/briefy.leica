@@ -61,7 +61,8 @@ class AssetService(RESTService):
 @resource(
     collection_path=PATH + '/transitions',
     path=PATH + '/transitions/{transition_id}',
-    cors_policy=CORS_POLICY
+    cors_policy=CORS_POLICY,
+    factory=AssetFactory
 )
 class AssetWorkflow(WorkflowAwareResource):
     """Assets workflow resourve."""
