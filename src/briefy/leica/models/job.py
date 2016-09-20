@@ -105,3 +105,9 @@ class Job(BriefyRoles, Mixin, Base):
         # TODO: Use a mapping
         status = self.workflow.state.name
         return status
+
+    def to_dict(self):
+        """Return a dict representation of this object."""
+        data = super().to_dict()
+        data['comments'] = self.comments
+        return data
