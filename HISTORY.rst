@@ -12,3 +12,4 @@ History
 * Recreate initial alembic migrations. (rudaporto)
 * Update all tests and test data to fit the changes in the models. (rudaporto)
 * LEICA-29: Add initial custom route factory for each model except JobLocation. (rudaporto)
+* BODY-31: fixed briefy.ws issue.
