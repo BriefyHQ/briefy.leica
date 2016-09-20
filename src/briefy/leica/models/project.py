@@ -35,6 +35,7 @@ class Project(BriefyRoles, BaseMetadata, Mixin, Base):
                                'validator': colander.uuid,
                                'typ': colander.String}}
                             )
+    external_id = sa.Column(sa.String)
 
     customer = sa.orm.relationship('Customer', back_populates='projects')
 

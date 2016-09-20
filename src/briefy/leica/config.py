@@ -13,5 +13,7 @@ FILE_PICKER_API_KEY = config('FILE_PICKER_API_KEY', default='')
 
 S3_CREDENTIALS = config('S3_IMAGE_BUCKET', default='')
 
+DATABASE_URL = config('DATABASE_URL',)
 
-EXTRA_BACKEND = "knack"
+
+# EXTRA_BACKEND = "knack"
