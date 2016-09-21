@@ -48,7 +48,8 @@ class AssetWorkflow(BriefyWorkflow):
 
     # Permissions:
 
-    can_submit = Permission().for_groups('r:professional')
+    can_submit = Permission().for_groups('r:professional', 'g:briefy_qa')
+    can_validate = Permission().for_groups('g:system')
     can_invalidate = Permission().for_groups('g:system')
     can_discard = Permission().for_groups('g:briefy_qa')
 

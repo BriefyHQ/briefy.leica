@@ -74,7 +74,8 @@ class JobCommentService(CommentService):
 @resource(
     collection_path=PATH + '/transitions',
     path=PATH + '/transitions/{transition_id}',
-    cors_policy=CORS_POLICY
+    cors_policy=CORS_POLICY,
+    factory=CommentFactory
 )
 class JobCommentWorkflowService(CommentsWorkflowService):
     """JobComment workflow resource."""
@@ -97,7 +98,8 @@ class AssetCommentService(CommentService):
 @resource(
     collection_path=PATH + '/transitions',
     path=PATH + '/transitions/{transition_id}',
-    cors_policy=CORS_POLICY
+    cors_policy=CORS_POLICY,
+    factory=CommentFactory
 )
 class AssetCommentWorkflowService(CommentsWorkflowService):
     """AssetComment workflow resource."""
