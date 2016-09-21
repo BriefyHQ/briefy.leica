@@ -70,4 +70,5 @@ class Asset(Image, Mixin, Base):
         data = super().to_dict()
         data['image'] = self.image
         data['metadata'] = self.metadata_
+        data['comments'] = self.comments
         return data

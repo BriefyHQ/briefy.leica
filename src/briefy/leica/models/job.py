@@ -111,5 +111,13 @@ class Job(BriefyRoles, Mixin, Base):
         status = self.workflow.state.name
         return status
 
+
     # Job ID on knack
     external_id = sa.Column(sa.String)
+
+    def to_dict(self):
+        """Return a dict representation of this object."""
+        data = super().to_dict()
+        data['comments'] = self.comments
+        return data
+
