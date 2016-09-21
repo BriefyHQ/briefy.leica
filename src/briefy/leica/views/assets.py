@@ -2,7 +2,6 @@
 from briefy.ws.resources import RESTService
 from briefy.ws.resources import WorkflowAwareResource
 from briefy.leica.models import Asset
-from briefy.leica.models import Job
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
@@ -52,10 +51,10 @@ class AssetService(RESTService):
     @property
     def default_filters(self) -> tuple:
         """Default filters for this Service."""
-        import pdb; pdb.set_trace()
-        job_id = self.request.matchdict.get('job_id', '')
+        job_id = self.request.matchdict.get('job_id')
         filters = list(super().default_filters)
-        filters.append((Asset.job_id == job_id))
+        if job_id:
+            filters.append((Asset.job_id == job_id))
         return tuple(filters)
 
 
