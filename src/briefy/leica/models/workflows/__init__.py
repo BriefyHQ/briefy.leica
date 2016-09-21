@@ -66,9 +66,9 @@ class AssetWorkflow(BriefyWorkflow):
     def can_validate(self):
         if not self.context or not self.document:
             return False
-        if self.state is self.validation and 'g:system' in self.context.groups:
+        if self.state.name == 'validation' and 'g:system' in self.context.groups:
             return True
-        if self.state is self.rejected and 'g:briefy_qa' in self.context.groups:
+        if self.state.name == 'rejected' and 'g:briefy_qa' in self.context.groups:
             return True
         return False
 
