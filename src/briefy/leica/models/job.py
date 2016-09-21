@@ -2,6 +2,7 @@
 from .types import CategoryChoices
 from briefy.common.db.mixins import Mixin
 from briefy.common.db.mixins import BriefyRoles
+from briefy.common.db.types import AwareDateTime
 from briefy.leica.db import Base
 from briefy.leica.db import Session
 from briefy.leica.models import workflows
@@ -44,14 +45,16 @@ class Job(BriefyRoles, Mixin, Base):
     project = sa.orm.relationship('Project', uselist=False, back_populates='jobs')
 
     # Professional
-    professional = sa.Column(sautils.UUIDType,
-                             nullable=True,
-                             info={'colanderalchemy': {
-                                   'title': 'Professional',
-                                   'validator': colander.uuid,
-                                   'missing': None,
-                                   'typ': colander.String}}
-                             )
+    professional_id = sa.Column(
+        sautils.UUIDType,
+        sa.ForeignKey('professionals.id'),
+        nullable=True,
+        info={'colanderalchemy': {
+            'title': 'Professional',
+            'validator': colander.uuid,
+            'typ': colander.String}}
+    )
+    professional = sa.orm.relationship('Professional', back_populates='jobs')
     # Job details
     title = sa.Column(sa.String(255), nullable=False)
     description = sa.Column(sa.Text, default='')
@@ -75,31 +78,40 @@ class Job(BriefyRoles, Mixin, Base):
                                             foreign_keys='InternalComment.entity_id',
                                             primaryjoin='InternalComment.entity_id == Job.id')
 
+    number_of_photos = sa.Column(sa.Integer(), default=20)
+
+    _assignment_date = sa.Column(AwareDateTime(), nullable=True)
+
     @property
     def customer(self):
         """Customer hiring this job."""
-        return self.project.customer
+        return self.project.customer.title
+
+    @property
+    def assignment_date(self):
+        if self._assignment_date:
+            return self._assignment_date
+        # TODO: else: retrieve date from the workflow history
+        return None
+
+    @assignment_date.setter
+    def assignment_date(self, value):
+        """Exlictly sets an assignmetn datetime stamp.
+
+           This will override any assignemnt datetime that
+           might be infered from the workflow history
+        """
+        self._assignment_date = value
+
+    @property
+    def project_brief(self):
+        """Returns the brief URL for the parent project"""
+        return self.project.brief
 
     @property
     def project_manager(self):
         """Return the project manager responsible for this job."""
         return self.project.project_manager
-
-    @property
-    def price(self) -> int:
-        """Price of this job.
-
-        :return: Return the price, in cents, of this job.
-        """
-        price = self._price
-        if not price:
-            price = self.project.price
-        return price
-
-    @price.setter
-    def price(self, value):
-        """Sets the price for this job"""
-        self._price = value
 
     @property
     def external_status(self) -> str:
@@ -111,13 +123,19 @@ class Job(BriefyRoles, Mixin, Base):
         status = self.workflow.state.name
         return status
 
-
     # Job ID on knack
     external_id = sa.Column(sa.String)
 
     def to_dict(self):
         """Return a dict representation of this object."""
-        data = super().to_dict()
-        data['comments'] = self.comments
+        data = super().to_dict(exclude=['internal_comments'])
+        # TODO: make to_dict recursive and serialize agregated models:
+        data['project'] = self.project.to_dict()
+        data['professional'] = self.professional.to_dict()
+        # Assets are not seriaized along the Job
+        data['customer'] = self.customer.to_dict()
+        data['comments'] = [c.to_dict() for c in self.comments]
+        data['project_brief'] = self.project_brief
+        data['assignment_date'] = self.assignment_date
+        data['job_location'] = [j.to_dict() for j in self.job_locations()]
         return data
-

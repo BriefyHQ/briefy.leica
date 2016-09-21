@@ -67,7 +67,7 @@ class Asset(Image, Mixin, Base):
 
     def to_dict(self):
         """Return a dict representation of this object."""
-        data = super().to_dict()
+        data = super().to_dict(excludes=['raw_metadata'])
         data['image'] = self.image
         data['metadata'] = self.metadata_
         data['comments'] = self.comments

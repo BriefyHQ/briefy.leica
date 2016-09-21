@@ -111,7 +111,9 @@ def import_jobs(project_dict):
         info = dict(
             province=klocation.state,
             route=klocation.street.strip('0123456789'),
-            street_number=pop() if push(klocation.street.split()[-1]).isdigit() else (pop(), '')[1],
+            street_number=(pop()
+                           if push(klocation.street and klocation.street.split()[-1]).isdigit()
+                           else (pop(), '')[1]),
             # TODO: fix this in mapping for country abbreviation
             country=country_id,
             postal_code=klocation.zip
@@ -136,7 +138,7 @@ def import_jobs(project_dict):
 
                 job_requirements=job.client_specific_requirement,
 
-                price=job.set_price or project.project_set_price,
+                price=job.set_price,
                 # TODO right now, this is knack id:
                 # professional=job.responsible_photographer[0]['id'],
                 # TODO: FIX
@@ -149,6 +151,7 @@ def import_jobs(project_dict):
                 # finance_manager=,
             )
         except Exception as error:
+            # import pdb; pdb.set_trace()
             logger.error('SNAFU: Could not instantiate SQLAlchemy job from {0}'.format(job))
             continue
 

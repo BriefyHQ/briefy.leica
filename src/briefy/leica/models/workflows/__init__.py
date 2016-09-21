@@ -151,6 +151,17 @@ class JobWorkflow(BriefyWorkflow):
     can_cancel = Permission().for_groups('r:project_manager')
 
 
+class ProfessionalWorkflow(BriefyWorkflow):
+    """Workflow for a Customer."""
+
+    entity = 'professional'
+    initial_state = 'created'
+
+    created = WorkflowState('created', title='Created', description='Customer created')
+    active = WorkflowState('active', title='Professional', description='Customer created')
+    inactive = WorkflowState('inactive', title='Professional', description='Customer created')
+
+
 class ProjectWorkflow(BriefyWorkflow):
     """Workflow for a Project."""
 

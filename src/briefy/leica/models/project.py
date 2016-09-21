@@ -55,3 +55,5 @@ class Project(BriefyRoles, BaseMetadata, Mixin, Base):
                                   )
 
     jobs = sa.orm.relationship('Job', back_populates='project')
+
+    brief = sa.Column(sa.String(), default='')
