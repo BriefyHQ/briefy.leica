@@ -52,9 +52,10 @@ class AssetService(RESTService):
     @property
     def default_filters(self) -> tuple:
         """Default filters for this Service."""
+        import pdb; pdb.set_trace()
         job_id = self.request.matchdict.get('job_id', '')
         filters = list(super().default_filters)
-        filters.append((Job.id == job_id))
+        filters.append((Asset.job_id == job_id))
         return tuple(filters)
 
 
