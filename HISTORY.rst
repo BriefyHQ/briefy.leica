@@ -16,4 +16,3 @@ History
 * LEICA-30: return comments list on the result payload of Jobs and Assets. (rudaporto)
 * LEICA-31: Run asset.update_metada() method every time afeter asset model instance change. (rudaporto)
 * LEICA-35: After Asset creation it will be automatic transitioned to pending state. (rudaporto)
-* LEICA-28: Improve models to import data from knack. (jsbueno) (rudaporto)
