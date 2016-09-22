@@ -10,16 +10,15 @@ import transaction
 
 @event.listens_for(models.Asset, 'after_insert')
 def auto_workflow_asset_insert(mapper, connection, target):
-    """Handler called when instance is flushed.
+    """Handler called after Asset instance is created (insert).
 
-    :param target: Asset model instance.
-    :param flush_context: sqlalchemy flush context.
-    :param attrs:
+    :param mapper: sqlalchemy mapper class
+    :param connection: sqlalchemy connection instance
+    :param target: Asset model instance
     :return:
     """
     request = getattr(target, 'request', None)
     if request is not None:
-        target.request = request
         user = request.user
         if user is not None:
             user = request.user
@@ -38,11 +37,11 @@ def auto_workflow_asset_insert(mapper, connection, target):
 
 @event.listens_for(models.Asset, 'refresh_flush')
 def update_metadata_asset_refresh_flush(target, flush_context, attrs):
-    """Handler called when instance is flushed.
+    """Handler called when Asset instance is flushed.
 
-    :param target: Asset model instance.
-    :param flush_context: sqlalchemy flush context.
-    :param attrs:
+    :param target: Asset model instance
+    :param flush_context: sqlalchemy flush context
+    :param attrs: list of changed attributes
     :return:
     """
     savepoint = transaction.savepoint()

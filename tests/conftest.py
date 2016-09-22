@@ -1,10 +1,10 @@
 from briefy.common.utils.transformers import to_serializable
-from briefy.ws.config import JWT_EXPIRATION
-from briefy.ws.config import JWT_SECRET
-from briefy.ws.auth import AuthenticatedUser
 from briefy.leica.db import Base
 from briefy.leica.db import create_engine
 from briefy.leica.db import Session as DBSession
+from briefy.ws.auth import AuthenticatedUser
+from briefy.ws.config import JWT_EXPIRATION
+from briefy.ws.config import JWT_SECRET
 from datetime import datetime
 from pyramid import testing
 from pyramid_jwt.policy import JWTAuthenticationPolicy
@@ -12,11 +12,11 @@ from pyramid.paster import get_app
 from webtest import TestApp
 
 import configparser
+import enum
 import json
 import pytest
 import os
 import uuid
-import enum
 
 
 @pytest.fixture(scope='session')
