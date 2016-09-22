@@ -17,6 +17,7 @@ class TestAssetView(BaseTestView):
     ]
     file_path = 'data/assets.json'
     model = models.Asset
+    initial_wf_state = 'pending'
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {

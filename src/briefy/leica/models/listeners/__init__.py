@@ -2,40 +2,52 @@
 from briefy.common.workflow.exceptions import WorkflowPermissionException
 from briefy.leica import models
 from briefy.leica import logger
-from copy import copy
 from requests.exceptions import ConnectionError
 from sqlalchemy import event
 
+import transaction
 
-@event.listens_for(models.Asset, 'refresh_flush')
-def receive_asset_refresh_flush(target, flush_context, attrs):
-    """Handler called when instance is flushed.
 
-    :param target: Asset model instance.
-    :param flush_context: sqlalchemy flush context.
-    :param attrs:
+@event.listens_for(models.Asset, 'after_insert')
+def auto_workflow_asset_insert(mapper, connection, target):
+    """Handler called after Asset instance is created (insert).
+
+    :param mapper: sqlalchemy mapper class
+    :param connection: sqlalchemy connection instance
+    :param target: Asset model instance
     :return:
     """
-    request = (getattr(target, 'request', None))
+    request = getattr(target, 'request', None)
     if request is not None:
         user = request.user
         if user is not None:
             user = request.user
-            workflow = target.workflow
-            workflow.context = user
-            if workflow.state.name == 'created':
+            wf = target.workflow
+            wf.context = user
+            if wf.state.name == 'created':
+                savepoint = transaction.savepoint()
                 try:
-                    workflow.submit()
-                    # TODO: create system user singleton and use hre
-                    system_user = copy(user)
-                    system_user.groups.append('g:system')
-                    workflow.context = user
-                    workflow.validate()
+                    wf.submit()
+                    wf.validate()
                 except WorkflowPermissionException:
+                    savepoint.rollback()
                     msg = 'Failure in automatic transition for asset: {id} title: {title}.'
-                    logger.debug(msg.format(id=target.id, title=target.title))
+                    logger.info(msg.format(id=target.id, title=target.title))
+
+
+@event.listens_for(models.Asset, 'refresh_flush')
+def update_metadata_asset_refresh_flush(target, flush_context, attrs):
+    """Handler called when Asset instance is flushed.
+
+    :param target: Asset model instance
+    :param flush_context: sqlalchemy flush context
+    :param attrs: list of changed attributes
+    :return:
+    """
+    savepoint = transaction.savepoint()
     try:
         target.update_metadata()
     except ConnectionError:
+        savepoint.rollback()
         msg = 'Failure updating metadata for asset: {id} title: {title}.'
-        logger.debug(msg.format(id=target.id, title=target.title))
+        logger.info(msg.format(id=target.id, title=target.title))

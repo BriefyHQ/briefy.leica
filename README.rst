@@ -6,6 +6,9 @@ from upload by the professionals up to delivering, including internal
 QA steps and so on.
 
 
+TODO
+----
+
 
 Code Health
 ============
