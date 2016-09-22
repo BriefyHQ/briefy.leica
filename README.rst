@@ -6,6 +6,12 @@ from upload by the professionals up to delivering, including internal
 QA steps and so on.
 
 
+TODO
+----
+
+* Asset.update_metadata should take care of requests.exceptions.ConnectionError
+*
+
 
 Code Health
 ============
