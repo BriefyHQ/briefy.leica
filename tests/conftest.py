@@ -255,6 +255,9 @@ class BaseTestView:
                     obj_value = to_serializable(obj_value)
                 assert obj_value == value
 
+        # state can be automatic changed by after_insert event listener
+        assert self.initial_wf_state == getattr(db_obj, 'state')
+
     def test_get_item(self, app, obj_payload):
         """Test get a item."""
         payload = obj_payload
@@ -270,7 +273,10 @@ class BaseTestView:
                     value = to_serializable(value)
                 assert result.get(key) == value
 
-    def test_get(self, app, obj_payload):
+        # state can be automatic changed by after_insert event listener
+        assert self.initial_wf_state == getattr(db_obj, 'state')
+
+    def test_get_collection(self, app, obj_payload):
         """Test get a collection of items."""
         request = app.get('{base}'.format(base=self.base_path),
                           headers=self.headers, status=200)
@@ -293,12 +299,18 @@ class BaseTestView:
             if key not in self.ignore_validation_fields:
                 assert result.get(key) == value
 
+        # state can be automatic changed by after_insert event listener
+        assert self.initial_wf_state == result.get('state')
+
         updated_obj = self.model.get(obj_id)
         for key, value in payload.items():
             obj_value = getattr(updated_obj, key)
             if isinstance(obj_value, (datetime, uuid.UUID, enum.Enum)):
                 obj_value = to_serializable(obj_value)
             assert obj_value == value
+
+        # state can be automatic changed by after_insert event listener
+        assert self.initial_wf_state == getattr(updated_obj, 'state')
 
     def test_get_not_found(self, app):
         """Test return 404 for valid UUID but do not refer to any obj."""

@@ -2,6 +2,7 @@
 from briefy.ws.resources import RESTService
 from briefy.ws.resources import WorkflowAwareResource
 from briefy.leica.models import Asset
+from briefy.leica.models import events
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
@@ -39,6 +40,13 @@ class AssetService(RESTService):
     model = Asset
     friendly_name = Asset.__name__
     default_order_by = 'created_at'
+
+    _default_notify_events = {
+        'POST': events.AssetCreatedEvent,
+        'PUT': events.AssetUpdatedEvent,
+        'GET': events.AssetLoadedEvent,
+        'DELETE': events.AssetDeletedEvent,
+    }
 
     @property
     def filter_allowed_fields(self):
