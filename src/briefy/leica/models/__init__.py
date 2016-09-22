@@ -10,4 +10,4 @@ from .professional import Professional
 from .project import Project
 
 
-ALL_MODELS = [Asset, Comment, Customer, InternalComment, Job, JobLocation, Project]
+ALL_MODELS = [Asset, Comment, Customer, InternalComment, Job, JobLocation, Professional, Project]

@@ -14,6 +14,7 @@
     "customer_job_id": "",
     "state": "created",
     "title": "Job Title",
+    "external_id": "ID1111",
     "_finance_manager": null,
     "state_history": [
       {
@@ -42,6 +43,7 @@
     "customer_job_id": "",
     "state": "created",
     "title": "Job Title",
+    "external_id": "ID2222",
     "_finance_manager": null,
     "state_history": [
       {
@@ -70,6 +72,7 @@
     "customer_job_id": "",
     "state": "created",
     "title": "Job Title",
+    "external_id": "ID3333",
     "_finance_manager": null,
     "state_history": [
       {
@@ -98,6 +101,7 @@
     "customer_job_id": "",
     "state": "created",
     "title": "Job Title",
+    "external_id": "ID4444",
     "_finance_manager": null,
     "state_history": [
       {
@@ -126,6 +130,7 @@
     "customer_job_id": "",
     "state": "created",
     "title": "Job Title",
+    "external_id": "ID5555",
     "_finance_manager": null,
     "state_history": [
       {

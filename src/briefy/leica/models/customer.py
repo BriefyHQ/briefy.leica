@@ -7,6 +7,7 @@ from briefy.leica.models import workflows
 from zope.interface import Interface
 from zope.interface import implementer
 
+import colander
 import sqlalchemy as sa
 
 
@@ -27,7 +28,12 @@ class Customer(BaseMetadata, Mixin, Base):
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state', '_slug']}
 
     projects = sa.orm.relationship('Project', back_populates='customer')
-    external_id = sa.Column(sa.String)
+    external_id = sa.Column(sa.String,
+                            nullable=True,
+                            info={'colanderalchemy': {
+                                'title': 'External ID',
+                                'missing': colander.drop}}
+                            )
 
     def __repr__(self):
         return '<Customer-proxy \'{0}\'>'.format(self.display_name)

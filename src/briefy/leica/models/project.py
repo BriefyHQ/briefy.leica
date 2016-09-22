@@ -37,7 +37,12 @@ class Project(BriefyRoles, BaseMetadata, Mixin, Base):
                             )
     customer = sa.orm.relationship('Customer', back_populates='projects')
 
-    external_id = sa.Column(sa.String)
+    external_id = sa.Column(sa.String,
+                            nullable=True,
+                            info={'colanderalchemy': {
+                                'title': 'External ID',
+                                'missing': colander.drop}}
+                            )
 
     """
     {

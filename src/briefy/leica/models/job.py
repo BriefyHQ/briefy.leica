@@ -29,8 +29,8 @@ class Job(BriefyRoles, Mixin, Base):
     __tablename__ = 'jobs'
     __session__ = Session
 
-    __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'project',
-                                               'comments', 'internal_comments']}
+    __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'project', 'comments',
+                                               'internal_comments', 'professional']}
 
     project_id = sa.Column(sautils.UUIDType,
                            sa.ForeignKey('projects.id'),
@@ -50,8 +50,9 @@ class Job(BriefyRoles, Mixin, Base):
         sa.ForeignKey('professionals.id'),
         nullable=True,
         info={'colanderalchemy': {
-            'title': 'Professional',
+            'title': 'Professional ID',
             'validator': colander.uuid,
+            'missing': colander.drop,
             'typ': colander.String}}
     )
     professional = sa.orm.relationship('Professional', back_populates='jobs')
@@ -80,7 +81,13 @@ class Job(BriefyRoles, Mixin, Base):
 
     number_of_photos = sa.Column(sa.Integer(), default=20)
 
-    _assignment_date = sa.Column(AwareDateTime(), nullable=True)
+    _assignment_date = sa.Column(AwareDateTime(),
+                                 nullable=True,
+                                 info={'colanderalchemy': {
+                                     'title': 'Assignment date',
+                                     'missing': colander.drop,
+                                     'typ': colander.DateTime}}
+                                 )
 
     @property
     def customer(self):
@@ -124,18 +131,23 @@ class Job(BriefyRoles, Mixin, Base):
         return status
 
     # Job ID on knack
-    external_id = sa.Column(sa.String)
+    external_id = sa.Column(sa.String,
+                            nullable=True,
+                            info={'colanderalchemy': {
+                                  'title': 'External ID',
+                                  'missing': colander.drop}}
+                            )
 
     def to_dict(self):
         """Return a dict representation of this object."""
-        data = super().to_dict(exclude=['internal_comments'])
+        data = super().to_dict(excludes=['internal_comments'])
         # TODO: make to_dict recursive and serialize agregated models:
-        data['project'] = self.project.to_dict()
-        data['professional'] = self.professional.to_dict()
+        data['project'] = self.project.to_dict() if self.project else None
+        data['professional'] = self.professional.to_dict() if self.professional else None
         # Assets are not seriaized along the Job
-        data['customer'] = self.customer.to_dict()
+        data['customer'] = self.project.customer.to_dict() if self.project.customer else None
         data['comments'] = [c.to_dict() for c in self.comments]
         data['project_brief'] = self.project_brief
         data['assignment_date'] = self.assignment_date
-        data['job_location'] = [j.to_dict() for j in self.job_locations()]
+        data['job_location'] = [j.to_dict() for j in self.job_locations]
         return data
