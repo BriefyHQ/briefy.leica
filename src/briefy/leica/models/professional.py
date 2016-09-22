@@ -1,4 +1,4 @@
-"""Briefy Leica Customer model."""
+"""Briefy Leica Professional model."""
 from briefy.common.db.mixins import Mixin
 from briefy.common.db.mixins import BaseMetadata
 from briefy.leica.db import Base
@@ -11,23 +11,23 @@ import colander
 import sqlalchemy as sa
 
 
-class ICustomer(Interface):
-    """Marker interface for a Customer"""
+class IProfessional(Interface):
+    """Marker interface for a Professional"""
 
 
-@implementer(ICustomer)
-class Customer(BaseMetadata, Mixin, Base):
-    """Customer model."""
+@implementer(IProfessional)
+class Professional(BaseMetadata, Mixin, Base):
+    """Professional model."""
 
     version = None
 
-    __tablename__ = "customers"
+    __tablename__ = "professionals"
     __session__ = Session
-    _workflow = workflows.CustomerWorkflow
+    _workflow = workflows.ProfessionalWorkflow
 
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state', '_slug']}
 
-    projects = sa.orm.relationship('Project', back_populates='customer')
+    jobs = sa.orm.relationship('Job', back_populates='professional')
     external_id = sa.Column(sa.String,
                             nullable=True,
                             info={'colanderalchemy': {
@@ -36,4 +36,4 @@ class Customer(BaseMetadata, Mixin, Base):
                             )
 
     def __repr__(self):
-        return '<Customer-proxy \'{0}\'>'.format(self.display_name)
+        return '<Professional-proxy \'{0}\'>'.format(self.display_name)

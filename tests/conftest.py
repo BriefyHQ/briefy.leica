@@ -207,6 +207,7 @@ class BaseTestView:
     payload_position = 0
     update_map = {}
     initial_wf_state = 'created'
+    ignore_validation_fields = ['state_history', 'state']
 
     @property
     def headers(self):
@@ -240,7 +241,7 @@ class BaseTestView:
 
         # validate response payload against sent payload
         for key, value in payload.items():
-            if key not in ('state_history', 'state'):
+            if key not in self.ignore_validation_fields:
                 assert result.get(key) == value
 
         # state can be automatic changed by after_insert event listener
@@ -248,7 +249,7 @@ class BaseTestView:
 
         # validate database model data against sent payload
         for key, value in payload.items():
-            if key != 'state_history':
+            if key not in self.ignore_validation_fields:
                 obj_value = getattr(db_obj, key)
                 if isinstance(obj_value, (datetime, uuid.UUID, enum.Enum)):
                     obj_value = to_serializable(obj_value)
@@ -264,7 +265,7 @@ class BaseTestView:
         db_obj = self.model.query().get(obj_id)
 
         for key, value in db_obj.to_dict().items():
-            if key != 'state_history':
+            if key not in self.ignore_validation_fields:
                 if isinstance(value, (datetime, uuid.UUID, enum.Enum)):
                     value = to_serializable(value)
                 assert result.get(key) == value
@@ -289,7 +290,7 @@ class BaseTestView:
 
         # validate response payload against sent payload
         for key, value in payload.items():
-            if key != 'state_history':
+            if key not in self.ignore_validation_fields:
                 assert result.get(key) == value
 
         updated_obj = self.model.get(obj_id)

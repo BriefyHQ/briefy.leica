@@ -35,9 +35,23 @@ class Project(BriefyRoles, BaseMetadata, Mixin, Base):
                                'validator': colander.uuid,
                                'typ': colander.String}}
                             )
-
     customer = sa.orm.relationship('Customer', back_populates='projects')
 
+    external_id = sa.Column(sa.String,
+                            nullable=True,
+                            info={'colanderalchemy': {
+                                'title': 'External ID',
+                                'missing': colander.drop}}
+                            )
+
+    """
+    {
+    "dimensions": "3000x2000",
+    #TODO: formalize these
+
+    }
+
+    """
     tech_requirements = sa.Column(sautils.JSONType,
                                   info={'colanderalchemy': {
                                        'title': 'Required Resolution',
@@ -46,3 +60,12 @@ class Project(BriefyRoles, BaseMetadata, Mixin, Base):
                                   )
 
     jobs = sa.orm.relationship('Job', back_populates='project')
+
+    brief = sa.Column(sautils.URLType,
+                      nullable=True,
+                      info={'colanderalchemy': {
+                          'title': 'Brief link',
+                          'validator': colander.url,
+                          'missing': colander.drop,
+                          'typ': colander.String}}
+                      )

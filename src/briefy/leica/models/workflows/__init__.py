@@ -48,7 +48,7 @@ class AssetWorkflow(BriefyWorkflow):
 
     # Permissions:
 
-    can_submit = Permission().for_groups('r:professional', 'g:briefy_qa')
+    can_submit = Permission().for_groups('r:professional', 'g:professionals', 'g:briefy_qa')
     can_validate = Permission().for_groups('g:system')
     can_invalidate = Permission().for_groups('g:system')
     can_discard = Permission().for_groups('g:briefy_qa')
@@ -70,8 +70,7 @@ class AssetWorkflow(BriefyWorkflow):
             is_right_state = True
         elif self.state.name == self.validation.name:
             is_right_state = True
-            allowed_groups.extend('r:professional')
-
+            allowed_groups.extend(['r:professional', 'g:professionals'])
         user_has_role = [p for p in allowed_groups if p in self.context.groups]
         return is_right_state and user_has_role
 
@@ -153,6 +152,17 @@ class JobWorkflow(BriefyWorkflow):
     can_customer_reject = Permission().for_groups('r:customer')
     can_customer_approve = Permission().for_groups('r:customer')
     can_cancel = Permission().for_groups('r:project_manager')
+
+
+class ProfessionalWorkflow(BriefyWorkflow):
+    """Workflow for a Customer."""
+
+    entity = 'professional'
+    initial_state = 'created'
+
+    created = WorkflowState('created', title='Created', description='Customer created')
+    active = WorkflowState('active', title='Professional', description='Customer created')
+    inactive = WorkflowState('inactive', title='Professional', description='Customer created')
 
 
 class ProjectWorkflow(BriefyWorkflow):

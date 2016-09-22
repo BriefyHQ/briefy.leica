@@ -18,6 +18,7 @@ requires = [
     'cornice',
     'newrelic',
     'phonenumbers',
+    'pycountry',
     'pyramid',
     'pyramid_tm',
     'requests',

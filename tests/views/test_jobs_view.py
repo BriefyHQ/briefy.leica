@@ -14,6 +14,7 @@ class TestJobView(BaseTestView):
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json')
     ]
+    ignore_validation_fields = ['state_history', 'state', 'project', 'customer']
     file_path = 'data/jobs.json'
     model = models.Job
     UPDATE_SUCCESS_MESSAGE = ''
