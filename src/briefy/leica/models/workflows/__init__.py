@@ -48,7 +48,8 @@ class AssetWorkflow(BriefyWorkflow):
 
     # Permissions:
 
-    can_submit = Permission().for_groups('r:professional')
+    can_submit = Permission().for_groups('r:professional', 'g:briefy_qa')
+    can_validate = Permission().for_groups('g:system')
     can_invalidate = Permission().for_groups('g:system')
     can_discard = Permission().for_groups('g:briefy_qa')
 
@@ -63,13 +64,16 @@ class AssetWorkflow(BriefyWorkflow):
 
     @Permission
     def can_validate(self):
-        if not self.context or not self.document:
-            return False
-        if self.state.name == 'validation' and 'g:system' in self.context.groups:
-            return True
-        if self.state.name == 'rejected' and 'g:briefy_qa' in self.context.groups:
-            return True
-        return False
+        allowed_groups = ['g:system', 'g:briefy_qa']
+        is_right_state = False
+        if self.state.name == self.reject.name:
+            is_right_state = True
+        elif self.state.name == self.validation.name:
+            is_right_state = True
+            allowed_groups.extend('r:professional')
+
+        user_has_role = [p for p in allowed_groups if p in self.context.groups]
+        return is_right_state and user_has_role
 
 
 class CustomerWorkflow(BriefyWorkflow):

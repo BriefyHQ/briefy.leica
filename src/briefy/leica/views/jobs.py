@@ -44,7 +44,8 @@ class JobService(RESTService):
 @resource(
     collection_path=PATH + '/transitions',
     path=PATH + '/transitions/{transition_id}',
-    cors_policy=CORS_POLICY
+    cors_policy=CORS_POLICY,
+    factory=JobFactory
 )
 class JobWorkflow(WorkflowAwareResource):
     """Job workflow resource."""

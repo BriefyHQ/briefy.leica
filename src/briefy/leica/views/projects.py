@@ -43,7 +43,8 @@ class ProjectService(RESTService):
 @resource(
     collection_path=PATH + '/transitions',
     path=PATH + '/transitions/{transition_id}',
-    cors_policy=CORS_POLICY
+    cors_policy=CORS_POLICY,
+    factory=ProjectFactory
 )
 class ProjectWorkflow(WorkflowAwareResource):
     """Project workflow resource."""
