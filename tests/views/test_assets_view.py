@@ -17,6 +17,8 @@ class TestAssetView(BaseTestView):
     ]
     file_path = 'data/assets.json'
     model = models.Asset
+    initial_wf_state = 'pending'
+    ignore_validation_fields = ['state_history', 'state', 'updated_at']
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {
@@ -46,7 +48,7 @@ class TestAssetView(BaseTestView):
         """Test get a collection of items, filtered by state."""
         # Filter by state created
         params = {
-            'state': 'created'
+            'state': 'pending'
         }
         request = app.get('{base}'.format(base=self.base_path),
                           params,
@@ -56,7 +58,7 @@ class TestAssetView(BaseTestView):
         assert 'total' in result
         assert result['total'] == 1
         assert result['data'][0]['id'] == '7caa7704-7558-47f6-a00f-f3e18bbc06b6'
-        assert result['data'][0]['state'] == 'created'
+        assert result['data'][0]['state'] == 'pending'
 
     def test_get_with_filters_with_wrong_id(self, app, obj_payload):
         """Test get a collection, filtering by the wrong id."""

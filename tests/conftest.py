@@ -1,9 +1,10 @@
 from briefy.common.utils.transformers import to_serializable
-from briefy.ws.config import JWT_EXPIRATION
-from briefy.ws.config import JWT_SECRET
 from briefy.leica.db import Base
 from briefy.leica.db import create_engine
 from briefy.leica.db import Session as DBSession
+from briefy.ws.auth import AuthenticatedUser
+from briefy.ws.config import JWT_EXPIRATION
+from briefy.ws.config import JWT_SECRET
 from datetime import datetime
 from pyramid import testing
 from pyramid_jwt.policy import JWTAuthenticationPolicy
@@ -11,11 +12,11 @@ from pyramid.paster import get_app
 from webtest import TestApp
 
 import configparser
+import enum
 import json
 import pytest
 import os
 import uuid
-import enum
 
 
 @pytest.fixture(scope='session')
@@ -81,7 +82,7 @@ def session():
     return DBSession()
 
 
-@pytest.mark.usefixtures('db_transaction')
+@pytest.mark.usefixtures('db_transaction', 'create_dummy_request')
 class BaseModelTest:
     """Base class to test all models."""
     cardinality = 1
@@ -90,11 +91,11 @@ class BaseModelTest:
     file_path = ''
     payload_position = 0
     model = None
+    request = None
 
     def setup_method(self, method):
         """Setup testing environment."""
-        request = testing.DummyRequest()
-        self.config = testing.setUp(request=request)
+        self.config = testing.setUp(request=self.request)
         app = get_app('configs/testing.ini#main')
         self.testapp = TestApp(app)
 
@@ -205,6 +206,8 @@ class BaseTestView:
     NOT_FOUND_MESSAGE = ''
     payload_position = 0
     update_map = {}
+    initial_wf_state = 'created'
+    ignore_validation_fields = ['state_history', 'state']
 
     @property
     def headers(self):
@@ -238,16 +241,22 @@ class BaseTestView:
 
         # validate response payload against sent payload
         for key, value in payload.items():
-            if key != 'state_history':
+            if key not in self.ignore_validation_fields:
                 assert result.get(key) == value
+
+        # state can be automatic changed by after_insert event listener
+        assert self.initial_wf_state == result.get('state')
 
         # validate database model data against sent payload
         for key, value in payload.items():
-            if key != 'state_history':
+            if key not in self.ignore_validation_fields:
                 obj_value = getattr(db_obj, key)
                 if isinstance(obj_value, (datetime, uuid.UUID, enum.Enum)):
                     obj_value = to_serializable(obj_value)
                 assert obj_value == value
+
+        # state can be automatic changed by after_insert event listener
+        assert self.initial_wf_state == getattr(db_obj, 'state')
 
     def test_get_item(self, app, obj_payload):
         """Test get a item."""
@@ -259,12 +268,15 @@ class BaseTestView:
         db_obj = self.model.query().get(obj_id)
 
         for key, value in db_obj.to_dict().items():
-            if key != 'state_history':
+            if key not in self.ignore_validation_fields:
                 if isinstance(value, (datetime, uuid.UUID, enum.Enum)):
                     value = to_serializable(value)
                 assert result.get(key) == value
 
-    def test_get(self, app, obj_payload):
+        # state can be automatic changed by after_insert event listener
+        assert self.initial_wf_state == getattr(db_obj, 'state')
+
+    def test_get_collection(self, app, obj_payload):
         """Test get a collection of items."""
         request = app.get('{base}'.format(base=self.base_path),
                           headers=self.headers, status=200)
@@ -284,8 +296,11 @@ class BaseTestView:
 
         # validate response payload against sent payload
         for key, value in payload.items():
-            if key != 'state_history':
+            if key not in self.ignore_validation_fields:
                 assert result.get(key) == value
+
+        # state can be automatic changed by after_insert event listener
+        assert self.initial_wf_state == result.get('state')
 
         updated_obj = self.model.get(obj_id)
         for key, value in payload.items():
@@ -293,6 +308,9 @@ class BaseTestView:
             if isinstance(obj_value, (datetime, uuid.UUID, enum.Enum)):
                 obj_value = to_serializable(obj_value)
             assert obj_value == value
+
+        # state can be automatic changed by after_insert event listener
+        assert self.initial_wf_state == getattr(updated_obj, 'state')
 
     def test_get_not_found(self, app):
         """Test return 404 for valid UUID but do not refer to any obj."""
@@ -345,7 +363,7 @@ def app():
 @pytest.fixture('class')
 def login(request):
     """Login and get JWT token."""
-    user = {
+    user_payload = {
         "locale": "en_GB",
         "id": "669a99c2-9bb3-443f-8891-e600a15e3c10",
         "fullname": "Rudá Filgueiras",
@@ -356,6 +374,19 @@ def login(request):
     }
     policy = JWTAuthenticationPolicy(private_key=JWT_SECRET,
                                      expiration=int(JWT_EXPIRATION))
-    token = policy.create_token(user['id'], **user)
+    token = policy.create_token(user_payload['id'], **user_payload)
     cls = request.cls
     cls.token = token
+    return user_payload
+
+
+@pytest.fixture('class')
+def create_dummy_request(request, login):
+    """Create and attach a DummyRequest on the test class."""
+    dummy_request = testing.DummyRequest()
+    user_id = login.pop('id')
+    dummy_request.user = AuthenticatedUser(user_id, login)
+    # this request is py.test request (who declare the fixture)
+    cls = request.cls
+    # this request is web request
+    cls.request = dummy_request

@@ -1,7 +1,7 @@
 """LEICA-37-Add uploaded by field.
 
 Revision ID: fd5b6154286b
-Revises: a17ac3a4417b
+Revises: dc7971325d41
 Create Date: 2016-09-23 17:05:55.212714
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 import sqlalchemy_utils
 
 revision = 'fd5b6154286b'
-down_revision = 'a17ac3a4417b'
+down_revision = 'dc7971325d41'
 branch_labels = None
 depends_on = None
 

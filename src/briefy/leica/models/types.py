@@ -3,7 +3,7 @@ from enum import Enum
 
 class CategoryChoices(Enum):
     undefined = 'undefined'
-    accomodation = 'Accomodation'
+    accommodation = 'Accommodation'
     food = 'Food'
     video = 'Video'
     company = 'Company'

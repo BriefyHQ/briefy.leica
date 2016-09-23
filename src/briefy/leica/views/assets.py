@@ -2,7 +2,7 @@
 from briefy.ws.resources import RESTService
 from briefy.ws.resources import WorkflowAwareResource
 from briefy.leica.models import Asset
-from briefy.leica.models import Job
+from briefy.leica.models import events
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
@@ -41,6 +41,13 @@ class AssetService(RESTService):
     friendly_name = Asset.__name__
     default_order_by = 'created_at'
 
+    _default_notify_events = {
+        'POST': events.AssetCreatedEvent,
+        'PUT': events.AssetUpdatedEvent,
+        'GET': events.AssetLoadedEvent,
+        'DELETE': events.AssetDeletedEvent,
+    }
+
     @property
     def filter_allowed_fields(self):
         """List of fields allowed in filtering and sorting."""
@@ -52,16 +59,18 @@ class AssetService(RESTService):
     @property
     def default_filters(self) -> tuple:
         """Default filters for this Service."""
-        job_id = self.request.matchdict.get('job_id', '')
+        job_id = self.request.matchdict.get('job_id')
         filters = list(super().default_filters)
-        filters.append((Job.id == job_id))
+        if job_id:
+            filters.append((Asset.job_id == job_id))
         return tuple(filters)
 
 
 @resource(
     collection_path=PATH + '/transitions',
     path=PATH + '/transitions/{transition_id}',
-    cors_policy=CORS_POLICY
+    cors_policy=CORS_POLICY,
+    factory=AssetFactory
 )
 class AssetWorkflow(WorkflowAwareResource):
     """Assets workflow resourve."""

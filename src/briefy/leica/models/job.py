@@ -2,6 +2,7 @@
 from .types import CategoryChoices
 from briefy.common.db.mixins import Mixin
 from briefy.common.db.mixins import BriefyRoles
+from briefy.common.db.types import AwareDateTime
 from briefy.leica.db import Base
 from briefy.leica.db import Session
 from briefy.leica.models import workflows
@@ -28,8 +29,8 @@ class Job(BriefyRoles, Mixin, Base):
     __tablename__ = 'jobs'
     __session__ = Session
 
-    __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'project',
-                                               'comments', 'internal_comments']}
+    __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'project', 'comments',
+                                               'internal_comments', 'professional']}
 
     project_id = sa.Column(sautils.UUIDType,
                            sa.ForeignKey('projects.id'),
@@ -44,14 +45,17 @@ class Job(BriefyRoles, Mixin, Base):
     project = sa.orm.relationship('Project', uselist=False, back_populates='jobs')
 
     # Professional
-    professional = sa.Column(sautils.UUIDType,
-                             nullable=True,
-                             info={'colanderalchemy': {
-                                   'title': 'Professional',
-                                   'validator': colander.uuid,
-                                   'missing': None,
-                                   'typ': colander.String}}
-                             )
+    professional_id = sa.Column(
+        sautils.UUIDType,
+        sa.ForeignKey('professionals.id'),
+        nullable=True,
+        info={'colanderalchemy': {
+            'title': 'Professional ID',
+            'validator': colander.uuid,
+            'missing': colander.drop,
+            'typ': colander.String}}
+    )
+    professional = sa.orm.relationship('Professional', back_populates='jobs')
     # Job details
     title = sa.Column(sa.String(255), nullable=False)
     description = sa.Column(sa.Text, default='')
@@ -75,26 +79,46 @@ class Job(BriefyRoles, Mixin, Base):
                                             foreign_keys='InternalComment.entity_id',
                                             primaryjoin='InternalComment.entity_id == Job.id')
 
+    number_of_photos = sa.Column(sa.Integer(), default=20)
+
+    _assignment_date = sa.Column(AwareDateTime(),
+                                 nullable=True,
+                                 info={'colanderalchemy': {
+                                     'title': 'Assignment date',
+                                     'missing': colander.drop,
+                                     'typ': colander.DateTime}}
+                                 )
+
     @property
     def customer(self):
         """Customer hiring this job."""
-        return self.project.customer
+        return self.project.customer.title
+
+    @property
+    def assignment_date(self):
+        if self._assignment_date:
+            return self._assignment_date
+        # TODO: else: retrieve date from the workflow history
+        return None
+
+    @assignment_date.setter
+    def assignment_date(self, value):
+        """Exlictly sets an assignmetn datetime stamp.
+
+           This will override any assignemnt datetime that
+           might be infered from the workflow history
+        """
+        self._assignment_date = value
+
+    @property
+    def project_brief(self):
+        """Returns the brief URL for the parent project"""
+        return self.project.brief
 
     @property
     def project_manager(self):
         """Return the project manager responsible for this job."""
         return self.project.project_manager
-
-    @property
-    def price(self) -> int:
-        """Price of this job.
-
-        :return: Return the price, in cents, of this job.
-        """
-        price = self._price
-        if not price:
-            price = self.project.price
-        return price
 
     @property
     def external_status(self) -> str:
@@ -105,3 +129,25 @@ class Job(BriefyRoles, Mixin, Base):
         # TODO: Use a mapping
         status = self.workflow.state.name
         return status
+
+    # Job ID on knack
+    external_id = sa.Column(sa.String,
+                            nullable=True,
+                            info={'colanderalchemy': {
+                                  'title': 'External ID',
+                                  'missing': colander.drop}}
+                            )
+
+    def to_dict(self):
+        """Return a dict representation of this object."""
+        data = super().to_dict(excludes=['internal_comments'])
+        # TODO: make to_dict recursive and serialize agregated models:
+        data['project'] = self.project.to_dict() if self.project else None
+        data['professional'] = self.professional.to_dict() if self.professional else None
+        # Assets are not seriaized along the Job
+        data['customer'] = self.project.customer.to_dict() if self.project.customer else None
+        data['comments'] = [c.to_dict() for c in self.comments]
+        data['project_brief'] = self.project_brief
+        data['assignment_date'] = self.assignment_date
+        data['job_location'] = [j.to_dict() for j in self.job_locations]
+        return data

@@ -48,7 +48,8 @@ class AssetWorkflow(BriefyWorkflow):
 
     # Permissions:
 
-    can_submit = Permission().for_groups('r:professional')
+    can_submit = Permission().for_groups('r:professional', 'g:professionals', 'g:briefy_qa')
+    can_validate = Permission().for_groups('g:system')
     can_invalidate = Permission().for_groups('g:system')
     can_discard = Permission().for_groups('g:briefy_qa')
 
@@ -63,13 +64,15 @@ class AssetWorkflow(BriefyWorkflow):
 
     @Permission
     def can_validate(self):
-        if not self.context or not self.document:
-            return False
-        if self.state is self.validation and 'g:system' in self.context.groups:
-            return True
-        if self.state is self.rejected and 'g:briefy_qa' in self.context.groups:
-            return True
-        return False
+        allowed_groups = ['g:system', 'g:briefy_qa']
+        is_right_state = False
+        if self.state.name == self.reject.name:
+            is_right_state = True
+        elif self.state.name == self.validation.name:
+            is_right_state = True
+            allowed_groups.extend(['r:professional', 'g:professionals'])
+        user_has_role = [p for p in allowed_groups if p in self.context.groups]
+        return is_right_state and user_has_role
 
 
 class CustomerWorkflow(BriefyWorkflow):
@@ -149,6 +152,17 @@ class JobWorkflow(BriefyWorkflow):
     can_customer_reject = Permission().for_groups('r:customer')
     can_customer_approve = Permission().for_groups('r:customer')
     can_cancel = Permission().for_groups('r:project_manager')
+
+
+class ProfessionalWorkflow(BriefyWorkflow):
+    """Workflow for a Customer."""
+
+    entity = 'professional'
+    initial_state = 'created'
+
+    created = WorkflowState('created', title='Created', description='Customer created')
+    active = WorkflowState('active', title='Professional', description='Customer created')
+    inactive = WorkflowState('inactive', title='Professional', description='Customer created')
 
 
 class ProjectWorkflow(BriefyWorkflow):
