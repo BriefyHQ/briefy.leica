@@ -37,6 +37,16 @@ class Asset(Image, Mixin, Base):
                               'typ': colander.String}},
                           nullable=False)
 
+    # Refers to a system user - reachable through microservices/redis
+    # This field exists because a QA could be the one that uploaded the image,
+    # So this field needs to express that
+    uploaded_by = sa.Column(sautils.UUIDType,
+                            info={'colanderalchemy': {
+                                'title': 'Uploaded by',
+                                'validator': colander.uuid,
+                                'typ': colander.String}},
+                            nullable=False)
+
     job_id = sa.Column(sautils.UUIDType,
                        sa.ForeignKey('jobs.id'),
                        nullable=False,
