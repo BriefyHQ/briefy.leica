@@ -18,4 +18,5 @@ History
 * LEICA-35: After Asset creation it will be automatic transitioned to pending state. (rudaporto)
 * LEICA-28: Improve models to import data from knack. (jsbueno) (rudaporto)
 * LEICA-36: Create events for Asset model instance lifecycle (POST, PUT, GET, DELETE) (rudaporto)
+* BODY-45: integrate briefy.ws fix. (rudaporto)
 
