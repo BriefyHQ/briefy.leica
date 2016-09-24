@@ -22,3 +22,6 @@ History
 * BODY-45: integrate briefy.ws fix. (rudaporto)
 * Speed up asset view tests by mocking calls to briefy-thumbor. (ericof)
 * LEICA-37: Add versioning to Assets. (ericof)
+* BODY-40: integrated briefy.common fix. (rudaporto)
+
+>>>>>>> develop
