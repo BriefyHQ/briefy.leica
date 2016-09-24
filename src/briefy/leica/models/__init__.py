@@ -9,5 +9,9 @@ from .job_location import JobLocation
 from .professional import Professional
 from .project import Project
 
+from briefy.ws.listeners import register_workflow_context_listeners
 
 ALL_MODELS = [Asset, Comment, Customer, InternalComment, Job, JobLocation, Professional, Project]
+
+# register sqlalchemy workflow context event handlers
+register_workflow_context_listeners(ALL_MODELS)

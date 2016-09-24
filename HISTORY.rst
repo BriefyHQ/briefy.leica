@@ -19,6 +19,7 @@ History
 * LEICA-35: After Asset creation it will be automatic transitioned to pending state. (rudaporto)
 * LEICA-28: Improve models to import data from knack. (jsbueno) (rudaporto)
 * LEICA-36: Create events for Asset model instance lifecycle (POST, PUT, GET, DELETE) (rudaporto)
-* BODY-45: integrate briefy.ws fix. (rudaporto)
-* BODY-40: integrated brify.common fix. (rudaporto)
+* BODY-45: Integrate briefy.ws fix. (rudaporto)
+* BODY-40: Integrated briefy.common fix. (rudaporto)
+* LEICA-42: Register sqlalchemy workflow context handlers for all models. (rudaporto)
 

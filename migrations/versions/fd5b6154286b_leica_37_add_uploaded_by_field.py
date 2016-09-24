@@ -19,7 +19,9 @@ def upgrade():
     """Upgrade database model."""
     op.add_column(
         'assets',
-        sa.Column('uploaded_by', sqlalchemy_utils.types.uuid.UUIDType(length=16), nullable=False)
+        sa.Column('uploaded_by',
+                  sqlalchemy_utils.types.uuid.UUIDType(),
+                  nullable=False)
     )
 
 
