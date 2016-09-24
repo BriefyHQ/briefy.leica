@@ -20,3 +20,5 @@ History
 * LEICA-28: Improve models to import data from knack. (jsbueno) (rudaporto)
 * LEICA-36: Create events for Asset model instance lifecycle (POST, PUT, GET, DELETE) (rudaporto)
 * BODY-45: integrate briefy.ws fix. (rudaporto)
+* Speed up asset view tests by mocking calls to briefy-thumbor. (ericof)
+* LEICA-37: Add versioning to Assets. (ericof)
