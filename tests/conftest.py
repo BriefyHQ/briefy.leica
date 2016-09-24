@@ -1,5 +1,5 @@
+"""Conftest for Leica."""
 from briefy.common.utils.transformers import to_serializable
-from briefy.leica import models
 from briefy.leica.db import Base
 from briefy.leica.db import create_engine
 from briefy.leica.db import Session as DBSession
@@ -397,6 +397,7 @@ def create_dummy_request(request, login):
     cls = request.cls
     # this request is web request
     cls.request = dummy_request
+
 
 @httmock.urlmatch(netloc=r'briefy-thumbor')
 def mock_thumbor(url, request):
