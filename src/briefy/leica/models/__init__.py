@@ -15,8 +15,8 @@ import sqlalchemy as sa
 
 ALL_MODELS = [Asset, Comment, Customer, InternalComment, Job, JobLocation, Professional, Project]
 
+
 # register sqlalchemy workflow context event handlers
 register_workflow_context_listeners(ALL_MODELS)
-
 
 sa.orm.configure_mappers()
