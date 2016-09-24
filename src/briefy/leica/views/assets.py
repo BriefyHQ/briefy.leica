@@ -8,6 +8,7 @@ from briefy.ws import CORS_POLICY
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
 from cornice.resource import view
+from pyramid.httpexceptions import HTTPNotFound as NotFound
 from pyramid.security import Allow
 
 
@@ -91,6 +92,7 @@ class AssetVersions(BaseResource):
     """Versioning of assets."""
 
     model = Asset
+    friendly_name = Asset.__name__
 
     @view(validators='_run_validators')
     def collection_get(self):
@@ -117,10 +119,15 @@ class AssetVersions(BaseResource):
         """Return a version for this object."""
         id = self.request.matchdict.get('id', '')
         obj = self.get_one(id)
+        version_id = self.request.matchdict.get('version_id', 0)
         try:
-            version_id = int(self.request.matchdict.get('version_id', 0))
+            version_id = int(version_id)
             version = obj.versions[version_id]
         except (ValueError, IndexError):
-            msg = 'Invalid version id'
-            self.raise_invalid('url', 'version_id', msg)
+            raise NotFound(
+                '{friendly_name} with version: {id} not found.'.format(
+                    friendly_name=self.friendly_name,
+                    id=version_id
+                )
+            )
         return version
