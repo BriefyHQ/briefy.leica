@@ -1,11 +1,10 @@
-"""LEICA-37-Add uploaded by field.
+"""LEICA-37-Add versioning to assets
 
 Revision ID: 115dbdf4ca44
 Revises: fd5b6154286b
 Create Date: 2016-09-23 19:02:05.390933
 """
 from alembic import op
-from briefy.leica.models import types
 
 
 import briefy.common
@@ -22,12 +21,14 @@ depends_on = None
 
 original_uuid_type = sqlalchemy_utils.types.uuid.UUIDType
 
-def monkey_uuid_type(*args, length=None,  **kw):
+
+def monkey_uuid_type(*args, length=None, **kw):
     return original_uuid_type(*args, **kw)
 
 sqlalchemy_utils.types.uuid.UUIDType = monkey_uuid_type
 
 original_timezone_type = sqlalchemy_utils.types.timezone.TimezoneType
+
 
 def monkey_timezone_type(*args, length=None, **kw):
     return original_timezone_type(*args, **kw)
@@ -50,7 +51,10 @@ def upgrade():
         sa.Column('size', sa.Integer(), autoincrement=False, nullable=True),
         sa.Column('width', sa.Integer(), autoincrement=False, nullable=True),
         sa.Column('height', sa.Integer(), autoincrement=False, nullable=True),
-        sa.Column('raw_metadata', sqlalchemy_utils.types.json.JSONType(), autoincrement=False, nullable=True),
+        sa.Column(
+            'raw_metadata',
+            sqlalchemy_utils.types.json.JSONType(), autoincrement=False, nullable=True
+        ),
         sa.Column(
             'created_at', briefy.common.db.types.aware_datetime.AwareDateTime(),
             autoincrement=False, nullable=True
