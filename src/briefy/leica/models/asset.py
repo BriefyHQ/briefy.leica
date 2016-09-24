@@ -4,7 +4,7 @@ from briefy.common.db.mixins import Mixin
 from briefy.leica.db import Base
 from briefy.leica.db import Session
 from briefy.leica.models import workflows
-
+from sqlalchemy_continuum.utils import count_versions
 
 import colander
 import sqlalchemy as sa
@@ -16,6 +16,10 @@ class Asset(Image, Mixin, Base):
 
     _workflow = workflows.AssetWorkflow
     __tablename__ = 'assets'
+
+    __versioned__ = {
+        'exclude': ['state_history', ]
+    }
     __session__ = Session
 
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'history',
@@ -24,10 +28,9 @@ class Asset(Image, Mixin, Base):
 
     title = sa.Column(sa.String(255), nullable=False)
     description = sa.Column(sa.Text, default='')
-    version = sa.Column(sa.Integer, nullable=False, default=0)
 
     # Denormalized string with the name of the OWNER of
-    # an asset under copyright law, disregarding whether he is a Briefy systems uer
+    # an asset under copyright law, disregarding whether he is a Briefy systems user
     owner = sa.Column(sa.String(255), nullable=False)
     # Refers to a system user - reachable through microservices/redis
     author_id = sa.Column(sautils.UUIDType,
@@ -74,6 +77,25 @@ class Asset(Image, Mixin, Base):
     internal_comments = sa.orm.relationship('InternalComment',
                                             foreign_keys='InternalComment.entity_id',
                                             primaryjoin='InternalComment.entity_id == Asset.id')
+
+    @property
+    def version(self) -> int:
+        """Return the current version number.
+
+        We are civilised here, so version numbering starts from zero ;-)
+        :return: Version number of this object.
+        """
+        versions = count_versions(self)
+        return versions - 1
+
+    @version.setter
+    def version(self, value: int) -> int:
+        """Explicitly sets a version to the asset. (Deprecated)
+
+        XXX: Here only to avoid issues if any client tries to set this.
+        :param value:
+        """
+        pass
 
     def to_dict(self):
         """Return a dict representation of this object."""

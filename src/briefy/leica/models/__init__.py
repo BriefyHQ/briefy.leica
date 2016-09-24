@@ -9,5 +9,9 @@ from .job_location import JobLocation
 from .professional import Professional
 from .project import Project
 
+import sqlalchemy as sa
+
 
 ALL_MODELS = [Asset, Comment, Customer, InternalComment, Job, JobLocation, Professional, Project]
+
+sa.orm.configure_mappers()

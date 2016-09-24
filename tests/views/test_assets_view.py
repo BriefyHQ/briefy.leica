@@ -115,3 +115,44 @@ class TestAssetView(BaseTestView):
 
     def test_workflow(self):
         pass
+
+    def test_versions_get_item(self, app, obj_payload):
+        """Test get a item."""
+        payload = obj_payload
+        obj_id = payload['id']
+        # Get original version
+        request = app.get(
+            '{base}/{id}/versions/0'.format(
+                base=self.base_path, id=obj_id
+            ),
+            headers=self.headers,
+            status=200
+        )
+        result = request.json
+        db_obj = self.model.query().get(obj_id)
+        assert db_obj.title != result['title']
+        assert db_obj.versions[0].title == result['title']
+
+    def test_versions_get_collection(self, app, obj_payload):
+        """Test get list of versions of an item."""
+        payload = obj_payload
+        obj_id = payload['id']
+        request = app.get(
+            '{base}/{id}/versions'.format(
+                base=self.base_path, id=obj_id
+            ),
+            headers=self.headers,
+            status=200
+        )
+        result = request.json
+        assert 'versions' in result
+        assert 'total' in result
+        assert result['total'] == len(result['versions'])
+
+        assert 'id' in result['versions'][0]
+        assert 'updated_at' in result['versions'][0]
+        assert 'id' in result['versions'][1]
+        assert 'updated_at' in result['versions'][1]
+
+        assert result['versions'][1]['id'] > result['versions'][0]['id']
+        assert result['versions'][1]['updated_at'] > result['versions'][0]['updated_at']
