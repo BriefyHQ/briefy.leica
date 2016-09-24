@@ -133,6 +133,21 @@ class TestAssetView(BaseTestView):
         assert db_obj.title != result['title']
         assert db_obj.versions[0].title == result['title']
 
+    def test_versions_get_item_wrong_id(self, app, obj_payload):
+        """Test get a item passing the wrong id."""
+        payload = obj_payload
+        obj_id = payload['id']
+        # Get version 42 (does not exist here)
+        request = app.get(
+            '{base}/{id}/versions/42'.format(
+                base=self.base_path, id=obj_id
+            ),
+            headers=self.headers,
+            status=404
+        )
+        result = request.json
+        assert 'Asset with version: 42 not found' in result['message']
+
     def test_versions_get_collection(self, app, obj_payload):
         """Test get list of versions of an item."""
         payload = obj_payload
