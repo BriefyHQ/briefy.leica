@@ -1,7 +1,9 @@
 """Test assets view."""
 from briefy.leica import models
 from conftest import BaseTestView
+from conftest import mock_thumbor
 
+import httmock
 import pytest
 
 
@@ -18,7 +20,7 @@ class TestAssetView(BaseTestView):
     file_path = 'data/assets.json'
     model = models.Asset
     initial_wf_state = 'pending'
-    ignore_validation_fields = ['state_history', 'state', 'updated_at']
+    ignore_validation_fields = ['state_history', 'state', 'updated_at', 'raw_metadata']
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {
@@ -26,6 +28,20 @@ class TestAssetView(BaseTestView):
         'owner': 'New Owner',
         'author_id': 'd39c07c6-7955-489a-afce-483dfc7c9c5b'
     }
+
+    def test_successful_creation(self, obj_payload, app):
+        """Test successful creation of a new model."""
+        with httmock.HTTMock(mock_thumbor):
+            super().test_successful_creation(obj_payload, app)
+
+    def test_successful_update(self, obj_payload, app):
+        """Test put Asset to existing object."""
+        with httmock.HTTMock(mock_thumbor):
+            super().test_successful_update(obj_payload, app)
+
+    def test_get_item(self, app, obj_payload):
+        """Test get a item."""
+        super().test_get_item(app, obj_payload)
 
     def test_get_with_filters(self, app, obj_payload):
         """Test get a collection of items, filtered."""
