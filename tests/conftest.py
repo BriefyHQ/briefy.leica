@@ -1,3 +1,4 @@
+"""Conftest for Leica."""
 from briefy.common.utils.transformers import to_serializable
 from briefy.leica.db import Base
 from briefy.leica.db import create_engine
@@ -14,6 +15,7 @@ from webtest import TestApp
 import configparser
 import enum
 import json
+import httmock
 import pytest
 import os
 import uuid
@@ -45,7 +47,12 @@ def sql_engine(request, db_settings):
     Base.metadata.create_all(engine)
 
     def teardown():
+        if 'transaction' in Base.metadata.tables:
+            transaction_table = Base.metadata.tables['transaction']
+            Base.metadata.remove(transaction_table)
         Base.metadata.drop_all(engine)
+        if 'transaction' in Base.metadata.tables:
+            DBSession.execute('DROP SEQUENCE transaction_id_seq CASCADE;')
 
     request.addfinalizer(teardown)
     return engine
@@ -390,3 +397,14 @@ def create_dummy_request(request, login):
     cls = request.cls
     # this request is web request
     cls.request = dummy_request
+
+
+@httmock.urlmatch(netloc=r'briefy-thumbor')
+def mock_thumbor(url, request):
+    """Mock request to briefy-thumbor."""
+    status_code = 200
+    headers = {
+        'content-type': 'application/json',
+    }
+    data = open(os.path.join(__file__.rsplit('/', 1)[0], 'data/thumbor.json')).read()
+    return httmock.response(status_code, data, headers, None, 5, request)

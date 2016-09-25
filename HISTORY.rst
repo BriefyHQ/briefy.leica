@@ -22,4 +22,5 @@ History
 * BODY-45: Integrate briefy.ws fix. (rudaporto)
 * BODY-40: Integrated briefy.common fix. (rudaporto)
 * LEICA-42: Register sqlalchemy workflow context handlers for all models. (rudaporto)
-
+* Speed up asset view tests by mocking calls to briefy-thumbor. (ericof)
+* LEICA-37: Add versioning to Assets. (ericof)

@@ -1,7 +1,9 @@
 """Test assets view."""
 from briefy.leica import models
 from conftest import BaseTestView
+from conftest import mock_thumbor
 
+import httmock
 import pytest
 
 
@@ -18,7 +20,7 @@ class TestAssetView(BaseTestView):
     file_path = 'data/assets.json'
     model = models.Asset
     initial_wf_state = 'pending'
-    ignore_validation_fields = ['state_history', 'state', 'updated_at']
+    ignore_validation_fields = ['state_history', 'state', 'updated_at', 'raw_metadata']
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {
@@ -26,6 +28,20 @@ class TestAssetView(BaseTestView):
         'owner': 'New Owner',
         'author_id': 'd39c07c6-7955-489a-afce-483dfc7c9c5b'
     }
+
+    def test_successful_creation(self, obj_payload, app):
+        """Test successful creation of a new model."""
+        with httmock.HTTMock(mock_thumbor):
+            super().test_successful_creation(obj_payload, app)
+
+    def test_successful_update(self, obj_payload, app):
+        """Test put Asset to existing object."""
+        with httmock.HTTMock(mock_thumbor):
+            super().test_successful_update(obj_payload, app)
+
+    def test_get_item(self, app, obj_payload):
+        """Test get a item."""
+        super().test_get_item(app, obj_payload)
 
     def test_get_with_filters(self, app, obj_payload):
         """Test get a collection of items, filtered."""
@@ -99,3 +115,59 @@ class TestAssetView(BaseTestView):
 
     def test_workflow(self):
         pass
+
+    def test_versions_get_item(self, app, obj_payload):
+        """Test get a item."""
+        payload = obj_payload
+        obj_id = payload['id']
+        # Get original version
+        request = app.get(
+            '{base}/{id}/versions/0'.format(
+                base=self.base_path, id=obj_id
+            ),
+            headers=self.headers,
+            status=200
+        )
+        result = request.json
+        db_obj = self.model.query().get(obj_id)
+        assert db_obj.title != result['title']
+        assert db_obj.versions[0].title == result['title']
+
+    def test_versions_get_item_wrong_id(self, app, obj_payload):
+        """Test get a item passing the wrong id."""
+        payload = obj_payload
+        obj_id = payload['id']
+        # Get version 42 (does not exist here)
+        request = app.get(
+            '{base}/{id}/versions/42'.format(
+                base=self.base_path, id=obj_id
+            ),
+            headers=self.headers,
+            status=404
+        )
+        result = request.json
+        assert 'Asset with version: 42 not found' in result['message']
+
+    def test_versions_get_collection(self, app, obj_payload):
+        """Test get list of versions of an item."""
+        payload = obj_payload
+        obj_id = payload['id']
+        request = app.get(
+            '{base}/{id}/versions'.format(
+                base=self.base_path, id=obj_id
+            ),
+            headers=self.headers,
+            status=200
+        )
+        result = request.json
+        assert 'versions' in result
+        assert 'total' in result
+        assert result['total'] == len(result['versions'])
+
+        assert 'id' in result['versions'][0]
+        assert 'updated_at' in result['versions'][0]
+        assert 'id' in result['versions'][1]
+        assert 'updated_at' in result['versions'][1]
+
+        assert result['versions'][1]['id'] > result['versions'][0]['id']
+        assert result['versions'][1]['updated_at'] > result['versions'][0]['updated_at']

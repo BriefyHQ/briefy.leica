@@ -25,6 +25,7 @@ requires = [
     'setuptools',
     's3transfer==0.1.2',
     'sqlalchemy',
+    'sqlalchemy_continuum',
     'waitress',
     'wheel',
     'zope.component',
