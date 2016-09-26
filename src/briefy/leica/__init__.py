@@ -46,4 +46,5 @@ def main(global_config, debug=False, **settings):
     )
     config.registry['debug'] = debug
     includeme(config)
+    logger.info('{name} is running'.format(name=__name__))
     return config.make_wsgi_app()
