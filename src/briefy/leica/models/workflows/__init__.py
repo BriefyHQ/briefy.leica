@@ -39,7 +39,8 @@ class AssetWorkflow(BriefyWorkflow):
     reserve = pending.transition(state_to=reserved, permission='can_reserve')
     reject = pending.transition(state_to=rejected, permission='can_reject')
 
-    approve = pending.transition(state_to=approved, permission='can_approve')
+    approve = pending.transition(state_to=approved, permission='can_approve',
+                                 extra_states=[rejected, reserved])
 
     retract = approved.transition(state_to=pending, permission='can_retract',
                                   extra_states=(discarded, reserved,))
