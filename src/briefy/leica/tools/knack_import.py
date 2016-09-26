@@ -43,6 +43,8 @@ class Auto:
     def __init__(self, **attrs):
         for k, v in attrs.items():
             setattr(self, k, v)
+    def __getattr__(self, attr):
+        return ''
 
 
 def import_projects():
@@ -62,8 +64,8 @@ def import_projects():
         Session.add(customer)
 
         lproject = LProject(customer=customer, external_id=project.id,
-                            title=project.project_name or 'Undefined',
-                            tech_requirements={'dimension': '4000x2000'})
+                            title=project.project_name.strip() or 'Undefined',
+                            tech_requirements={'dimension': '4000x3000'})
         proj_id = lproject.id = uuid.uuid4()
 
         with transaction.manager:
@@ -83,20 +85,8 @@ def import_projects():
     return project_dict
 
 
-def import_jobs(project_dict):
-
-    KJob, all_jobs = get_model_and_data('Job')
-    count = 0
-    for i, job in enumerate(all_jobs):
-        # TODO: create a smart enum that can retrieve enum members by value:
-        category = CategoryChoices.accommodation
-        project_id = project_dict.get(job.project[0]['id'], None)
-        if not project_id:
-            logger.error('Could not import job {}: no corresponding project '.format(job.id))
-            continue
-        project = LProject.query().get(project_id)
-
-        klocation = Auto(**job.__dict__['job_location'])
+def create_location(location_dict):
+        klocation = Auto(**location_dict)
         extra_location_info = {}
         if hasattr(klocation, 'latitude') and hasattr(klocation, 'longitude'):
             extra_location_info['coordinates'] = {
@@ -125,8 +115,25 @@ def import_jobs(project_dict):
             locality=klocation.city,
             **extra_location_info
         )
+        return location
 
+
+def import_jobs(project_dict):
+
+    KJob, all_jobs = get_model_and_data('Job')
+    count = 0
+    for i, job in enumerate(all_jobs):
+        # TODO: create a smart enum that can retrieve enum members by value:
+        category = CategoryChoices.accommodation
+        project_id = project_dict.get(job.project[0]['id'], None)
+        if not project_id:
+            logger.error('Could not import job {}: no corresponding project '.format(job.id))
+            continue
+        project = LProject.query().get(project_id)
+
+        location = create_location(job.__dict__['job_location'])
         Session.add(location)
+
         try:
             ljob = LJob(
                 title=job.job_name or job.id,
@@ -137,8 +144,8 @@ def import_jobs(project_dict):
                 external_id=job.id,
 
                 job_requirements=job.client_specific_requirement,
+                assignment_date = job.assignment_date,
 
-                price=job.set_price,
                 # TODO right now, this is knack id:
                 # professional=job.responsible_photographer[0]['id'],
                 # TODO: FIX
@@ -151,13 +158,14 @@ def import_jobs(project_dict):
                 # finance_manager=,
             )
         except Exception as error:
+            import pdb; pdb.set_trace()
             # import pdb; pdb.set_trace()
             logger.error('SNAFU: Could not instantiate SQLAlchemy job from {0}'.format(job))
             continue
 
         ljob.job_locations.append(location)
-        if job.set_price:
-            ljob.price = int(job.set_price)
+        #if job.set_price:
+            #ljob.price = int(job.set_price)
         if job.briefy_id:
             ljob.id = job.briefy_id
 
