@@ -19,6 +19,19 @@ logger.setLevel(logging.DEBUG)
 logger.handlers[0].setLevel(logging.DEBUG)
 
 
+# Initial workflow state based on field ['client_job_status']
+knack_status_mapping = {
+  'Job received': 'pending',
+  'In scheduling process': 'scheduling',
+  'Scheduled': 'scheduled',
+  'In QA process': 'in_qa',
+  'Completed': 'approved',
+  'In revision ': 'revision',
+  'Resolved': 'completed',
+  'Cancelled ':'cancelled'
+}
+
+
 def configure():
     """Bind session for 'stand alone' DB usage"""
     global Session
@@ -158,10 +171,18 @@ def import_jobs(project_dict):
                 # finance_manager=,
             )
         except Exception as error:
-            import pdb; pdb.set_trace()
-            # import pdb; pdb.set_trace()
             logger.error('SNAFU: Could not instantiate SQLAlchemy job from {0}'.format(job))
             continue
+
+        if job.client_job_status:
+            status = knack_status_mapping.get(job.client_job_status.pop(), 'in_qa')
+        else:
+            # For purposes of inital import into LEICA only:
+            status = 'in_qa'
+
+        ljob.state = knack_status_mapping.get(status, 'in_qa')
+        if ljob.state_history and len(ljob.state_history) == 1:
+            ljob.state_history[0]['message'] = 'Imported in this state from Knack database'
 
         ljob.job_locations.append(location)
         #if job.set_price:
