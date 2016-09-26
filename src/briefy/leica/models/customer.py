@@ -36,4 +36,4 @@ class Customer(BaseMetadata, Mixin, Base):
                             )
 
     def __repr__(self):
-        return '<Customer-proxy \'{0}\'>'.format(self.display_name)
+        return '<Customer-proxy \'{0}\'>'.format(self.title)
