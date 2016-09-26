@@ -15,6 +15,7 @@ Table of Contents
    contributing
    codebase/index
    database
+   workflow
    history
 
 Indices and tables

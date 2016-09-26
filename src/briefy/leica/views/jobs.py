@@ -1,6 +1,7 @@
 """Views to handle Jobs creation."""
 from briefy.ws.resources import RESTService
 from briefy.ws.resources import WorkflowAwareResource
+from briefy.leica.models import events
 from briefy.leica.models import Job
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources.factory import BaseFactory
@@ -40,6 +41,12 @@ class JobService(RESTService):
     friendly_name = model.__name__
     default_order_by = 'created_at'
 
+    _default_notify_events = {
+        'POST': events.JobCreatedEvent,
+        'PUT': events.JobUpdatedEvent,
+        'GET': events.JobLoadedEvent,
+        'DELETE': events.JobDeletedEvent,
+    }
 
 @resource(
     collection_path=PATH + '/transitions',

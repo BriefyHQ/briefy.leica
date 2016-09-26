@@ -24,3 +24,4 @@ History
 * LEICA-42: Register sqlalchemy workflow context handlers for all models. (rudaporto)
 * Speed up asset view tests by mocking calls to briefy-thumbor. (ericof)
 * LEICA-37: Add versioning to Assets. (ericof)
+* LEICA-44: After JOB creation automaticaly transition to in_qa state. (rudaporto)
