@@ -118,9 +118,12 @@ class JobWorkflow(BriefyWorkflow):
 
     # Transitions
     submit = created.transition(state_to=pending, permission='can_submit')
+    workaround = created.transition(state_to=in_qa, permission='can_workaround')
     assign = pending.transition(state_to=scheduling, permission='can_assign')
     publish = pending.transition(state_to=published, permission='can_publish')
     retract = published.transition(state_to=pending, permission='can_retract')
+    self_assign = published.transition(state_to=scheduling, permission='can_self_assign')
+
     schedule = scheduling.transition(state_to=scheduled, permission='can_schedule')
     scheduling_issues = scheduled.transition(state_to=scheduling,
                                              extra_states=(awaiting_assets,),
@@ -148,11 +151,15 @@ class JobWorkflow(BriefyWorkflow):
         'r:scout_manager', 'r:professional', 'g:system')
     can_upload = Permission().for_groups('r:professional')
     can_reject = Permission().for_groups('r:qa_manager')
-    can_approve = Permission().for_groups('r:qa_manager')
+    # TODO: review permission
+    can_approve = Permission().for_groups('r:qa_manager', 'g:briefy_qa')
     can_retract_approval = Permission().for_groups('r:qa_manager', 'r:project_manager')
     can_customer_reject = Permission().for_groups('r:customer')
     can_customer_approve = Permission().for_groups('r:customer')
     can_cancel = Permission().for_groups('r:project_manager')
+    # TODO: in the future this should be changed to a context role
+    can_self_assign = Permission().for_groups('g:professionals')
+    can_workaround = Permission().for_groups('g:briefy_qa')
 
 
 class ProfessionalWorkflow(BriefyWorkflow):
