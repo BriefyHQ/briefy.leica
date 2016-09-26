@@ -174,15 +174,19 @@ def import_jobs(project_dict):
             logger.error('SNAFU: Could not instantiate SQLAlchemy job from {0}'.format(job))
             continue
 
-        if job.client_job_status:
-            status = knack_status_mapping.get(job.client_job_status.pop(), 'in_qa')
+        knack_status = list(job.client_job_status)
+        print("***", knack_status, end=" - ")
+        if knack_status:
+            status = knack_status_mapping.get(knack_status[0], 'in_qa')
         else:
-            # For purposes of inital import into LEICA only:
-            status = 'in_qa'
 
-        ljob.state = knack_status_mapping.get(status, 'in_qa')
+            status = 'in_qa'
+        print(status)
+        ljob.state = status
         if ljob.state_history and len(ljob.state_history) == 1:
             ljob.state_history[0]['message'] = 'Imported in this state from Knack database'
+            ljob.state_history[0]['actor'] = 'g:system'
+            ljob.state_history[0]['to'] = status
 
         ljob.job_locations.append(location)
         #if job.set_price:
