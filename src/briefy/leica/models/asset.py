@@ -18,7 +18,7 @@ class Asset(Image, Mixin, Base):
     __tablename__ = 'assets'
 
     __versioned__ = {
-        'exclude': ['state_history', ]
+        'exclude': ['state_history', '_state_history', ]
     }
     __session__ = Session
 

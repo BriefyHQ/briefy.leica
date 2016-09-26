@@ -39,7 +39,8 @@ class AssetWorkflow(BriefyWorkflow):
     reserve = pending.transition(state_to=reserved, permission='can_reserve')
     reject = pending.transition(state_to=rejected, permission='can_reject')
 
-    approve = pending.transition(state_to=approved, permission='can_approve')
+    approve = pending.transition(state_to=approved, permission='can_approve',
+                                 extra_states=[rejected, reserved])
 
     retract = approved.transition(state_to=pending, permission='can_retract',
                                   extra_states=(discarded, reserved,))
@@ -119,7 +120,12 @@ class JobWorkflow(BriefyWorkflow):
     submit = created.transition(state_to=pending, permission='can_submit')
     assign = pending.transition(state_to=scheduling, permission='can_assign')
     publish = pending.transition(state_to=published, permission='can_publish')
+    workaround_upload = created.transition(state_to=awaiting_assets, permission='can_workaround')
+    workaround_qa = created.transition(state_to=in_qa, permission='can_workaround')
+
     retract = published.transition(state_to=pending, permission='can_retract')
+    self_assign = published.transition(state_to=scheduling, permission='can_self_assign')
+
     schedule = scheduling.transition(state_to=scheduled, permission='can_schedule')
     scheduling_issues = scheduled.transition(state_to=scheduling,
                                              extra_states=(awaiting_assets,),
@@ -135,7 +141,8 @@ class JobWorkflow(BriefyWorkflow):
     customer_approve = revision.transition(state_to=completed, permission='can_customer_approve')
     cancel = revision.transition(state_to=cancelled, permission='can_cancel')
 
-    can_submit = Permission().for_groups('g:system')
+    # TODO: review permission
+    can_submit = Permission().for_groups('g:system', 'g:briefy_qa')
     can_assign = Permission().for_groups('r:scout_manager', 'r:project_manager')
     can_publish = Permission().for_groups('r:scout_manager', 'r:project_manager')
     can_retract = Permission().for_groups('r:scout_manager', 'r:project_manager')
@@ -147,11 +154,15 @@ class JobWorkflow(BriefyWorkflow):
         'r:scout_manager', 'r:professional', 'g:system')
     can_upload = Permission().for_groups('r:professional')
     can_reject = Permission().for_groups('r:qa_manager')
-    can_approve = Permission().for_groups('r:qa_manager')
+    # TODO: review permission
+    can_approve = Permission().for_groups('r:qa_manager', 'g:briefy_qa')
     can_retract_approval = Permission().for_groups('r:qa_manager', 'r:project_manager')
     can_customer_reject = Permission().for_groups('r:customer')
     can_customer_approve = Permission().for_groups('r:customer')
     can_cancel = Permission().for_groups('r:project_manager')
+    # TODO: in the future this should be changed to a context role
+    can_self_assign = Permission().for_groups('g:professionals')
+    can_workaround = Permission().for_groups('g:briefy_qa')
 
 
 class ProfessionalWorkflow(BriefyWorkflow):
