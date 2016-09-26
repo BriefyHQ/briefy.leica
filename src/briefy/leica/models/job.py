@@ -96,6 +96,7 @@ class Job(BriefyRoles, Mixin, Base):
 
     @property
     def assignment_date(self):
+        """Timestamp of when photographer was assigned to the job"""
         if self._assignment_date:
             return self._assignment_date
         # TODO: else: retrieve date from the workflow history
