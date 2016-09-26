@@ -3,6 +3,36 @@ Workflow
 
 Workflows definitions.
 
+Assets
+++++++
+
+.. uml::
+
+    @startuml
+
+    [*] --> created
+    created --> validation : submit
+    validation --> edit : invalidate
+    validation --> pending : validate
+    edit --> pending : validate
+    edit --> validation : submit
+    pending --> rejected : discard
+    delivered --> rejected : discard
+    pending --> post_processing : process
+    post_processing --> pending : processed
+    pending --> reserved : reserve
+    approved --> reserved : reserve
+    pending --> edit: reject
+    pending --> approved: approve
+    reserved --> approved: approve
+    approved --> pending : retract
+    rejected --> pending : retract
+    reserved --> pending : retract
+    approved --> delivered : deliver
+    delivered --> [*]
+
+    @enduml
+
 Jobs
 ++++
 
@@ -33,4 +63,5 @@ Jobs
     revision --> cancelled: cancel
     completed --> [*]
     cancelled --> [*]
+
     @enduml
