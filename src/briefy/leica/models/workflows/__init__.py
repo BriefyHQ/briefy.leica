@@ -118,9 +118,11 @@ class JobWorkflow(BriefyWorkflow):
 
     # Transitions
     submit = created.transition(state_to=pending, permission='can_submit')
-    workaround = created.transition(state_to=in_qa, permission='can_workaround')
     assign = pending.transition(state_to=scheduling, permission='can_assign')
     publish = pending.transition(state_to=published, permission='can_publish')
+    workaround_upload = created.transition(state_to=awaiting_assets, permission='can_workaround')
+    workaround_qa = created.transition(state_to=in_qa, permission='can_workaround')
+
     retract = published.transition(state_to=pending, permission='can_retract')
     self_assign = published.transition(state_to=scheduling, permission='can_self_assign')
 
@@ -139,7 +141,8 @@ class JobWorkflow(BriefyWorkflow):
     customer_approve = revision.transition(state_to=completed, permission='can_customer_approve')
     cancel = revision.transition(state_to=cancelled, permission='can_cancel')
 
-    can_submit = Permission().for_groups('g:system')
+    # TODO: review permission
+    can_submit = Permission().for_groups('g:system', 'g:briefy_qa')
     can_assign = Permission().for_groups('r:scout_manager', 'r:project_manager')
     can_publish = Permission().for_groups('r:scout_manager', 'r:project_manager')
     can_retract = Permission().for_groups('r:scout_manager', 'r:project_manager')
