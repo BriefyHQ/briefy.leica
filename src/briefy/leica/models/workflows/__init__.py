@@ -120,8 +120,8 @@ class JobWorkflow(BriefyWorkflow):
     submit = created.transition(state_to=pending, permission='can_submit')
     assign = pending.transition(state_to=scheduling, permission='can_assign')
     publish = pending.transition(state_to=published, permission='can_publish')
-    workaround_upload = created.transition(state_to=awaiting_assets, permission='can_workaround')
-    workaround_qa = created.transition(state_to=in_qa, permission='can_workaround')
+    workaround_upload = pending.transition(state_to=awaiting_assets, permission='can_workaround')
+    workaround_qa = pending.transition(state_to=in_qa, permission='can_workaround')
 
     retract = published.transition(state_to=pending, permission='can_retract')
     self_assign = published.transition(state_to=scheduling, permission='can_self_assign')
