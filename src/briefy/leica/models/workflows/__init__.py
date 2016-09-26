@@ -13,13 +13,13 @@ class AssetWorkflow(BriefyWorkflow):
 
     # States:
     created = WorkflowState('created', description='Asset created')
+    edit = WorkflowState('edit', description='Request asset edit')
     validation = WorkflowState('validation', title='In Validation',
                                description='Asset under automatic validation')
     rejected = WorkflowState('rejected', title='Rejected', description='Asset Rejected')
     pending = WorkflowState('pending', title='Pending Approval',
                             description='Under verification by internal Q.A.')
     reserved = WorkflowState('reserved', description='Reserved for future use')
-    discarded = WorkflowState('discarded', description='')
     post_processing = WorkflowState('post_processing', title='Post Processing',
                                     description='Asset under manual post-processing')
     approved = WorkflowState('approved', description='Ready for delivery')
@@ -27,23 +27,23 @@ class AssetWorkflow(BriefyWorkflow):
 
     # Transitions:
     submit = created.transition(state_to=validation, permission='can_submit',
-                                extra_states=(rejected,))
-    invalidate = validation.transition(state_to=rejected, permission='can_invalidate',
+                                extra_states=(edit,))
+    invalidate = validation.transition(state_to=edit, permission='can_invalidate',
                                        title='Invalidate')
     validate = validation.transition(state_to=pending, permission='can_validate',
-                                     extra_states=(rejected,))
+                                     extra_states=(edit,))
 
-    discard = pending.transition(state_to=discarded, permission='can_discard',
+    discard = pending.transition(state_to=rejected, permission='can_discard',
                                  extra_states=(delivered,))
     process = pending.transition(state_to=post_processing, permission='can_start_processing')
-    reserve = pending.transition(state_to=reserved, permission='can_reserve')
-    reject = pending.transition(state_to=rejected, permission='can_reject')
+    reserve = pending.transition(state_to=reserved, permission='can_reserve',
+                                 extra_states=(approved,))
+    reject = pending.transition(state_to=edit, permission='can_reject')
 
     approve = pending.transition(state_to=approved, permission='can_approve',
-                                 extra_states=[rejected, reserved])
-
+                                 extra_states=(reserved,))
     retract = approved.transition(state_to=pending, permission='can_retract',
-                                  extra_states=(discarded, reserved,))
+                                  extra_states=(rejected, reserved,))
     deliver = approved.transition(state_to=delivered, permission='can_deliver',)
     processed = post_processing.transition(state_to=pending, permission='can_end_processing')
 
@@ -120,8 +120,8 @@ class JobWorkflow(BriefyWorkflow):
     submit = created.transition(state_to=pending, permission='can_submit')
     assign = pending.transition(state_to=scheduling, permission='can_assign')
     publish = pending.transition(state_to=published, permission='can_publish')
-    workaround_upload = created.transition(state_to=awaiting_assets, permission='can_workaround')
-    workaround_qa = created.transition(state_to=in_qa, permission='can_workaround')
+    workaround_upload = pending.transition(state_to=awaiting_assets, permission='can_workaround')
+    workaround_qa = pending.transition(state_to=in_qa, permission='can_workaround')
 
     retract = published.transition(state_to=pending, permission='can_retract')
     self_assign = published.transition(state_to=scheduling, permission='can_self_assign')
