@@ -98,9 +98,8 @@ def asset_created_handler(event):
 
 
 @subscriber(JobCreatedEvent)
-def asset_created_handler(event):
+def job_created_handler(event):
     """Handle job created event."""
-    safe_update_metadata(event.obj)
     transitions = ['workaround']
     safe_workflow_trigger_transitions(event, transitions=transitions)
 

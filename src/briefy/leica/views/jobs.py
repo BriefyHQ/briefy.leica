@@ -48,6 +48,7 @@ class JobService(RESTService):
         'DELETE': events.JobDeletedEvent,
     }
 
+
 @resource(
     collection_path=PATH + '/transitions',
     path=PATH + '/transitions/{transition_id}',
