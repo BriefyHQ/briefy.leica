@@ -28,7 +28,7 @@ knack_status_mapping = {
   'Completed': 'approved',
   'In revision ': 'revision',
   'Resolved': 'completed',
-  'Cancelled ':'cancelled'
+  'Cancelled ': 'cancelled'
 }
 
 
@@ -56,6 +56,7 @@ class Auto:
     def __init__(self, **attrs):
         for k, v in attrs.items():
             setattr(self, k, v)
+
     def __getattr__(self, attr):
         return ''
 
@@ -155,10 +156,8 @@ def import_jobs(project_dict):
                 customer_job_id=job.job_id,
                 job_id=job.job_id or job.job_name or job.id,
                 external_id=job.id,
-
                 job_requirements=job.client_specific_requirement,
-                assignment_date = job.assignment_date,
-
+                assignment_date=job.assignment_date,
                 # TODO right now, this is knack id:
                 # professional=job.responsible_photographer[0]['id'],
                 # TODO: FIX
@@ -189,8 +188,6 @@ def import_jobs(project_dict):
             ljob.state_history[0]['to'] = status
 
         ljob.job_locations.append(location)
-        #if job.set_price:
-            #ljob.price = int(job.set_price)
         if job.briefy_id:
             ljob.id = job.briefy_id
 
