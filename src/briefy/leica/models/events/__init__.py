@@ -25,19 +25,19 @@ class AssetLoadedEvent(events.ObjectLoadedEvent):
 
 
 class JobCreatedEvent(events.ObjectCreatedEvent):
-    """Job to notify asset creation."""
+    """Event to notify job creation."""
 
 
 class JobUpdatedEvent(events.ObjectUpdatedEvent):
-    """Job to notify asset update."""
+    """Event to notify job update."""
 
 
 class JobDeletedEvent(events.ObjectDeletedEvent):
-    """Job to notify asset delete."""
+    """Event to notify job delete."""
 
 
 class JobLoadedEvent(events.ObjectLoadedEvent):
-    """Job to notify asset load."""
+    """Event to notify job load."""
 
 
 def safe_update_metadata(obj):
