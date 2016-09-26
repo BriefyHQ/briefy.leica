@@ -100,7 +100,7 @@ def asset_created_handler(event):
 @subscriber(JobCreatedEvent)
 def job_created_handler(event):
     """Handle job created event."""
-    transitions = ['workaround']
+    transitions = ['submit']
     safe_workflow_trigger_transitions(event, transitions=transitions)
 
 

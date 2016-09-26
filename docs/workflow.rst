@@ -12,7 +12,8 @@ Jobs
 
     [*] --> created
     created --> pending : submit
-    created --> in_qa : workaround
+    pending --> in_qa : workaround_qa
+    pending --> awaiting_assets : workaround_upload
     pending --> scheduling: assign
     pending --> published: publish
     published --> pending: retract
