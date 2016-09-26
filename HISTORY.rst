@@ -25,3 +25,5 @@ History
 * Speed up asset view tests by mocking calls to briefy-thumbor. (ericof)
 * LEICA-37: Add versioning to Assets. (ericof)
 * LEICA-44: After JOB creation automaticaly transition to in_qa state. (rudaporto)
+* LEICA-45: Review asset workflow: rename rejected to edit and discarded to rejected. (rudaporto)
+
