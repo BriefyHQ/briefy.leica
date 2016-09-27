@@ -50,10 +50,8 @@ class AssetWorkflow(BriefyWorkflow):
     # Permissions:
 
     can_submit = Permission().for_groups('r:professional', 'g:professionals', 'g:briefy_qa')
-    can_validate = Permission().for_groups('g:system')
     can_invalidate = Permission().for_groups('g:system')
     can_discard = Permission().for_groups('g:briefy_qa')
-
     can_reserve = Permission().for_groups('g:briefy_qa')
     can_approve = Permission().for_groups('g:briefy_qa')
     can_start_processing = Permission().for_groups('g:briefy_qa')
@@ -67,7 +65,7 @@ class AssetWorkflow(BriefyWorkflow):
     def can_validate(self):
         allowed_groups = ['g:system', 'g:briefy_qa']
         is_right_state = False
-        if self.state.name == self.reject.name:
+        if self.state.name == self.edit.name:
             is_right_state = True
         elif self.state.name == self.validation.name:
             is_right_state = True
