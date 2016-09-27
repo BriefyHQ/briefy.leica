@@ -3,6 +3,7 @@ from briefy.common.db.mixins import Mixin
 from briefy.leica.db import Base
 from briefy.leica.db import Session
 from briefy.leica.models import workflows
+from briefy.ws.utils.user import add_user_info_to_state_history
 from zope.interface import implementer
 from zope.interface import Interface
 
@@ -60,6 +61,12 @@ class Comment(Mixin, Base):
                           )
 
     entity = sautils.generic_relationship(entity_type, entity_id)
+
+    def to_dict(self):
+        """Return a dict representation of this object."""
+        data = super().to_dict()
+        add_user_info_to_state_history(self.state_history)
+        return data
 
 
 class InternalComment(Comment):

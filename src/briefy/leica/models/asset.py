@@ -4,6 +4,8 @@ from briefy.common.db.mixins import Mixin
 from briefy.leica.db import Base
 from briefy.leica.db import Session
 from briefy.leica.models import workflows
+from briefy.ws.utils.user import add_user_info_to_state_history
+from briefy.ws.utils.user import get_public_user_info
 from sqlalchemy_continuum.utils import count_versions
 
 import colander
@@ -102,4 +104,7 @@ class Asset(Image, Mixin, Base):
         data = super().to_dict(excludes=['raw_metadata'])
         data['image'] = self.image
         data['metadata'] = self.metadata_
+        add_user_info_to_state_history(self.state_history)
+        data['author_id'] = get_public_user_info(self.author_id)
+        data['uploaded_by'] = get_public_user_info(self.uploaded_by)
         return data

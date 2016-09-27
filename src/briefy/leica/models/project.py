@@ -5,6 +5,8 @@ from briefy.common.db.mixins import BriefyRoles
 from briefy.leica.db import Base
 from briefy.leica.db import Session
 from briefy.leica.models import workflows
+from briefy.ws.utils.user import add_user_info_to_state_history
+from briefy.ws.utils.user import get_public_user_info
 from zope.interface import Interface
 from zope.interface import implementer
 
@@ -69,3 +71,14 @@ class Project(BriefyRoles, BaseMetadata, Mixin, Base):
                           'missing': colander.drop,
                           'typ': colander.String}}
                       )
+
+    def to_dict(self):
+        """Return a dict representation of this object."""
+        data = super().to_dict()
+        add_user_info_to_state_history(self.state_history)
+        # TODO: improve this to be a function
+        data['qa_manager'] = get_public_user_info(self.qa_manager)
+        data['project_manager'] = get_public_user_info(self.project_manager)
+        data['scout_manager'] = get_public_user_info(self.scout_manager)
+        data['finance_manager'] = get_public_user_info(self.finance_manager)
+        return data
