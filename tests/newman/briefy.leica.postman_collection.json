@@ -1,0 +1,556 @@
+{
+	"id": "154a9f57-99d3-3d4d-1fca-dad53a19c444",
+	"name": "Briefy.Leica",
+	"description": "",
+	"order": [],
+	"folders": [
+		{
+			"id": "55e3e58d-2dc4-4b96-4bb2-a4e7ccf0b20e",
+			"name": "01-Customer",
+			"description": "",
+			"order": [
+				"7176f27b-0a7d-4f63-c238-4cf0c6f4bdcb",
+				"93683af7-c6f6-c882-e0f1-b4ce5947f7db",
+				"62203a80-fca2-2fb6-8882-9ffba8288fa6"
+			],
+			"owner": "267182"
+		},
+		{
+			"id": "855da5e9-64a7-e2d0-85dc-50037289bc89",
+			"name": "02-Project",
+			"description": "",
+			"order": [
+				"f846e68f-e442-ecd2-b530-64379c3d1249",
+				"fd5921f6-77dd-7b7a-f4d3-29a55a0eb01a",
+				"c488e481-28b9-e2f7-55d4-28d126e2f8c0"
+			],
+			"owner": "267182",
+			"collectionId": "154a9f57-99d3-3d4d-1fca-dad53a19c444"
+		},
+		{
+			"id": "6fb0a524-f557-7199-7913-d408b479e8d9",
+			"name": "03-Jobs",
+			"description": "",
+			"order": [
+				"e335d872-0085-dfbe-3009-5f92da83f493",
+				"e191cb32-f812-0470-0e02-9388391b99cf",
+				"889caae8-ad01-e399-d7c2-96ebf0d00f65"
+			],
+			"owner": "267182",
+			"collectionId": "154a9f57-99d3-3d4d-1fca-dad53a19c444"
+		},
+		{
+			"id": "e7590cb7-5a6a-60b1-0978-dbc3b7ee5bf0",
+			"name": "04-Assets",
+			"description": "",
+			"order": [
+				"31aba457-f17d-97f8-e5ff-ae4ea4e6daf8",
+				"8264565f-92d3-e781-c16f-5c5ff125a3ec",
+				"505b9525-35f7-8932-951c-2cdc881144d6"
+			],
+			"owner": "267182",
+			"collectionId": "154a9f57-99d3-3d4d-1fca-dad53a19c444"
+		},
+		{
+			"id": "51c21617-758c-805c-14eb-42d3d7abe25c",
+			"name": "05-Comments",
+			"description": "",
+			"order": [
+				"2cd91910-2336-d5ce-d0b0-10b9e1b2a564",
+				"e7964d30-d4b6-adcb-9a76-92c5f097e01a",
+				"c7394a1d-5f3a-86d2-f077-03d12c29efd8",
+				"ec5eaf15-c1f6-5127-8e8d-fa0fe31861c7",
+				"1144c787-7f4e-d683-d2af-be165cfc1354",
+				"07eb3b77-372a-d228-9883-639997a7adf6"
+			],
+			"owner": "267182",
+			"collectionId": "154a9f57-99d3-3d4d-1fca-dad53a19c444"
+		}
+	],
+	"timestamp": 1473950734197,
+	"owner": "267182",
+	"public": false,
+	"published": false,
+	"requests": [
+		{
+			"id": "07eb3b77-372a-d228-9883-639997a7adf6",
+			"headers": "Authorization: JWT {{token}}\nX-Locale: en_GB\n",
+			"url": "{{api_url}}/jobs/{{job_id}}/assets/{{asset_id}}/comments",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1474224800292,
+			"name": "List Coomments Assets",
+			"description": "",
+			"collectionId": "154a9f57-99d3-3d4d-1fca-dad53a19c444",
+			"responses": []
+		},
+		{
+			"id": "1144c787-7f4e-d683-d2af-be165cfc1354",
+			"headers": "Authorization: JWT {{token}}\nX-Locale: en_GB\n",
+			"url": "{{api_url}}/jobs/{{job_id}}/assets/{{asset_id}}/comments/{{asset_comment_id}}",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1474224776791,
+			"name": "Get Comment Asset",
+			"description": "",
+			"collectionId": "154a9f57-99d3-3d4d-1fca-dad53a19c444",
+			"responses": []
+		},
+		{
+			"id": "2cd91910-2336-d5ce-d0b0-10b9e1b2a564",
+			"headers": "Authorization: JWT {{token}}\nX-Locale: en_GB\n",
+			"url": "{{api_url}}/jobs/{{job_id}}/comments",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "POST",
+			"data": [
+				{
+					"key": "content",
+					"value": "Nice comment!!!",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "author_id",
+					"value": "a90a4275-a83b-45ca-a869-9a387504cfb9",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "entity_id",
+					"value": "{{job_id}}",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "urlencoded",
+			"tests": "var jsonData = JSON.parse(responseBody);\n\nif (responseCode.code === 200)\n{\n    postman.setEnvironmentVariable(\"job_comment_id\", jsonData.id);\n    \n    \n}",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1474224449423,
+			"name": "Add Comment Job",
+			"description": "",
+			"collectionId": "154a9f57-99d3-3d4d-1fca-dad53a19c444",
+			"responses": []
+		},
+		{
+			"id": "31aba457-f17d-97f8-e5ff-ae4ea4e6daf8",
+			"headers": "Authorization: JWT {{token}}\nX-Locale: en_GB\n",
+			"url": "{{api_url}}/jobs/{{job_id}}/assets",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "POST",
+			"data": [
+				{
+					"key": "title",
+					"value": "IMAGE01",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "job_id",
+					"value": "{{job_id}}",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "owner",
+					"value": "Professional Name",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "author_id",
+					"value": "23d94a43-3947-42fc-958c-09245ecca5f2",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "filename",
+					"value": "2345.jpg",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "source_path",
+					"value": "source/files/jobs/2345.jpg",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "height",
+					"value": "3840",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "width",
+					"value": "5760",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "size",
+					"value": "4049867",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "content_type",
+					"value": "image/jpeg",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "urlencoded",
+			"tests": "var jsonData = JSON.parse(responseBody);\n\nif (responseCode.code === 200)\n{\n    postman.setEnvironmentVariable(\"asset_id\", jsonData.id);\n    \n    \n}",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1474224285559,
+			"name": "Add new Asset",
+			"description": "",
+			"collectionId": "154a9f57-99d3-3d4d-1fca-dad53a19c444",
+			"responses": []
+		},
+		{
+			"id": "505b9525-35f7-8932-951c-2cdc881144d6",
+			"headers": "Authorization: JWT {{token}}\nX-Locale: en_GB\n",
+			"url": "{{api_url}}/jobs/{{job_id}}/assets",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1474224383878,
+			"name": "List Assets",
+			"description": "",
+			"collectionId": "154a9f57-99d3-3d4d-1fca-dad53a19c444",
+			"responses": []
+		},
+		{
+			"id": "62203a80-fca2-2fb6-8882-9ffba8288fa6",
+			"headers": "Authorization: JWT {{token}}\nX-Locale: en_GB\n",
+			"url": "{{api_url}}/customers",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1474223511801,
+			"name": "List Customers",
+			"description": "",
+			"collectionId": "154a9f57-99d3-3d4d-1fca-dad53a19c444",
+			"responses": []
+		},
+		{
+			"id": "7176f27b-0a7d-4f63-c238-4cf0c6f4bdcb",
+			"headers": "Authorization: JWT {{token}}\nX-Locale: en_GB\n",
+			"url": "{{api_url}}/customers",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "POST",
+			"data": [
+				{
+					"key": "title",
+					"value": "Cliente 01",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "",
+					"value": "",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "urlencoded",
+			"tests": "var jsonData = JSON.parse(responseBody);\n\nif (responseCode.code === 200)\n{\n    postman.setEnvironmentVariable(\"customer_id\", jsonData.id);\n    \n    \n}",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1474223453269,
+			"name": "Add Customer",
+			"description": "",
+			"collectionId": "154a9f57-99d3-3d4d-1fca-dad53a19c444",
+			"responses": []
+		},
+		{
+			"id": "8264565f-92d3-e781-c16f-5c5ff125a3ec",
+			"headers": "Authorization: JWT {{token}}\nX-Locale: en_GB\n",
+			"url": "{{api_url}}/jobs/{{job_id}}/assets/{{asset_id}}",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1474224390623,
+			"name": "Get Asset",
+			"description": "",
+			"collectionId": "154a9f57-99d3-3d4d-1fca-dad53a19c444",
+			"responses": []
+		},
+		{
+			"id": "889caae8-ad01-e399-d7c2-96ebf0d00f65",
+			"headers": "Authorization: JWT {{token}}\nX-Locale: en_GB\n",
+			"url": "{{api_url}}/jobs",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1474214869153,
+			"name": "List Jobs",
+			"description": "",
+			"collectionId": "154a9f57-99d3-3d4d-1fca-dad53a19c444",
+			"responses": []
+		},
+		{
+			"id": "93683af7-c6f6-c882-e0f1-b4ce5947f7db",
+			"headers": "Authorization: JWT {{token}}\nX-Locale: en_GB\n",
+			"url": "{{api_url}}/customers/{{customer_id}}",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1474220937026,
+			"name": "Get Customer",
+			"description": "",
+			"collectionId": "154a9f57-99d3-3d4d-1fca-dad53a19c444",
+			"responses": []
+		},
+		{
+			"id": "c488e481-28b9-e2f7-55d4-28d126e2f8c0",
+			"headers": "Authorization: JWT {{token}}\nX-Locale: en_GB\n",
+			"url": "{{api_url}}/projects",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1474223517634,
+			"name": "List Projects",
+			"description": "",
+			"collectionId": "154a9f57-99d3-3d4d-1fca-dad53a19c444",
+			"responses": []
+		},
+		{
+			"id": "c7394a1d-5f3a-86d2-f077-03d12c29efd8",
+			"headers": "Authorization: JWT {{token}}\nX-Locale: en_GB\n",
+			"url": "{{api_url}}/jobs/{{job_id}}/comments",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1474224743615,
+			"name": "List Job Comments",
+			"description": "",
+			"collectionId": "154a9f57-99d3-3d4d-1fca-dad53a19c444",
+			"responses": []
+		},
+		{
+			"id": "e191cb32-f812-0470-0e02-9388391b99cf",
+			"headers": "Authorization: JWT {{token}}\nX-Locale: en_GB\n",
+			"url": "{{api_url}}/jobs/{{job_id}}",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1474214732581,
+			"name": "Get Job",
+			"description": "",
+			"collectionId": "154a9f57-99d3-3d4d-1fca-dad53a19c444",
+			"responses": []
+		},
+		{
+			"id": "e335d872-0085-dfbe-3009-5f92da83f493",
+			"headers": "Authorization: JWT {{token}}\nX-Locale: en_GB\n",
+			"url": "{{api_url}}/jobs",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "POST",
+			"data": [
+				{
+					"key": "title",
+					"value": "Job Title",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "project_id",
+					"value": "{{project_id}}",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "job_id",
+					"value": "1",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "urlencoded",
+			"tests": "var jsonData = JSON.parse(responseBody);\n\nif (responseCode.code === 200)\n{\n    postman.setEnvironmentVariable(\"job_id\", jsonData.id);\n    \n    \n}",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1474214560376,
+			"name": "Add Job",
+			"description": "",
+			"collectionId": "154a9f57-99d3-3d4d-1fca-dad53a19c444",
+			"responses": []
+		},
+		{
+			"id": "e7964d30-d4b6-adcb-9a76-92c5f097e01a",
+			"headers": "Authorization: JWT {{token}}\nX-Locale: en_GB\n",
+			"url": "{{api_url}}/jobs/{{job_id}}/comments/{{job_comment_id}}",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1474224733469,
+			"name": "Get Comment Job",
+			"description": "",
+			"collectionId": "154a9f57-99d3-3d4d-1fca-dad53a19c444",
+			"responses": []
+		},
+		{
+			"id": "ec5eaf15-c1f6-5127-8e8d-fa0fe31861c7",
+			"headers": "Authorization: JWT {{token}}\nX-Locale: en_GB\n",
+			"url": "{{api_url}}/jobs/{{job_id}}/assets/{{asset_id}}/comments",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "POST",
+			"data": [
+				{
+					"key": "content",
+					"value": "Nice image!",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "author_id",
+					"value": "a90a4275-a83b-45ca-a869-9a387504cfb9",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "entity_id",
+					"value": "{{asset_id}}",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "urlencoded",
+			"tests": "var jsonData = JSON.parse(responseBody);\n\nif (responseCode.code === 200)\n{\n    postman.setEnvironmentVariable(\"asset_comment_id\", jsonData.id);\n    \n    \n}",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1474224643186,
+			"name": "Add Comment Asset",
+			"description": "",
+			"collectionId": "154a9f57-99d3-3d4d-1fca-dad53a19c444",
+			"responses": []
+		},
+		{
+			"id": "f846e68f-e442-ecd2-b530-64379c3d1249",
+			"headers": "Authorization: JWT {{token}}\nX-Locale: en_GB\n",
+			"url": "{{api_url}}/projects",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "POST",
+			"data": [
+				{
+					"key": "title",
+					"value": "Project 01",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "customer_id",
+					"value": "{{customer_id}}",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "urlencoded",
+			"tests": "var jsonData = JSON.parse(responseBody);\n\nif (responseCode.code === 200)\n{\n    postman.setEnvironmentVariable(\"project_id\", jsonData.id);\n    \n    \n}",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1474223474584,
+			"name": "Add Project",
+			"description": "",
+			"collectionId": "154a9f57-99d3-3d4d-1fca-dad53a19c444",
+			"responses": []
+		},
+		{
+			"id": "fd5921f6-77dd-7b7a-f4d3-29a55a0eb01a",
+			"headers": "Authorization: JWT {{token}}\nX-Locale: en_GB\n",
+			"url": "{{api_url}}/projects/{{project_id}}",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1474214510298,
+			"name": "Get Project",
+			"description": "",
+			"collectionId": "154a9f57-99d3-3d4d-1fca-dad53a19c444",
+			"responses": []
+		}
+	]
+}

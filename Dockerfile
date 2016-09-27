@@ -1,4 +1,4 @@
-FROM briefy/python3:latest
+FROM briefy/python3:1.0.0
 MAINTAINER RideLink <developers@ridelink.com>
 
 ADD . /app

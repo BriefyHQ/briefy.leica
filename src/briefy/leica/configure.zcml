@@ -3,8 +3,4 @@
 	<include package="zope.component" />
 	<include package="briefy.common" />
 
-	<!-- include package=".queue" /-->
-	<!-- include package=".worker" /-->
-	<!-- include package=".views" / -->
-
 </configure>

@@ -70,10 +70,10 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr htmlcov/
 
 lint: ## check style with flake8
-	flake8 src/briefy/leica  tests setup.py
+	flake8 src/briefy/leica tests setup.py migrations
 
-test: ## run tests quickly with the default Python
-	py.test
+test: lint ## run tests quickly with the default Python
+	py.test --cov-report term-missing --cov=briefy.leica tests
 
 test-all: ## run tests on every Python version with tox
 	tox
@@ -94,7 +94,7 @@ docs: ## generate Sphinx HTML documentation, including API docs
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
 
 docs_server: docs
-	@cd $(BUILDDIR)/dirhtml; python3 -m SimpleHTTPServer 8000
+	@cd $(BUILDDIR)/dirhtml; python3 -m http.server 8000
 
 release: clean ## package and upload a release
 	python setup.py sdist upload
@@ -107,3 +107,20 @@ dist: clean ## builds source and wheel package
 
 install: clean ## install the package to the active Python's site-packages
 	python setup.py install
+
+
+stop_dockers: ## stop and remove docker containers
+	# sqs
+	docker stop sqs
+	docker rm sqs
+	# postgres
+	docker stop briefy-leica-test
+	docker rm briefy-leica-test
+
+run_dockers: ## run docker containers
+	docker run -d -p 127.0.0.1:5000:5000 --name sqs briefy/aws-test:latest sqs
+	export SQS_IP=127.0.0.1 SQS_PORT=5000
+	docker run -d -p 127.0.0.1:9999:5432 -e POSTGRES_PASSWORD=briefy -e POSTGRES_USER=briefy -e POSTGRES_DB=briefy-leica --name briefy-leica-test mdillon/postgis:9.5
+	export DATABASE_URL=postgresql://briefy:briefy@127.0.0.1:9999/briefy-leica
+	sleep 5
+

@@ -1,1 +1,1 @@
-from .assets import get_asset
+"""Common views functions."""

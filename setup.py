@@ -11,11 +11,22 @@ with open(os.path.join(here, 'HISTORY.rst')) as f:
     CHANGES = f.read()
 
 requires = [
-    'briefy.common',
     'boto3',
+    'briefy.common',
+    'briefy.ws',
+    'colanderalchemy',
+    'cornice',
     'newrelic',
+    'phonenumbers',
+    'pycountry',
+    'pyramid',
+    'pyramid_tm',
     'requests',
     'setuptools',
+    's3transfer==0.1.2',
+    'sqlalchemy',
+    'sqlalchemy_continuum',
+    'waitress',
     'wheel',
     'zope.component',
     'zope.configuration',
@@ -30,7 +41,7 @@ test_requirements = [
 
 setup(
     name='briefy.leica',
-    version='0.1.0',
+    version='1.0.0',
     description='Image Handling System',
     long_description=README + '\n\n' + CHANGES,
     classifiers=[
@@ -49,6 +60,9 @@ setup(
     tests_require=test_requirements,
     install_requires=requires,
     entry_points="""
+    [paste.app_factory]
+     main = briefy.leica:main
+
 
     """,
 )

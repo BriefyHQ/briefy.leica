@@ -4,10 +4,16 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy_continuum import make_versioned
 from zope.sqlalchemy import ZopeTransactionExtension
 
-
 Session = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
+
+# As our users are not in here, it is not easy to keep track
+# of changes using this
+make_versioned(
+    user_cls=None
+)
 
 
 def get_db(request):
@@ -26,7 +32,7 @@ def get_engine(settings):
     :returns: A SQLAlchemy database engine
     :rtype: sqlalchemy.engine.base.Engine
     """
-    engine = create_engine(settings['sqlalchemy_url'], pool_recycle=3600)
+    engine = create_engine(settings['sqlalchemy.url'], pool_recycle=3600)
     return engine
 
 
