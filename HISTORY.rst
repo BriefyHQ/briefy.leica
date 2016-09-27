@@ -29,4 +29,5 @@ History
 * LEICA-28: Adds knack_import script to fetch Knack JOB and Project data into the local database
 * BODY-49: Integrate fix from briefy.ws. (rudaporto)
 * LEICA-46: Update user_id data on all fields to user info map when object is serialized. (rudaporto)
+* Integrate briefy.ws fixes for workflow endpoint POST with empty message attribute on body. (rudaporto)
 
