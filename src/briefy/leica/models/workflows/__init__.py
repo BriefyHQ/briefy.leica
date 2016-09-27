@@ -153,10 +153,11 @@ class JobWorkflow(BriefyWorkflow):
     can_get_ready_for_upload = Permission().for_groups(
         'r:scout_manager', 'r:professional', 'g:system')
     can_upload = Permission().for_groups('r:professional')
-    can_reject = Permission().for_groups('r:qa_manager')
+    can_reject = Permission().for_groups('r:qa_manager', 'g:briefy_qa')
     # TODO: review permission
     can_approve = Permission().for_groups('r:qa_manager', 'g:briefy_qa')
-    can_retract_approval = Permission().for_groups('r:qa_manager', 'r:project_manager')
+    can_retract_approval = Permission().for_groups('r:qa_manager', 'r:project_manager',
+                                                   'g:briefy_qa')
     can_customer_reject = Permission().for_groups('r:customer')
     can_customer_approve = Permission().for_groups('r:customer')
     can_cancel = Permission().for_groups('r:project_manager')
