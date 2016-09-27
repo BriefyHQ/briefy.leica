@@ -1,0 +1,26 @@
+{
+  "status": "success",
+  "type": "users",
+  "data": {
+    "locale": "en_GB",
+    "state_history": [
+      {
+        "to": "created",
+        "message": null,
+        "actor": null,
+        "date": "2016-09-20T10:57:06.406960+00:00",
+        "from": "",
+        "transition": ""
+      }
+    ],
+    "state": "created",
+    "fullname": "Laure",
+    "last_name": "",
+    "email": "laure@briefy.co",
+    "password": null,
+    "id": "2405e381-08da-468b-b759-490ca93cd887",
+    "first_name": "Laure",
+    "created_at": "2016-09-20T10:57:06.407987+00:00Z",
+    "updated_at": "2016-09-20T10:57:06.408001+00:00Z"
+  }
+}

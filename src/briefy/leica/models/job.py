@@ -6,6 +6,8 @@ from briefy.common.db.types import AwareDateTime
 from briefy.leica.db import Base
 from briefy.leica.db import Session
 from briefy.leica.models import workflows
+from briefy.ws.utils.user import add_user_info_to_state_history
+from briefy.ws.utils.user import get_public_user_info
 
 from zope.interface import implementer
 from zope.interface import Interface
@@ -151,4 +153,10 @@ class Job(BriefyRoles, Mixin, Base):
         data['project_brief'] = self.project_brief
         data['assignment_date'] = self.assignment_date
         data['job_location'] = [j.to_dict() for j in self.job_locations]
+        add_user_info_to_state_history(self.state_history)
+        # TODO: improve this to be a function
+        data['qa_manager'] = get_public_user_info(self.qa_manager)
+        data['project_manager'] = get_public_user_info(self.project_manager)
+        data['scout_manager'] = get_public_user_info(self.scout_manager)
+        data['finance_manager'] = get_public_user_info(self.finance_manager)
         return data
