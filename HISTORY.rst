@@ -2,8 +2,12 @@
 History
 =======
 
-1.0.0 (Unreleased)
+1.1.0 (Unreleased)
 ------------------
+
+
+1.0.0
+-----
 
 * LEICA-24: Clean up Job and Project models. (rudaporto)
 * Add Metadata and Briefy Roles mixins to Job and Project. (rudaporto)
