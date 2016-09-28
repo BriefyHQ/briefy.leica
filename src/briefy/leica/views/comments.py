@@ -1,7 +1,8 @@
 """Views to handle Comments creation."""
+from briefy.leica.models import Comment
+from briefy.leica.models.events import comment as events
 from briefy.ws.resources import RESTService
 from briefy.ws.resources import WorkflowAwareResource
-from briefy.leica.models import Comment
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
@@ -31,6 +32,13 @@ class CommentService(RESTService):
     model = Comment
     friendly_name = model.__name__
     default_order_by = 'created_at'
+
+    _default_notify_events = {
+        'POST': events.CommentCreatedEvent,
+        'PUT': events.CommentUpdatedEvent,
+        'GET': events.CommentLoadedEvent,
+        'DELETE': events.CommentDeletedEvent,
+    }
 
     @property
     def filter_allowed_fields(self):

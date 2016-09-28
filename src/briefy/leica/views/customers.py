@@ -1,7 +1,8 @@
 """Views to handle Projects creation."""
+from briefy.leica.models import Customer
+from briefy.leica.models.events import customer as events
 from briefy.ws.resources import RESTService
 from briefy.ws.resources import WorkflowAwareResource
-from briefy.leica.models import Customer
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
@@ -39,6 +40,13 @@ class CustomersService(RESTService):
     model = Customer
     friendly_name = model.__name__
     default_order_by = 'created_at'
+
+    _default_notify_events = {
+        'POST': events.CustomerCreatedEvent,
+        'PUT': events.CustomerUpdatedEvent,
+        'GET': events.CustomerLoadedEvent,
+        'DELETE': events.CustomerDeletedEvent,
+    }
 
 
 @resource(
