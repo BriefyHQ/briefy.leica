@@ -5,15 +5,20 @@ from briefy.leica.db import create_engine
 from briefy.leica.models import Job
 from briefy.leica.models import Asset
 
+
+import briefy.leica as K
 import csv
 import logging
 import os
 import transaction
+import uuid
 
 
 CSV_NAME = 's3_paths.csv'
 
 S3_SOURCE_PREFIX = 'source/files/'
+
+SENTINEL_PROFESSIONAL_UUID = 'ca6083a9-bc94-4309-be3c-a80a0d1f2370'
 
 logger.setLevel(logging.DEBUG)
 logger.handlers[0].setLevel(logging.DEBUG)
@@ -47,6 +52,11 @@ def import_assets(asset_rows):
             job = Job.query().get(job_id)
             previous_job_id = job_id
 
+        if  job.professional:
+            professional_id = job.professional_id
+        else:
+            professional_id = SENTINEL_PROFESSIONAL_UUID
+
         title = s3_path.split('/')[-1]
         title = title.strip('-_ ')
         if title.lower().startswith(job.customer_job_id.lower()):
@@ -57,12 +67,12 @@ def import_assets(asset_rows):
             title=title,
             description="",
             # TODO: replace these with actual Photographer's names
-            owner=str(job.professional_id),
-            author_id=job.professional_id,
-            uploaded_by=job
-            .professional_id,
+            owner=str(professional_id),
+            author_id=professional_id,
+            uploaded_by=professional_id,
             #  Image Mixin fields:
-            source_path=os.path.join(S3_SOURCE_PREFIX, s3_path)
+            source_path=os.path.join(S3_SOURCE_PREFIX, s3_path.lstrip('/')),
+            filename=s3_path.split('/')[-1]
         )
         asset.state = 'delivered'
         if asset.state_history and len(asset.state_history) == 1:
@@ -80,6 +90,7 @@ def import_assets(asset_rows):
             try:
                 Session.add(asset)
                 Session.flush()
+                print(".", end='', flush=True)
             except Exception as error:
                 logging.error('Could not import asset "{}". Error {}'.format(
                     s3_path, error))
@@ -87,12 +98,25 @@ def import_assets(asset_rows):
                 continue
 
             count += 1
-    logging.info('{} new projects imported into Leica'.format(count))
+            if not count % 70:
+                print()
+    logging.warning('{} new projects imported into Leica'.format(count))
 
+"""
+def grab_data()
+    global KJob, KPhotographer, all_jobs, all_photographers, kphoto_id, kjob_id
+    KJob = K.get_model("Job")
+    KPhotographer = K.get_model("Photographer")
+    print('Downloading all Job and Professional information from KnackHQ')
+    all_jobs = KJob.query.all()
+    all_photographers = KPhotographer.query.all()
+
+    kphoto_id = {p.id:p for p in all_photographers}
+    kjob_id = {j.id:j for j in all_jobs}
+"""
 
 def main():
     """Handles all the stuff"""
-
     asset_reader = csv.reader(open(CSV_NAME))
 
     # Throw away headers:
