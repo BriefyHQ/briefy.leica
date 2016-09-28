@@ -5,6 +5,7 @@ History
 1.1.0 (Unreleased)
 ------------------
 
+* BODY-53: Additional metadata from image (ericof).
 
 1.0.0
 -----
