@@ -1,9 +1,9 @@
 """Views to handle Assets creation."""
+from briefy.leica.models import Asset
+from briefy.leica.models.events import asset as events
 from briefy.ws.resources import BaseResource
 from briefy.ws.resources import RESTService
 from briefy.ws.resources import WorkflowAwareResource
-from briefy.leica.models import Asset
-from briefy.leica.models import events
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
