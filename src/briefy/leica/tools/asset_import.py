@@ -6,12 +6,12 @@ from briefy.leica.models import Job
 from briefy.leica.models import Asset
 
 
-import briefy.leica as K
+# import briefy.leica as K
 import csv
 import logging
 import os
 import transaction
-import uuid
+import uuid  # noQA
 
 
 CSV_NAME = 's3_paths.csv'
@@ -46,13 +46,13 @@ class Auto:
 def import_assets(asset_rows):
 
     previous_job_id = None
-    count = 0
+    created = updated = count = 0
     for job_id, s3_path in asset_rows:
         if job_id != previous_job_id:
             job = Job.query().get(job_id)
             previous_job_id = job_id
 
-        if  job.professional:
+        if job.professional:
             professional_id = job.professional_id
         else:
             professional_id = SENTINEL_PROFESSIONAL_UUID
@@ -62,7 +62,18 @@ def import_assets(asset_rows):
         if title.lower().startswith(job.customer_job_id.lower()):
             title = title[len(job.customer_job_id):].strip(" -+")
         title = title.replace("_", " ")
-        asset = Asset(
+        source_path = os.path.join(S3_SOURCE_PREFIX, s3_path.lstrip('/'))
+
+        new_asset = False
+        asset = Asset.query().filter_by(source_path=source_path).first()
+
+        if not asset:
+            created += 1
+            new_asset = True
+            asset = Asset()
+        else:
+            updated += 1
+        asset.update(
             job_id=job_id,
             title=title,
             description="",
@@ -88,7 +99,8 @@ def import_assets(asset_rows):
 
         with transaction.manager:
             try:
-                Session.add(asset)
+                if new_asset:
+                    Session.add(asset)
                 Session.flush()
                 print(".", end='', flush=True)
             except Exception as error:
@@ -100,7 +112,8 @@ def import_assets(asset_rows):
             count += 1
             if not count % 70:
                 print()
-    logging.warning('{} new projects imported into Leica'.format(count))
+    logging.info('{} new assets imported into Leica'.format(created))
+    logging.info('{} new assets updated into Leica'.format(updated))
 
 """
 def grab_data()
@@ -114,6 +127,7 @@ def grab_data()
     kphoto_id = {p.id:p for p in all_photographers}
     kjob_id = {j.id:j for j in all_jobs}
 """
+
 
 def main():
     """Handles all the stuff"""
