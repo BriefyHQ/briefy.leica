@@ -33,7 +33,7 @@ DELIVERY_SETTINGS = {
         {'gdrive': {
             'folder_structure': 'simple',
             'base_folder': AGODA_DELIVERY_GDRIVE,
-            'sharing': ['erico@briefy.co'],
+            'sharing': [],
             'sets': [
                 {
                     'id': 'reduced',
