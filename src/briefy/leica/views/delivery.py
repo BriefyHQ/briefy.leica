@@ -88,18 +88,19 @@ class DeliveryInfoService:
         """Return user UUID from knack profile ID."""
         job = self.get_one()
         if job:
-            assets = []
+            approved_assets = []
             for item in job.assets:
-                assets.append(
-                    dict(id=item.id,
-                         source_path=item.source_path,
-                         state=item.state)
-                )
+                if item.state == item.workflow.approved.name:
+                    approved_assets.append(
+                        dict(id=item.id,
+                             source_path=item.source_path,
+                             state=item.state)
+                    )
             result = {
                 'job_id': job.id,
                 'customer': job.project.customer_id,
                 'customer_job_id': job.customer_job_id,
-                'assets': assets,
+                'assets': approved_assets,
                 'settings': self.settings(job.project.customer_id)
             }
             return result
