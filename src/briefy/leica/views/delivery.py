@@ -94,7 +94,9 @@ class DeliveryInfoService:
                     approved_assets.append(
                         dict(id=item.id,
                              source_path=item.source_path,
-                             state=item.state)
+                             state=item.state,
+                             title=item.title,
+                             )
                     )
             result = {
                 'job_id': job.id,
