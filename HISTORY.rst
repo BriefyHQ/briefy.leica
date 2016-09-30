@@ -9,6 +9,7 @@ History
 * LEICA-50: Add custom resource event types for models: customer, comments, project. (rudaporto)
 * Integrate new fixes on briefy.ws. (rudaporto)
 * Deploy to update briefy.ws. (rudaporto)
+* LEICA-56: New service to return delevery info for a job. (rudaporto)
 
 1.0.0
 -----
