@@ -56,7 +56,7 @@ def _update_job_on_knack(job_info: dict, knack_state: str):
     :param state: New knack state
     """
     # concatenate them in a variable
-    qa_feedback = '\n'.join(job_info['comments'])
+    qa_feedback = '\n\n'.join(job_info['comments'])
 
     # Get knack job
     knack_job = get_knack_job(job_info)
