@@ -11,6 +11,7 @@ History
 * Deploy to update briefy.ws. (rudaporto)
 * LEICA-56: New service to return delivery info for a job. (rudaporto)
 * LEICA-58: Update Knack on job approval and rejection. (ericof)
+* LEICA-47: Machine checking of assets. (ericof)
 
 1.0.0
 -----
