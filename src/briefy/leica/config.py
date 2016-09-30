@@ -15,5 +15,5 @@ S3_CREDENTIALS = config('S3_IMAGE_BUCKET', default='')
 
 DATABASE_URL = config('DATABASE_URL',)
 
-
-# EXTRA_BACKEND = "knack"
+# Agoda custom config
+AGODA_DELIVERY_GDRIVE = config('AGODA_DELIVERY_GDRIVE', default='') # noqa

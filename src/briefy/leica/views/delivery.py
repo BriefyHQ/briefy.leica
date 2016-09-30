@@ -1,4 +1,5 @@
 """Views to handle Projects creation."""
+from briefy.leica.config import AGODA_DELIVERY_GDRIVE
 from briefy.leica.models import Job
 from briefy.leica.views import InternalFactory
 from briefy.ws import CORS_POLICY
@@ -17,20 +18,30 @@ DELIVERY_SETTINGS = {
             'filename': '{job_id}.zip',
             'folder_structure': 'simple',
             's3_bucket': 'delivery-{env}'.format(env=ENV),
-            's3_path': '{client_id}/{project_id}/'}}
+            's3_path': '{client_id}/{project_id}/',
+            'sets': [
+                {
+                    'id': 'original',
+                    'folder_name': 'original',
+                    'transforms': [],
+                }
+            ]
+        }}
     ],
 
     'd466091b-98c5-4f9d-81a6-ecbc83dd3386': [
         {'gdrive': {
             'folder_structure': 'simple',
-            'base_folder': 'https://drive.google.com/drive/folders/0BwrdIL719n7wVURQUC1VS2VKY0E',
+            'base_folder': AGODA_DELIVERY_GDRIVE,
             'sharing': ['erico@briefy.co'],
             'sets': [
                 {
+                    'id': 'reduced',
                     'folder_name': 'reduced_size',
-                    'transforms': 'thumbor_filter',
+                    'transforms': ['maxbytes(4000000)'],
                 },
                 {
+                    'id': 'original',
                     'folder_name': 'original_size',
                     'transforms': '',
                 }
@@ -76,7 +87,7 @@ class DeliveryInfoService:
     def get(self):
         """Return user UUID from knack profile ID."""
         job = self.get_one()
-        if job is not None:
+        if job:
             assets = []
             for item in job.assets:
                 assets.append(
