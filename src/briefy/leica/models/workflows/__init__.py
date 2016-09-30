@@ -36,7 +36,7 @@ class AssetWorkflow(BriefyWorkflow):
     # Transitions:
     submit = created.transition(state_to=validation, permission='can_submit',
                                 extra_states=(edit,))
-    invalidate = validation.transition(state_to=edit, permission='can_invalidate',
+    invalidate = validation.transition(state_to=edit, permission='can_validate',
                                        title='Invalidate')
     validate = validation.transition(state_to=pending, permission='can_validate',
                                      extra_states=(edit,))

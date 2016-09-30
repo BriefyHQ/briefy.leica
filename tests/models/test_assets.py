@@ -1,8 +1,10 @@
 """Test Asset database model."""
 from briefy.leica import models
 from conftest import BaseModelTest
+from conftest import mock_thumbor
 from sqlalchemy_continuum.utils import count_versions
 
+import httmock
 import pytest
 import transaction
 
@@ -43,6 +45,24 @@ class TestAssetModel(BaseModelTest):
         assert 'aperture' in serialized['metadata']
         assert 'iso' in serialized['metadata']
         assert 'shutter' in serialized['metadata']
+
+    def test_asset_is_valid(self, instance_obj):
+        """Test if the asset is valid."""
+        asset = instance_obj
+        job = asset.job
+        project = job.project
+        project.tech_requirements = {
+            'dimensions': {'value': '5760x3840', 'operator': 'eq'},
+        }
+
+        assert asset.is_valid == True
+
+        project.tech_requirements = {
+            'dpi': {'value': '300', 'operator': 'eq'},
+            'dimensions': {'value': '5760x3840', 'operator': 'eq'},
+        }
+
+        assert asset.is_valid == False
 
     def test_obj_versioning(self, session, obj_payload):
         """Test object versioning."""

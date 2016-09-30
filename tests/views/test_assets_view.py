@@ -7,6 +7,7 @@ import httmock
 import pytest
 import requests_mock
 import os
+import transaction
 
 
 @pytest.mark.usefixtures('create_dependencies')
@@ -184,3 +185,31 @@ class TestAssetView(BaseTestView):
 
         assert result['versions'][1]['id'] > result['versions'][0]['id']
         assert result['versions'][1]['updated_at'] > result['versions'][0]['updated_at']
+
+    def test_machine_validation_invalidating(self, session, obj_payload, app):
+        """Test creation of a new asset ending on edit state."""
+        from briefy.leica.models import Job
+
+        payload = obj_payload
+        payload['id'] = '560a6697-11d2-4fe9-9757-a279c126b6bf'
+        with transaction.manager:
+            job = Job.get(payload['job_id'])
+            project = job.project
+            project.tech_requirements = {
+                'dimensions': {'value': '800x600', 'operator': 'eq'},
+            }
+            session.add(project)
+            session.flush()
+
+        with httmock.HTTMock(mock_thumbor):
+            request = app.post_json(self.base_path, payload, headers=self.headers, status=200)
+
+        assert 'application/json' == request.content_type
+        result = request.json
+
+        db_obj = self.model.query().get(payload['id'])
+
+        assert db_obj.state == 'edit'
+        history = db_obj.state_history
+        assert len(history) == 3
+        assert history[2]['message'] == 'Check for dimensions failed'

@@ -4,6 +4,7 @@ from briefy.leica import logger
 from briefy.leica.models.events.asset import AssetCreatedEvent
 from briefy.leica.models.events.asset import AssetUpdatedEvent
 from briefy.leica.models.events.job import JobCreatedEvent
+from briefy.ws.resources.events import WorkflowTranstionEvent
 from pyramid.events import subscriber
 from requests.exceptions import ConnectionError
 
@@ -41,10 +42,10 @@ def safe_workflow_trigger_transitions(event, transitions, state='created'):
             wf.context = user
             if wf.state.name == state:
                 savepoint = transaction.savepoint()
-                for transition_name in transitions:
+                for transition_name, message in transitions:
                     try:
                         transition = getattr(wf, transition_name)
-                        transition()
+                        transition(message=message)
                     except AttributeError:
                         savepoint.rollback()
                         msg = 'Transition: {transition} not found in asset: {id} title: {title}.'
@@ -57,20 +58,32 @@ def safe_workflow_trigger_transitions(event, transitions, state='created'):
                         logger.info(msg.format(id=obj.id, state=wf.state.name,
                                                transition=transition_name,
                                                groups=user.groups))
+                    else:
+                        # Trigger an workflow transition name
+                        wf_transition_event = WorkflowTranstionEvent(
+                            event.obj, event.request, transition
+                        )
+                        wf_transition_event()
 
 
 @subscriber(AssetCreatedEvent)
 def asset_created_handler(event):
     """Handle asset created event."""
-    safe_update_metadata(event.obj)
-    transitions = ['submit', 'validate']
+    obj = event.obj
+    safe_update_metadata(obj)
+    transitions = [('submit', ''), ]
+    if obj.is_valid:
+        transitions.append(('validate', ''), )
+    else:
+        msg = '\n'.join(obj.check_requirements)
+        transitions.append(('invalidate', msg), )
     safe_workflow_trigger_transitions(event, transitions=transitions)
 
 
 @subscriber(JobCreatedEvent)
 def job_created_handler(event):
     """Handle job created event."""
-    transitions = ['submit']
+    transitions = [('submit', ''), ]
     safe_workflow_trigger_transitions(event, transitions=transitions)
 
 
