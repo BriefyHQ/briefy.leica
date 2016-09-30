@@ -73,12 +73,14 @@ class Job(BriefyRoles, Mixin, Base):
     job_id = sa.Column(sa.String, nullable=False)  # Was internal_job_id
     customer_job_id = sa.Column(sa.String, default='')  # Id on the customer database
 
-    assets = sa.orm.relationship('Asset', back_populates='job')
+    assets = sa.orm.relationship('Asset', back_populates='job', lazy='dynamic')
     comments = sa.orm.relationship('Comment',
                                    foreign_keys='Comment.entity_id',
+                                   order_by='asc(Comment.created_at)',
                                    primaryjoin='Comment.entity_id == Job.id')
     internal_comments = sa.orm.relationship('InternalComment',
                                             foreign_keys='InternalComment.entity_id',
+                                            order_by='asc(InternalComment.created_at)',
                                             primaryjoin='InternalComment.entity_id == Job.id')
 
     number_of_photos = sa.Column(sa.Integer(), default=20)
@@ -90,6 +92,19 @@ class Job(BriefyRoles, Mixin, Base):
                                      'missing': colander.drop,
                                      'typ': colander.DateTime}}
                                  )
+
+    @property
+    def approvable(self) -> bool:
+        """Check if this job could be approved.
+
+        :returns: Boolean indicating if it is possible to approve this job.
+        """
+        from briefy.leica.models.asset import Asset
+        approvable_assets_count = self.assets.filter(
+            Asset.state.in_(('pending', 'approved'))
+        ).count()
+        check_images = self.number_of_photos == approvable_assets_count
+        return check_images
 
     @property
     def customer(self):
@@ -106,7 +121,7 @@ class Job(BriefyRoles, Mixin, Base):
 
     @assignment_date.setter
     def assignment_date(self, value):
-        """Exlictly sets an assignmetn datetime stamp.
+        """Explicitly sets an assignment datetime stamp.
 
            This will override any assignemnt datetime that
            might be infered from the workflow history
