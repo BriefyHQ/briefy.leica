@@ -4,6 +4,7 @@ from briefy.common.db.model import Base
 from briefy.leica.db import get_db
 from briefy.leica.db import get_engine
 from briefy.leica.db import Session
+from concurrent.futures import ThreadPoolExecutor as Executor
 from pyramid.config import Configurator
 from zope.configuration.xmlconfig import XMLConfig
 
@@ -20,6 +21,9 @@ cs.setLevel(logging.INFO)
 logger.addHandler(cs)
 
 XMLConfig('configure.zcml', leica)()
+
+# Used for Knack intergration
+internal_actions = Executor(max_workers=2)
 
 
 def includeme(config):

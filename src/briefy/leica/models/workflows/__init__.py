@@ -2,6 +2,14 @@
 from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import Permission
 from briefy.common.workflow import WorkflowState
+from briefy.leica import internal_actions
+from briefy.leica.utils import bridge
+from briefy.leica.utils import transitions
+
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class AssetWorkflow(BriefyWorkflow):
@@ -131,13 +139,35 @@ class JobWorkflow(BriefyWorkflow):
     ready_for_upload = scheduled.transition(state_to=awaiting_assets,
                                             permission='can_get_ready_for_upload')
     upload = awaiting_assets.transition(state_to=in_qa, permission='can_upload')
-    reject = in_qa.transition(state_to=awaiting_assets, permission='can_reject')
-    approve = in_qa.transition(state_to=approved, permission='can_approve')
     retract_approval = approved.transition(state_to=in_qa, permission='can_retract_approval')
     deliver = approved.transition(state_to=revision, permission='can_deliver')
     customer_reject = revision.transition(state_to=in_qa, permission='can_customer_reject')
     customer_approve = revision.transition(state_to=completed, permission='can_customer_approve')
     cancel = revision.transition(state_to=cancelled, permission='can_cancel')
+    reject = in_qa.transition(state_to=awaiting_assets, permission='can_reject')
+    approve = in_qa.transition(state_to=approved, permission='can_approve')
+
+    @approve
+    def approve_transition(self, *args, **kwargs):
+        """Approve a Job."""
+        job = self.document
+        if not job.approvable:
+            raise self.state.exception_transition(
+                'Incorrect number of assets.'
+            )
+        # Transition all pending assets to approved
+        transitions.approve_assets_in_job(job, self.context)
+        job_info = bridge.get_info_from_job(job)
+        # Update state and comments on Knack
+        internal_actions.submit(bridge.approve_job, job_info)
+
+    @reject
+    def reject_transition(self, workflow, *args, **kwargs):
+        """Reject a Job."""
+        # Update state and comments on Knack
+        job = self.document
+        job_info = bridge.get_info_from_job(job)
+        internal_actions.submit(bridge.reject_job, job_info)
 
     # TODO: review permission
     can_submit = Permission().for_groups('g:system', 'g:briefy_qa')

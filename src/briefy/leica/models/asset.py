@@ -74,6 +74,7 @@ class Asset(Image, Mixin, Base):
 
     comments = sa.orm.relationship('Comment',
                                    foreign_keys='Comment.entity_id',
+                                   order_by='asc(Comment.created_at)',
                                    primaryjoin='Comment.entity_id == Asset.id')
 
     internal_comments = sa.orm.relationship('InternalComment',
