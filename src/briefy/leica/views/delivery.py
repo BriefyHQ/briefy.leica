@@ -17,8 +17,8 @@ DELIVERY_SETTINGS = {
             'filename': '{job_id}.zip',
             'folder_structure': 'simple',
             's3_bucket': 'delivery-{env}'.format(env=ENV),
-            's3_path': '{client_id}/{project_id}/'},
-    }],
+            's3_path': '{client_id}/{project_id}/'}}
+    ],
 
     'd466091b-98c5-4f9d-81a6-ecbc83dd3386': [
         {'gdrive': {
