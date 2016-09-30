@@ -8,6 +8,7 @@ History
 * BODY-53: Additional metadata from image (ericof).
 * LEICA-50: Add custom resource event types for models: customer, comments, project. (rudaporto)
 * Integrate new fixes on briefy.ws. (rudaporto)
+* Deploy to update briefy.ws. (rudaporto)
 
 1.0.0
 -----
