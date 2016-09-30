@@ -16,4 +16,4 @@ S3_CREDENTIALS = config('S3_IMAGE_BUCKET', default='')
 DATABASE_URL = config('DATABASE_URL',)
 
 # Agoda custom config
-AGODA_DELIVERY_GDRIVE = config('AGODA_DELIVERY_GDRIVE', default='') # noqa
+AGODA_DELIVERY_GDRIVE = config('AGODA_DELIVERY_GDRIVE', default='')
