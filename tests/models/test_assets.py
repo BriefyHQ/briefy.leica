@@ -1,10 +1,8 @@
 """Test Asset database model."""
 from briefy.leica import models
 from conftest import BaseModelTest
-from conftest import mock_thumbor
 from sqlalchemy_continuum.utils import count_versions
 
-import httmock
 import pytest
 import transaction
 
@@ -55,14 +53,14 @@ class TestAssetModel(BaseModelTest):
             'dimensions': {'value': '5760x3840', 'operator': 'eq'},
         }
 
-        assert asset.is_valid == True
+        assert asset.is_valid is True
 
         project.tech_requirements = {
             'dpi': {'value': '300', 'operator': 'eq'},
             'dimensions': {'value': '5760x3840', 'operator': 'eq'},
         }
 
-        assert asset.is_valid == False
+        assert asset.is_valid is False
 
     def test_obj_versioning(self, session, obj_payload):
         """Test object versioning."""
