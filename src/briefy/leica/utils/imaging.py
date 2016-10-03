@@ -47,7 +47,7 @@ def _check_dimensions(metadata: dict, value: str, operator: str='eq') -> bool:
     :return: Boolean indicating if constraint was met or not.
     """
     cw, ch = value.split('x')
-    dimensions = metadata.get('dimensions')
+    dimensions = metadata.get('dimensions', '')
     w, h = dimensions.split(' x ')
     value1 = (int(w), int(h))
     value2 = (int(cw), int(ch))
