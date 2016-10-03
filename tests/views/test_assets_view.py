@@ -205,7 +205,6 @@ class TestAssetView(BaseTestView):
             request = app.post_json(self.base_path, payload, headers=self.headers, status=200)
 
         assert 'application/json' == request.content_type
-        result = request.json
 
         db_obj = self.model.query().get(payload['id'])
 

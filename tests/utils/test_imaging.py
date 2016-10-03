@@ -55,6 +55,7 @@ def test_dpi():
     assert func(metadata, '300', 'eq') is True
     assert func(metadata, '72', 'eq') is False
 
+
 def test_mimetype():
     """Test check mimetype."""
     func = imaging._check_mimetype
@@ -64,6 +65,7 @@ def test_mimetype():
 
     assert func(metadata, 'image/jpeg', 'eq') is True
     assert func(metadata, 'image/gif', 'eq') is False
+
 
 def test_check_image_constraints():
     """Test check image constraints."""
