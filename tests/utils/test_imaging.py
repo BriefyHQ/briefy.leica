@@ -71,6 +71,7 @@ def test_check_image_constraints():
     """Test check image constraints."""
     func = imaging.check_image_constraints
     metadata = {
+        'dimensions': '4200 x 3150',
         'width': 4200,
         'height': 3150,
         'ratio': '4/3',
