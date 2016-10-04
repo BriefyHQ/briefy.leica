@@ -48,9 +48,9 @@ class Project(BriefyRoles, BaseMetadata, Mixin, Base):
 
     """
     {
-    "dimensions": "3000x2000",
-    #TODO: formalize these
-
+    "dimensions": {"value": "3000x2000", "operator": "ge"},
+    "ratio": {"value": "4/3", "operator": "equal"},
+    "size": {"value": "4000000", "operator": "le"},
     }
 
     """
