@@ -170,7 +170,7 @@ class Job(BriefyRoles, Mixin, Base):
         data = super().to_dict(excludes=['internal_comments'])
         # TODO: make to_dict recursive and serialize agregated models:
         data['project'] = self.project.to_dict() if self.project else None
-        data['professional'] = self.professional.to_dict() if self.professional else None
+        # data['professional'] = self.professional.to_dict() if self.professional else None
         # Assets are not seriaized along the Job
         data['customer'] = self.project.customer.to_dict() if self.project.customer else None
         data['comments'] = [c.to_dict() for c in self.comments]
@@ -179,6 +179,7 @@ class Job(BriefyRoles, Mixin, Base):
         data['job_location'] = [j.to_dict() for j in self.job_locations]
         add_user_info_to_state_history(self.state_history)
         # TODO: improve this to be a function
+        data['professional'] = get_public_user_info(self.professional_id)
         data['qa_manager'] = get_public_user_info(self.qa_manager)
         data['project_manager'] = get_public_user_info(self.project_manager)
         data['scout_manager'] = get_public_user_info(self.scout_manager)
