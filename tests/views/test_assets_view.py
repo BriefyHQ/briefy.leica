@@ -5,6 +5,8 @@ from conftest import mock_thumbor
 
 import httmock
 import pytest
+import requests_mock
+import os
 
 
 @pytest.mark.usefixtures('create_dependencies')
@@ -20,7 +22,9 @@ class TestAssetView(BaseTestView):
     file_path = 'data/assets.json'
     model = models.Asset
     initial_wf_state = 'pending'
-    ignore_validation_fields = ['state_history', 'state', 'updated_at', 'raw_metadata']
+    # TODO: author_id and uploaded_by should be validated
+    ignore_validation_fields = ['state_history', 'state', 'updated_at',
+                                'raw_metadata', 'uploaded_by', 'author_id']
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {
@@ -28,6 +32,15 @@ class TestAssetView(BaseTestView):
         'owner': 'New Owner',
         'author_id': 'd39c07c6-7955-489a-afce-483dfc7c9c5b'
     }
+
+    TEST_USER_SERVICE_URL01 = 'https://api.stg.briefy.co/internal/users/23d94a43-3947-42fc-958c-09245ecca5f2' # noqa
+    TEST_USER_SERVICE_URL02 = 'https://api.stg.briefy.co/internal/users/d39c07c6-7955-489a-afce-483dfc7c9c5b'  # noqa
+
+    def setup_method(self, method):
+        self.requests_mock = requests_mock.Mocker()
+        text = open(os.path.join(__file__.rsplit('/', 2)[0], 'data/user.json')).read()
+        self.requests_mock.get(self.TEST_USER_SERVICE_URL01, text=text)
+        self.requests_mock.get(self.TEST_USER_SERVICE_URL02, text=text)
 
     def test_successful_creation(self, obj_payload, app):
         """Test successful creation of a new model."""

@@ -1,8 +1,8 @@
 """Views to handle Jobs creation."""
+from briefy.leica.models import Job
+from briefy.leica.models.events import job as events
 from briefy.ws.resources import RESTService
 from briefy.ws.resources import WorkflowAwareResource
-from briefy.leica.models import events
-from briefy.leica.models import Job
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
