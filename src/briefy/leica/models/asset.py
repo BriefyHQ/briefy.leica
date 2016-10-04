@@ -4,6 +4,7 @@ from briefy.common.db.mixins import Mixin
 from briefy.leica.db import Base
 from briefy.leica.db import Session
 from briefy.leica.models import workflows
+from briefy.leica.utils import imaging
 from briefy.ws.utils.user import add_user_info_to_state_history
 from briefy.ws.utils.user import get_public_user_info
 from sqlalchemy_continuum.utils import count_versions
@@ -80,6 +81,36 @@ class Asset(Image, Mixin, Base):
     internal_comments = sa.orm.relationship('InternalComment',
                                             foreign_keys='InternalComment.entity_id',
                                             primaryjoin='InternalComment.entity_id == Asset.id')
+
+    @property
+    def tech_requirements(self) -> dict:
+        """Tech requirements for this asset.
+
+        :return: A dictionary with technical requirements for an asset.
+        """
+        job = self.job
+        return job.tech_requirements
+
+    @property
+    def check_requirements(self) -> list:
+        """Compare metadata with tech requirements
+
+        :return: A list with error messages, if any.
+        """
+        response = []
+        metadata = self.metadata_
+        tech_requirements = self.tech_requirements
+        if tech_requirements:
+            response = imaging.check_image_constraints(metadata, tech_requirements)
+        return response
+
+    @property
+    def is_valid(self) -> bool:
+        """Compare metadata with tech requirements
+
+        :return: A boolean indicating if this image is valid or not.
+        """
+        return not self.check_requirements
 
     @property
     def version(self) -> int:

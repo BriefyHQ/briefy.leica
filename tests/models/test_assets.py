@@ -44,6 +44,24 @@ class TestAssetModel(BaseModelTest):
         assert 'iso' in serialized['metadata']
         assert 'shutter' in serialized['metadata']
 
+    def test_asset_is_valid(self, instance_obj):
+        """Test if the asset is valid."""
+        asset = instance_obj
+        job = asset.job
+        project = job.project
+        project.tech_requirements = {
+            'dimensions': {'value': '5760x3840', 'operator': 'eq'},
+        }
+
+        assert asset.is_valid is True
+
+        project.tech_requirements = {
+            'dpi': {'value': '300', 'operator': 'eq'},
+            'dimensions': {'value': '5760x3840', 'operator': 'eq'},
+        }
+
+        assert asset.is_valid is False
+
     def test_obj_versioning(self, session, obj_payload):
         """Test object versioning."""
         # We will create a new object, so change the id from the payload

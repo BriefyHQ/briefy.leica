@@ -57,7 +57,7 @@ class DeliveryInfoFactory(InternalFactory):
     model = Job
 
 
-@resource(path='/internal/jobs/{id}/delivery_info',
+@resource(path='/internal/jobs/{id}/delivery',
           cors_policy=CORS_POLICY,
           factory=DeliveryInfoFactory)
 class DeliveryInfoService:

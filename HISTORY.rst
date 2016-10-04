@@ -2,7 +2,11 @@
 History
 =======
 
-1.1.0 (Unreleased)
+1.1.1 (Unreleased)
+------------------
+
+
+1.1.0 (2016-10-04)
 ------------------
 
 * BODY-53: Additional metadata from image (ericof).
@@ -11,6 +15,8 @@ History
 * Deploy to update briefy.ws. (rudaporto)
 * LEICA-56: New service to return delivery info for a job. (rudaporto)
 * LEICA-58: Update Knack on job approval and rejection. (ericof)
+* LEICA-47: Machine checking of assets. (ericof)
+* Change to use gunicorn as wsgi service. (rudaporto)
 
 1.0.0
 -----
