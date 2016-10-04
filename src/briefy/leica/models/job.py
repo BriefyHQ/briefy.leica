@@ -156,6 +156,15 @@ class Job(BriefyRoles, Mixin, Base):
                                   'missing': colander.drop}}
                             )
 
+    @property
+    def tech_requirements(self) -> dict:
+        """Tech requirements for this job.
+
+        :return: A dictionary with technical requirements for a job.
+        """
+        project = self.project
+        return project.tech_requirements
+
     def to_dict(self):
         """Return a dict representation of this object."""
         data = super().to_dict(excludes=['internal_comments'])
