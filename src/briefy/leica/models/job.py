@@ -49,7 +49,7 @@ class Job(BriefyRoles, Mixin, Base):
     # Professional
     professional_id = sa.Column(
         sautils.UUIDType,
-        sa.ForeignKey('professionals.id'),
+        # sa.ForeignKey('professionals.id'),
         nullable=True,
         info={'colanderalchemy': {
             'title': 'Professional ID',
@@ -57,7 +57,7 @@ class Job(BriefyRoles, Mixin, Base):
             'missing': colander.drop,
             'typ': colander.String}}
     )
-    professional = sa.orm.relationship('Professional', back_populates='jobs')
+    # professional = sa.orm.relationship('Professional', back_populates='jobs')
     # Job details
     title = sa.Column(sa.String(255), nullable=False)
     description = sa.Column(sa.Text, default='')
