@@ -4,6 +4,7 @@ from briefy.common.db.mixins import BaseMetadata
 from briefy.leica.db import Base
 from briefy.leica.db import Session
 from briefy.leica.models import workflows
+from briefy.ws.utils.user import add_user_info_to_state_history
 from zope.interface import Interface
 from zope.interface import implementer
 
@@ -34,6 +35,12 @@ class Customer(BaseMetadata, Mixin, Base):
                                 'title': 'External ID',
                                 'missing': colander.drop}}
                             )
+
+    def to_dict(self):
+        """Return a dict representation of this object."""
+        data = super().to_dict()
+        add_user_info_to_state_history(self.state_history)
+        return data
 
     def __repr__(self):
         return '<Customer-proxy \'{0}\'>'.format(self.title)

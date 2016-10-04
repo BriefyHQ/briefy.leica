@@ -2,8 +2,18 @@
 History
 =======
 
-1.0.0 (Unreleased)
+1.1.0 (Unreleased)
 ------------------
+
+* BODY-53: Additional metadata from image (ericof).
+* LEICA-50: Add custom resource event types for models: customer, comments, project. (rudaporto)
+* Integrate new fixes on briefy.ws. (rudaporto)
+* Deploy to update briefy.ws. (rudaporto)
+* LEICA-56: New service to return delivery info for a job. (rudaporto)
+* LEICA-58: Update Knack on job approval and rejection. (ericof)
+
+1.0.0
+-----
 
 * LEICA-24: Clean up Job and Project models. (rudaporto)
 * Add Metadata and Briefy Roles mixins to Job and Project. (rudaporto)
@@ -28,5 +38,7 @@ History
 * LEICA-45: Review asset workflow: rename rejected to edit and discarded to rejected. (rudaporto)
 * LEICA-28: Adds knack_import script to fetch Knack JOB and Project data into the local database
 * BODY-49: Integrate fix from briefy.ws. (rudaporto)
-
+* LEICA-46: Update user_id data on all fields to user info map when object is serialized. (rudaporto)
+* Integrate briefy.ws fixes for workflow endpoint POST with empty message attribute on body. (rudaporto)
+* BODY-52: (hotfix) Quote filename for thumbor image signature. (ericof)
 
