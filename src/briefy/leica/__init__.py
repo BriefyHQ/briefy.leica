@@ -1,7 +1,6 @@
 """Briefy Leica."""
 from briefy import leica
 from briefy.common.db.model import Base
-from briefy.common.log import log_handler
 from briefy.leica.db import get_db
 from briefy.leica.db import get_engine
 from briefy.leica.db import Session
@@ -15,15 +14,9 @@ import logging
 import pkg_resources
 
 __version__ = pkg_resources.get_distribution(__package__).version
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-cs = logging.StreamHandler()
-cs.setLevel(logging.INFO)
-logger.addHandler(cs)
-
-# If we have LOG_SERVER variable set, add logstash handler
-if log_handler:
-    logger.addHandler(log_handler)
 
 XMLConfig('configure.zcml', leica)()
 
