@@ -43,10 +43,11 @@ class Auto:
         return ''
 
 
-def import_assets(Session, asset_rows):
+def import_assets(session, asset_rows):
 
     previous_job_id = None
     created = updated = count = 0
+    failed = []
     for job_id, s3_path, image_size, image_width, image_height in asset_rows:
         if job_id != previous_job_id:
             job = Job.query().get(job_id)
@@ -84,6 +85,7 @@ def import_assets(Session, asset_rows):
             new_asset = True
             asset = Asset()
 
+            #Main data upating:
             asset.update(dict(
             job_id=job_id,
             title=title,
@@ -110,23 +112,25 @@ def import_assets(Session, asset_rows):
             asset.state_history[0]['actor'] = ''
             asset.state_history[0]['to'] = asset.state
 
-        with transaction.manager:
-            try:
-                if new_asset:
-                    Session.add(asset)
-                Session.flush()
-                print(".", end='', flush=True)
-            except Exception as error:
-                logging.error('Could not import asset "{}". Error {}'.format(
-                    s3_path, error))
-                Session.rollback()
-                continue
+        savepoint = transaction.savepoint()
+        try:
+            if new_asset:
+                session.add(asset)
+            session.flush()
+            print(".", end='', flush=True)
+        except Exception as error:
+            logging.error('Could not import asset "{}". Error {}'.format(
+                s3_path, error))
+            savepoint.rollback()
+            failed.append(dict(job_id=job.id, asset_name=filename))
+            continue
 
             count += 1
             if not count % 70:
                 print()
     logging.info('{} new assets imported into Leica'.format(created))
     logging.info('{} new assets updated into Leica'.format(updated))
+    return {'created': created, 'updated': updated, 'failed': failed}
 
 """
 def grab_data()
