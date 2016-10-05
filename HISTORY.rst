@@ -5,6 +5,7 @@ History
 1.1.1 (Unreleased)
 ------------------
  * Remove foreign key from jobs to professional. (rudaporto)
+ * Add logging with logstash to this package. (ericof)
 
 1.1.0 (2016-10-04)
 ------------------

@@ -1,4 +1,5 @@
 """Transition helpers for Leica."""
+from briefy.leica import logger
 
 
 def approve_assets_in_job(job: 'Job', context) -> list:
@@ -18,4 +19,11 @@ def approve_assets_in_job(job: 'Job', context) -> list:
         # Approve asset
         asset.workflow.approve()
         assets_ids.append(asset.id)
+
+    logger.info(
+        'Transitioned {assets_count} assets to approved for job {id}'.format(
+            assets_count=len(pending),
+            id=job.id,
+        )
+    )
     return assets_ids
