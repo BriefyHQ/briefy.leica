@@ -27,7 +27,7 @@ class Professional(BaseMetadata, Mixin, Base):
 
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state', '_slug']}
 
-    jobs = sa.orm.relationship('Job', back_populates='professional')
+    # jobs = sa.orm.relationship('Job', back_populates='professional')
     external_id = sa.Column(sa.String,
                             nullable=True,
                             info={'colanderalchemy': {
