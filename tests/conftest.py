@@ -301,7 +301,7 @@ class BaseTestView:
         assert result['total'] == len(result['data'])
 
     def test_successful_update(self, obj_payload, app):
-        """Teste put CustomerInfo to existing object."""
+        """Teste put Data to existing object."""
         payload = self.update_map
         obj_id = obj_payload['id']
         request = app.put_json('{base}/{id}'.format(base=self.base_path, id=obj_id),

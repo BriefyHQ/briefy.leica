@@ -1,5 +1,6 @@
 """S3 helpers."""
 from botocore.exceptions import ClientError
+from briefy.leica.config import DEIS_APP
 from briefy.leica.config import IMAGE_BUCKET
 from briefy.leica.config import UPLOAD_BUCKET
 
@@ -44,6 +45,10 @@ def move_asset_source_file(key: str) -> bool:
     :param key: Path to data to be moved.
     :return: Status of the move.
     """
+    status = False
     source = UPLOAD_BUCKET
     dest = IMAGE_BUCKET
-    return move_key_between_buckets(key, source, dest)
+    if DEIS_APP:
+        # We run only if inside a DEIS environment
+        status = move_key_between_buckets(key, source, dest)
+    return status

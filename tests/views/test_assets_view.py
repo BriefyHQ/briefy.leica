@@ -1,5 +1,7 @@
 """Test assets view."""
 from briefy.leica import models
+from briefy.leica.config import IMAGE_BUCKET
+from briefy.leica.config import UPLOAD_BUCKET
 from conftest import BaseTestView
 from conftest import mock_thumbor
 
@@ -31,6 +33,7 @@ class TestAssetView(BaseTestView):
     update_map = {
         'title': 'New Image',
         'owner': 'New Owner',
+        'source_path': 'path/to/foo/bar.jpg',
         'author_id': 'd39c07c6-7955-489a-afce-483dfc7c9c5b'
     }
 

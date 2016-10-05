@@ -28,3 +28,6 @@ DATABASE_URL = config('DATABASE_URL',)
 
 # Agoda custom config
 AGODA_DELIVERY_GDRIVE = config('AGODA_DELIVERY_GDRIVE', default='')
+
+# Check if running under DEIS
+DEIS_APP = config('DEIS_APP', default='')
