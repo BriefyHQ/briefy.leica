@@ -43,11 +43,11 @@ class Auto:
         return ''
 
 
-def import_assets(asset_rows):
+def import_assets(Session, asset_rows):
 
     previous_job_id = None
     created = updated = count = 0
-    for job_id, s3_path in asset_rows:
+    for job_id, s3_path, image_size, image_width, image_height in asset_rows:
         if job_id != previous_job_id:
             job = Job.query().get(job_id)
             previous_job_id = job_id
@@ -57,34 +57,47 @@ def import_assets(asset_rows):
         else:
             professional_id = SENTINEL_PROFESSIONAL_UUID
 
-        title = s3_path.split('/')[-1]
-        title = title.strip('-_ ')
+        filename = s3_path.split('/')[-1]
+        title = filename.strip('-_ ')
         if title.lower().startswith(job.customer_job_id.lower()):
             title = title[len(job.customer_job_id):].strip(" -+")
         title = title.replace("_", " ")
         source_path = os.path.join(S3_SOURCE_PREFIX, s3_path.lstrip('/'))
 
         new_asset = False
-        asset = Asset.query().filter_by(source_path=source_path).first()
+        # asset = Asset.query().filter_by(source_path=source_path).first()
 
-        if not asset:
+        possible_duplicate = [asset for asset in job.assets if asset.filename==filename]
+
+        if len(possible_duplicate) >= 1:
+            asset = possible_duplicate[0]
+            updated += 1
+            if len(possible_duplicate) > 1:
+                logger.error('Job "{0}" has duplicate assets with the name "{1}"'.format(
+                    job_id, filename))
+                with open('duplicate_asset_filename.csv', 'at') as file_:
+                    wr = csv.writer(file_)
+                    wr.writerow((job_id, filename))
+                del wr, file_
+        else:
             created += 1
             new_asset = True
             asset = Asset()
-        else:
-            updated += 1
-        asset.update(
+
+            asset.update(dict(
             job_id=job_id,
             title=title,
             description="",
-            # TODO: replace these with actual Photographer's names
             owner=str(professional_id),
             author_id=professional_id,
             uploaded_by=professional_id,
             #  Image Mixin fields:
             source_path=os.path.join(S3_SOURCE_PREFIX, s3_path.lstrip('/')),
-            filename=s3_path.split('/')[-1]
-        )
+            filename=filename,
+            size=image_size,
+            width=image_width,
+            height=image_height
+        ))
         asset.state = 'delivered'
         if asset.state_history and len(asset.state_history) == 1:
             # TODO: the information about photo uploading time can
@@ -136,7 +149,7 @@ def main():
     # Throw away headers:
     next(asset_reader)
 
-    import_assets(asset_reader)
+    import_assets(Session, asset_reader)
 
 if __name__ == '__main__':
     main()
