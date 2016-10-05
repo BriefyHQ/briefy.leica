@@ -1,7 +1,6 @@
 """Briefy Leica."""
 from briefy import leica
 from briefy.common.db.model import Base
-from briefy.common.log import log_handler
 from briefy.leica.db import get_db
 from briefy.leica.db import get_engine
 from briefy.leica.db import Session
