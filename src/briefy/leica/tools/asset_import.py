@@ -46,14 +46,14 @@ class Auto:
 def import_assets(session, asset_rows):
 
     previous_job_id = None
-    created = updated = count = 0
+    created = updated = 0
     failed = []
     for job_id, s3_path, image_size, image_width, image_height in asset_rows:
         if job_id != previous_job_id:
             job = Job.query().get(job_id)
             previous_job_id = job_id
 
-        if job.professional:
+        if job.professional_id:
             professional_id = job.professional_id
         else:
             professional_id = SENTINEL_PROFESSIONAL_UUID
@@ -63,12 +63,12 @@ def import_assets(session, asset_rows):
         if title.lower().startswith(job.customer_job_id.lower()):
             title = title[len(job.customer_job_id):].strip(" -+")
         title = title.replace("_", " ")
-        source_path = os.path.join(S3_SOURCE_PREFIX, s3_path.lstrip('/'))
+        # source_path = os.path.join(S3_SOURCE_PREFIX, s3_path.lstrip('/'))
 
         new_asset = False
         # asset = Asset.query().filter_by(source_path=source_path).first()
 
-        possible_duplicate = [asset for asset in job.assets if asset.filename==filename]
+        possible_duplicate = [asset for asset in job.assets if asset.filename == filename]
 
         if len(possible_duplicate) >= 1:
             asset = possible_duplicate[0]
@@ -85,20 +85,20 @@ def import_assets(session, asset_rows):
             new_asset = True
             asset = Asset()
 
-            #Main data upating:
+            # Main data updating:
             asset.update(dict(
-            job_id=job_id,
-            title=title,
-            description="",
-            owner=str(professional_id),
-            author_id=professional_id,
-            uploaded_by=professional_id,
-            #  Image Mixin fields:
-            source_path=os.path.join(S3_SOURCE_PREFIX, s3_path.lstrip('/')),
-            filename=filename,
-            size=image_size,
-            width=image_width,
-            height=image_height
+                job_id=job_id,
+                title=title,
+                description="",
+                owner=str(professional_id),
+                author_id=professional_id,
+                uploaded_by=professional_id,
+                #  Image Mixin fields:
+                source_path=os.path.join(S3_SOURCE_PREFIX, s3_path.lstrip('/')),
+                filename=filename,
+                size=image_size,
+                width=image_width,
+                height=image_height
         ))
         asset.state = 'delivered'
         if asset.state_history and len(asset.state_history) == 1:
