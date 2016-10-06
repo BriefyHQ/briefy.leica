@@ -38,7 +38,7 @@ class Auto:
 def import_assets(session, asset_rows):
 
     previous_job_id = None
-    created = updated = 0
+    created = updated = count = 0
     failed = []
     for job_id, s3_path, image_size, image_width, image_height in asset_rows:
         if job_id != previous_job_id:
@@ -90,8 +90,8 @@ def import_assets(session, asset_rows):
                 filename=filename,
                 size=image_size,
                 width=image_width,
-                height=image_height
-        ))
+                height=image_height)
+            )
         asset.state = 'delivered'
         if asset.state_history and len(asset.state_history) == 1:
             # TODO: the information about photo uploading time can

@@ -54,14 +54,14 @@ def safe_workflow_trigger_transitions(event, transitions, state='created'):
             savepoint.rollback()
             msg = 'Transition: {transition} not found in asset: {id} title: {title}.'
             logger.info(msg.format(id=obj.id, title=obj.title,
-                                    transition=transition_name))
+                                   transition=transition_name))
         except WorkflowPermissionException:
             savepoint.rollback()
             msg = 'Permission denied. Could not execute transition: {transition} for ' \
-                    'asset: {id} state: {state}. user groups:{groups}'
+                  'asset: {id} state: {state}. user groups:{groups}'
             logger.info(msg.format(id=obj.id, state=wf.state.name,
-                                    transition=transition_name,
-                                    groups=user.groups))
+                                   transition=transition_name,
+                                   groups=user.groups))
         else:
             # Trigger an workflow transition name
             wf_transition_event = WorkflowTranstionEvent(
