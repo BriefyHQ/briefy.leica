@@ -66,7 +66,7 @@ def _update_job_on_knack(job_info: dict, knack_state: str):
     knack_job.quality_assurance_feedback = qa_feedback
 
     # Update
-    KJob.commit_knack_object(
+    K.commit_knack_object(
         knack_job,
         only_fields=(
             'approval_status',
