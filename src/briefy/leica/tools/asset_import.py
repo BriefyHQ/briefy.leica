@@ -5,23 +5,15 @@ from briefy.leica.db import create_engine
 from briefy.leica.models import Job
 from briefy.leica.models import Asset
 
-
-# import briefy.leica as K
 import csv
 import logging
 import os
 import transaction
-import uuid  # noQA
 
 
 CSV_NAME = 's3_paths.csv'
-
 S3_SOURCE_PREFIX = 'source/files/'
-
 SENTINEL_PROFESSIONAL_UUID = 'ca6083a9-bc94-4309-be3c-a80a0d1f2370'
-
-logger.setLevel(logging.DEBUG)
-logger.handlers[0].setLevel(logging.DEBUG)
 
 
 def configure():
