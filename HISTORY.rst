@@ -7,6 +7,8 @@ History
  * Remove foreign key from jobs to professional. (rudaporto)
  * Add logging with logstash to this package. (ericof)
  * Fix _update_job_on_knack. (rudaporto)
+ * Change role to group in the Asset and Job workflows. (rudaporto)
+ * Integrate workflow fix in briefy.common. (rudaporto)
 
 1.1.0 (2016-10-04)
 ------------------

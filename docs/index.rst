@@ -16,6 +16,7 @@ Table of Contents
    codebase/index
    database
    workflow
+   sync
    history
 
 Indices and tables

@@ -89,7 +89,7 @@ class TestJobView(BaseTestView):
             status=200
         )
         result = request.json
-        assert result['total'] == 2
+        assert result['total'] == 4
         assert 'workaround_qa' in result['transitions']
 
         # Transition to in_qa
