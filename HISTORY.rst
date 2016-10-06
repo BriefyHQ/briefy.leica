@@ -7,6 +7,7 @@ History
  * Remove foreign key from jobs to professional. (rudaporto)
  * Add logging with logstash to this package. (ericof)
  * LEICA-60: Move image file on Asset creation or update. (ericof)
+ * Fix _update_job_on_knack. (rudaporto)
 
 1.1.0 (2016-10-04)
 ------------------
