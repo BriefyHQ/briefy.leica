@@ -148,7 +148,7 @@ class JobWorkflow(BriefyWorkflow):
     approve = in_qa.transition(state_to=approved, permission='can_approve')
 
     @approve
-    def approve_transition(self, *args, **kwargs):
+    def approve(self, *args, **kwargs):
         """Approve a Job."""
         job = self.document
         if not job.approvable:
@@ -162,7 +162,7 @@ class JobWorkflow(BriefyWorkflow):
         internal_actions.submit(bridge.approve_job, job_info)
 
     @reject
-    def reject_transition(self, workflow, *args, **kwargs):
+    def reject(self, workflow, *args, **kwargs):
         """Reject a Job."""
         # Update state and comments on Knack
         job = self.document
