@@ -77,7 +77,7 @@ class AssetWorkflow(BriefyWorkflow):
             is_right_state = True
         elif self.state.name == self.validation.name:
             is_right_state = True
-            allowed_groups.extend(['g:professionals')
+            allowed_groups.extend(['g:professionals'])
         user_has_role = [p for p in allowed_groups if p in self.context.groups]
         return is_right_state and user_has_role
 
