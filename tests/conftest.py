@@ -21,6 +21,14 @@ import os
 import uuid
 
 
+@pytest.fixture
+def queue_url():
+    """Return the url for the SQS server."""
+    host = os.environ.get('SQS_IP', '127.0.0.1')
+    port = os.environ.get('SQS_PORT', '5000')
+    return 'http://{}:{}'.format(host, port)
+
+
 @pytest.fixture(scope='session')
 def db_settings():
     """Get database configuration from .ini file.
@@ -293,7 +301,7 @@ class BaseTestView:
         assert result['total'] == len(result['data'])
 
     def test_successful_update(self, obj_payload, app):
-        """Teste put CustomerInfo to existing object."""
+        """Teste put Data to existing object."""
         payload = self.update_map
         obj_id = obj_payload['id']
         request = app.put_json('{base}/{id}'.format(base=self.base_path, id=obj_id),

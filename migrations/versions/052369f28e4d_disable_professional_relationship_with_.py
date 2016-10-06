@@ -5,11 +5,6 @@ Revises: 115dbdf4ca44
 Create Date: 2016-10-04 22:32:14.787547
 """
 from alembic import op
-from briefy.leica.models import types
-
-import briefy.common
-import sqlalchemy as sa
-import sqlalchemy_utils
 
 revision = '052369f28e4d'
 down_revision = '115dbdf4ca44'

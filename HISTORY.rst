@@ -6,6 +6,7 @@ History
 ------------------
  * Remove foreign key from jobs to professional. (rudaporto)
  * Add logging with logstash to this package. (ericof)
+ * LEICA-60: Move image file on Asset creation or update. (ericof)
  * Fix _update_job_on_knack. (rudaporto)
  * Change role to group in the Asset and Job workflows. (rudaporto)
  * Integrate workflow fix in briefy.common. (rudaporto)
