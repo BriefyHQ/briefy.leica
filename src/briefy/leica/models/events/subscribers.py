@@ -35,36 +35,41 @@ def safe_workflow_trigger_transitions(event, transitions, state='created'):
     """
     obj = event.obj
     request = event.request
-    if request is not None:
-        user = request.user
-        if user is not None:
-            user = request.user
-            wf = obj.workflow
-            wf.context = user
-            if wf.state.name == state:
-                savepoint = transaction.savepoint()
-                for transition_name, message in transitions:
-                    try:
-                        transition = getattr(wf, transition_name)
-                        transition(message=message)
-                    except AttributeError:
-                        savepoint.rollback()
-                        msg = 'Transition: {transition} not found in asset: {id} title: {title}.'
-                        logger.info(msg.format(id=obj.id, title=obj.title,
-                                               transition=transition_name))
-                    except WorkflowPermissionException:
-                        savepoint.rollback()
-                        msg = 'Permission denied. Could not execute transition: {transition} for ' \
-                              'asset: {id} state: {state}. user groups:{groups}'
-                        logger.info(msg.format(id=obj.id, state=wf.state.name,
-                                               transition=transition_name,
-                                               groups=user.groups))
-                    else:
-                        # Trigger an workflow transition name
-                        wf_transition_event = WorkflowTranstionEvent(
-                            event.obj, event.request, transition
-                        )
-                        wf_transition_event()
+    if request is None:
+        return None
+    user = request.user
+    if user is None:
+        return None
+
+    user = request.user
+    wf = obj.workflow
+    wf.context = user
+    if wf.state.name != state:
+        return None
+    savepoint = transaction.savepoint()
+    for transition_name, message in transitions:
+        try:
+            transition = getattr(wf, transition_name)
+            transition(message=message)
+        except AttributeError:
+            savepoint.rollback()
+            msg = 'Transition: {transition} not found in asset: {id} title: {title}.'
+            logger.info(msg.format(id=obj.id, title=obj.title,
+                                   transition=transition_name))
+        except WorkflowPermissionException:
+            savepoint.rollback()
+            msg = 'Permission denied. Could not execute transition: {transition} for ' \
+                  'asset: {id} state: {state}. user groups:{groups}'
+            logger.info(msg.format(id=obj.id, state=wf.state.name,
+                                   transition=transition_name,
+                                   groups=user.groups))
+        else:
+            # Trigger an workflow transition name
+            wf_transition_event = WorkflowTranstionEvent(
+                event.obj, event.request, transition
+            )
+            wf_transition_event()
+    return None
 
 
 @subscriber(AssetCreatedEvent)
