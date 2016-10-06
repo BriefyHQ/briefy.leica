@@ -10,6 +10,14 @@ import logging
 logger = logging.getLogger('briefy.leica')
 
 
+def should_move() -> bool:
+    """Decide if we need to run the routine to move the image between buckets.
+
+    :return: Boolean indicating if we should move files.
+    """
+    return True if DEIS_APP else False
+
+
 def move_key_between_buckets(key: str, source: str, dest: str) -> bool:
     """Move a file (key) between two S3 buckets.
 
@@ -48,7 +56,7 @@ def move_asset_source_file(key: str) -> bool:
     status = False
     source = UPLOAD_BUCKET
     dest = IMAGE_BUCKET
-    if DEIS_APP:
+    if should_move:
         # We run only if inside a DEIS environment
         status = move_key_between_buckets(key, source, dest)
     return status

@@ -56,6 +56,12 @@ def test_move_asset_source_file():
     from briefy.leica.config import IMAGE_BUCKET
     from briefy.leica.config import UPLOAD_BUCKET
 
+    def _should_move():
+        return True
+
+    original = s3.should_move
+    s3.should_move = _should_move
+
     func = s3.move_asset_source_file
     data = b'Hello world!!'
     key = 'foo/bar/hello.txt'
@@ -79,3 +85,5 @@ def test_move_asset_source_file():
     assert status is True
     assert len([o for o in source.objects.all()]) == 0
     assert len([o for o in dest.objects.all()]) == 1
+
+    s3.should_move = original

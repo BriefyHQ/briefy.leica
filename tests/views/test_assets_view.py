@@ -1,7 +1,5 @@
 """Test assets view."""
 from briefy.leica import models
-from briefy.leica.config import IMAGE_BUCKET
-from briefy.leica.config import UPLOAD_BUCKET
 from conftest import BaseTestView
 from conftest import mock_thumbor
 
