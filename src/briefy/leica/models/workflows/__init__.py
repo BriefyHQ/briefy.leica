@@ -57,8 +57,8 @@ class AssetWorkflow(BriefyWorkflow):
 
     # Permissions:
 
-    can_submit = Permission().for_groups('r:professional', 'g:professionals', 'g:briefy_qa')
-    can_invalidate = Permission().for_groups('g:system')
+    can_submit = Permission().for_groups('g:professionals', 'g:briefy_qa')
+    can_invalidate = Permission().for_groups('g:system', 'g:professionals', 'g:briefy_qa')
     can_discard = Permission().for_groups('g:briefy_qa')
     can_reserve = Permission().for_groups('g:briefy_qa')
     can_approve = Permission().for_groups('g:briefy_qa')
@@ -77,7 +77,7 @@ class AssetWorkflow(BriefyWorkflow):
             is_right_state = True
         elif self.state.name == self.validation.name:
             is_right_state = True
-            allowed_groups.extend(['r:professional', 'g:professionals'])
+            allowed_groups.extend(['g:professionals'])
         user_has_role = [p for p in allowed_groups if p in self.context.groups]
         return is_right_state and user_has_role
 
@@ -148,7 +148,7 @@ class JobWorkflow(BriefyWorkflow):
     approve = in_qa.transition(state_to=approved, permission='can_approve')
 
     @approve
-    def approve_transition(self, *args, **kwargs):
+    def approve(self, *args, **kwargs):
         """Approve a Job."""
         job = self.document
         if not job.approvable:
@@ -162,7 +162,7 @@ class JobWorkflow(BriefyWorkflow):
         internal_actions.submit(bridge.approve_job, job_info)
 
     @reject
-    def reject_transition(self, workflow, *args, **kwargs):
+    def reject(self, workflow, *args, **kwargs):
         """Reject a Job."""
         # Update state and comments on Knack
         job = self.document
@@ -171,24 +171,24 @@ class JobWorkflow(BriefyWorkflow):
 
     # TODO: review permission
     can_submit = Permission().for_groups('g:system', 'g:briefy_qa')
-    can_assign = Permission().for_groups('r:scout_manager', 'r:project_manager')
-    can_publish = Permission().for_groups('r:scout_manager', 'r:project_manager')
-    can_retract = Permission().for_groups('r:scout_manager', 'r:project_manager')
+    can_assign = Permission().for_groups('g:briefy_scout', 'g:briefy_pm')
+    can_publish = Permission().for_groups('g:briefy_scout', 'g:briefy_pm')
+    can_retract = Permission().for_groups('g:briefy_scout', 'g:briefy_pm')
     can_schedule = Permission().for_groups(
-        'r:scout_manager', 'r:project_manager', 'r:professional')
+        'g:briefy_scout', 'g:briefy_pm', 'g:professionals')
     can_have_schedulling_issues = Permission().for_groups(
-        'r:scout_manager', 'r:project_manager', 'r:professional')
+        'g:briefy_scout', 'g:briefy_pm', 'g:professionals')
     can_get_ready_for_upload = Permission().for_groups(
-        'r:scout_manager', 'r:professional', 'g:system')
-    can_upload = Permission().for_groups('r:professional')
+        'g:briefy_scout', 'g:professionals', 'g:system')
+    can_upload = Permission().for_groups('g:professionals')
     can_reject = Permission().for_groups('r:qa_manager', 'g:briefy_qa')
     # TODO: review permission
     can_approve = Permission().for_groups('r:qa_manager', 'g:briefy_qa')
-    can_retract_approval = Permission().for_groups('r:qa_manager', 'r:project_manager',
+    can_retract_approval = Permission().for_groups('r:qa_manager', 'g:briefy_pm',
                                                    'g:briefy_qa')
-    can_customer_reject = Permission().for_groups('r:customer')
-    can_customer_approve = Permission().for_groups('r:customer')
-    can_cancel = Permission().for_groups('r:project_manager')
+    can_customer_reject = Permission().for_groups('g:customers')
+    can_customer_approve = Permission().for_groups('g:customers')
+    can_cancel = Permission().for_groups('g:briefy_pm')
     # TODO: in the future this should be changed to a context role
     can_self_assign = Permission().for_groups('g:professionals')
     can_workaround = Permission().for_groups('g:briefy_qa')
