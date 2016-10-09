@@ -42,6 +42,7 @@ class AssetService(RESTService):
 
     model = Asset
     friendly_name = Asset.__name__
+    items_per_page = 150
     default_order_by = 'created_at'
 
     _default_notify_events = {

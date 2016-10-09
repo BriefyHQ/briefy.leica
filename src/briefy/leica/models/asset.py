@@ -14,6 +14,17 @@ import sqlalchemy as sa
 import sqlalchemy_utils as sautils
 
 
+__summary_attributes__ = [
+    'id', 'title', 'filename', 'created_at', 'updated_at', 'state', 'uploaded_by',
+    'author_id', 'size', 'width', 'height', 'is_valid', 'image'
+]
+
+__listing_attributes__ = [
+    'id', 'title', 'filename', 'created_at', 'updated_at', 'state', 'uploaded_by',
+    'author_id', 'size', 'width', 'height', 'is_valid', 'image', 'version', 'history'
+]
+
+
 class Asset(Image, Mixin, Base):
     """A deliverable asset from a Job."""
 
@@ -24,6 +35,22 @@ class Asset(Image, Mixin, Base):
         'exclude': ['state_history', '_state_history', ]
     }
     __session__ = Session
+
+    __summary_attributes__ = __summary_attributes__
+    __listing_attributes__ = __listing_attributes__
+
+    __raw_acl__ = (
+        ('list', ('g:professionals', 'g:system')),
+        ('view', ()),
+        ('edit', ()),
+        ('delete', ()),
+    )
+
+    __actors__ = (
+        'author_id',
+        'uploaded_by',
+        'qa_manager',
+    )
 
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'history',
                                                'raw_metadata',
@@ -130,6 +157,38 @@ class Asset(Image, Mixin, Base):
         :param value:
         """
         pass
+
+    @property
+    def qa_manager(self) -> str:
+        """Return the qa_manager id for this object.
+
+        :return: ID of the qa_manager.
+        """
+        return self.job.qa_manager
+
+    def _apply_actors_info(self, data: dict) -> dict:
+        """Apply actors information for a given data dictionary.
+
+        :param data: Data dictionary.
+        :return: Data dictionary.
+        """
+        actors = [(k, k) for k in self.__actors__]
+        info = self._actors_info()
+        for key, attr in actors:
+            value = info.get(attr, None)
+            data[key] = get_public_user_info(value) if value else None
+        return data
+
+    def to_listing_dict(self) -> dict:
+        """Return a summarized version of the dict representation of this Class.
+
+        Used to serialize this object within a parent object serialization.
+        :returns: Dictionary with fields and values used by this Class
+        """
+        data = super().to_listing_dict()
+        # data = self._apply_actors_info(data)
+        data['metadata'] = self.metadata_
+        return data
 
     def to_dict(self):
         """Return a dict representation of this object."""

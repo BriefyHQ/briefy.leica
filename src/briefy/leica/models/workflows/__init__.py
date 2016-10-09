@@ -12,6 +12,15 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+G_CUS = 'g:customers'
+G_PM = 'g:briefy_pm'
+G_PROF = 'g:professionals'
+G_QA = 'g:briefy_qa'
+G_SCOUT = 'g:briefy_scout'
+G_SYS = 'g:system'
+R_QA = 'r:qa_manager'
+
+
 class AssetWorkflow(BriefyWorkflow):
     """Workflow for an Asset."""
 
@@ -57,27 +66,27 @@ class AssetWorkflow(BriefyWorkflow):
 
     # Permissions:
 
-    can_submit = Permission().for_groups('g:professionals', 'g:briefy_qa')
-    can_invalidate = Permission().for_groups('g:system', 'g:professionals', 'g:briefy_qa')
-    can_discard = Permission().for_groups('g:briefy_qa')
-    can_reserve = Permission().for_groups('g:briefy_qa')
-    can_approve = Permission().for_groups('g:briefy_qa')
-    can_start_processing = Permission().for_groups('g:briefy_qa')
-    can_reserve = Permission().for_groups('g:briefy_qa')
-    can_reject = Permission().for_groups('g:briefy_qa')
-    can_retract = Permission().for_groups('g:briefy_qa')
-    can_deliver = Permission().for_groups('g:system')
-    can_end_processing = Permission().for_groups('g:briefy_qa')
+    can_submit = Permission().for_groups(G_PROF, G_QA)
+    can_invalidate = Permission().for_groups(G_SYS, G_PROF, G_QA)
+    can_discard = Permission().for_groups(G_QA)
+    can_reserve = Permission().for_groups(G_QA)
+    can_approve = Permission().for_groups(G_QA)
+    can_start_processing = Permission().for_groups(G_QA)
+    can_reserve = Permission().for_groups(G_QA)
+    can_reject = Permission().for_groups(G_QA)
+    can_retract = Permission().for_groups(G_QA)
+    can_deliver = Permission().for_groups(G_SYS)
+    can_end_processing = Permission().for_groups(G_QA)
 
     @Permission
     def can_validate(self):
-        allowed_groups = ['g:system', 'g:briefy_qa']
+        allowed_groups = [G_SYS, G_QA]
         is_right_state = False
         if self.state.name == self.edit.name:
             is_right_state = True
         elif self.state.name == self.validation.name:
             is_right_state = True
-            allowed_groups.extend(['g:professionals'])
+            allowed_groups.extend([G_PROF])
         user_has_role = [p for p in allowed_groups if p in self.context.groups]
         return is_right_state and user_has_role
 
@@ -169,29 +178,26 @@ class JobWorkflow(BriefyWorkflow):
         job_info = bridge.get_info_from_job(job)
         internal_actions.submit(bridge.reject_job, job_info)
 
+    func = Permission().for_groups
     # TODO: review permission
-    can_submit = Permission().for_groups('g:system', 'g:briefy_qa')
-    can_assign = Permission().for_groups('g:briefy_scout', 'g:briefy_pm')
-    can_publish = Permission().for_groups('g:briefy_scout', 'g:briefy_pm')
-    can_retract = Permission().for_groups('g:briefy_scout', 'g:briefy_pm')
-    can_schedule = Permission().for_groups(
-        'g:briefy_scout', 'g:briefy_pm', 'g:professionals')
-    can_have_schedulling_issues = Permission().for_groups(
-        'g:briefy_scout', 'g:briefy_pm', 'g:professionals')
-    can_get_ready_for_upload = Permission().for_groups(
-        'g:briefy_scout', 'g:professionals', 'g:system')
-    can_upload = Permission().for_groups('g:professionals')
-    can_reject = Permission().for_groups('r:qa_manager', 'g:briefy_qa')
+    can_submit = func(G_SYS, G_QA)
+    can_assign = func(G_SCOUT, G_PM)
+    can_publish = func(G_SCOUT, G_PM)
+    can_retract = func(G_SCOUT, G_PM)
+    can_schedule = func(G_SCOUT, G_PM, G_PROF)
+    can_have_schedulling_issues = func(G_SCOUT, G_PM, G_PROF)
+    can_get_ready_for_upload = func(G_SCOUT, G_PROF, G_SYS)
+    can_upload = func(G_PROF)
+    can_reject = func(R_QA, G_QA)
     # TODO: review permission
-    can_approve = Permission().for_groups('r:qa_manager', 'g:briefy_qa')
-    can_retract_approval = Permission().for_groups('r:qa_manager', 'g:briefy_pm',
-                                                   'g:briefy_qa')
-    can_customer_reject = Permission().for_groups('g:customers')
-    can_customer_approve = Permission().for_groups('g:customers')
-    can_cancel = Permission().for_groups('g:briefy_pm')
+    can_approve = func(R_QA, G_QA)
+    can_retract_approval = func(R_QA, G_PM, G_QA)
+    can_customer_reject = func(G_CUS)
+    can_customer_approve = func(G_CUS)
+    can_cancel = func(G_PM)
     # TODO: in the future this should be changed to a context role
-    can_self_assign = Permission().for_groups('g:professionals')
-    can_workaround = Permission().for_groups('g:briefy_qa')
+    can_self_assign = func(G_PROF)
+    can_workaround = func(G_QA)
 
 
 class ProfessionalWorkflow(BriefyWorkflow):

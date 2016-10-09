@@ -20,6 +20,12 @@ class JobLocation(Mixin, AddressMixin, Base):
     __tablename__ = 'job_locations'
     __session__ = Session
 
+    __summary_attributes__ = [
+        'id', 'country', 'locality', 'coordinates'
+    ]
+
+    __listing_attributes__ = __summary_attributes__
+
     job_id = sa.Column(sautils.UUIDType,
                        sa.ForeignKey('jobs.id'),
                        nullable=False,
