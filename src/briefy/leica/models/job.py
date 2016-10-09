@@ -132,11 +132,9 @@ class Job(BriefyRoles, Mixin, Base):
 
         :returns: Number of assets on this job.
         """
-        # from briefy.leica.models.asset import Asset
-        #approvable_assets_count = self.assets.filter(
-        #    Asset.state.in_(('pending', 'approved', 'delivered'))
-        #).count()
-        approvable_assets_count = len([a for a in self.assets if a.state in ('pending', 'approved', 'delivered')])
+        approvable_assets_count = len(
+            [a for a in self.assets if a.state in ('pending', 'approved', 'delivered')]
+        )
         return approvable_assets_count
 
     @property
