@@ -1,6 +1,7 @@
 """Briefy Leica Job model."""
-from briefy.common.db.mixins import Mixin
+from briefy.common.db.mixins import BaseMetadata
 from briefy.common.db.mixins import BriefyRoles
+from briefy.common.db.mixins import Mixin
 from briefy.common.db.types import AwareDateTime
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica.db import Base
@@ -29,7 +30,7 @@ class IJob(Interface):
 
 
 @implementer(IJob)
-class Job(BriefyRoles, Mixin, Base):
+class Job(BriefyRoles, Mixin, BaseMetadata, Base):
     """A Job within a project."""
 
     version = None
@@ -83,16 +84,17 @@ class Job(BriefyRoles, Mixin, Base):
             'typ': colander.String}}
     )
     # professional = sa.orm.relationship('Professional', back_populates='jobs')
+
     # Job details
-    title = sa.Column(sa.String(255), nullable=False)
-    description = sa.Column(sa.Text, default='')
     job_requirements = sa.Column(sa.Text, default='')
     job_locations = sa.orm.relationship('JobLocation')
 
-    # Category of the job # TODO: need to come from briefy.common
-    category = sa.Column(sautils.ChoiceType(CategoryChoices, impl=sa.String()),
-                         default='undefined',
-                         nullable=True)
+    # Category of the job
+    category = sa.Column(
+        sautils.ChoiceType(CategoryChoices, impl=sa.String()),
+        default='undefined',
+        nullable=True
+    )
 
     # Job Identifiers
     job_id = sa.Column(sa.String, nullable=False)  # Was internal_job_id
