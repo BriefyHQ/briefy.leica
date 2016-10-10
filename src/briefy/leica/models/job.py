@@ -256,6 +256,7 @@ class Job(BriefyRoles, Mixin, BaseMetadata, Base):
     def to_dict(self):
         """Return a dict representation of this object."""
         data = super().to_dict(excludes=['internal_comments'])
+        data['description'] = self.description
         data['project_brief'] = self.project_brief
         data['assignment_date'] = self.assignment_date
 

@@ -1,9 +1,10 @@
 from briefy.common.utils.transformers import to_serializable
+from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica.models import types
 
 
-@to_serializable.register(types.CategoryChoices)
-def json_jog_category_type(val):
+@to_serializable.register(CategoryChoices)
+def json_job_category_type(val):
     """CategoryChoices serializer."""
     return str(val.value)
 
