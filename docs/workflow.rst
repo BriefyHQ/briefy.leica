@@ -3,46 +3,14 @@ Workflow
 
 Workflows definitions.
 
-Assets
-++++++
+Job
++++
 
 .. uml::
 
     @startuml
 
-    [*] --> created
-    created --> validation : submit
-    validation --> edit : invalidate
-    validation --> pending : validate
-    edit --> pending : validate
-    edit --> validation : submit
-    pending --> discarded : discard
-    discarded --> pending : retract
-    delivered --> rejected : reject
-    pending --> post_processing : process
-    post_processing --> pending : processed
-    pending --> reserved : reserve
-    approved --> reserved : reserve
-    pending --> edit: request_edit
-    pending --> approved: approve
-    reserved --> approved: approve
-    approved --> pending : retract
-    rejected --> pending : retract
-    reserved --> pending : retract
-    approved --> delivered : deliver
-    delivered --> [*]
-
-    @enduml
-
-Jobs
-++++
-
-.. uml::
-
-    @startuml
-
-    [*] --> created
-    created --> pending : submit
+    [*] --> pending : submit
     pending --> in_qa : workaround_qa
     pending --> awaiting_assets : workaround_upload
     pending --> assigned: assign
@@ -64,3 +32,44 @@ Jobs
     completed --> [*]
 
     @enduml
+
+
+Asset
++++++
+
+.. uml::
+
+    @startuml
+
+    state validation: Under machine\nvalidation
+    state edit: Professional needs to\nwork on the Asset
+    state pending: Under QA evaluation
+    state discarded: Not going\nto be used
+    state post_processing: Internal\npost processing
+    state approved: Approved by QA
+    state reserved: Will not be delivered\nbut is available for Briefy.
+    state delivered: Delivered to\nthe customer.
+    state rejected: Customer rejected\nthe Asset.
+
+    [*] --> validation : submit\n(Professional)
+    validation --> edit : invalidate\n(System)
+    validation --> pending : validate\n(System)
+    edit --> pending : validate\n(QA)
+    edit --> validation : submit\n(QA)
+    pending --> discarded : discard\n(QA)
+    discarded --> pending : retract\n(QA)
+    delivered --> rejected : reject\n(QA)
+    pending --> post_processing : process\n(QA)
+    post_processing --> pending : processed\n(QA)
+    pending --> reserved : reserve\n(QA)
+    approved --> reserved : reserve\n(QA)
+    pending --> edit: request_edit\n(QA)
+    pending --> approved: approve\n(QA)
+    reserved --> approved: approve\n(QA)
+    approved --> pending : retract\n(QA)
+    rejected --> pending : retract\n(Customer)
+    reserved --> pending : retract\n(QA)
+    approved --> delivered : deliver\n(QA)
+
+    @enduml
+

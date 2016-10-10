@@ -28,6 +28,15 @@ class Project(BriefyRoles, BaseMetadata, Mixin, Base):
     __session__ = Session
     _workflow = workflows.ProjectWorkflow
 
+    __summary_attributes__ = [
+        'id', 'title', 'description', 'created_at', 'updated_at', 'state', 'external_id'
+    ]
+
+    __listing_attributes__ = [
+        'id', 'title', 'description', 'created_at', 'updated_at', 'state', 'external_id',
+        'total_jobs'
+    ]
+
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'customer']}
     customer_id = sa.Column(sautils.UUIDType,
                             sa.ForeignKey('customers.id'),
@@ -61,7 +70,7 @@ class Project(BriefyRoles, BaseMetadata, Mixin, Base):
                                        'typ': colander.String}}
                                   )
 
-    jobs = sa.orm.relationship('Job', back_populates='project')
+    jobs = sa.orm.relationship('Job', back_populates='project', lazy='dynamic')
 
     brief = sa.Column(sautils.URLType,
                       nullable=True,
@@ -72,13 +81,46 @@ class Project(BriefyRoles, BaseMetadata, Mixin, Base):
                           'typ': colander.String}}
                       )
 
+    @property
+    def total_jobs(self) -> int:
+        """Total number of jobs.
+
+        :returns: Number of jobs on this project.
+        """
+        return self.jobs.count()
+
+    def _apply_actors_info(self, data: dict) -> dict:
+        """Apply actors information for a given data dictionary.
+
+        :param data: Data dictionary.
+        :return: Data dictionary.
+        """
+        actors = (
+            ('qa_manager', 'qa_manager'),
+            ('project_manager', 'project_manager'),
+            ('scout_manager', 'scout_manager'),
+            ('finance_manager', 'finance_manager'),
+        )
+        for key, attr in actors:
+            data[key] = get_public_user_info(getattr(self, attr))
+
+        return data
+
+    def to_listing_dict(self) -> dict:
+        """Return a summarized version of the dict representation of this Class.
+
+        Used to serialize this object within a parent object serialization.
+        :returns: Dictionary with fields and values used by this Class
+        """
+        data = super().to_listing_dict()
+        customer = self.customer
+        data['customer'] = customer.to_summary_dict() if customer else None
+        return data
+
     def to_dict(self):
         """Return a dict representation of this object."""
         data = super().to_dict()
         add_user_info_to_state_history(self.state_history)
-        # TODO: improve this to be a function
-        data['qa_manager'] = get_public_user_info(self.qa_manager)
-        data['project_manager'] = get_public_user_info(self.project_manager)
-        data['scout_manager'] = get_public_user_info(self.scout_manager)
-        data['finance_manager'] = get_public_user_info(self.finance_manager)
+        # Apply actor information to data
+        data = self._apply_actors_info(data)
         return data
