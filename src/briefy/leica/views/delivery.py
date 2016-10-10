@@ -111,3 +111,16 @@ class DeliveryService:
                 'status': 'notfound',
                 'message': 'Job not found.'
             }
+
+    @view(permission='edit', validators=[validate_id])
+    def put(self):
+        """Update delivery link after briefy.courier build the delivey package."""
+        job = self.get_one()
+        if job:
+            pass
+        else:
+            self.request.response.status_code = 404
+            return {
+                'status': 'notfound',
+                'message': 'Job not found.'
+            }

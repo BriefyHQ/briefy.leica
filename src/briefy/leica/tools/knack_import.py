@@ -6,7 +6,7 @@ from briefy.leica.models import Customer as LCustomer
 from briefy.leica.models import Job as LJob
 from briefy.leica.models import JobLocation
 from briefy.leica.models import Project as LProject
-from briefy.leica.models.types import CategoryChoices
+from briefy.common.vocabularies.categories import CategoryChoices
 from stackfull import pop
 from stackfull import push
 
@@ -47,6 +47,7 @@ class JwtAuth(requests.auth.AuthBase):
     user = None
 
     def __call__(self, request):
+        """Customized authentication for briefy API request."""
         if not self.token:
             login()
         request.headers['Authorization'] = 'JWT {token}'.format(token=self.token)
@@ -54,12 +55,14 @@ class JwtAuth(requests.auth.AuthBase):
 
 
 def get_headers():
+    """Default headers for all API requests."""
     headers = {'X-Locale': 'en_GB',
                'User-Agent': 'Briefy-SyncBot/0.1'}
     return headers
 
 
 def login():
+    """Use briefy.rolleiflex email login to get a valid token."""
     data = dict(username=config.API_USERNAME, password=config.API_PASSWORD)
     print('Login')
     response = requests.post(config.LOGIN_ENDPOINT, data=data, headers=get_headers())
@@ -82,6 +85,8 @@ def get_model_and_data(model_name):
 
 
 class Auto:
+    """Helper class to map dict to object."""
+
     def __init__(self, **attrs):
         for k, v in attrs.items():
             setattr(self, k, v)
@@ -91,7 +96,12 @@ class Auto:
 
 
 def import_projects(session, rosetta: dict) -> dict:
-    """Import all projects from knack and return a map of imported projects."""
+    """Import all projects from knack and return a map of imported projects.
+
+    :param session: sqlalchemy session object
+    :param rosetta: map of knack user ID to briefy.rolleiflex UUID
+    :return: dict with all projects imported
+    """
     KProject, all_projects = get_model_and_data('Project')
     project_dict = {}
     customer_dict = {}
@@ -115,7 +125,6 @@ def import_projects(session, rosetta: dict) -> dict:
                             tech_requirements={'dimension': '4000x3000'})
         proj_id = lproject.id = uuid.uuid4()
 
-        savepoint = transaction.savepoint()
         try:
             session.add(lproject)
             session.flush()
@@ -123,7 +132,6 @@ def import_projects(session, rosetta: dict) -> dict:
             logger.error('Could not import project "{project}". Error {error}'.format(
                 project=project.project_name,
                 error=error))
-            savepoint.rollback()
             continue
         else:
             count += 1
@@ -135,56 +143,65 @@ def import_projects(session, rosetta: dict) -> dict:
 
 
 def create_location(location_dict: dict, job: LJob, session) -> JobLocation:
-        klocation = Auto(**location_dict)
-        extra_location_info = {}
-        if hasattr(klocation, 'latitude') and hasattr(klocation, 'longitude'):
-            extra_location_info['coordinates'] = {
-                'type': 'Point',
-                'coordinates': [klocation.latitude, klocation.longitude]
-            }
-        country = klocation.country
-        country = country.rstrip(' ')
-        if country == 'USA':
-            country = 'United States'
-        country = pycountry.countries.indices['name'].get(country, None)
-        if country:
-            country_id = country.alpha2
-            info = dict(
-                province=klocation.state,
-                route=klocation.street.strip('0123456789'),
-                street_number=(pop()
-                               if push(klocation.street and klocation.street.split()[-1]).isdigit()
-                               else (pop(), '')[1]),
-                # TODO: fix this in mapping for country abbreviation
+    """Create location based on knack job_location field.
+
+    :param location_dict: job_location field
+    :param job: briefy.leica job instance
+    :param session: sqlalchemy session instance
+    :return: job location instance
+    """
+    klocation = Auto(**location_dict)
+    extra_location_info = {}
+    if hasattr(klocation, 'latitude') and hasattr(klocation, 'longitude'):
+        extra_location_info['coordinates'] = {
+            'type': 'Point',
+            'coordinates': [klocation.latitude, klocation.longitude]
+        }
+    country = klocation.country
+    country = country.rstrip(' ')
+    if country == 'USA':
+        country = 'United States'
+    country = pycountry.countries.indices['name'].get(country, None)
+    if country:
+        country_id = country.alpha2
+        info = dict(
+            province=klocation.state,
+            route=klocation.street.strip('0123456789'),
+            street_number=(pop()
+                           if push(klocation.street and klocation.street.split()[-1]).isdigit()
+                           else (pop(), '')[1]),
+            # TODO: fix this in mapping for country abbreviation
+            country=country_id,
+            postal_code=klocation.zip
+        )
+
+        try:
+            location = JobLocation(
                 country=country_id,
-                postal_code=klocation.zip
+                job_id=job.id,
+                info=info,
+                locality=klocation.city,
+                **extra_location_info
             )
-            savepoint = transaction.savepoint()
-            try:
-                location = JobLocation(
-                    country=country_id,
-                    job_id=job.id,
-                    info=info,
-                    locality=klocation.city,
-                    **extra_location_info
-                )
-                session.add(location)
-                session.flush()
-            except Exception as error:
-                savepoint.rollback()
-                msg = 'Failure to create location for Job: {job}. Error: {error}'
-                logger.error(msg.format(job=job.customer_job_id, error=error))
-                location = None
-            return location
-        else:
-            msg = 'Country not found: {country}. Job ID: {job_id}. Customer ID: {customer_id}'
-            print(
-                msg.format(
-                    country=klocation.country,
-                    customer_id=job.customer_job_id,
-                    job_id=job.job_id
-                )
+            session.add(location)
+            session.flush()
+        except Exception as error:
+            msg = 'Failure to create location for Job: {job}. Error: {error}'
+            logger.error(msg.format(job=job.customer_job_id, error=error))
+            location = None
+        return location
+
+    else:
+        msg = 'Country not found: {country}. Job ID: {job_id}. ' \
+              'Customer ID: {customer_id}. Location: {location}'
+        print(
+            msg.format(
+                country=klocation.country,
+                customer_id=job.customer_job_id,
+                job_id=job.job_id,
+                location=location_dict,
             )
+        )
 
 
 def get_rosetta() -> dict:
@@ -197,7 +214,14 @@ def get_rosetta() -> dict:
         return {}
 
 
-def import_jobs(project_dict, session, rosetta):
+def import_jobs(project_dict: dict, session: Session, rosetta: dict):
+    """Import all jobs from knack.
+
+    :param project_dict: map with all created projects.
+    :param session: sqlalchemy session object
+    :param rosetta: map of knack user ID to briefy.rolleiflex UUID
+    :return: none
+    """
 
     KJob, all_jobs = get_model_and_data('Job')
     count = 0
@@ -240,16 +264,14 @@ def import_jobs(project_dict, session, rosetta):
         except Exception:
             pass
 
-        savepoint = transaction.savepoint()
         try:
             ljob = LJob(**payload)
             session.add(ljob)
             session.flush()
             logger.debug(ljob.title)
         except Exception as error:
-            savepoint.rollback()
             msg = 'Could not instantiate SQLAlchemy job from {job}. Error: {error}'
-            logger.error(msg.format(job=job, error=error))
+            logger.error(msg.format(job=job.job_id, error=error))
             continue
         else:
             count += 1
@@ -260,7 +282,7 @@ def import_jobs(project_dict, session, rosetta):
         else:
             status = 'in_qa'
 
-        logger.debug('Job: {id}. knack status: {knack_status}, leica status: {status}'.format(
+        logger.info('Job: {id}. knack status: {knack_status}, leica status: {status}'.format(
             id=ljob.id,
             knack_status=knack_status,
             status=status
