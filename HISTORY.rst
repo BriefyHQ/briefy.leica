@@ -10,6 +10,7 @@ History
  * Fix _update_job_on_knack. (rudaporto)
  * Change role to group in the Asset and Job workflows. (rudaporto)
  * Integrate workflow fix in briefy.common. (rudaporto)
+ * BODY-62: Implement pagination. (ericof)
 
 1.1.0 (2016-10-04)
 ------------------
