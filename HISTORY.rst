@@ -10,6 +10,7 @@ History
  * Fix _update_job_on_knack. (rudaporto)
  * Change role to group in the Asset and Job workflows. (rudaporto)
  * Integrate workflow fix in briefy.common. (rudaporto)
+ * LEICA-09: Improve Customers, Projects and Jobs import. Add service to run the import by API call. (rudaporto)
 
 1.1.0 (2016-10-04)
 ------------------
