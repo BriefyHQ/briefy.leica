@@ -40,7 +40,7 @@ class Asset(Image, Mixin, Base):
     __listing_attributes__ = __listing_attributes__
 
     __raw_acl__ = (
-        ('list', ('g:professionals', 'g:system')),
+        ('list', ('g:briefy_qa', 'g:briefy_pm', 'g:system')),
         ('view', ()),
         ('edit', ()),
         ('delete', ()),
@@ -48,8 +48,7 @@ class Asset(Image, Mixin, Base):
 
     __actors__ = (
         'author_id',
-        'uploaded_by',
-        'qa_manager',
+        'uploaded_by'
     )
 
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'history',

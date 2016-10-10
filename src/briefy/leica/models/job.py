@@ -43,7 +43,7 @@ class Job(BriefyRoles, Mixin, BaseMetadata, Base):
     __listing_attributes__ = __listing_attributes__
 
     __raw_acl__ = (
-        ('list', ('g:professionals', 'g:system')),
+        ('list', ('g:briefy_qa', 'g:briefy_pm', 'g:system')),
         ('view', ()),
         ('edit', ()),
         ('delete', ()),
