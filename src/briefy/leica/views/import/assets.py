@@ -14,7 +14,7 @@ class AssetImportFactory(BaseFactory):
 
     @property
     def __base_acl__(self):
-        """RosettaFactory custom acl.
+        """AssetImportFactory custom acl.
 
         :return list of acl for the current logged user plus defaults.
         :rtype list
@@ -28,7 +28,7 @@ class AssetImportFactory(BaseFactory):
           cors_policy=CORS_POLICY,
           factory=AssetImportFactory)
 class AssetImportService:
-    """Service to map knack profile ID to local user UUID."""
+    """Service to import assets from knack to briefy.leica."""
 
     def __init__(self, context, request):
         """Service initialize."""
@@ -37,7 +37,7 @@ class AssetImportService:
 
     @view(permission='add')
     def post(self):
-        """Return all profile IDs from knack mapped to respective user UUIDs."""
+        """Add all assets from the data list received as a json map."""
         data = self.request.json.get('data')
         success = False
         result = {}

@@ -1,5 +1,5 @@
 from briefy.leica import logger
-from briefy.leica.config import DATABASE_URL
+from briefy.leica import config
 from briefy.leica.db import Session  # noQA
 from briefy.leica.db import create_engine
 from briefy.leica.models import Customer as LCustomer
@@ -7,16 +7,14 @@ from briefy.leica.models import Job as LJob
 from briefy.leica.models import JobLocation
 from briefy.leica.models import Project as LProject
 from briefy.leica.models.types import CategoryChoices
-import briefy.knack as K
-from stackfull import push, pop
+from stackfull import pop
+from stackfull import push
 
-import logging
+import briefy.knack as K
 import pycountry
+import requests
 import transaction
 import uuid
-
-logger.setLevel(logging.DEBUG)
-logger.handlers[0].setLevel(logging.DEBUG)
 
 
 # Initial workflow state based on field ['client_job_status']
@@ -35,11 +33,42 @@ knack_status_mapping = {
 def configure():
     """Bind session for 'stand alone' DB usage"""
     global Session
-    engine = create_engine(DATABASE_URL, pool_recycle=3600)
+    engine = create_engine(config.DATABASE_URL, pool_recycle=3600)
     Session.configure(bind=engine)
     return Session
 
 Session = configure()  # noQA
+
+
+class JwtAuth(requests.auth.AuthBase):
+    """Custom auth class to inject Authorization header from jwt token."""
+
+    token = None
+    user = None
+
+    def __call__(self, request):
+        if not self.token:
+            login()
+        request.headers['Authorization'] = 'JWT {token}'.format(token=self.token)
+        return request
+
+
+def get_headers():
+    headers = {'X-Locale': 'en_GB',
+               'User-Agent': 'Briefy-SyncBot/0.1'}
+    return headers
+
+
+def login():
+    data = dict(username=config.API_USERNAME, password=config.API_PASSWORD)
+    print('Login')
+    response = requests.post(config.LOGIN_ENDPOINT, data=data, headers=get_headers())
+    if response.status_code == 200:
+        result = response.json()
+        JwtAuth.token = result.get('token')
+        JwtAuth.user = result.get('user')
+    else:
+        raise Exception('Login failed. Message: \n{msg}'.format(msg=response.text))
 
 
 def get_model_and_data(model_name):
@@ -61,8 +90,8 @@ class Auto:
         return ''
 
 
-def import_projects():
-
+def import_projects(session, rosetta: dict) -> dict:
+    """Import all projects from knack and return a map of imported projects."""
     KProject, all_projects = get_model_and_data('Project')
     project_dict = {}
     customer_dict = {}
@@ -71,35 +100,41 @@ def import_projects():
         if project.company[0]['id'] not in customer_dict:
             customer = LCustomer(external_id=project.company[0]['id'],
                                  title=project.company[0]['identifier'])
-            Session.add(customer)
+            session.add(customer)
             customer_dict[customer.external_id] = customer
         else:
             customer = customer_dict[project.company[0]['id']]
-        Session.add(customer)
+        session.add(customer)
 
-        lproject = LProject(customer=customer, external_id=project.id,
+        # TODO: add new field and import company_user from knack
+        # customer_manager = company_user[0]['id']
+        lproject = LProject(customer=customer,
+                            external_id=project.id,
                             title=project.project_name.strip() or 'Undefined',
+                            project_manager=rosetta.get(project.project_manager[0]['id']),
                             tech_requirements={'dimension': '4000x3000'})
         proj_id = lproject.id = uuid.uuid4()
 
-        with transaction.manager:
-            try:
-                Session.add(lproject)
-                Session.flush()
-            except Exception as error:
-                logging.error('Could not import project "{}". Error {}'.format(
-                    project.project_name, error))
-                Session.rollback()
-                continue
-
+        savepoint = transaction.savepoint()
+        try:
+            session.add(lproject)
+            session.flush()
+        except Exception as error:
+            logger.error('Could not import project "{project}". Error {error}'.format(
+                project=project.project_name,
+                error=error))
+            savepoint.rollback()
+            continue
+        else:
             count += 1
+
         project_dict[project.id] = proj_id
-    logging.info('{} new projects imported into Leica'.format(count))
+    logger.info('{} new projects imported into Leica'.format(count))
 
     return project_dict
 
 
-def create_location(location_dict):
+def create_location(location_dict: dict, job: LJob, session) -> JobLocation:
         klocation = Auto(**location_dict)
         extra_location_info = {}
         if hasattr(klocation, 'latitude') and hasattr(klocation, 'longitude'):
@@ -107,32 +142,62 @@ def create_location(location_dict):
                 'type': 'Point',
                 'coordinates': [klocation.latitude, klocation.longitude]
             }
-        country = pycountry.countries.indices['name'].get(klocation.country, None)
+        country = klocation.country
+        country = country.rstrip(' ')
+        if country == 'USA':
+            country = 'United States'
+        country = pycountry.countries.indices['name'].get(country, None)
         if country:
             country_id = country.alpha2
+            info = dict(
+                province=klocation.state,
+                route=klocation.street.strip('0123456789'),
+                street_number=(pop()
+                               if push(klocation.street and klocation.street.split()[-1]).isdigit()
+                               else (pop(), '')[1]),
+                # TODO: fix this in mapping for country abbreviation
+                country=country_id,
+                postal_code=klocation.zip
+            )
+            savepoint = transaction.savepoint()
+            try:
+                location = JobLocation(
+                    country=country_id,
+                    job_id=job.id,
+                    info=info,
+                    locality=klocation.city,
+                    **extra_location_info
+                )
+                session.add(location)
+                session.flush()
+            except Exception as error:
+                savepoint.rollback()
+                msg = 'Failure to create location for Job: {job}. Error: {error}'
+                logger.error(msg.format(job=job.customer_job_id, error=error))
+                location = None
+            return location
         else:
-            country_id = None
-        info = dict(
-            province=klocation.state,
-            route=klocation.street.strip('0123456789'),
-            street_number=(pop()
-                           if push(klocation.street and klocation.street.split()[-1]).isdigit()
-                           else (pop(), '')[1]),
-            # TODO: fix this in mapping for country abbreviation
-            country=country_id,
-            postal_code=klocation.zip
-        )
-
-        location = JobLocation(
-            country=country_id,
-            info=info,
-            locality=klocation.city,
-            **extra_location_info
-        )
-        return location
+            msg = 'Country not found: {country}. Job ID: {job_id}. Customer ID: {customer_id}'
+            print(
+                msg.format(
+                    country=klocation.country,
+                    customer_id=job.customer_job_id,
+                    job_id=job.job_id
+                )
+            )
 
 
-def import_jobs(project_dict):
+def get_rosetta() -> dict:
+    """Get user map between Knack and Rolleiflex"""
+    response = requests.get(config.ROSETTA_ENDPOINT, headers=get_headers(), auth=JwtAuth())
+    if response.status_code == 200:
+        return response.json()
+    else:
+        logger.error('Fail to get rosetta user mapping.')
+        return {}
+
+
+def import_jobs(project_dict, session, rosetta):
 
     KJob, all_jobs = get_model_and_data('Job')
     count = 0
@@ -143,79 +208,88 @@ def import_jobs(project_dict):
         if not project_id:
             logger.error('Could not import job {}: no corresponding project '.format(job.id))
             continue
+
         project = LProject.query().get(project_id)
 
-        location = create_location(job.__dict__['job_location'])
-        Session.add(location)
+        payload = dict(
+            title=job.job_name or job.id,
+            category=category,
+            project=project,
+            customer_job_id=job.job_id,
+            job_id=job.internal_job_id or job.job_name or job.id,
+            external_id=job.id,
+            job_requirements=job.client_specific_requirement,
+            assignment_date=job.assignment_date
+        )
+
+        if job.briefy_id:
+            payload['id'] = job.briefy_id
 
         try:
-            ljob = LJob(
-                title=job.job_name or job.id,
-                category=category,
-                project=project,
-                customer_job_id=job.job_id,
-                job_id=job.job_id or job.job_name or job.id,
-                external_id=job.id,
-                job_requirements=job.client_specific_requirement,
-                assignment_date=job.assignment_date,
-                # TODO right now, this is knack id:
-                # professional=job.responsible_photographer[0]['id'],
-                # TODO: FIX
-                # project_manager= project.manager
-                # TODO: FIX
-                # qa_manager=job.qa_manager[0]['id']
-                # TODO: FIX
-                # scout_manager=,
-                # TODO: FIX
-                # finance_manager=,
-            )
+            payload['professional_id'] = rosetta.get(job.responsible_photographer[0]['id'])
+        except Exception:
+            pass
+
+        try:
+            payload['qa_manager'] = rosetta.get(job.qa_manager[0]['id'])
+        except Exception:
+            pass
+
+        try:
+            payload['scout_manager'] = rosetta.get(job.scouting_manager[0]['id'])
+        except Exception:
+            pass
+
+        savepoint = transaction.savepoint()
+        try:
+            ljob = LJob(**payload)
+            session.add(ljob)
+            session.flush()
+            logger.debug(ljob.title)
         except Exception as error:
-            logger.error('SNAFU: Could not instantiate SQLAlchemy job from {0}'.format(job))
+            savepoint.rollback()
+            msg = 'Could not instantiate SQLAlchemy job from {job}. Error: {error}'
+            logger.error(msg.format(job=job, error=error))
             continue
+        else:
+            count += 1
 
         knack_status = list(job.client_job_status)
-        print("***", knack_status, end=" - ")
         if knack_status:
             status = knack_status_mapping.get(knack_status[0], 'in_qa')
         else:
-
             status = 'in_qa'
-        print(status)
+
+        logger.debug('Job: {id}. knack status: {knack_status}, leica status: {status}'.format(
+            id=ljob.id,
+            knack_status=knack_status,
+            status=status
+        ))
         ljob.state = status
         if ljob.state_history and len(ljob.state_history) == 1:
             ljob.state_history[0]['message'] = 'Imported in this state from Knack database'
             ljob.state_history[0]['actor'] = 'g:system'
             ljob.state_history[0]['to'] = status
 
-        ljob.job_locations.append(location)
-        if job.briefy_id:
-            ljob.id = job.briefy_id
+        location = create_location(job.__dict__['job_location'], ljob, session)
+        if location:
+            ljob.job_locations.append(location)
 
-        with transaction.manager:
-            try:
-                Session.add(ljob)
-                Session.flush()
-                logger.debug(ljob.title)
-            except Exception as error:
-                logging.error('Could not import job "{}". Error {}'.format(ljob.title, error))
-                Session.rollback()
-                continue
-
-            count += 1
-
-    logging.info('{0} new jobs imported into Leica'.format(count))
+    logger.info('{0} new jobs imported into Leica'.format(count))
 
 
 def main():
     """Handles all the stuff"""
     # Initialize pycountry
     len(pycountry.countries)
+    rosetta = get_rosetta()
 
-    project_dict = import_projects()
-    # If the projects are already imported, the needed project_dictionary can
-    # be queried with this
-    # project_dict={p.external_id: p.id for p in LProject.query().all()  }
-    import_jobs(project_dict)
+    with transaction.manager:
+        project_dict = import_projects(Session, rosetta)
+        # If the projects are already imported, the needed project_dictionary can
+        # be queried with this
+        # project_dict={p.external_id: p.id for p in LProject.query().all()  }
+        import_jobs(project_dict, Session, rosetta)
 
 if __name__ == '__main__':
     main()

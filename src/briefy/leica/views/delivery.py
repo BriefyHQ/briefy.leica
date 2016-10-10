@@ -51,7 +51,7 @@ DELIVERY_SETTINGS = {
 }
 
 
-class DeliveryInfoFactory(InternalFactory):
+class DeliveryFactory(InternalFactory):
     """Internal context factory for jobs delivery service."""
 
     model = Job
@@ -59,9 +59,9 @@ class DeliveryInfoFactory(InternalFactory):
 
 @resource(path='/internal/jobs/{id}/delivery',
           cors_policy=CORS_POLICY,
-          factory=DeliveryInfoFactory)
-class DeliveryInfoService:
-    """Service to return delivery information to briefy.courrier."""
+          factory=DeliveryFactory)
+class DeliveryService:
+    """Service to return delivery information to briefy.courier."""
 
     def __init__(self, context, request):
         """Service initialize."""
@@ -73,17 +73,15 @@ class DeliveryInfoService:
         """Return settings for the current job/customer."""
         result = DELIVERY_SETTINGS.get(str(customer_id), None)
         if not result:
-            return DELIVERY_SETTINGS.get('default')
-        else:
-            return result
+            result = DELIVERY_SETTINGS.get('default')
+        return result
 
     def get_one(self):
         """Get on Job from the database."""
         job_id = self.request.matchdict.get('id')
         return Job.query().get(job_id)
 
-    @view(permission='view',
-          validators=[validate_id])
+    @view(permission='view', validators=[validate_id])
     def get(self):
         """Return user UUID from knack profile ID."""
         job = self.get_one()
