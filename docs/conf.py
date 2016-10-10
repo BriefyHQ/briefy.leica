@@ -3,7 +3,7 @@ import pkg_resources
 import sphinx_bootstrap_theme
 
 
-release = pkg_resources.get_distribution("briefy.common").version
+release = pkg_resources.get_distribution("briefy.leica").version
 version = release.split('.')
 
 major_version = version[0]
@@ -24,11 +24,11 @@ source_suffix = '.rst'
 source_encoding = 'utf-8'
 master_doc = 'index'
 
-project = u'briefy.common'
-copyright = u'2016, Briefy'
-author = u'Erico Andrei'
+project = 'briefy.leica'
+copyright = '2016, Briefy'
+author = 'Briefy Tech Team'
 
-version = u'{}.{}'.format(major_version, minor_version)
+version = '{}.{}'.format(major_version, minor_version)
 release = release
 
 language = 'en'
