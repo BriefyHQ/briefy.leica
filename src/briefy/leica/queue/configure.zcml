@@ -1,6 +1,0 @@
-<configure xmlns="http://namespaces.zope.org/zope">
-
-    <!-- <built-in method title of str object at 0x7fb8da372570> queue -->
-    <utility name="leica.queue" component=".LeicaQueue" provides="briefy.common.queue.IQueue" />
-
-</configure>
