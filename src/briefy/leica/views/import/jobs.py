@@ -1,19 +1,14 @@
 """Service to import batch add assets to briefy.leica."""
 from briefy.leica import logger
-from briefy.leica.models import Customer
-from briefy.leica.models import Project
-from briefy.leica.models import Job
-from briefy.leica.tools.knack_import import get_rosetta
-from briefy.leica.tools.knack_import import import_projects
-from briefy.leica.tools.knack_import import import_jobs
+from briefy.leica.sync.customer import CustomerSync
+from briefy.leica.sync.job import JobSync
+from briefy.leica.sync.project import ProjectSync
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
 from cornice.resource import view
 from pyramid.authentication import Everyone
 from pyramid.authorization import Allow
-
-import pycountry
 
 
 class JobImportFactory(BaseFactory):
@@ -45,24 +40,37 @@ class JobImportService:
     @view(permission='add')
     def post(self):
         """Return all profile IDs from knack mapped to respective user UUIDs."""
-        len(pycountry.countries)
-        rosetta = get_rosetta()
-
         session = self.request.db
-        project_dict = import_projects(session, rosetta)
-        import_jobs(project_dict, session, rosetta)
+        msg = '{model} - created: {created} | updated: {updated}'
 
-        customers = Customer.query().count()
-        projects = Project.query().count()
-        jobs = Job.query().count()
+        customers_created, customers_updated = CustomerSync(session)()
+        logger.info(msg.format(
+            model='Customers',
+            created=len(customers_created),
+            updated=len(customers_updated)
+        ))
 
-        msg = 'Total of items: Customers: {customers}, ' \
-              'Projects: {projects} and Jobs: {jobs} imported.'.format(customers=customers,
-                                                                       projects=projects,
-                                                                       jobs=jobs)
-        logger.info(msg)
+        projects_created, projects_updated = ProjectSync(session)()
+        logger.info(msg.format(
+            model='Projects',
+            created=len(projects_created),
+            updated=len(projects_updated)
+        ))
+
+        jobs_created, jobs_updated = JobSync(session)()
+        logger.info(msg.format(
+            model='Jobs',
+            created=len(jobs_created),
+            updated=len(jobs_updated)
+        ))
+
+        result = dict(
+            jobs={'created': len(jobs_created), 'updated': len(jobs_updated)},
+            customers={'created': len(customers_created), 'updated': len(customers_updated)},
+            projects={'created': len(projects_created), 'updated': len(projects_updated)},
+        )
 
         return {
             'status': 'success',
-            'message': msg
+            'result': result
         }

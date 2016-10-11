@@ -1,6 +1,6 @@
 """Service to import batch add assets to briefy.leica."""
 from briefy.leica import logger
-from briefy.leica.tools.asset_import import import_assets
+from briefy.leica.sync.asset import import_assets
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource

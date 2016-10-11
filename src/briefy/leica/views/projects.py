@@ -24,7 +24,8 @@ class ProjectFactory(BaseFactory):
         :rtype: list
         """
         _acls = [
-            (Allow, 'g:briefy_pm', ['add', 'delete', 'edit', 'list', 'view'])
+            (Allow, 'g:briefy_pm', ['add', 'delete', 'edit', 'list', 'view']),
+            (Allow, 'g:briefy_qa', ['list', 'view'])
         ]
         return _acls
 
