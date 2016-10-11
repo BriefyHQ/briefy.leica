@@ -43,6 +43,12 @@ class ModelSync:
         self.updated = {}
         self.rosetta = get_rosetta()
 
+    def get_knack_item(self, knack_id) -> object:
+        """Get one item from knack service."""
+        if not self.knack_model:
+            self.knack_model = knack.get_model(self.knack_model_name)
+        return self.knack_model.get(knack_id)
+
     def get_items(self):
         """Get all items for one knack model."""
         self.knack_model, items = get_model_and_data(self.knack_model_name)
@@ -105,11 +111,18 @@ class ModelSync:
 
         return item
 
-    def __call__(self):
-        """Syncronize all items from knack to sqlalchemy model."""
+    def __call__(self, knack_id=None):
+        """Syncronize one or all items from knack to sqlalchemy model."""
         created = self.created
         updated = self.updated
-        items = self.get_items()
+        items = []
+
+        if knack_id:
+            item = self.get_knack_item(knack_id)
+            if item:
+                items.append(item)
+        else:
+            items = self.get_items()
 
         for kobj in items:
             item = self.get_db_item(kobj)

@@ -12,6 +12,7 @@ History
  * Integrate workflow fix in briefy.common. (rudaporto)
  * BODY-62: Implement pagination. (ericof)
  * LEICA-09: Improve Customers, Projects and Jobs import. Add service to run the import by API call. (rudaporto)
+ * LEICA-69: LEICA-69: Create new endpoints to sync with knack individual records. (rudaporto)
 
 1.1.0 (2016-10-04)
 ------------------
