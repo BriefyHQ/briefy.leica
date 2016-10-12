@@ -16,4 +16,3 @@ class CustomerWorkflow(BriefyWorkflow):
     initial_state = 'created'
 
     created = WorkflowState('created', title='Created', description='Customer created')
-
