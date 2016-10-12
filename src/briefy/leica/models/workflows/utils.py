@@ -1,6 +1,14 @@
 from pyramid.security import Allow
 from pyramid.security import Everyone
 
+G_CUS = 'g:customers'
+G_PM = 'g:briefy_pm'
+G_PROF = 'g:professionals'
+G_QA = 'g:briefy_qa'
+G_SCOUT = 'g:briefy_scout'
+G_SYS = 'g:system'
+R_QA = 'r:qa_manager'
+
 
 # TODO: Move this to briefy.ws
 
