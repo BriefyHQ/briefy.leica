@@ -44,6 +44,7 @@ class KnackLoggerService:
         try:
             payload = self.request.json
         except JSONDecodeError as exc:
+            self.request.response.status_code = 400
             msg = 'Invalid payload. Exception: {exc}'.format(exc=exc)
             logger.error(msg)
             return dict(status='error', message=msg)
@@ -53,7 +54,4 @@ class KnackLoggerService:
             extra['user'] = user.to_dict()
         logger.info('Knack payload', extra=extra)
 
-        return {
-            'status': 'success',
-            'extra': extra
-        }
+        return dict(status='success')
