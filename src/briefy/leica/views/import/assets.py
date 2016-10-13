@@ -24,7 +24,7 @@ class AssetImportFactory(BaseFactory):
         ]
 
 
-@resource(path='/assets/import',
+@resource(path='/knack/assets/import',
           cors_policy=CORS_POLICY,
           factory=AssetImportFactory)
 class AssetImportService:

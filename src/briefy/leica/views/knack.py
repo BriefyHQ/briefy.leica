@@ -8,13 +8,6 @@ from pyramid.authentication import Everyone
 from pyramid.authorization import Allow
 from simplejson.scanner import JSONDecodeError
 
-import colander
-
-
-class KnackLoggerSchema(colander.MappingSchema):
-    """Payload with data from knack to be logged."""
-    payload = colander.Mapping()
-
 
 class KnackLoggerFactory(BaseFactory):
     """Internal context factory for knack logger service."""
@@ -33,7 +26,6 @@ class KnackLoggerFactory(BaseFactory):
 
 @resource(path='/knack/logger',
           cors_policy=CORS_POLICY,
-          schema=KnackLoggerSchema,
           factory=KnackLoggerFactory)
 class KnackLoggerService:
     """Service to log payloads from knack."""
