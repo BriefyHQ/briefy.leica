@@ -9,6 +9,10 @@ from pyramid.authentication import Everyone
 from pyramid.authorization import Allow
 
 
+COLLECTION_PATH = '/knack/customers/import'
+PATH = COLLECTION_PATH + '/{knack_id}'
+
+
 class CustomerImportFactory(BaseFactory):
     """Internal context factory for import customers service."""
 
@@ -24,8 +28,8 @@ class CustomerImportFactory(BaseFactory):
         ]
 
 
-@resource(collection_path='/customers/import',
-          path='/customers/import/{knack_id}',
+@resource(collection_path=COLLECTION_PATH,
+          path=PATH,
           cors_policy=CORS_POLICY,
           factory=CustomerImportFactory)
 class CustomerImportService:

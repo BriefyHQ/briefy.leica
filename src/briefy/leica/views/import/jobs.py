@@ -11,6 +11,10 @@ from pyramid.authentication import Everyone
 from pyramid.authorization import Allow
 
 
+COLLECTION_PATH = '/knack/jobs/import'
+PATH = COLLECTION_PATH + '/{knack_id}'
+
+
 class JobImportFactory(BaseFactory):
     """Internal context factory for import jobs service."""
 
@@ -26,8 +30,8 @@ class JobImportFactory(BaseFactory):
         ]
 
 
-@resource(collection_path='/jobs/import',
-          path='/jobs/import/{knack_id}',
+@resource(collection_path=COLLECTION_PATH,
+          path=PATH,
           cors_policy=CORS_POLICY,
           factory=JobImportFactory)
 class JobImportService:
