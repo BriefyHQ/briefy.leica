@@ -30,6 +30,8 @@ def includeme(config):
     config.add_request_method(get_db, 'db', reify=True)
     config.include('briefy.ws')
     briefy.ws.initialize(config, version=__version__, project_name=__name__)
+    config.include('pyramid_zcml')
+    config.load_zcml('configure.zcml')
     config.scan()
 
 

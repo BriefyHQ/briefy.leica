@@ -5,7 +5,6 @@ from briefy.leica.models.events.asset import AssetCreatedEvent
 from briefy.leica.models.events.asset import AssetUpdatedEvent
 from briefy.leica.models.events.job import JobCreatedEvent
 from briefy.leica.utils import s3
-from briefy.ws.resources.events import WorkflowTranstionEvent
 from pyramid.events import subscriber
 from requests.exceptions import ConnectionError
 
@@ -63,12 +62,6 @@ def safe_workflow_trigger_transitions(event, transitions, state='created'):
             logger.info(msg.format(id=obj.id, state=wf.state.name,
                                    transition=transition_name,
                                    groups=user.groups))
-        else:
-            # Trigger an workflow transition name
-            wf_transition_event = WorkflowTranstionEvent(
-                event.obj, event.request, transition
-            )
-            wf_transition_event()
     return None
 
 
@@ -78,13 +71,7 @@ def asset_created_handler(event):
     obj = event.obj
     source_path = obj.source_path
     s3.move_asset_source_file(source_path)
-    safe_update_metadata(obj)
     transitions = [('submit', ''), ]
-    if obj.is_valid:
-        transitions.append(('validate', ''), )
-    else:
-        msg = '\n'.join(obj.check_requirements)
-        transitions.append(('invalidate', msg), )
     safe_workflow_trigger_transitions(event, transitions=transitions)
 
 

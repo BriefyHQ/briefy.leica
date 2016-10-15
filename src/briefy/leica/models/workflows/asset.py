@@ -1,7 +1,8 @@
 """Asset Workflow."""
 from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import Permission
-from briefy.common.workflow import WorkflowState
+from briefy.common.workflow import WorkflowState as WS
+from briefy.leica.models.workflows.utils import G_CUS
 from briefy.leica.models.workflows.utils import G_PROF
 from briefy.leica.models.workflows.utils import G_QA
 from briefy.leica.models.workflows.utils import G_SYS
@@ -19,65 +20,185 @@ class AssetWorkflow(BriefyWorkflow):
     initial_state = 'created'
 
     # States:
-    created = WorkflowState('created', description='Asset created')
-    edit = WorkflowState('edit', description='Request asset edit')
-    validation = WorkflowState(
-        'validation', title='In Validation',
-        description='Asset under automatic validation')
-    rejected = WorkflowState('rejected', title='Rejected', description='Asset Rejected')
-    pending = WorkflowState('pending', title='Pending Approval',
-                            description='Under verification by internal Q.A.')
-    reserved = WorkflowState('reserved', description='Reserved for future use')
-    post_processing = WorkflowState('post_processing', title='Post Processing',
-                                    description='Asset under manual post-processing')
-    approved = WorkflowState('approved', description='Ready for delivery')
-    delivered = WorkflowState('delivered', description='Delivered to customer')
+    created = WS(
+        'created',
+        'Created',
+        'Asset created.'
+    )
+    edit = WS(
+        'edit',
+        'Edit',
+        'Request asset edit.'
+    )
+    deleted = WS(
+        'deleted',
+        'Deleted',
+        'Asset is deleted.'
+    )
+    validation = WS(
+        'validation',
+        'In Validation',
+        'Under machine validation.'
+    )
+    discarded = WS(
+        'discarded',
+        'Discarded',
+        'Asset was discarded.'
+    )
+    pending = WS(
+        'pending',
+        'Pending Approval',
+        'Under QA validation.'
+    )
+    reserved = WS(
+        'reserved',
+        'Reserved'
+        'Reserved for future use.'
+    )
+    post_processing = WS(
+        'post_processing',
+        'Post Processing',
+        'Asset under manual post-processing'
+    )
+    approved = WS(
+        'approved',
+        'Approved',
+        'Ready for delivery.'
+    )
+    delivered = WS(
+        'delivered',
+        'Delivered'
+        'Delivered to customer.'
+    )
+    rejected = WS(
+        'rejected',
+        'Rejected'
+        'Customer reject the asset.'
+    )
 
     # Transitions:
-    submit = created.transition(state_to=validation, permission='can_submit',
-                                extra_states=(edit,))
-    invalidate = validation.transition(state_to=edit, permission='can_validate',
-                                       title='Invalidate')
-    validate = validation.transition(state_to=pending, permission='can_validate',
-                                     extra_states=(edit,))
+    @created.transition(validation, 'can_submit')
+    @edit.transition(validation, 'can_submit')
+    def submit(self):
+        """After asset creation, or edition submit it to machine validation."""
+        # Update metadata on the object
+        asset = self.document
+        asset.update_metadata()
 
-    discard = pending.transition(state_to=rejected, permission='can_discard',
-                                 extra_states=(delivered,))
-    process = pending.transition(state_to=post_processing, permission='can_start_processing')
-    reserve = pending.transition(state_to=reserved, permission='can_reserve',
-                                 extra_states=(approved,))
-    reject = pending.transition(state_to=edit, permission='can_reject')
+    @validation.transition(edit, 'can_validate')
+    def invalidate(self):
+        """Invalidate an asset and send it to edition."""
+        pass
 
-    approve = pending.transition(state_to=approved, permission='can_approve',
-                                 extra_states=(reserved,))
-    retract = approved.transition(state_to=pending, permission='can_retract',
-                                  extra_states=(rejected, reserved,))
-    deliver = approved.transition(state_to=delivered, permission='can_deliver',)
-    processed = post_processing.transition(state_to=pending, permission='can_end_processing')
+    @validation.transition(pending, 'can_validate')
+    @edit.transition(pending, 'can_validate')
+    def validate(self):
+        """Validate an asset and send it to edition."""
+        pass
 
-    # Permissions:
-    perm_groups = Permission().for_groups
-    can_submit = perm_groups(G_PROF, G_QA)
-    can_invalidate = perm_groups(G_SYS, G_PROF, G_QA)
-    can_discard = perm_groups(G_QA)
-    can_reserve = perm_groups(G_QA)
-    can_approve = perm_groups(G_QA)
-    can_start_processing = perm_groups(G_QA)
-    can_reserve = perm_groups(G_QA)
-    can_reject = perm_groups(G_QA)
-    can_retract = perm_groups(G_QA)
-    can_deliver = perm_groups(G_SYS)
-    can_end_processing = perm_groups(G_QA)
+    @pending.transition(edit, 'can_approve')
+    def request_edit(self):
+        """Request an edit on the asset."""
+        pass
 
-    @Permission
+    @pending.transition(deleted, 'can_delete')
+    @edit.transition(deleted, 'can_delete')
+    def delete(self):
+        """Delete the asset."""
+        pass
+
+    @pending.transition(discarded, 'can_discard')
+    def discard(self):
+        """Discard the asset."""
+        pass
+
+    @pending.transition(post_processing, 'can_process')
+    def process(self):
+        """Move asset to post processing."""
+        pass
+
+    @pending.transition(reserved, 'can_reserve')
+    @approved.transition(reserved, 'can_reserve')
+    def reserve(self):
+        """Reserve an asset."""
+        pass
+
+    @pending.transition(approved, 'can_approve')
+    @reserved.transition(approved, 'can_approve')
+    def approve(self):
+        """Approve an asset."""
+        pass
+
+    @approved.transition(rejected, 'can_reject')
+    @delivered.transition(rejected, 'can_reject')
+    def reject(self):
+        """Customer reject an asset."""
+        pass
+
+    @approved.transition(delivered, 'can_deliver')
+    def deliver(self):
+        """Asset was delivered."""
+        pass
+
+    @discarded.transition(pending, 'can_discard')
+    @post_processing.transition(pending, 'can_process')
+    @reserved.transition(pending, 'can_reserve')
+    @rejected.transition(pending, 'can_reserve')
+    def retract(self):
+        """Send an asset back to pending."""
+        pass
+
+    @Permission(groups=[G_SYS, G_PROF, G_QA])
+    def can_submit(self):
+        """Validate if user can submit the asset to validation."""
+        return True
+
+    @Permission(groups=[G_SYS, ])
     def can_validate(self):
-        """Logic to check if a user could trigger a validation process."""
-        allowed_groups = [G_SYS, G_QA]
-        is_right_state = False
-        if self.state.name == self.edit.name:
-            is_right_state = True
-        elif self.state.name == self.validation.name:
-            is_right_state = True
-            allowed_groups.extend([G_PROF])
-        user_has_role = [p for p in allowed_groups if p in self.context.groups]
-        return is_right_state and user_has_role
+        """Validate if user can invalidate an asset."""
+        return True
+
+    @Permission(groups=[G_QA, ])
+    def can_discard(self):
+        """Validate if user can discard an asset."""
+        return True
+
+    @Permission(groups=[G_QA, ])
+    def can_reserve(self):
+        """Validate if user can reserve an asset."""
+        return True
+
+    @Permission(groups=[G_QA, ])
+    def can_approve(self):
+        """Validate if user can approve an asset."""
+        return True
+
+    @Permission(groups=[G_QA, ])
+    def can_retract(self):
+        """Validate if user can retract an asset."""
+        return True
+
+    @Permission(groups=[G_SYS, ])
+    def can_deliver(self):
+        """Validate if user can mark an asset as delivered."""
+        return True
+
+    @Permission(groups=[G_QA, ])
+    def can_process(self):
+        """Validate if user can mark an asset as delivered."""
+        return True
+
+    @Permission(groups=[G_CUS, ])
+    def can_reject(self):
+        """Validate if user can mark an asset as delivered."""
+        return True
+
+    @Permission(groups=[G_PROF, ])
+    def can_delete(self):
+        """Validate if professional can delete this asset."""
+        allowed_job_status = ['awaiting_assets', ]
+        obj = self.document
+        job = obj.job
+        if job and job.state in allowed_job_status:
+            return True
+        return False

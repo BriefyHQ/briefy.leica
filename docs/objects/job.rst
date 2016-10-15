@@ -21,16 +21,12 @@ State Machine
     state in_qa: Briefy QA
     state approved: Approved by Briefy
     state completed: Waiting for delivery\npackage creation
-    state delivered: Delivered to\ncustomer
     state customer_rejected: Customer rejected
-    state customer_approved: Customer approved
 
     [*] --> validation : submit\n(Customer)
     validation --> edit : invalidate\n(System,Biz)
     edit --> validation : submit\n(Customer)
     validation --> pending : validate\n(System,Biz)
-    pending --> in_qa : workaround_qa\n(PM, QA)
-    pending --> awaiting_assets : workaround_upload\n(PM, QA)
     pending --> assigned: assign\n(Scout)
     pending --> published: publish\n(PM, Customer)
     published --> pending: retract\n(PM, Customer)
@@ -45,12 +41,11 @@ State Machine
     in_qa --> approved: approve\n(QA)
     in_qa --> pending: reassign\n(QA)
     approved --> in_qa: retract_approval\n(QA)
-    approved --> completed: complete\n(QA, System)
-    completed --> delivered: deliver\n(System)
-    delivered --> customer_rejected: customer_reject\n(Customer)
-    delivered --> customer_approved: customer_approve\n(Customer)
-    customer_rejected --> customer_approved: customer_approve\n(Customer, PM)
-    customer_rejected --> in_qa: customer_reject\n(PM)
+    approved --> completed: complete\n(PM, System, Customer)
+    approved --> customer_rejected: customer_reject\n(Customer)
+    customer_rejected --> completed: complete\n(PM, System, Customer)
+    customer_rejected --> in_qa: retract_approval\n(PM, QA)
+    completed --> completed: deliver\n(System)
     pending --> cancelled: cancel\n(Customer)
     published --> cancelled: cancel\n(Customer)
     assigned --> cancelled: cancel\n(Customer)

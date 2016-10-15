@@ -1,4 +1,5 @@
 """Conftest for Leica."""
+from briefy import leica
 from briefy.common.utils.transformers import to_serializable
 from briefy.leica.db import Base
 from briefy.leica.db import create_engine
@@ -11,7 +12,9 @@ from pyramid import testing
 from pyramid_jwt.policy import JWTAuthenticationPolicy
 from pyramid.paster import get_app
 from webtest import TestApp
+from zope.configuration.xmlconfig import XMLConfig
 
+import botocore
 import configparser
 import enum
 import json
@@ -107,6 +110,16 @@ class BaseModelTest:
     payload_position = 0
     model = None
     request = None
+
+    def setup_class(cls):
+        """Setup test class."""
+        class MockEndpoint(botocore.endpoint.Endpoint):
+            def __init__(self, host, *args, **kwargs):
+                super().__init__(queue_url(), *args, **kwargs)
+
+        botocore.endpoint.Endpoint = MockEndpoint
+
+        XMLConfig('configure.zcml', leica)()
 
     def setup_method(self, method):
         """Setup testing environment."""
