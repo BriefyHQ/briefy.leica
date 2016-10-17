@@ -1,4 +1,5 @@
 """Model event subscribers for briefy.leica."""
+from briefy.common.event.workflow import WorkflowTranstionEvent
 from briefy.common.workflow.exceptions import WorkflowPermissionException
 from briefy.leica import logger
 from briefy.leica.models.events.asset import AssetCreatedEvent
@@ -92,3 +93,20 @@ def asset_updated_handler(event):
         source_path = obj.source_path
         s3.move_asset_source_file(source_path)
     safe_update_metadata(obj)
+
+@subscriber(WorkflowTranstionEvent)
+def asset_submit_handler(event):
+    """Handle asset submited event."""
+    if event.name != 'asset.workflow.submit':
+        return
+    obj = event.obj
+    transitions = []
+    if obj.is_valid:
+        transitions.appemd(
+            ('validate', 'Machine check approved')
+        )
+    else:
+        transitions.appemd(
+            ('invalidate', 'Machine check failed')
+        )
+    safe_workflow_trigger_transitions(event, transitions=transitions)
