@@ -56,7 +56,7 @@ def move_asset_source_file(key: str) -> bool:
     status = False
     source = UPLOAD_BUCKET
     dest = IMAGE_BUCKET
-    if should_move:
+    if should_move():
         # We run only if inside a DEIS environment
         status = move_key_between_buckets(key, source, dest)
     return status

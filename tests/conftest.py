@@ -1,5 +1,6 @@
 """Conftest for Leica."""
 from briefy import leica
+from briefy.common.types import BaseUser
 from briefy.common.utils.transformers import to_serializable
 from briefy.leica.db import Base
 from briefy.leica.db import create_engine
@@ -429,3 +430,25 @@ def mock_thumbor(url, request):
     }
     data = open(os.path.join(__file__.rsplit('/', 1)[0], 'data/thumbor.json')).read()
     return httmock.response(status_code, data, headers, None, 5, request)
+
+
+@httmock.urlmatch(netloc=r'api.stg.briefy.co')
+def mock_rolleiflex(url, request):
+    """Mock request to briefy-rolleiflex."""
+    status_code = 200
+    headers = {
+        'content-type': 'application/json',
+    }
+    data = open(os.path.join(__file__.rsplit('/', 1)[0], 'data/user.json')).read()
+    return httmock.response(status_code, data, headers, None, 5, request)
+
+
+@pytest.fixture('class')
+def roles():
+    """Mock request to briefy-thumbor."""
+    data = json.load(open(os.path.join(__file__.rsplit('/', 1)[0], 'data/roles.json')))
+    roles = {
+        k: BaseUser(data[k]['id'], data=data[k])
+        for k in data
+    }
+    return roles

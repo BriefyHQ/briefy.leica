@@ -119,11 +119,6 @@ class JobWorkflow(BriefyWorkflow):
         """Put the job to be self assigned."""
         pass
 
-    @pending.transition(published, 'can_publish')
-    def publish(self):
-        """Put the job to be self assigned."""
-        pass
-
     @published.transition(pending, 'can_retract')
     def retract(self):
         """Remove a job from Job Poll."""
@@ -228,11 +223,6 @@ class JobWorkflow(BriefyWorkflow):
         """Validate if user is system and job."""
         return True
 
-    @Permission(groups=[G_SCOUT, G_PM])
-    def can_assign(self):
-        """Validate if user can assign a professional to this job."""
-        return True
-
     @Permission(groups=[G_CUS, G_PM])
     def can_publish(self):
         """Validate if user can publish this job (job pool)."""
@@ -278,7 +268,7 @@ class JobWorkflow(BriefyWorkflow):
         """Validate if user can retract from customer_retract."""
         return True
 
-    @Permission(groups=[G_CUS, G_SYS, G_PM,])
+    @Permission(groups=[G_CUS, G_SYS, G_PM])
     def can_complete(self):
         """Validate if user can move a job to completed."""
         return True
