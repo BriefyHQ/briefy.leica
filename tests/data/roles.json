@@ -1,0 +1,56 @@
+{
+    "customer": {
+        "locale": "en_GB",
+        "fullname": "Marketplace Customer",
+        "first_name": "Marketplace",
+        "email": "email@marketplacecustomer.com",
+        "last_name": "Customer",
+        "id": "669a99c2-9bb3-443f-8891-e600a15e3c10",
+        "groups": ["g:customers"]
+    },
+    "system": {
+        "locale": "en_GB",
+        "fullname": "Briefy Leica",
+        "first_name": "Briefy",
+        "email": "leica@briefy.co",
+        "last_name": "Leica",
+        "id": "769a99c2-9bb3-443f-8891-e600a15e3c10",
+        "groups": ["g:system"]
+    },
+    "professional": {
+        "locale": "en_GB",
+        "fullname": "Sebastiao Salgado",
+        "first_name": "Sebastiao",
+        "email": "sebastiao@salgado.com",
+        "last_name": "Salgado",
+        "id": "679a99c2-9bb3-443f-8891-e600a15e3c10",
+        "groups": ["g:professionals"]
+    },
+    "qa": {
+        "locale": "en_GB",
+        "fullname": "Briefy QA",
+        "first_name": "Briefy",
+        "email": "qa@briefy.co",
+        "last_name": "QA",
+        "id": "599a99c2-9bb4-443f-8891-e600a15e3c10",
+        "groups": ["g:briefy_qa"]
+    },
+    "pm": {
+        "locale": "en_GB",
+        "fullname": "Briefy PM",
+        "first_name": "Briefy",
+        "email": "pm@briefy.co",
+        "last_name": "PM",
+        "id": "999a99c2-9bb3-443f-8891-e600a15e3c10",
+        "groups": ["g:briefy_pm"]
+    },
+    "scout": {
+        "locale": "en_GB",
+        "fullname": "Briefy Scout",
+        "first_name": "Briefy",
+        "email": "scout@briefy.co",
+        "last_name": "Scout",
+        "id": "a99a99c2-9bb3-443f-8891-e600a15e3c12",
+        "groups": ["g:briefy_scout"]
+    }
+}

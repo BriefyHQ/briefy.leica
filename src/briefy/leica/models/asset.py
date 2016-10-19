@@ -119,9 +119,9 @@ class Asset(Image, Mixin, Base):
 
     @property
     def check_requirements(self) -> list:
-        """Compare metadata with tech requirements
+        """Compare metadata with tech requirements.
 
-        :return: A list with error messages, if any.
+        :return: A list with validation failures, if any.
         """
         response = []
         metadata = self.metadata_
@@ -197,4 +197,8 @@ class Asset(Image, Mixin, Base):
         add_user_info_to_state_history(self.state_history)
         data['author_id'] = get_public_user_info(self.author_id)
         data['uploaded_by'] = get_public_user_info(self.uploaded_by)
+        data['is_valid'] = self.is_valid
+        data['invalid_checks'] = [
+            c['check'] for c in self.check_requirements
+        ]
         return data

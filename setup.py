@@ -21,6 +21,7 @@ requires = [
     'pycountry',
     'pyramid',
     'pyramid_tm',
+    'pyramid_zcml',
     'requests',
     'setuptools',
     's3transfer==0.1.2',

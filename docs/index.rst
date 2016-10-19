@@ -15,7 +15,7 @@ Table of Contents
    contributing
    codebase/index
    database
-   workflow
+   objects/index
    sync
    history
 

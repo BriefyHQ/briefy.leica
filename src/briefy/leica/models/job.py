@@ -120,6 +120,18 @@ class Job(BriefyRoles, Mixin, BaseMetadata, Base):
                                      'typ': colander.DateTime}}
                                  )
 
+    scheduled_datetime = sa.Column(
+        AwareDateTime(),
+        nullable=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Assignment date',
+                'missing': colander.drop,
+                'typ': colander.DateTime
+            }
+        }
+    )
+
     @property
     def total_assets(self) -> int:
         """Total number of assets.
@@ -146,7 +158,7 @@ class Job(BriefyRoles, Mixin, BaseMetadata, Base):
         :returns: Boolean indicating if it is possible to approve this job.
         """
         approvable_assets_count = self.total_approvable_assets
-        check_images = self.number_of_photos == approvable_assets_count
+        check_images = self.number_of_photos <= approvable_assets_count
         return check_images
 
     @property

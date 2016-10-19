@@ -91,4 +91,5 @@ def test_check_image_constraints():
 
     constraints['mimetype'] = {'value': 'image/tiff', 'operator': 'eq'}
 
-    assert func(metadata, constraints) == ['Check for mimetype failed']
+    assert func(metadata, constraints)[0]['check'] == 'mimetype'
+    assert func(metadata, constraints)[0]['text'] == 'Check for mimetype failed'

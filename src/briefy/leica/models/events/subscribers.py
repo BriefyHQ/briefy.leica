@@ -1,11 +1,11 @@
 """Model event subscribers for briefy.leica."""
+from briefy.common.users import SystemUser
 from briefy.common.workflow.exceptions import WorkflowPermissionException
 from briefy.leica import logger
 from briefy.leica.models.events.asset import AssetCreatedEvent
 from briefy.leica.models.events.asset import AssetUpdatedEvent
 from briefy.leica.models.events.job import JobCreatedEvent
 from briefy.leica.utils import s3
-from briefy.ws.resources.events import WorkflowTranstionEvent
 from pyramid.events import subscriber
 from requests.exceptions import ConnectionError
 
@@ -35,13 +35,13 @@ def safe_workflow_trigger_transitions(event, transitions, state='created'):
     """
     obj = event.obj
     request = event.request
-    if request is None:
+    user = getattr(event, 'user', None)
+    if request is None and user is None:
         return None
-    user = request.user
+    user = user if user else request.user
     if user is None:
         return None
 
-    user = request.user
     wf = obj.workflow
     wf.context = user
     if wf.state.name != state:
@@ -63,12 +63,6 @@ def safe_workflow_trigger_transitions(event, transitions, state='created'):
             logger.info(msg.format(id=obj.id, state=wf.state.name,
                                    transition=transition_name,
                                    groups=user.groups))
-        else:
-            # Trigger an workflow transition name
-            wf_transition_event = WorkflowTranstionEvent(
-                event.obj, event.request, transition
-            )
-            wf_transition_event()
     return None
 
 
@@ -78,13 +72,7 @@ def asset_created_handler(event):
     obj = event.obj
     source_path = obj.source_path
     s3.move_asset_source_file(source_path)
-    safe_update_metadata(obj)
     transitions = [('submit', ''), ]
-    if obj.is_valid:
-        transitions.append(('validate', ''), )
-    else:
-        msg = '\n'.join(obj.check_requirements)
-        transitions.append(('invalidate', msg), )
     safe_workflow_trigger_transitions(event, transitions=transitions)
 
 
@@ -105,3 +93,36 @@ def asset_updated_handler(event):
         source_path = obj.source_path
         s3.move_asset_source_file(source_path)
     safe_update_metadata(obj)
+
+
+def asset_submit_handler(event):
+    """Handle asset submited event."""
+    if event.event_name != 'asset.workflow.submit':
+        return
+    obj = event.obj
+    transitions = []
+    # Impersonate the System here
+    event.user = SystemUser
+    if obj.is_valid:
+        transitions.append(
+            ('validate', 'Machine check approved')
+        )
+    else:
+        error_message = '\n'.join([c['text'] for c in obj.check_requirements])
+        transitions.append(
+            ('invalidate', error_message)
+        )
+    safe_workflow_trigger_transitions(event, transitions=transitions, state='validation')
+
+
+def job_submit_handler(event):
+    """Handle job submitted event."""
+    if event.event_name != 'job.workflow.submit':
+        return
+    transitions = []
+    # Impersonate the System here
+    event.user = SystemUser
+    transitions.append(
+        ('validate', 'Machine check approved')
+    )
+    safe_workflow_trigger_transitions(event, transitions=transitions, state='validation')

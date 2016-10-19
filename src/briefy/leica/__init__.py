@@ -18,10 +18,11 @@ __version__ = pkg_resources.get_distribution(__package__).version
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-XMLConfig('configure.zcml', leica)()
-
-# Used for Knack intergration
+# Used for Knack integration
 internal_actions = Executor(max_workers=2)
+
+
+XMLConfig('configure.zcml', leica)()
 
 
 def includeme(config):
@@ -30,6 +31,8 @@ def includeme(config):
     config.add_request_method(get_db, 'db', reify=True)
     config.include('briefy.ws')
     briefy.ws.initialize(config, version=__version__, project_name=__name__)
+    config.include('pyramid_zcml')
+    config.load_zcml('configure.zcml')
     config.scan()
 
 

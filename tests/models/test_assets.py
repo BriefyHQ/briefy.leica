@@ -93,5 +93,70 @@ class TestAssetModel(BaseModelTest):
         assert obj.versions[0].source_path != 'foo_bar.jpg'
         assert obj.versions[0].source_path == obj_source_path
 
-    def test_workflow(self):
-        return True
+    def test_workflow(self, instance_obj, roles):
+        """Test workflow for this model."""
+        asset = instance_obj
+        job = asset.job
+        job.state = 'awaiting_assets'
+
+        wf = asset.workflow
+
+        # Object starts as created
+        assert asset.state == 'created'
+
+        # Professional can move it to validation
+        wf.context = roles['professional']
+        assert 'submit' in wf.transitions
+        # System as well
+        wf.context = roles['system']
+        assert 'submit' in wf.transitions
+        # QA as well
+        wf.context = roles['qa']
+        assert 'submit' in wf.transitions
+
+        # Professional moves it to validation
+        wf.context = roles['professional']
+        wf.submit()
+
+        # Automatic validation happened
+        assert asset.state == 'pending'
+        # And now Professional is not able to move the object anymore
+        assert len(wf.transitions) == 0
+
+        # QA could transition to 5 distinct states
+        wf.context = roles['qa']
+        assert len(wf.transitions) == 5
+        assert 'request_edit' in wf.transitions
+        assert 'discard' in wf.transitions
+        assert 'process' in wf.transitions
+        assert 'reserve' in wf.transitions
+        assert 'approve' in wf.transitions
+
+        # QA request an edit
+        wf.request_edit()
+        assert asset.state == 'edit'
+        # Professional re-submits it and validation works
+        wf.context = roles['professional']
+        wf.submit()
+
+        # QA will discard it and get it back
+        wf.context = roles['qa']
+        wf.discard()
+        wf.retract()
+
+        # QA will processe it and get it back
+        wf.process()
+        wf.retract()
+
+        # QA will reserve it and get it back
+        wf.reserve()
+        wf.retract()
+
+        # QA will approve it
+        wf.approve()
+        assert asset.state == 'approved'
+
+        # Customer can refuse it
+        wf.context = roles['customer']
+        assert len(wf.transitions) == 1
+        assert 'refuse' in wf.transitions
