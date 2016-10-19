@@ -11,7 +11,7 @@ import os
 class TestAssetImportView():
     """Test AssetImportService view."""
 
-    base_path = '/assets/import'
+    base_path = '/knack/assets/import'
 
     dependencies = [
         (models.Customer, 'data/customers.json'),

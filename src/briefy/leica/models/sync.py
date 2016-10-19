@@ -7,5 +7,5 @@ job_fields_map = [
     ('finance_manager', 'finance_manager'),
     ('number_of_photos', 'number_of_photos'),
     ('job_id', 'internal_job_id'),
-    ('custumer_job_id', 'job_id'),
+    ('customer_job_id', 'job_id'),
 ]
