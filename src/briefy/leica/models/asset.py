@@ -118,7 +118,7 @@ class Asset(Image, Mixin, Base):
         return job.tech_requirements
 
     @property
-    def _check_requirements(self) -> list:
+    def check_requirements(self) -> list:
         """Compare metadata with tech requirements.
 
         :return: A list with validation failures, if any.
@@ -128,28 +128,6 @@ class Asset(Image, Mixin, Base):
         tech_requirements = self.tech_requirements
         if tech_requirements:
             response = imaging.check_image_constraints(metadata, tech_requirements)
-        return response
-
-    @property
-    def check_requirements(self) -> list:
-        """Compare metadata with tech requirements.
-
-        :return: A list with error messages, if any.
-        """
-        response = [
-            c['text'] for c in self._check_requirements
-        ]
-        return response
-
-    @property
-    def invalid_checks(self) -> list:
-        """Return a list of invalid metadata checks.
-
-        :return: A list with invalid metadata, if any.
-        """
-        response = [
-            c['check'] for c in self._check_requirements
-        ]
         return response
 
     @property
@@ -220,5 +198,7 @@ class Asset(Image, Mixin, Base):
         data['author_id'] = get_public_user_info(self.author_id)
         data['uploaded_by'] = get_public_user_info(self.uploaded_by)
         data['is_valid'] = self.is_valid
-        data['invalid_checks'] = self.invalid_checks
+        data['invalid_checks'] = [
+            c['check'] for c in self.check_requirements
+        ]
         return data

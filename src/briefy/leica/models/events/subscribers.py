@@ -108,9 +108,9 @@ def asset_submit_handler(event):
             ('validate', 'Machine check approved')
         )
     else:
-        message = '\n'.join(obj.check_requirements)
+        error_message = '\n'.join([c['text'] for c in obj.check_requirements])
         transitions.append(
-            ('invalidate', message)
+            ('invalidate', error_message)
         )
     safe_workflow_trigger_transitions(event, transitions=transitions, state='validation')
 

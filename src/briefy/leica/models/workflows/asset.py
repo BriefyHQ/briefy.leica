@@ -85,7 +85,7 @@ class AssetWorkflow(BriefyWorkflow):
     @validation.transition(pending, 'can_validate')
     @edit.transition(pending, 'can_validate')
     def validate(self):
-        """Validate an asset and send it to edition."""
+        """Validate an asset and send it to pending."""
         pass
 
     @pending.transition(edit, 'can_approve')
@@ -141,7 +141,7 @@ class AssetWorkflow(BriefyWorkflow):
 
     @Permission(groups=[G['system'], ])
     def can_validate(self):
-        """Validate if user can invalidate an asset."""
+        """Validate if user can validade/invalidate an asset."""
         return True
 
     @Permission(groups=[G['qa'], ])
