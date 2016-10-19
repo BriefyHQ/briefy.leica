@@ -18,8 +18,7 @@ State Machine
     state post_processing: Internal\npost processing
     state approved: Approved by QA
     state reserved: Will not be delivered\nbut is available for Briefy.
-    state delivered: Delivered to\nthe customer.
-    state rejected: Customer rejected\nthe Asset.
+    state refused: Customer refused\nthe Asset.
 
     [*] --> validation : submit\n(Professional)
     validation --> edit : invalidate\n(System)
@@ -30,7 +29,7 @@ State Machine
     pending --> deleted : delete\n(Professional)
     pending --> discarded : discard\n(QA)
     discarded --> pending : retract\n(QA)
-    delivered --> rejected : reject\n(QA)
+    approved --> refused : refuse\n(Customer)
     pending --> post_processing : process\n(QA)
     post_processing --> pending : processed\n(QA)
     pending --> reserved : reserve\n(QA)
@@ -39,8 +38,7 @@ State Machine
     pending --> approved: approve\n(QA)
     reserved --> approved: approve\n(QA)
     approved --> pending : retract\n(QA)
-    rejected --> pending : retract\n(QA, PM, Customer)
     reserved --> pending : retract\n(QA)
-    approved --> delivered : deliver\n(QA)
+    refused --> pending : retract\n(QA)
 
     @enduml
