@@ -4,8 +4,6 @@ from conftest import BaseModelTest
 
 import pytest
 
-from briefy.common.types import BaseUser
-
 
 @pytest.mark.usefixtures('create_dependencies')
 class TestJobModel(BaseModelTest):

@@ -121,14 +121,14 @@ def check_image_constraints(metadata: dict, constraints: dict) -> list:
     """
     response = []
     for name, params in constraints.items():
-        if not 'value' in params:
+        if 'value' not in params:
             logger.info('Error with constraints format')
             continue
 
         value = params['value']
         operator = params.get('operator', 'eq')
 
-        if not name in CHECKERS:
+        if name not in CHECKERS:
             logger.info('Invalid constraint name {name}'.format(name=name))
             continue
         check = CHECKERS[name](metadata, value, operator)

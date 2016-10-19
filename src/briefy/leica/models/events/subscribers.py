@@ -119,7 +119,6 @@ def job_submit_handler(event):
     """Handle job submitted event."""
     if event.event_name != 'job.workflow.submit':
         return
-    obj = event.obj
     transitions = []
     # Impersonate the System here
     event.user = SystemUser
