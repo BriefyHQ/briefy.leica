@@ -23,7 +23,7 @@ State Machine
     state completed: Waiting for delivery\npackage creation
     state refused: Customer refuse
 
-    [*] --> validation : submit\n(Customer, Biz)
+    [*] --> validation : submit\n(Customer, Biz, System)
     validation --> edit : invalidate\n(System)
     edit --> validation : submit\n(Customer, Biz)
     validation --> pending : validate\n(System)

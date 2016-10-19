@@ -1,0 +1,6 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+    <subscriber for="briefy.common.event.workflow.IWorkflowTransitionEvent" handler=".subscribers.asset_submit_handler" />
+    <subscriber for="briefy.common.event.workflow.IWorkflowTransitionEvent" handler=".subscribers.job_submit_handler" />
+
+</configure>

@@ -19,7 +19,7 @@ import botocore
 import configparser
 import enum
 import json
-import httmock
+import requests
 import pytest
 import os
 import uuid
@@ -118,6 +118,8 @@ class BaseModelTest:
             def __init__(self, host, *args, **kwargs):
                 super().__init__(queue_url(), *args, **kwargs)
 
+        if not hasattr(botocore.endpoint, 'OrigEndpoint'):
+            botocore.endpoint.OrigEndpoint = botocore.endpoint.Endpoint
         botocore.endpoint.Endpoint = MockEndpoint
 
         XMLConfig('configure.zcml', leica)()
@@ -237,6 +239,19 @@ class BaseTestView:
     update_map = {}
     initial_wf_state = 'created'
     ignore_validation_fields = ['state_history', 'state']
+
+    def setup_class(cls):
+        """Setup test class."""
+        class MockEndpoint(botocore.endpoint.Endpoint):
+            def __init__(self, host, *args, **kwargs):
+                super().__init__(queue_url(), *args, **kwargs)
+
+        if not hasattr(botocore.endpoint, 'OrigEndpoint'):
+            botocore.endpoint.OrigEndpoint = botocore.endpoint.Endpoint
+
+        botocore.endpoint.Endpoint = MockEndpoint
+
+        XMLConfig('configure.zcml', leica)()
 
     @property
     def headers(self):
@@ -399,7 +414,7 @@ def login(request):
         "first_name": "Rudá",
         "email": "rudazz@gmail.com",
         "last_name": "Filgueiras",
-        "groups": ["g:briefy_qa", "g:briefy_pm"]
+        "groups": ["g:briefy_qa", "g:briefy_pm", "g:briefy_bizdev"]
     }
     policy = JWTAuthenticationPolicy(private_key=JWT_SECRET,
                                      expiration=int(JWT_EXPIRATION))
@@ -421,26 +436,28 @@ def create_dummy_request(request, login):
     cls.request = dummy_request
 
 
-@httmock.urlmatch(netloc=r'briefy-thumbor')
-def mock_thumbor(url, request):
-    """Mock request to briefy-thumbor."""
-    status_code = 200
-    headers = {
-        'content-type': 'application/json',
-    }
-    data = open(os.path.join(__file__.rsplit('/', 1)[0], 'data/thumbor.json')).read()
-    return httmock.response(status_code, data, headers, None, 5, request)
+@pytest.fixture(autouse=True)
+def mock_api(monkeypatch):
+    """Mock all api calls."""
 
+    def mock_request(self, method, url, *args, **kwargs):
+        """Mock a response"""
+        if 'briefy-thumbor' in url:
+            filename = 'data/thumbor.json'
+        elif 'internal/users' in url:
+            filename = 'data/user.json'
+        status_code = 200
+        headers = {
+            'content-type': 'application/json',
+        }
+        data = open(os.path.join(__file__.rsplit('/', 1)[0], filename)).read()
+        resp = requests.Response()
+        resp.status_code = status_code
+        resp.headers = headers
+        resp._content = data.encode('utf8')
+        return resp
 
-@httmock.urlmatch(netloc=r'api.stg.briefy.co')
-def mock_rolleiflex(url, request):
-    """Mock request to briefy-rolleiflex."""
-    status_code = 200
-    headers = {
-        'content-type': 'application/json',
-    }
-    data = open(os.path.join(__file__.rsplit('/', 1)[0], 'data/user.json')).read()
-    return httmock.response(status_code, data, headers, None, 5, request)
+    monkeypatch.setattr(requests.sessions.Session, 'request', mock_request)
 
 
 @pytest.fixture('class')

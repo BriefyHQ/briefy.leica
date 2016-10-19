@@ -1,5 +1,5 @@
 """Model event subscribers for briefy.leica."""
-from briefy.common.event.workflow import WorkflowTranstionEvent
+from briefy.common.users import SystemUser
 from briefy.common.workflow.exceptions import WorkflowPermissionException
 from briefy.leica import logger
 from briefy.leica.models.events.asset import AssetCreatedEvent
@@ -35,13 +35,13 @@ def safe_workflow_trigger_transitions(event, transitions, state='created'):
     """
     obj = event.obj
     request = event.request
-    if request is None:
+    user = getattr(event, 'user', None)
+    if request is None and user is None:
         return None
-    user = request.user
+    user = user if user else request.user
     if user is None:
         return None
 
-    user = request.user
     wf = obj.workflow
     wf.context = user
     if wf.state.name != state:
@@ -94,19 +94,36 @@ def asset_updated_handler(event):
         s3.move_asset_source_file(source_path)
     safe_update_metadata(obj)
 
-@subscriber(WorkflowTranstionEvent)
+
 def asset_submit_handler(event):
     """Handle asset submited event."""
-    if event.name != 'asset.workflow.submit':
+    if event.event_name != 'asset.workflow.submit':
         return
     obj = event.obj
     transitions = []
+    # Impersonate the System here
+    event.user = SystemUser
     if obj.is_valid:
-        transitions.appemd(
+        transitions.append(
             ('validate', 'Machine check approved')
         )
     else:
-        transitions.appemd(
-            ('invalidate', 'Machine check failed')
+        message = '\n'.join(obj.check_requirements)
+        transitions.append(
+            ('invalidate', message)
         )
-    safe_workflow_trigger_transitions(event, transitions=transitions)
+    safe_workflow_trigger_transitions(event, transitions=transitions, state='validation')
+
+
+def job_submit_handler(event):
+    """Handle job submitted event."""
+    if event.event_name != 'job.workflow.submit':
+        return
+    obj = event.obj
+    transitions = []
+    # Impersonate the System here
+    event.user = SystemUser
+    transitions.append(
+        ('validate', 'Machine check approved')
+    )
+    safe_workflow_trigger_transitions(event, transitions=transitions, state='validation')

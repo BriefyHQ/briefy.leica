@@ -1,12 +1,8 @@
 """Test assets view."""
 from briefy.leica import models
 from conftest import BaseTestView
-from conftest import mock_thumbor
 
-import httmock
 import pytest
-import requests_mock
-import os
 import transaction
 
 
@@ -34,29 +30,6 @@ class TestAssetView(BaseTestView):
         'source_path': 'path/to/foo/bar.jpg',
         'author_id': 'd39c07c6-7955-489a-afce-483dfc7c9c5b'
     }
-
-    TEST_USER_SERVICE_URL01 = 'https://api.stg.briefy.co/internal/users/23d94a43-3947-42fc-958c-09245ecca5f2' # noqa
-    TEST_USER_SERVICE_URL02 = 'https://api.stg.briefy.co/internal/users/d39c07c6-7955-489a-afce-483dfc7c9c5b'  # noqa
-
-    def setup_method(self, method):
-        self.requests_mock = requests_mock.Mocker()
-        text = open(os.path.join(__file__.rsplit('/', 2)[0], 'data/user.json')).read()
-        self.requests_mock.get(self.TEST_USER_SERVICE_URL01, text=text)
-        self.requests_mock.get(self.TEST_USER_SERVICE_URL02, text=text)
-
-    def test_successful_creation(self, obj_payload, app):
-        """Test successful creation of a new model."""
-        with httmock.HTTMock(mock_thumbor):
-            super().test_successful_creation(obj_payload, app)
-
-    def test_successful_update(self, obj_payload, app):
-        """Test put Asset to existing object."""
-        with httmock.HTTMock(mock_thumbor):
-            super().test_successful_update(obj_payload, app)
-
-    def test_get_item(self, app, obj_payload):
-        """Test get a item."""
-        super().test_get_item(app, obj_payload)
 
     def test_get_with_filters(self, app, obj_payload):
         """Test get a collection of items, filtered."""
@@ -202,8 +175,7 @@ class TestAssetView(BaseTestView):
             session.add(project)
             session.flush()
 
-        with httmock.HTTMock(mock_thumbor):
-            request = app.post_json(self.base_path, payload, headers=self.headers, status=200)
+        request = app.post_json(self.base_path, payload, headers=self.headers, status=200)
 
         assert 'application/json' == request.content_type
 

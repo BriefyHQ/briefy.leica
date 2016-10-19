@@ -7,6 +7,7 @@ G_PROF = 'g:professionals'
 G_QA = 'g:briefy_qa'
 G_SCOUT = 'g:briefy_scout'
 G_SYS = 'g:system'
+G_BIZ = 'g:briefy_business'
 R_QA = 'r:qa_manager'
 
 

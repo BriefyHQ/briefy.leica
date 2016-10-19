@@ -1,12 +1,8 @@
 """Test Asset database model."""
-from briefy.common.types import BaseUser
 from briefy.leica import models
 from conftest import BaseModelTest
-from conftest import mock_rolleiflex
-from conftest import mock_thumbor
 from sqlalchemy_continuum.utils import count_versions
 
-import httmock
 import pytest
 import transaction
 
@@ -99,97 +95,68 @@ class TestAssetModel(BaseModelTest):
 
     def test_workflow(self, instance_obj, roles):
         """Test workflow for this model."""
-        from briefy.common.workflow.exceptions import WorkflowTransitionException
-
         asset = instance_obj
         job = asset.job
         job.state = 'awaiting_assets'
 
         wf = asset.workflow
 
-        with httmock.HTTMock(mock_rolleiflex):
-            # Object starts as created
-            assert asset.state == 'created'
+        # Object starts as created
+        assert asset.state == 'created'
 
-            # Professional can move it to validation
-            wf.context = roles['professional']
-            assert 'submit' in wf.transitions
-            # System as well
-            wf.context = roles['system']
-            assert 'submit' in wf.transitions
-            # QA as well
-            wf.context = roles['qa']
-            assert 'submit' in wf.transitions
+        # Professional can move it to validation
+        wf.context = roles['professional']
+        assert 'submit' in wf.transitions
+        # System as well
+        wf.context = roles['system']
+        assert 'submit' in wf.transitions
+        # QA as well
+        wf.context = roles['qa']
+        assert 'submit' in wf.transitions
 
-            # Professional moves it to validation
-            wf.context = roles['professional']
-            with httmock.HTTMock(mock_thumbor):
-                wf.submit()
+        # Professional moves it to validation
+        wf.context = roles['professional']
+        wf.submit()
 
-            assert asset.state == 'validation'
-            # And now Professional is not able to move the object anymore
-            assert len(wf.transitions) == 0
+        # Automatic validation happened
+        assert asset.state == 'pending'
+        # And now Professional is not able to move the object anymore
+        assert len(wf.transitions) == 0
 
-            # System will invalidate the submission
-            wf.context = roles['system']
-            wf.invalidate()
-            assert asset.state == 'edit'
+        # QA could transition to 5 distinct states
+        wf.context = roles['qa']
+        assert len(wf.transitions) == 5
+        assert 'request_edit' in wf.transitions
+        assert 'discard' in wf.transitions
+        assert 'process' in wf.transitions
+        assert 'reserve' in wf.transitions
+        assert 'approve' in wf.transitions
 
-            # Professional now can edit the job and submit it again
-            wf.context = roles['professional']
-            assert len(wf.transitions) == 2
-            assert 'submit' in wf.transitions
-            with httmock.HTTMock(mock_thumbor):
-                wf.submit()
-            assert asset.state == 'validation'
+        # QA request an edit
+        wf.request_edit()
+        assert asset.state == 'edit'
+        # Professional re-submits it and validation works
+        wf.context = roles['professional']
+        wf.submit()
 
-            # System will validate the submission
-            wf.context = roles['system']
-            wf.validate()
-            assert asset.state == 'pending'
+        # QA will discard it and get it back
+        wf.context = roles['qa']
+        wf.discard()
+        wf.retract()
 
-            # QA could transition to 5 distinct states
-            wf.context = roles['qa']
-            assert len(wf.transitions) == 5
-            assert 'request_edit' in wf.transitions
-            assert 'discard' in wf.transitions
-            assert 'process' in wf.transitions
-            assert 'reserve' in wf.transitions
-            assert 'approve' in wf.transitions
+        # QA will processe it and get it back
+        wf.process()
+        wf.retract()
 
-            # QA request an edit
-            wf.request_edit()
-            assert asset.state == 'edit'
-            # Professional re-submits it and validation works
-            wf.context = roles['professional']
-            wf.submit()
-            wf.context = roles['system']
-            wf.validate()
+        # QA will reserve it and get it back
+        wf.reserve()
+        wf.retract()
 
-            # QA will discard it and get it back
-            wf.context = roles['qa']
-            wf.discard()
-            wf.retract()
+        # QA will approve it
+        wf.approve()
+        assert asset.state == 'approved'
 
-            # QA will processe it and get it back
-            wf.process()
-            wf.retract()
-
-            # QA will reserve it and get it back
-            wf.reserve()
-            wf.retract()
-
-            # QA will approve it
-            wf.approve()
-            wf.state == 'approved'
-
-            # Customer can reject it
-            wf.context = roles['customer']
-            assert len(wf.transitions) == 1
-            assert 'reject' in wf.transitions
-
-            # System can mark it as delivered
-            wf.context = roles['system']
-            assert len(wf.transitions) == 1
-            assert 'deliver' in wf.transitions
-            wf.deliver()
+        # Customer can refuse it
+        wf.context = roles['customer']
+        assert len(wf.transitions) == 1
+        assert 'refuse' in wf.transitions

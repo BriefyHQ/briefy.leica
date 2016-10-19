@@ -1,11 +1,8 @@
 """Asset Workflow."""
+from briefy.common.vocabularies.roles import Groups as G
 from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import Permission
 from briefy.common.workflow import WorkflowState as WS
-from briefy.leica.models.workflows.utils import G_CUS
-from briefy.leica.models.workflows.utils import G_PROF
-from briefy.leica.models.workflows.utils import G_QA
-from briefy.leica.models.workflows.utils import G_SYS
 
 import logging
 
@@ -65,15 +62,10 @@ class AssetWorkflow(BriefyWorkflow):
         'Approved',
         'Ready for delivery.'
     )
-    delivered = WS(
-        'delivered',
-        'Delivered'
-        'Delivered to customer.'
-    )
-    rejected = WS(
-        'rejected',
-        'Rejected'
-        'Customer reject the asset.'
+    refused = WS(
+        'refused',
+        'Refused'
+        'Customer refused the asset.'
     )
 
     # Transitions:
@@ -129,71 +121,60 @@ class AssetWorkflow(BriefyWorkflow):
         """Approve an asset."""
         pass
 
-    @approved.transition(rejected, 'can_reject')
-    @delivered.transition(rejected, 'can_reject')
-    def reject(self):
-        """Customer reject an asset."""
-        pass
-
-    @approved.transition(delivered, 'can_deliver')
-    def deliver(self):
-        """Asset was delivered."""
+    @approved.transition(refused, 'can_reject')
+    def refuse(self):
+        """Customer refused an asset."""
         pass
 
     @discarded.transition(pending, 'can_discard')
     @post_processing.transition(pending, 'can_process')
     @reserved.transition(pending, 'can_reserve')
-    @rejected.transition(pending, 'can_reserve')
+    @refused.transition(pending, 'can_reserve')
     def retract(self):
         """Send an asset back to pending."""
         pass
 
-    @Permission(groups=[G_SYS, G_PROF, G_QA])
+    @Permission(groups=[G['system'], G['professionals'], G['qa']])
     def can_submit(self):
         """Validate if user can submit the asset to validation."""
         return True
 
-    @Permission(groups=[G_SYS, ])
+    @Permission(groups=[G['system'], ])
     def can_validate(self):
         """Validate if user can invalidate an asset."""
         return True
 
-    @Permission(groups=[G_QA, ])
+    @Permission(groups=[G['qa'], ])
     def can_discard(self):
         """Validate if user can discard an asset."""
         return True
 
-    @Permission(groups=[G_QA, ])
+    @Permission(groups=[G['qa'], ])
     def can_reserve(self):
         """Validate if user can reserve an asset."""
         return True
 
-    @Permission(groups=[G_QA, ])
+    @Permission(groups=[G['qa'], ])
     def can_approve(self):
         """Validate if user can approve an asset."""
         return True
 
-    @Permission(groups=[G_QA, ])
+    @Permission(groups=[G['qa'], ])
     def can_retract(self):
         """Validate if user can retract an asset."""
         return True
 
-    @Permission(groups=[G_SYS, ])
-    def can_deliver(self):
-        """Validate if user can mark an asset as delivered."""
-        return True
-
-    @Permission(groups=[G_QA, ])
+    @Permission(groups=[G['qa'], ])
     def can_process(self):
-        """Validate if user can mark an asset as delivered."""
+        """Validate if user can mark an asset to processed."""
         return True
 
-    @Permission(groups=[G_CUS, ])
+    @Permission(groups=[G['customers'], ])
     def can_reject(self):
-        """Validate if user can mark an asset as delivered."""
+        """Validate if user can reject an asset."""
         return True
 
-    @Permission(groups=[G_PROF, ])
+    @Permission(groups=[G['professionals'], ])
     def can_delete(self):
         """Validate if professional can delete this asset."""
         allowed_job_status = ['awaiting_assets', ]

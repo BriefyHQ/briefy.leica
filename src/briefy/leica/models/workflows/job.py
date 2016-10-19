@@ -1,15 +1,10 @@
 """Job workflow."""
+from briefy.common.vocabularies.roles import Groups as G
+from briefy.common.vocabularies.roles import LocalRoles as LR
 from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import Permission
 from briefy.common.workflow import WorkflowState as WS
 from briefy.leica import internal_actions
-from briefy.leica.models.workflows.utils import G_CUS
-from briefy.leica.models.workflows.utils import G_PM
-from briefy.leica.models.workflows.utils import G_PROF
-from briefy.leica.models.workflows.utils import G_QA
-from briefy.leica.models.workflows.utils import G_SCOUT
-from briefy.leica.models.workflows.utils import G_SYS
-from briefy.leica.models.workflows.utils import R_QA
 from briefy.leica.utils import bridge
 from briefy.leica.utils import transitions
 
@@ -81,9 +76,9 @@ class JobWorkflow(BriefyWorkflow):
         'Content approved',
         'Content was approved by Briefy quality assurance team'
     )
-    customer_rejected = WS(
-        'customer_rejected',
-        'Customer rejected',
+    refused = WS(
+        'refused',
+        'Customer refused',
         'Job was rejected by the customer.'
     )
     completed = WS(
@@ -150,6 +145,12 @@ class JobWorkflow(BriefyWorkflow):
         """Professional submits all assets for QA."""
         pass
 
+    @in_qa.transition(pending, 'can_unassign')
+    def unassign(self):
+        """QA unassign a Job."""
+        # Update state and comments on Knack
+        pass
+
     @in_qa.transition(approved, 'can_approve')
     def approve(self):
         """QA approves a Job."""
@@ -173,23 +174,23 @@ class JobWorkflow(BriefyWorkflow):
         internal_actions.submit(bridge.reject_job, job_info)
 
     @approved.transition(in_qa, 'can_retract_approval')
-    @customer_rejected.transition(in_qa, 'can_retract_approval_customer')
+    @refused.transition(in_qa, 'can_retract_approval_customer')
     def retract_approval(self):
         """QA retracts the approval."""
         pass
 
     @approved.transition(completed, 'can_complete')
-    @customer_rejected.transition(completed, 'can_complete')
+    @refused.transition(completed, 'can_complete_from_refused')
     def complete(self):
         """Customer approve the job."""
         pass
 
-    @approved.transition(customer_rejected, 'can_customer_reject', require_message=True)
-    def customer_reject(self):
-        """Customer rejects the job."""
+    @approved.transition(refused, 'can_refuse', require_message=True)
+    def refuse(self):
+        """Customer refuses the job."""
         pass
 
-    @completed.transition(completed, 'can_deliver')
+    @approved.transition(approved, 'can_deliver')
     def deliver(self):
         """Execute the delivery of job assets."""
         pass
@@ -202,88 +203,98 @@ class JobWorkflow(BriefyWorkflow):
         """Customer or Briefy cancel the job.."""
         pass
 
-    @Permission(groups=[G_CUS, G_SYS])
+    @Permission(groups=[G['customers'], G['bizdev'], G['system']])
     def can_submit(self):
         """Validate if user can submit the job."""
         return True
 
-    @Permission(groups=[G_SCOUT, G_PM])
+    @Permission(groups=[G['scout'], G['pm']])
     def can_assign(self):
         """Validate if user can assign the job to a professional."""
         return True
 
-    @Permission(groups=[G_PROF, ])
+    @Permission(groups=[G['professionals'], ])
     def can_self_assign(self):
         """Validate if user is able to self assign this job."""
         # TODO: Check for existing jobs in the same date.
         return True
 
-    @Permission(groups=[G_SYS, ])
+    @Permission(groups=[G['system'], ])
     def can_validate(self):
         """Validate if user is system and job."""
         return True
 
-    @Permission(groups=[G_CUS, G_PM])
+    @Permission(groups=[G['customers'], G['pm'], G['scout'], G['system']])
     def can_publish(self):
         """Validate if user can publish this job (job pool)."""
         return True
 
-    @Permission(groups=[G_CUS, G_PM])
+    @Permission(groups=[G['customers'], G['pm'], G['scout']])
     def can_retract(self):
         """Validate if user can retract job from job pool."""
         return True
 
-    @Permission(groups=[G_PROF, ])
+    @Permission(groups=[G['professionals'], G['pm']])
     def can_schedule(self):
         """Validate if user can schedule a job."""
         return True
 
-    @Permission(groups=[G_SYS, ])
+    @Permission(groups=[G['system'], ])
     def can_get_ready_for_upload(self):
         """Validate if user can move Job to waiting for assets."""
         return True
 
-    @Permission(groups=[G_PROF, G_QA, ])
+    @Permission(groups=[G['professionals'], G['qa'], ])
     def can_upload(self):
         """Validate if user can move Job to qa."""
         return True
 
-    @Permission(groups=[R_QA, G_QA, ])
+    @Permission(groups=[LR['qa_manager'], G['qa'], G['pm'], ])
+    def can_unassign(self):
+        """Validate if user can unassign a Job."""
+        return True
+
+    @Permission(groups=[LR['qa_manager'], G['qa'], ])
     def can_approve(self):
         """Validate if user can approve a Job."""
         return True
 
-    @Permission(groups=[R_QA, G_QA, ])
+    @Permission(groups=[LR['qa_manager'], G['qa'], ])
     def can_reject(self):
         """Validate if user can reject a Job."""
         return True
 
-    @Permission(groups=[R_QA, G_QA, ])
+    @Permission(groups=[LR['qa_manager'], G['qa'], ])
     def can_retract_approval(self):
         """Validate if user can retract an approval."""
         return True
 
-    @Permission(groups=[R_QA, G_QA, G_PM])
+    @Permission(groups=[LR['qa_manager'], G['qa'], G['pm']])
     def can_retract_approval_customer(self):
         """Validate if user can retract from customer_retract."""
         return True
 
-    @Permission(groups=[G_CUS, G_SYS, G_PM])
+    @Permission(groups=[G['customers'], G['pm'], G['system']])
     def can_complete(self):
         """Validate if user can move a job to completed."""
         return True
 
-    @Permission(groups=[G_CUS, ])
-    def can_customer_reject(self):
+    @Permission(groups=[G['customers'], G['pm']])
+    def can_complete_from_refused(self):
+        """Validate if user can move a job to completed from refused state."""
+        return True
+
+    @Permission(groups=[G['customers'], ])
+    def can_refuse(self):
         """Validate if user can reject a job as a customer."""
         return True
 
-    @Permission(groups=[G_CUS, ])
+    @Permission(groups=[G['customers'], ])
     def can_cancel(self):
-        """Validate if user can reject a job as a customer."""
+        """Validate if user can cancel a job as a customer."""
         return True
 
-    @Permission(groups=[G_SYS, ])
+    @Permission(groups=[G['system'], ])
     def can_deliver(self):
         """Validate if user can execute a deliver transition."""
         return True

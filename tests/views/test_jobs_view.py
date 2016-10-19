@@ -89,53 +89,6 @@ class TestJobView(BaseTestView):
             status=200
         )
         result = request.json
-        assert result['total'] == 4
-        assert 'workaround_qa' in result['transitions']
-
-        # Transition to in_qa
-        payload = {
-            'transition': 'workaround_qa',
-            'message': 'In qa'
-        }
-        request = app.post_json(
-            endpoint,
-            payload,
-            headers=self.headers,
-            status=200
-        )
-        result = request.json
-        assert result['status'] is True
-
-        # Transition to approved will raise an error because we do not have the
-        # required number of assets
-        payload = {
-            'transition': 'approve',
-            'message': 'Good set'
-        }
-        request = app.post_json(
-            endpoint,
-            payload,
-            headers=self.headers,
-            status=400
-        )
-        result = request.json
-        assert result['status'] == 'error'
-
-        # Change the number of required photos
-        with transaction.manager:
-            job = models.Job.get(obj_id)
-            job.number_of_photos = 1
-            session.add(job)
-            session.flush()
-
-        request = app.post_json(
-            endpoint,
-            payload,
-            headers=self.headers,
-            status=200
-        )
-        job = models.Job.get(obj_id)
-        result = request.json
-        assert result['status'] is True
-        assert result['message'] == 'Transition executed: approve'
-        assert job.assets[0].state == 'approved'
+        assert result['total'] == 2
+        assert 'publish' in result['transitions']
+        assert 'assign' in result['transitions']
