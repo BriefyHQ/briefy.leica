@@ -1,6 +1,7 @@
 """Briefy Leica Asset model."""
 from briefy.common.db.mixins import Image
 from briefy.common.db.mixins import Mixin
+from briefy.common.db.mixins import BaseMetadata
 from briefy.leica.db import Base
 from briefy.leica.db import Session
 from briefy.leica.models import workflows
@@ -25,7 +26,7 @@ __listing_attributes__ = [
 ]
 
 
-class Asset(Image, Mixin, Base):
+class Asset(BaseMetadata, Image, Mixin, Base):
     """A deliverable asset from a Job."""
 
     _workflow = workflows.AssetWorkflow
@@ -54,9 +55,6 @@ class Asset(Image, Mixin, Base):
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'history',
                                                'raw_metadata',
                                                'comments', 'internal_comments', 'job']}
-
-    title = sa.Column(sa.String(255), nullable=False)
-    description = sa.Column(sa.Text, default='')
 
     # Denormalized string with the name of the OWNER of
     # an asset under copyright law, disregarding whether he is a Briefy systems user
@@ -94,9 +92,8 @@ class Asset(Image, Mixin, Base):
     # - A transition on the object workflow
     # - An editing operation on the mains asset that results in a new binary -
     #        this can be the result of:
-    #        -  a new upload that superseeds an earlier version,
+    #        - a new upload that superseeds an earlier version,
     #        - an internal operation (crop, filter, so on)
-    #        -
     history = sa.Column(sautils.JSONType, nullable=True)
 
     comments = sa.orm.relationship('Comment',

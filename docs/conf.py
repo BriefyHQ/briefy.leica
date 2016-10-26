@@ -17,6 +17,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinxcontrib.plantuml',
     'sphinxcontrib.sadisp',
+    'sphinx.ext.inheritance_diagram',
 ]
 
 templates_path = ['_templates']
@@ -60,3 +61,9 @@ html_theme_options = {
 plantuml = 'java -jar /usr/local/bin/plantuml.jar'.split()
 graphviz = 'dot -Tpng'.split()
 sadisplay_default_render = 'plantuml'
+
+inheritance_graph_attrs = dict(rankdir="LR", fontsize=16, size='"10.0, 4.0"',
+                               ratio='expand')
+
+inheritance_node_attrs = dict(shape='ellipse', fontsize=16, height=0.75,
+                              color='yellow', style='filled')

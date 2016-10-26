@@ -42,6 +42,7 @@ class JobSync(ModelSync):
                 job_id=kobj.internal_job_id or kobj.job_name or kobj.id,
                 external_id=kobj.id,
                 job_requirements=kobj.client_specific_requirement,
+                number_of_photos=kobj.number_of_photos,
                 assignment_date=kobj.assignment_date,
                 professional_id=get_user(kobj, 'responsible_photographer'),
                 qa_manager=get_user(kobj, 'qa_manager'),
