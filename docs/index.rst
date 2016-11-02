@@ -13,9 +13,9 @@ Table of Contents
 
    intro
    contributing
+   objects/index
    codebase/index
    database
-   objects/index
    sync
    history
 
