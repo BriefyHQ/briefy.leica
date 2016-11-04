@@ -1,13 +1,12 @@
 """Views to handle Projects creation."""
+from briefy.leica.events import customer as events
 from briefy.leica.models import Customer
-from briefy.leica.models.events import customer as events
+from briefy.ws import CORS_POLICY
 from briefy.ws.resources import RESTService
 from briefy.ws.resources import WorkflowAwareResource
-from briefy.ws import CORS_POLICY
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
 from pyramid.security import Allow
-
 
 COLLECTION_PATH = '/customers'
 PATH = COLLECTION_PATH + '/{id}'

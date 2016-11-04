@@ -2,6 +2,6 @@
 
 	<include package="zope.component" />
 	<include package="briefy.common" />
-	<include package=".models.events" />
+	<include package=".subscribers" />
 
 </configure>

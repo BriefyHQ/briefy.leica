@@ -1,16 +1,15 @@
 """Views to handle Assets creation."""
+from briefy.leica.events import asset as events
 from briefy.leica.models import Asset
-from briefy.leica.models.events import asset as events
+from briefy.ws import CORS_POLICY
 from briefy.ws.resources import BaseResource
 from briefy.ws.resources import RESTService
 from briefy.ws.resources import WorkflowAwareResource
-from briefy.ws import CORS_POLICY
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
 from cornice.resource import view
 from pyramid.httpexceptions import HTTPNotFound as NotFound
 from pyramid.security import Allow
-
 
 COLLECTION_PATH = '/jobs/{job_id}/assets'
 PATH = COLLECTION_PATH + '/{id}'
