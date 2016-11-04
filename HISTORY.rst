@@ -16,6 +16,7 @@ History
      * LEICA-69: Create new endpoints to sync with knack individual records. (rudaporto)
      * LEICA-70: New endpoint to log requests from knack. (rudaporto)
      * Moved import/sync endpoints path to reside inside /knack namespace. (rudaporto)
+     * LEICA-74: Backport image validation code from Ms. Laure. (ericof)
 
 1.1.0 (2016-10-04)
 ------------------

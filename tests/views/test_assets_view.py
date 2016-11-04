@@ -184,4 +184,4 @@ class TestAssetView(BaseTestView):
         assert db_obj.state == 'edit'
         history = db_obj.state_history
         assert len(history) == 3
-        assert history[2]['message'] == 'Check for dimensions failed'
+        assert history[2]['message'] == 'Dimensions check failed 5760 x 3840'

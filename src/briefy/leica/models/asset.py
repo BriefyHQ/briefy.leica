@@ -107,7 +107,7 @@ class Asset(BaseMetadata, Image, Mixin, Base):
 
     @property
     def tech_requirements(self) -> dict:
-        """Tech requirements for this asset.
+        """Technical requirements for this asset.
 
         :return: A dictionary with technical requirements for an asset.
         """

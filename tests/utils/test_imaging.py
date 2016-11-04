@@ -23,11 +23,11 @@ def test_ratio():
     """Test check ratio."""
     func = imaging._check_ratio
     metadata = {
-        'ratio': '4/3'
+        'dimensions': '4000 x 3000'
     }
 
-    assert func(metadata, '4/3', 'eq') is True
-    assert func(metadata, '3/4', 'eq') is False
+    assert func(metadata, 4/3, 'eq') is True
+    assert func(metadata, 3/4, 'eq') is False
 
 
 def test_size():
@@ -64,6 +64,7 @@ def test_mimetype():
     }
 
     assert func(metadata, 'image/jpeg', 'eq') is True
+    assert func(metadata, ['image/jpeg', 'image/png'], 'in') is True
     assert func(metadata, 'image/gif', 'eq') is False
 
 
@@ -81,10 +82,10 @@ def test_check_image_constraints():
     }
 
     constraints = {
-        'dimensions': {'value': '4200x3150', 'operator': 'eq'},
-        'dpi': {'value': '300', 'operator': 'eq'},
-        'ratio': {'value': '4/3', 'operator': 'eq'},
-        'mimetype': {'value': 'image/jpeg', 'operator': 'eq'},
+        'dimensions': [{'value': '4200x3150', 'operator': 'eq'}, ],
+        'dpi': [{'value': '300', 'operator': 'eq'}, ],
+        'ratio': [{'value': 4/3, 'operator': 'eq'}, ],
+        'mimetype': [{'value': 'image/jpeg', 'operator': 'eq'}, ],
     }
 
     assert func(metadata, constraints) == []
@@ -92,4 +93,4 @@ def test_check_image_constraints():
     constraints['mimetype'] = {'value': 'image/tiff', 'operator': 'eq'}
 
     assert func(metadata, constraints)[0]['check'] == 'mimetype'
-    assert func(metadata, constraints)[0]['text'] == 'Check for mimetype failed'
+    assert func(metadata, constraints)[0]['text'] == 'Mimetype check failed image/jpeg'

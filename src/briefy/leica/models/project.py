@@ -57,15 +57,14 @@ class Project(BriefyRoles, BaseMetadata, Mixin, Base):
 
     """
     {
-    "dimensions": {"value": "3000x2000", "operator": "ge"},
-    "ratio": {"value": "4/3", "operator": "equal"},
-    "size": {"value": "4000000", "operator": "le"},
+        "dimensions": [{"value": "3000x2000", "operator": "ge"}, ],
+        "ratio": [{"value": 4/3, "operator": "equal"}, ],
+        "size": [{"value": "4000000", "operator": "le"}, ],
     }
-
     """
     tech_requirements = sa.Column(sautils.JSONType,
                                   info={'colanderalchemy': {
-                                       'title': 'Required Resolution',
+                                       'title': 'Technical Requirements for this project.',
                                        'missing': colander.drop,
                                        'typ': colander.String}}
                                   )
