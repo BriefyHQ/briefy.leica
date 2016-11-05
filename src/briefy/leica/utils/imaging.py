@@ -32,7 +32,7 @@ def __lt__(value1: Any, value2: Any) -> bool:
     return value1 < value2
 
 
-def __in__(value1: Any, value2: Any) -> bool:
+def __contains__(value1: Any, value2: Any) -> bool:
     """Check if value1 is in value2."""
     return value1 in value2
 
@@ -43,7 +43,7 @@ OPERATIONS = {
     'max': __le__,
     'lt': __lt__,
     'gt': __gt__,
-    'in': __in__,
+    'in': __contains__,
 }
 
 
