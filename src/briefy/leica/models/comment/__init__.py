@@ -1,8 +1,7 @@
 """Briefy Leica Comment model."""
-from briefy.common.db.mixins import Mixin
 from briefy.leica.db import Base
-from briefy.leica.db import Session
-from briefy.leica.models import workflows
+from briefy.leica.models import mixins
+from briefy.leica.models.comment import workflows
 from briefy.ws.utils.user import add_user_info_to_state_history
 from zope.interface import implementer
 from zope.interface import Interface
@@ -17,20 +16,11 @@ class IComment(Interface):
 
 
 @implementer(IComment)
-class Comment(Mixin, Base):
+class Comment(mixins.LeicaMixin, Base):
 
-    __tablename__ = 'comments'
-    __session__ = Session
     _workflow = workflows.CommentWorkflow
 
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'entity_type', 'type']}
-
-    type = sa.Column(sa.String(50))
-
-    __mapper_args__ = {
-        'polymorphic_on': type,
-        'polymorphic_identity': 'comment'
-    }
 
     content = sa.Column(sa.Text, nullable=False)
     comment_order = sa.Column(sa.Integer, default=0)
@@ -67,10 +57,3 @@ class Comment(Mixin, Base):
         data = super().to_dict()
         add_user_info_to_state_history(self.state_history)
         return data
-
-
-class InternalComment(Comment):
-
-    __mapper_args__ = {
-        'polymorphic_identity': 'internal_comment'
-    }

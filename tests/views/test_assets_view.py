@@ -12,23 +12,24 @@ class TestAssetView(BaseTestView):
 
     base_path = '/jobs/c04dc102-7d3b-4574-a261-4bf72db571db/assets'
     dependencies = [
+        (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
         (models.Job, 'data/jobs.json')
     ]
-    file_path = 'data/assets.json'
-    model = models.Asset
+    file_path = 'data/images.json'
+    model = models.Image
     initial_wf_state = 'pending'
     # TODO: author_id and uploaded_by should be validated
-    ignore_validation_fields = ['state_history', 'state', 'updated_at',
-                                'raw_metadata', 'uploaded_by', 'author_id']
+    ignore_validation_fields = ['state_history', 'state', 'updated_at', 'job',
+                                'raw_metadata', 'uploaded_by', 'professional']
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {
         'title': 'New Image',
         'owner': 'New Owner',
         'source_path': 'path/to/foo/bar.jpg',
-        'author_id': 'd39c07c6-7955-489a-afce-483dfc7c9c5b'
+        'professional_id': 'd39c07c6-7955-489a-afce-483dfc7c9c5b'
     }
 
     def test_get_with_filters(self, app, obj_payload):
@@ -134,7 +135,7 @@ class TestAssetView(BaseTestView):
             status=404
         )
         result = request.json
-        assert 'Asset with version: 42 not found' in result['message']
+        assert 'Image with version: 42 not found' in result['message']
 
     def test_versions_get_collection(self, app, obj_payload):
         """Test get list of versions of an item."""

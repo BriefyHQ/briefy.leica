@@ -14,6 +14,7 @@ class TestAssetImportView():
     base_path = '/knack/assets/import'
 
     dependencies = [
+        (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
         (models.Job, 'data/jobs.json')
@@ -25,7 +26,7 @@ class TestAssetImportView():
 
     def test_post_import_assets(self, app):
         """Test post to the internal import assets."""
-        csv_file = open(os.path.join(__file__.rsplit('/', 2)[0], 'data/asset_import.csv'))
+        csv_file = open(os.path.join(__file__.rsplit('/', 2)[0], 'data/images_import.csv'))
         asset_rows = csv.DictReader(csv_file)
         params = {'data': []}
         for item in asset_rows:

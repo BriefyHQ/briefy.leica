@@ -11,10 +11,11 @@ class TestJobComments(BaseTestView):
 
     base_path = '/jobs/c04dc102-7d3b-4574-a261-4bf72db571db/comments'
     dependencies = [
+        (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
         (models.Job, 'data/jobs.json'),
-        (models.Asset, 'data/assets.json')
+        (models.Image, 'data/images.json')
     ]
     file_path = 'data/comments.json'
     model = models.Comment

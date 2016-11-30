@@ -1,4 +1,4 @@
-"""Test Asset database model."""
+"""Test Image database model."""
 from briefy.leica import models
 from conftest import BaseModelTest
 from sqlalchemy_continuum.utils import count_versions
@@ -8,17 +8,18 @@ import transaction
 
 
 @pytest.mark.usefixtures('create_dependencies')
-class TestAssetModel(BaseModelTest):
-    """Test Asset."""
+class TestImageModel(BaseModelTest):
+    """Test Image."""
 
     dependencies = [
+        (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
         (models.Job, 'data/jobs.json')
     ]
 
-    file_path = 'data/assets.json'
-    model = models.Asset
+    file_path = 'data/images.json'
+    model = models.Image
     number_of_wf_transtions = 1
 
     def test_obj_to_dict_serializes_image(self, instance_obj):
@@ -70,11 +71,11 @@ class TestAssetModel(BaseModelTest):
         payload['id'] = obj_id
         # Create the object using a new transaction
         with transaction.manager:
-            asset = models.Asset(**payload)
+            asset = models.Image(**payload)
             session.add(asset)
             session.flush()
 
-        obj = models.Asset.get(obj_id)
+        obj = models.Image.get(obj_id)
         obj_source_path = obj.source_path
 
         assert count_versions(obj) == 1
@@ -86,7 +87,7 @@ class TestAssetModel(BaseModelTest):
             session.add(obj)
             session.flush()
 
-        obj = models.Asset.get(obj_id)
+        obj = models.Image.get(obj_id)
         assert obj.version == 1
         assert count_versions(obj) == 2
         assert obj.source_path == 'foo_bar.jpg'

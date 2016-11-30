@@ -12,6 +12,7 @@ class TestJobView(BaseTestView):
 
     base_path = '/jobs'
     dependencies = [
+        (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json')
     ]
@@ -33,7 +34,7 @@ class TestJobView(BaseTestView):
         payload = {
             'owner': 'Professional Name',
             'id': '264b3e66-c327-4bbd-9cc7-271716fce178',
-            'author_id': '23d94a43-3947-42fc-958c-09245ecca5f2',
+            'professional_id': '23d94a43-3947-42fc-958c-09245ecca5f2',
             'uploaded_by': '23d94a43-3947-42fc-958c-09245ecca5f2',
             'description': '',
             'updated_at': '2016-09-18T18:55:20.696061+00:00',

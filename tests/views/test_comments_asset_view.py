@@ -13,10 +13,11 @@ class TestAssetComment(BaseTestView):
         '/jobs/cf326cc7/assets/bf721f30-79ce-4bc7-9887-79b6c53c681d/comments'
     )
     dependencies = [
+        (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
         (models.Job, 'data/jobs.json'),
-        (models.Asset, 'data/assets.json')
+        (models.Image, 'data/images.json')
     ]
     file_path = 'data/comments.json'
     model = models.Comment

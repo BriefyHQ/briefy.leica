@@ -5,7 +5,7 @@ Revises: ${down_revision | comma,n}
 Create Date: ${create_date}
 """
 from alembic import op
-from briefy.leica.models import types
+from sqlalchemy_utils import types
 ${imports if imports else ""}
 
 import briefy.common
@@ -23,12 +23,16 @@ depends_on = ${repr(depends_on)}
 original_uuid_type = sqlalchemy_utils.types.uuid.UUIDType
 def monkey_uuid_type(*args, length=None,  **kw):
     return original_uuid_type(*args, **kw)
+
+
 sqlalchemy_utils.types.uuid.UUIDType = monkey_uuid_type
 
 
-original_timezone_type=sqlalchemy_utils.types.timezone.TimezoneType
+original_timezone_type = sqlalchemy_utils.types.timezone.TimezoneType
 def monkey_timezone_type(*args, length=None, **kw):
     return original_timezone_type(*args, **kw)
+
+
 sqlalchemy_utils.types.timezone.TimezoneType=monkey_timezone_type
 
 

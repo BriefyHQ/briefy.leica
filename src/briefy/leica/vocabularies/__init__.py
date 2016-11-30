@@ -1,13 +1,5 @@
+"""Vocabularies used by Leica."""
 from enum import Enum
-
-
-class CategoryChoices(Enum):
-    undefined = 'undefined'
-    accommodation = 'Accommodation'
-    food = 'Food'
-    video = 'Video'
-    company = 'Company'
-    restaurant = 'Restaurant'
 
 
 class ClientJobStatusChoices(Enum):
@@ -19,25 +11,6 @@ class ClientJobStatusChoices(Enum):
     completed = 'Completed'
     in_revision_ = 'In revision '
     resolved = 'Resolved'
-
-
-# class ApprovalStatusChoices(Enum):
-    # awaiting_approval = 'Awaiting Approval'
-    # approved = 'Approved'
-    # not_approved = 'Not Approved'
-    # updated_and_awaiting_for_approval = 'Updated And Awaiting For Approval'
-    # awaiting_for_submission = 'Awaiting for submission'
-
-class JobContinentChoices(Enum):
-    undefined = 'undefined'
-    europe = 'Europe'
-    asia = 'Asia'
-    north_america = 'North America'
-    africa = 'Africa'
-    caribbean = 'Caribbean'
-    central_and_south_america = 'Central and South America'
-    oceania = 'Oceania'
-    antarctica = 'Antarctica'
 
 
 class SchedulingIssuesChoices(Enum):
@@ -54,3 +27,8 @@ class SchedulingIssuesChoices(Enum):
     faulty_address_ = 'C1. Faulty address '
     faulty_contact_details_ = 'C2. Faulty contact details '
     weather_condition = 'C3. weather condition'
+
+
+class JobInputSource(Enum):
+    customer = 'customer'
+    briefy = 'briefy'

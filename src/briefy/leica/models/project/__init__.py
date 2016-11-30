@@ -1,12 +1,11 @@
 """Briefy Leica Project model."""
-from briefy.common.db.mixins import Mixin
-from briefy.common.db.mixins import BaseMetadata
 from briefy.common.db.mixins import BriefyRoles
 from briefy.leica.db import Base
-from briefy.leica.db import Session
-from briefy.leica.models import workflows
+from briefy.leica.models import mixins
+from briefy.leica.models.project import workflows
 from briefy.ws.utils.user import add_user_info_to_state_history
 from briefy.ws.utils.user import get_public_user_info
+from sqlalchemy import orm
 from zope.interface import Interface
 from zope.interface import implementer
 
@@ -20,12 +19,9 @@ class IProject(Interface):
 
 
 @implementer(IProject)
-class Project(BriefyRoles, BaseMetadata, Mixin, Base):
-    """Project model."""
-    version = None
+class Project(BriefyRoles, mixins.KLeicaVersionedMixin, Base):
+    """A Project in Briefy."""
 
-    __tablename__ = "projects"
-    __session__ = Session
     _workflow = workflows.ProjectWorkflow
 
     __summary_attributes__ = [
@@ -38,6 +34,7 @@ class Project(BriefyRoles, BaseMetadata, Mixin, Base):
     ]
 
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'customer']}
+
     customer_id = sa.Column(sautils.UUIDType,
                             sa.ForeignKey('customers.id'),
                             nullable=False,
@@ -46,47 +43,42 @@ class Project(BriefyRoles, BaseMetadata, Mixin, Base):
                                'validator': colander.uuid,
                                'typ': colander.String}}
                             )
-    customer = sa.orm.relationship('Customer', back_populates='projects')
 
-    external_id = sa.Column(sa.String,
-                            nullable=True,
-                            info={'colanderalchemy': {
-                                'title': 'External ID',
-                                'missing': colander.drop}}
-                            )
+    tech_requirements = sa.Column(
+        sautils.JSONType,
+        info={
+            'colanderalchemy': {
+                'title': 'Technical Requirements for this project.',
+                'missing': colander.drop,
+                'typ': colander.String
+            }
+        }
+    )
 
-    """
-    {
-        "dimensions": [{"value": "3000x2000", "operator": "ge"}, ],
-        "ratio": [{"value": 4/3, "operator": "equal"}, ],
-        "size": [{"value": "4000000", "operator": "le"}, ],
-    }
-    """
-    tech_requirements = sa.Column(sautils.JSONType,
-                                  info={'colanderalchemy': {
-                                       'title': 'Technical Requirements for this project.',
-                                       'missing': colander.drop,
-                                       'typ': colander.String}}
-                                  )
+    jobs = orm.relationship(
+        'Job',
+        backref=orm.backref('project', lazy='joined'),
+        lazy='dynamic'
+    )
 
-    jobs = sa.orm.relationship('Job', back_populates='project', lazy='dynamic')
+    @sautils.aggregated('jobs', sa.Column(sa.Integer, default=0))
+    def total_jobs(self):
+        """Total jobs in this project."""
+        return sa.func.count('1')
 
-    brief = sa.Column(sautils.URLType,
-                      nullable=True,
-                      info={'colanderalchemy': {
-                          'title': 'Brief link',
-                          'validator': colander.url,
-                          'missing': colander.drop,
-                          'typ': colander.String}}
-                      )
-
-    @property
-    def total_jobs(self) -> int:
-        """Total number of jobs.
-
-        :returns: Number of jobs on this project.
-        """
-        return self.jobs.count()
+    # Formely know as brief
+    briefing = sa.Column(
+        sautils.URLType,
+        nullable=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Brief link',
+                'validator': colander.url,
+                'missing': colander.drop,
+                'typ': colander.String
+            }
+        }
+    )
 
     def _apply_actors_info(self, data: dict) -> dict:
         """Apply actors information for a given data dictionary.

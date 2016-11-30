@@ -12,10 +12,8 @@ def job_created_handler(event):
     safe_workflow_trigger_transitions(event, transitions=transitions)
 
 
-def job_submit_handler(event):
+def job_submit(event):
     """Handle job submitted event."""
-    if event.event_name != 'job.workflow.submit':
-        return
     transitions = []
     # Impersonate the System here
     event.user = SystemUser
@@ -23,3 +21,17 @@ def job_submit_handler(event):
         ('validate', 'Machine check approved')
     )
     safe_workflow_trigger_transitions(event, transitions=transitions, state='validation')
+
+
+def transition_handler(event):
+    """Handle job transition events."""
+    event_name = event.event_name
+    if not event_name.startswith('job.workflow'):
+        return
+
+    handlers = {
+        'job.workflow.submit': job_submit
+    }
+    handler = handlers.get(event_name, None)
+    if handler:
+        handler(event)

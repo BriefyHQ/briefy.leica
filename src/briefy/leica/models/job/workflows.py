@@ -298,3 +298,17 @@ class JobWorkflow(BriefyWorkflow):
     def can_deliver(self):
         """Validate if user can execute a deliver transition."""
         return True
+
+
+class JobLocationWorkflow(BriefyWorkflow):
+    """Workflow for a JobLocation."""
+
+    entity = 'job_location'
+    initial_state = 'created'
+
+    # States
+    created = WS(
+        'created',
+        'Created',
+        'Job created by the customer.',
+    )

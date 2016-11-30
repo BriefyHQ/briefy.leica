@@ -1,10 +1,10 @@
 """Briefy Leica Customer model."""
-from briefy.common.db.mixins import Mixin
-from briefy.common.db.mixins import BaseMetadata
 from briefy.leica.db import Base
-from briefy.leica.db import Session
-from briefy.leica.models import workflows
+from briefy.leica.models import mixins
+from briefy.leica.models.customer import workflows
 from briefy.ws.utils.user import add_user_info_to_state_history
+from sqlalchemy import orm
+from sqlalchemy.ext.declarative import declared_attr
 from zope.interface import Interface
 from zope.interface import implementer
 
@@ -17,13 +17,11 @@ class ICustomer(Interface):
 
 
 @implementer(ICustomer)
-class Customer(BaseMetadata, Mixin, Base):
+class Customer(mixins.KLeicaVersionedMixin, Base):
     """Customer model."""
 
     version = None
 
-    __tablename__ = "customers"
-    __session__ = Session
     _workflow = workflows.CustomerWorkflow
 
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state', '_slug']}
@@ -35,6 +33,23 @@ class Customer(BaseMetadata, Mixin, Base):
                                 'title': 'External ID',
                                 'missing': colander.drop}}
                             )
+
+    projects = orm.relationship(
+        'Project',
+        backref=orm.backref('customer', lazy='joined'),
+        lazy='dynamic'
+    )
+
+    jobs = orm.relationship(
+        'Job',
+        backref=orm.backref('customer', lazy='joined'),
+        lazy='dynamic'
+    )
+
+    @declared_attr
+    def _external_model_(cls):
+        """Name of the model on Knack."""
+        return 'Company'
 
     def to_dict(self):
         """Return a dict representation of this object."""
