@@ -1,0 +1,33 @@
+[
+  {
+    "updated_at": "2016-09-08T15:36:28.087123Z",
+    "state_history": [
+      {
+        "transition": "",
+        "actor": null,
+        "to": "created",
+        "date": "2016-09-08T15:36:28.082599+00:00",
+        "from": ""
+      }
+    ],
+    "locality": "Salvador",
+    "country": "BR",
+    "range": 15,
+    "range_unit": "km",
+    "coordinates": {
+        "type": "Point",
+        "coordinates": [-13.011917,-38.493519]
+    },
+    "info": {
+      "locality": "Salvador",
+      "province": "BA",
+      "route": "Praça Geraldo Walter",
+      "street_number": "32",
+      "country": "BR"
+    },
+    "professional_id": "23d94a43-3947-42fc-958c-09245ecca5f2",
+    "id": "356fe26a-7672-48dd-a1ca-5ffe8ad4fbba",
+    "created_at": "2016-09-08T15:36:28.087112Z",
+    "state": "created"
+  }
+]

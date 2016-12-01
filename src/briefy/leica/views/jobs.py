@@ -71,7 +71,7 @@ class JobWorkflow(WorkflowAwareResource):
     factory=JobFactory
 )
 class JobVersions(BaseResource):
-    """Versioning of assets."""
+    """Versioning of Jobs."""
 
     model = Job
     friendly_name = Job.__name__

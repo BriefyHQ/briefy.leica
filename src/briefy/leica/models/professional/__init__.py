@@ -34,7 +34,7 @@ class Professional(ProfessionalMixin, Base):
 
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', 'profiles', 'links', 'locations'
+            'state_history', 'state', 'profiles', 'links', 'locations', 'type'
         ]
     }
 

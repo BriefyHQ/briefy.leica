@@ -1,11 +1,18 @@
 from briefy.common.utils.transformers import to_serializable
 from briefy.common.vocabularies.categories import CategoryChoices
+from briefy.common.vocabularies.person import GenderCategories
 from briefy.leica import vocabularies
 
 
 @to_serializable.register(CategoryChoices)
 def json_job_category_type(val):
     """CategoryChoices serializer."""
+    return str(val.value)
+
+
+@to_serializable.register(GenderCategories)
+def json_gender_categories(val):
+    """GenderCategories serializer."""
     return str(val.value)
 
 

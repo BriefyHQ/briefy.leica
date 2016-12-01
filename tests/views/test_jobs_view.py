@@ -1,13 +1,13 @@
 """Test jobs view."""
 from briefy.leica import models
-from conftest import BaseTestView
+from conftest import BaseVersionedTestView
 
 import pytest
 import transaction
 
 
 @pytest.mark.usefixtures('create_dependencies')
-class TestJobView(BaseTestView):
+class TestJobView(BaseVersionedTestView):
     """Test JobService view."""
 
     base_path = '/jobs'
@@ -23,7 +23,7 @@ class TestJobView(BaseTestView):
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {
-        'title': 'Job Title',
+        'title': 'New Job Title',
         'job_id': '10',
         'project_id': '36d359f0-8e92-41bb-8d1c-fedfd60e7046'
     }
