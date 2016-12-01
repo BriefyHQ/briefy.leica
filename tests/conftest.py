@@ -480,7 +480,6 @@ class BaseVersionedTestView(BaseTestView):
         assert result['versions'][1]['updated_at'] > result['versions'][0]['updated_at']
 
 
-
 @pytest.fixture()
 def app():
     """Fixture to create new app instance.
