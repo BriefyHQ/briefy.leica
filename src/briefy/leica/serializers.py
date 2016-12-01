@@ -26,3 +26,9 @@ def json_client_job_status(val):
 def json_scheduling_issues(val):
     """SchedulingIssuesChoices serializer."""
     return str(val.value)
+
+
+@to_serializable.register(vocabularies.JobInputSource)
+def json_input_source(val):
+    """JobInputSource serializer."""
+    return str(val.value)
