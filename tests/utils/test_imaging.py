@@ -28,8 +28,8 @@ def test_dimensions(value, op, expected):
 
 
 testdata = [
-    (4/3, 'eq', True),
-    (3/4, 'eq', False),
+    (4 / 3, 'eq', True),
+    (3 / 4, 'eq', False),
 ]
 
 
@@ -47,8 +47,8 @@ def test_ratio(value, op, expected):
 testdata = [
     (4194304, 'eq', True),
     (4000000, 'eq', False),
-    (4194304, 'min',  True),
-    (4194304, 'max',  True),
+    (4194304, 'min', True),
+    (4194304, 'max', True),
     (4000000, 'lt', False),
     (4000000, 'gt', True),
 ]
@@ -105,7 +105,7 @@ testdata = [
         {
             'dimensions': [{'value': '4200x3150', 'operator': 'eq'}, ],
             'dpi': [{'value': '300', 'operator': 'eq'}, ],
-            'ratio': [{'value': 4/3, 'operator': 'eq'}, ],
+            'ratio': [{'value': 4 / 3, 'operator': 'eq'}, ],
             'mimetype': [{'value': 'image/jpeg', 'operator': 'eq'}, ],
         },
         0
@@ -114,7 +114,7 @@ testdata = [
         {
             'dimensions': [{'value': '4200x3150', 'operator': 'eq'}, ],
             'dpi': [{'value': '300', 'operator': 'eq'}, ],
-            'ratio': [{'value': 4/3, 'operator': 'eq'}, ],
+            'ratio': [{'value': 4 / 3, 'operator': 'eq'}, ],
             'mimetype': [{'value': 'image/tiff', 'operator': 'eq'}, ],
         },
         1

@@ -16,11 +16,11 @@ class DummyObject:
 
 
 _history = [
-        {'date': datetime(2016, 12, 21, 12, 0, 0), 'transition': 'create'},
-        {'date': datetime(2016, 12, 21, 12, 5, 0), 'transition': 'submit'},
-        {'date': datetime(2016, 12, 21, 12, 10, 0), 'transition': 'assign'},
-        {'date': datetime(2016, 12, 21, 13, 10, 0), 'transition': 'unassign'},
-        {'date': datetime(2016, 12, 21, 14, 10, 0), 'transition': 'assign'},
+    {'date': datetime(2016, 12, 21, 12, 0, 0), 'transition': 'create'},
+    {'date': datetime(2016, 12, 21, 12, 5, 0), 'transition': 'submit'},
+    {'date': datetime(2016, 12, 21, 12, 10, 0), 'transition': 'assign'},
+    {'date': datetime(2016, 12, 21, 13, 10, 0), 'transition': 'unassign'},
+    {'date': datetime(2016, 12, 21, 14, 10, 0), 'transition': 'assign'},
 ]
 
 testdata = [
