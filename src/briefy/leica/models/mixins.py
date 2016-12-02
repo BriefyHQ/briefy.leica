@@ -20,6 +20,11 @@ class JobFinancialInfo:
         sautils.CurrencyType,
         default='EUR'
     )
+    """Professional Payout currency.
+
+    ISO4217 code for the currency to be used to payout the professional.
+    """
+
     payout_value = sa.Column(
         sa.Integer,
         nullable=False,
@@ -32,6 +37,11 @@ class JobFinancialInfo:
             }
         }
     )
+    """Professional Payout value.
+
+    How much the professional will be paid for this Job.
+    This value is expressed in cents.
+    """
 
     # Photographer Expenses
     travel_expenses = sa.Column(
@@ -46,6 +56,12 @@ class JobFinancialInfo:
             }
         }
     )
+    """Travel expenses amount.
+
+    Amount to be paid to the professional as travel expenses.
+    This value is expressed in cents.
+    """
+
     additional_compensation = sa.Column(
         sa.Integer,
         nullable=False,
@@ -58,12 +74,22 @@ class JobFinancialInfo:
             }
         }
     )
+    """Amount of additional (extra) compensation.
+
+    Amount to be paid to the professional as additional compensation.
+    This value is expressed in cents.
+    """
 
     # Set price
     price_currency = sa.Column(
         sautils.CurrencyType,
         default='EUR'
     )
+    """Price currency.
+
+    ISO4217 code for the currency to be used by customer to pay Briefy.
+    """
+
     _price = sa.Column(
         'price',
         sa.Integer,
@@ -76,6 +102,11 @@ class JobFinancialInfo:
             }
         }
     )
+    """Price to be paid, by the customer, for this job.
+
+    Amount to be paid by the customer for this job.
+    This value is expressed in cents.
+    """
 
     @property
     def price(self) -> int:
@@ -85,9 +116,10 @@ class JobFinancialInfo:
         """
         return self._price
 
+
     @hybrid_property
     def costs(self) -> int:
-        """Sum costs for this job.
+        """Sum of costs for this job.
 
         :return: Return the sum of costs, in cents, of this job.
         """
@@ -100,6 +132,10 @@ class VersionMixin:
     __versioned__ = {
         'exclude': ['state_history', '_state_history', ]
     }
+    """SQLAlchemy Continuum settings.
+
+    By default we do not keep track of state_history.
+    """
 
     @property
     def version(self) -> int:
@@ -128,7 +164,11 @@ class LeicaMixin(Mixin):
 
     @declared_attr
     def __tablename__(cls):
-        """Return tablename."""
+        """Return tablename.
+
+        Tablename, by our convention, is always the plural of the lowercase version of the
+        class name.
+        """
         tablename = '{klass}s'.format(
             klass=cls.__name__.lower()
         )
@@ -136,12 +176,18 @@ class LeicaMixin(Mixin):
 
 
 class LeicaVersionedMixin(VersionMixin, BaseMetadata, LeicaMixin):
-    """Base mixin for Leica Objects."""
+    """Base mixin for Leica Objects supporting versioning.
+
+    Used on objects that require Version support and Base metadata.
+    """
 
     pass
 
 
 class KLeicaVersionedMixin(KnackMixin, LeicaVersionedMixin):
-    """Base mixin for Leica Objects with Knack support."""
+    """Base mixin for Leica Objects with Knack support.
+
+    Used on objects that require Version support, Base metadata amd Knack integration.
+    """
 
     pass

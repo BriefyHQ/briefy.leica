@@ -6,7 +6,7 @@ Inheritance
 
 Inheritance diagram for the Job location class:
 
-.. inheritance-diagram:: briefy.leica.models.job_location.JobLocation
+.. inheritance-diagram:: briefy.leica.models.job.location.JobLocation
 
 
 
@@ -97,6 +97,6 @@ Database model
 Database diagram for the JobLocation data model:
 
 .. sadisplay::
-    :module: briefy.leica.models.job_location
+    :module: briefy.leica.models.job.location.JobLocation
     :alt: Job locations data model
     :render: plantuml

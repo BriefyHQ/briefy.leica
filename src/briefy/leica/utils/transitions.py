@@ -3,7 +3,7 @@ from briefy.leica import logger
 from datetime import datetime
 
 
-def get_transition_date(transitions: list, obj, first: bool=False) -> datetime:
+def get_transition_date(transitions: tuple, obj, first: bool=False) -> datetime:
     """Return the datetime for a named transition.
 
     Return None if transition never occured.
@@ -12,7 +12,7 @@ def get_transition_date(transitions: list, obj, first: bool=False) -> datetime:
     :param first: Return the first occurence of this transition.
     """
     order = 0 if first else -1
-    history = getattr(obj, 'state_history', [])
+    history = obj.state_history if hasattr(obj, 'state_history') else []
     valid = [t for t in history if t['transition'] in transitions]
     return valid[order]['date'] if valid else None
 

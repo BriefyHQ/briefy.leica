@@ -22,7 +22,7 @@ import sqlalchemy_utils as sautils
 
 __summary_attributes__ = [
     'id', 'title', 'description', 'created_at', 'updated_at', 'state', 'approvable',
-    'number_of_photos', 'total_assets', 'total_approvable_assets'
+    'number_of_assets', 'total_assets', 'total_approvable_assets'
 ]
 
 __listing_attributes__ = __summary_attributes__
@@ -32,9 +32,95 @@ class IJob(Interface):
     """Marker interface for Job"""
 
 
+class JobDates:
+    """Mixin providing date-related information of a Job."""
+
+
+    _availability = sa.Column(
+        'availability',
+        sautils.JSONType,
+        info={
+            'colanderalchemy': {
+                'title': 'Availability for scheduling this job.',
+                'missing': colander.drop,
+                'typ': colander.String
+            }
+        }
+    )
+    """Availability attribute.
+
+    Access to it should be done using the hybrid_property availability.
+    """
+
+    scheduled_datetime = sa.Column(
+        AwareDateTime(),
+        nullable=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Scheduled date for shooting',
+                'missing': colander.drop,
+                'typ': colander.DateTime
+            }
+        }
+    )
+    """Scheduled date time of shooting."""
+
+    @hybrid_property
+    def availability(self) -> list:
+        """Return availability for a Job.
+
+        This should return a list with zero or more available dates for
+        scheduling this job.
+        i.e.::
+
+            [
+              datetime(2016, 12, 21, 12, 0, 0),
+              datetime(2016, 12, 22, 14, 0, 0),
+            ]
+
+        """
+        availability = self._availability
+        if isinstance(availability, dict):
+            availability = [availability, ]
+        return availability
+
+    @availability.setter
+    def availability(self, value: dict):
+        """Set availabilities for a job."""
+        self._availability = value
+
+    # Relevant dates
+    @hybrid_property
+    def assignment_date(self) -> datetime:
+        """Return last assignment date for this job.
+
+        Information will be extracted from state history field.
+        """
+        transitions = ('assign', 'self_assign', )
+        return get_transition_date(transitions, self)
+
+    @hybrid_property
+    def last_approval_date(self) -> datetime:
+        """Return last QA transition date for this job.
+
+        Information will be extracted from state history field.
+        """
+        transitions = ('approve', 'reject', )
+        return get_transition_date(transitions, self)
+
+    @hybrid_property
+    def submission_date(self) -> datetime:
+        """Return last submission date date for this job.
+
+        Information will be extracted from state history field.
+        """
+        transitions = ('approve', 'reject', )
+        return get_transition_date(transitions, self, first=True)
+
+
 @implementer(IJob)
-class Job(BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersionedMixin, Base):
-    """A Job within a project."""
+class Job(JobDates, BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersionedMixin, Base):
+    """A Job within a Project."""
 
     _workflow = workflows.JobWorkflow
 
@@ -75,6 +161,10 @@ class Job(BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersionedMixin, Bas
             }
         }
     )
+    """Customer ID.
+
+    Relationship with :class:`briefy.leica.models.customer.Customer`.
+    """
 
     # Project
     project_id = sa.Column(
@@ -90,6 +180,10 @@ class Job(BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersionedMixin, Bas
             }
         }
     )
+    """Project ID.
+
+    Relationship with :class:`briefy.leica.models.project.Project`.
+    """
 
     # Professional
     professional_id = sa.Column(
@@ -102,29 +196,58 @@ class Job(BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersionedMixin, Bas
             'missing': colander.drop,
             'typ': colander.String}}
     )
+    """Professional ID.
+
+    Relationship with :class:`briefy.leica.models.professional.Professional`.
+    """
+
 
     # Job details
-    locations = orm.relationship('JobLocation')
-    requirements = sa.Column(sa.Text, default='')
-    number_of_photos = sa.Column(sa.Integer(), default=20)
+    locations = orm.relationship(
+        'JobLocation',
+        backref=orm.backref('job', lazy='joined'),
+        lazy='joined'
+    )
+    """Job Locations.
 
-    # Category of the job
+    Relationship with :class:`briefy.leica.models.job.location.JobLocation`.
+    """
+    requirements = sa.Column(sa.Text, default='')
+    """Human-readable requirements for a Job."""
+
+    number_of_assets = sa.Column(sa.Integer(), default=20)
+    """Number of assets of a job."""
+
     category = sa.Column(
         sautils.ChoiceType(CategoryChoices, impl=sa.String()),
         default='undefined',
         nullable=True
     )
+    """Category of this job.
 
-    # Source of the job
+    Options come from :module:`briefy.common.vocabularies.categories`.
+    """
     source = sa.Column(
         sautils.ChoiceType(JobInputSource, impl=sa.String()),
         default='briefy',
         nullable=False
     )
+    """Source of this job.
 
+    This field stores which part created this job, Customer or Briefy.
+    Options come from :module:`briefy.leica.vocabularies`.
+    """
     # Job Identifiers
-    job_id = sa.Column(sa.String, nullable=False)  # Was internal_job_id
-    customer_job_id = sa.Column(sa.String, default='')  # Id on the customer database
+    job_id = sa.Column(sa.Integer, nullable=True, index=True)
+    """Job ID was the main Briefy id for a Job.
+
+    This field was used on Knack as an auto-increment.
+    """
+    customer_job_id = sa.Column(sa.String, default='', index=True)
+    """ID of the job for the customer.
+
+    Reference for the customer to find this job.
+    """
 
     # Assets for this job
     assets = orm.relationship(
@@ -132,6 +255,10 @@ class Job(BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersionedMixin, Bas
         backref=orm.backref('job', lazy='joined'),
         lazy='dynamic'
     )
+    """Assets connected to this job.
+
+    Collection of :class:`briefy.leica.models.asset.Asset`.
+    """
 
     approvable_assets = orm.relationship(
         'Asset',
@@ -142,8 +269,20 @@ class Job(BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersionedMixin, Bas
         viewonly=True
 
     )
+    """Approvable assets connected to this job.
 
-    # Comments
+    To be listed here, an Asset, needs to be on one of the following states:
+
+        * approved
+
+        * pending
+
+        * delivered
+
+    Collection of :class:`briefy.leica.models.asset.Asset`.
+    """
+
+
     comments = orm.relationship(
         'Comment',
         foreign_keys='Comment.entity_id',
@@ -151,30 +290,10 @@ class Job(BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersionedMixin, Bas
         primaryjoin='Comment.entity_id == Job.id',
         lazy='dynamic'
     )
+    """Comments connected to this job.
 
-    _availability = sa.Column(
-        'availability',
-        sautils.JSONType,
-        info={
-            'colanderalchemy': {
-                'title': 'Availability for scheduling this job.',
-                'missing': colander.drop,
-                'typ': colander.String
-            }
-        }
-    )
-
-    scheduled_datetime = sa.Column(
-        AwareDateTime(),
-        nullable=True,
-        info={
-            'colanderalchemy': {
-                'title': 'Scheduled date for shooting',
-                'missing': colander.drop,
-                'typ': colander.DateTime
-            }
-        }
-    )
+    Collection of :class:`briefy.leica.models.comment.Comment`.
+    """
 
     submission_path = sa.Column(
         sautils.URLType,
@@ -188,6 +307,10 @@ class Job(BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersionedMixin, Bas
             }
         }
     )
+    """Path to the assets submission.
+
+    This will be deprecated when assets upload is handled also using Leica.
+    """
 
     _delivery = sa.Column(
         'delivery',
@@ -200,37 +323,23 @@ class Job(BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersionedMixin, Bas
             }
         }
     )
+    """Delivery links.
 
-    @hybrid_property
-    def availability(self) -> list:
-        """Return availability for a Job.
-
-        This should return a list with zero or more available dates for
-        scheduling this job.
-        i.e.:
-            [
-              datetime(2016, 12, 21, 12, 0, 0),
-              datetime(2016, 12, 22, 14, 0, 0),
-            ]
-        """
-        availability = self._availability
-        return availability
-
-    @availability.setter
-    def availability(self, value: dict):
-        """Set availabilities for a job."""
-        self._availability = value
+    JSON with a collection of delivery links. Should be accessed using delivery attribute.
+    """
 
     @hybrid_property
     def delivery(self) -> dict:
         """Return delivery info for a Job.
 
         This should return a dict with delivery method and link
-        i.e.:
+        i.e.::
+
             {
                 'sftp': 'sftp://agoda@delivery.briefy.co/bali/3456/',
                 'gdrive': 'https://drive.google.com/foo/bar',
             }
+
         """
         delivery = self._delivery
         return delivery
@@ -242,12 +351,18 @@ class Job(BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersionedMixin, Bas
 
     @sautils.aggregated('assets', sa.Column(sa.Integer, default=0))
     def total_assets(self):
-        """Total number of assets."""
+        """Total number of assets.
+
+        Counter of the number of assets in this Job.
+        """
         return sa.func.count('1')
 
     @sautils.aggregated('approvable_assets', sa.Column(sa.Integer, default=0))
     def total_approvable_assets(self):
-        """Total number of assets taht can be approved."""
+        """Total number of assets that can be approved.
+
+        Counter of the number of assets in this Job that can be approved.
+        """
         return sa.func.count('1')
 
     @property
@@ -257,18 +372,18 @@ class Job(BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersionedMixin, Bas
         :returns: Boolean indicating if it is possible to approve this job.
         """
         approvable_assets_count = self.total_approvable_assets
-        check_images = self.number_of_photos <= approvable_assets_count
+        check_images = self.number_of_assets <= approvable_assets_count
         return check_images
 
     @property
     def briefing(self) -> str:
-        """Return the briefing URL for the parent project"""
+        """Return the briefing URL for the parent project."""
         return self.project.briefing
 
     @property
     def assigned(self) -> bool:
         """Return if this job is assigned or not."""
-        return self.assignment_date and self.professional_id
+        return True if (self.assignment_date and self.professional_id) else False
 
     @property
     def tech_requirements(self) -> dict:
@@ -278,25 +393,6 @@ class Job(BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersionedMixin, Bas
         """
         project = self.project
         return project.tech_requirements
-
-    # Relevant dates
-    @hybrid_property
-    def assignment_date(self) -> datetime:
-        """Return last assignement date for this job."""
-        transitions = ('assign', 'self_assign', )
-        return get_transition_date(transitions, self)
-
-    @hybrid_property
-    def last_approval_date(self) -> datetime:
-        """Return last QA transition date for this job."""
-        transitions = ('approve', 'reject', )
-        return get_transition_date(transitions, self)
-
-    @hybrid_property
-    def submission_date(self) -> datetime:
-        """Return last submission date date for this job."""
-        transitions = ('approve', 'reject', )
-        return get_transition_date(transitions, self, first=True)
 
     def _apply_actors_info(self, data: dict) -> dict:
         """Apply actors information for a given data dictionary.
