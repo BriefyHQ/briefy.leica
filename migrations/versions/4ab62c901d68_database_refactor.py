@@ -6,11 +6,11 @@ Create Date: 2016-12-02 17:06:18.985479
 """
 from alembic import op
 from briefy.common.db.types.aware_datetime import AwareDateTime
-from briefy.common.vocabularies.person import GenderCategories
 from briefy.common.db.types.geo import POINT
+from briefy.common.vocabularies.categories import CategoryChoices
+from briefy.common.vocabularies.person import GenderCategories
 from briefy.leica.models.professional.location import DistanceUnits
 from briefy.leica.vocabularies import JobInputSource
-from briefy.common.vocabularies.categories import CategoryChoices
 from sqlalchemy_utils.types.choice import ChoiceType
 from sqlalchemy_utils.types.json import JSONType
 from sqlalchemy_utils.types.timezone import TimezoneType
