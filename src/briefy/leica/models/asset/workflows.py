@@ -16,7 +16,7 @@ class AssetWorkflow(BriefyWorkflow):
     entity = 'asset'
     initial_state = 'created'
 
-    # States:
+    # States
     created = WS('created', 'Created')
     """State: Asset created."""
 
@@ -78,7 +78,7 @@ class AssetWorkflow(BriefyWorkflow):
 
     @pending.transition(edit, 'can_approve')
     def request_edit(self):
-        """Tramsition: Request an edit on the asset.
+        """Transition: Request an edit on the asset.
 
         Permission: :func:`AssetWorkflow.can_approve`
         """
@@ -87,7 +87,7 @@ class AssetWorkflow(BriefyWorkflow):
     @pending.transition(deleted, 'can_delete')
     @edit.transition(deleted, 'can_delete')
     def delete(self):
-        """Tramsition: Delete the asset.
+        """Transition: Delete the asset.
 
         Permission: :func:`AssetWorkflow.can_delete`
         """
