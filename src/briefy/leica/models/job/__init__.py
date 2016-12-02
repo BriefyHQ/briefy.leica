@@ -35,7 +35,6 @@ class IJob(Interface):
 class JobDates:
     """Mixin providing date-related information of a Job."""
 
-
     _availability = sa.Column(
         'availability',
         sautils.JSONType,
@@ -201,7 +200,6 @@ class Job(JobDates, BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersioned
     Relationship with :class:`briefy.leica.models.professional.Professional`.
     """
 
-
     # Job details
     locations = orm.relationship(
         'JobLocation',
@@ -281,7 +279,6 @@ class Job(JobDates, BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersioned
 
     Collection of :class:`briefy.leica.models.asset.Asset`.
     """
-
 
     comments = orm.relationship(
         'Comment',

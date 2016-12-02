@@ -15,77 +15,50 @@ logger = logging.getLogger(__name__)
 
 
 class JobWorkflow(BriefyWorkflow):
-    """Workflow for an Asset."""
+    """Workflow for a Job."""
 
     entity = 'jobs'
     initial_state = 'created'
 
     # States
-    created = WS(
-        'created',
-        'Created',
-        'Job created by the customer.',
-    )
-    validation = WS(
-        'validation',
-        'Validation'
-        'Under system validation.'
-    )
-    edit = WS(
-        'edit',
-        'Edit',
-        'Customer must edit job in order to be approved.'
-    )
-    pending = WS(
-        'pending',
-        'Pending'
-        'Awaiting professional assignment by Briefy.'
-    )
-    published = WS(
-        'published',
-        'Job Poll'
-        'Available for Professional self assignment.'
-    )
-    assigned = WS(
-        'assigned',
-        'Assigned',
-        'Job assigned, waiting for scheduling.'
-    )
-    scheduled = WS(
-        'scheduled',
-        'Scheduled'
-        'Job scheduled.'
-    )
-    cancelled = WS(
-        'cancelled',
-        'Cancelled',
-        'Job was cancelled by the customer.'
-    )
-    awaiting_assets = WS(
-        'awaiting_assets',
-        'Awaiting Uploads',
-        'Waiting for content to be upload to the system.'
-    )
-    in_qa = WS(
-        'in_qa',
-        'Quality assurance',
-        'Job is under quality assurance.'
-    )
-    approved = WS(
-        'approved',
-        'Content approved',
-        'Content was approved by Briefy quality assurance team'
-    )
-    refused = WS(
-        'refused',
-        'Customer refused',
-        'Job was rejected by the customer.'
-    )
-    completed = WS(
-        'completed',
-        'Completed',
-        'Job is completed.'
-    )
+    created = WS('created', 'Created')
+    """Job created by the customer."""
+
+    validation = WS('validation', 'Validation')
+    """Under system validation."""
+
+    edit = WS('edit', 'Edit')
+    """Customer must edit job in order to be approved."""
+
+    pending = WS('pending', 'Pending')
+    """Awaiting professional assignment by Briefy."""
+
+    published = WS('published', 'Job Pool')
+    """Available for Professional self assignment."""
+
+    assigned = WS('assigned', 'Assigned')
+    """Job assigned, waiting for scheduling."""
+
+    scheduled = WS('scheduled', 'Scheduled')
+    """Job scheduled."""
+
+    cancelled = WS('cancelled', 'Cancelled')
+    """Job was cancelled by the customer."""
+
+    awaiting_assets = WS('awaiting_assets', 'Awaiting Uploads')
+    """Waiting for content to be upload to the system."""
+
+    in_qa = WS('in_qa', 'Quality assurance')
+    """Job is under quality assurance."""
+
+    approved = WS('approved', 'Content approved')
+    """Content was approved by Briefy quality assurance team"""
+
+    refused = WS('refused', 'Customer refused')
+    """Job was rejected by the customer."""
+
+    completed = WS('completed', 'Completed')
+    """Job is completed."""
 
     # Transitions
     @created.transition(validation, 'can_submit')

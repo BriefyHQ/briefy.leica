@@ -12,8 +12,9 @@ pyramid-debugtoolbar==2.4.2
 pyramid_ipython
 requests_mock
 snowballstemmer==1.2.1
-sphinx-bootstrap-theme==0.4.8
+sphinx-bootstrap-theme==0.4.12
 sphinx-rtd-theme==0.1.9
+sphinx-autodoc-typehints
 sphinxcontrib-sadisplay
 sphinxcontrib-plantuml
 tox==2.3.1

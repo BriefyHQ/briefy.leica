@@ -19,17 +19,11 @@ class ProfessionalWorkflow(BriefyWorkflow):
     initial_state = 'created'
 
     # States
-    created = WS(
-        'created',
-        'Created'
-        'Inserted into the database.'
-    )
+    created = WS('created', 'Created')
+    """Inserted into the database."""
 
-    deleted = WS(
-        'deleted',
-        'Deleted link'
-        'Professional was deleted from the platform.'
-    )
+    deleted = WS('deleted', 'Deleted link')
+    """Professional was deleted from the platform."""
 
     # Transitions:
     @created.transition(deleted, 'can_delete')
@@ -50,17 +44,11 @@ class SkillWorkflow(BriefyWorkflow):
     initial_state = 'created'
 
     # States
-    created = WS(
-        'created',
-        'Created'
-        'Inserted into the database.'
-    )
+    created = WS('created', 'Created')
+    """Inserted into the database."""
 
-    deleted = WS(
-        'deleted',
-        'Deleted link'
-        'Professional Skill was deleted from the platform.'
-    )
+    deleted = WS('deleted', 'Deleted Skill')
+    """Professional Skill was deleted from the platform."""
 
     # Transitions:
     @created.transition(deleted, 'can_delete')
@@ -81,29 +69,17 @@ class LocationWorkflow(BriefyWorkflow):
     initial_state = 'created'
 
     # States
-    created = WS(
-        'created',
-        'Created'
-        'Inserted into the database.'
-    )
+    created = WS('created', 'Created')
+    """Inserted into the database."""
 
-    active = WS(
-        'active',
-        'Active working location'
-        'Professional can be hired at this working location.'
-    )
+    active = WS('active', 'Active working location')
+    """Professional can be hired at this working location."""
 
-    inactive = WS(
-        'inactive',
-        'Inactive working location'
-        'Professional cannot be hired at this working location.'
-    )
+    inactive = WS('inactive', 'Inactive working location')
+    """Professional cannot be hired at this working location."""
 
-    deleted = WS(
-        'deleted',
-        'Deleted working location'
-        'Working location was deleted from the platform.'
-    )
+    deleted = WS('deleted', 'Deleted working location')
+    """Working location was deleted from the platform."""
 
     # Transitions:
     @created.transition(active, 'can_submit')
@@ -152,17 +128,11 @@ class LinkWorkflow(BriefyWorkflow):
     initial_state = 'created'
 
     # States
-    created = WS(
-        'created',
-        'Created'
-        'Inserted into the database.'
-    )
+    created = WS('created', 'Created')
+    """Inserted into the database."""
 
-    deleted = WS(
-        'deleted',
-        'Deleted link'
-        'Link was deleted from the platform.'
-    )
+    deleted = WS('deleted', 'Deleted link')
+    """Link was deleted from the platform."""
 
     # Transitions:
     @created.transition(deleted, 'can_delete')

@@ -11,6 +11,7 @@ minor_version = version[1]
 
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx_autodoc_typehints',
     'sphinx.ext.coverage',
     'sphinx.ext.doctest',
     'sphinx.ext.todo',
@@ -67,3 +68,5 @@ inheritance_graph_attrs = dict(rankdir="LR", fontsize=16, size='"10.0, 4.0"',
 
 inheritance_node_attrs = dict(shape='ellipse', fontsize=16, height=0.75,
                               color='yellow', style='filled')
+
+autodoc_member_order = 'bysource'

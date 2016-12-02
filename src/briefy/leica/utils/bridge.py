@@ -1,4 +1,5 @@
 """Bridge helpers between Knack and Briefy."""
+from briefy.common.db import Base
 from briefy.knack.config import KNACK_API_KEY
 from briefy.knack.config import KNACK_APPLICATION_ID
 
@@ -14,7 +15,7 @@ else:
     KJob = None
 
 
-def _get_comments_from_job(job: 'Job') -> list:
+def _get_comments_from_job(job: Base) -> list:
     """Return the list of comment contents for a job.
 
     :param job: Internal Briefy Job
@@ -24,7 +25,7 @@ def _get_comments_from_job(job: 'Job') -> list:
     return comments
 
 
-def get_info_from_job(job: 'Job') -> dict:
+def get_info_from_job(job: Base) -> dict:
     """Return information about the job."""
     result = {
         'id': job.id,

@@ -1,4 +1,5 @@
 """Transition helpers for Leica."""
+from briefy.common.db import Base
 from briefy.leica import logger
 from datetime import datetime
 
@@ -17,7 +18,7 @@ def get_transition_date(transitions: tuple, obj, first: bool=False) -> datetime:
     return valid[order]['date'] if valid else None
 
 
-def approve_assets_in_job(job: 'Job', context) -> list:
+def approve_assets_in_job(job: Base, context) -> list:
     """Approve all pending assets in a Job.
 
     :param job: Internal Briefy Job.

@@ -1,6 +1,6 @@
 """Project Workflow."""
 from briefy.common.workflow import BriefyWorkflow
-from briefy.common.workflow import WorkflowState
+from briefy.common.workflow import WorkflowState as WS
 
 import logging
 
@@ -14,4 +14,5 @@ class ProjectWorkflow(BriefyWorkflow):
     entity = 'projects'
     initial_state = 'created'
 
-    created = WorkflowState('created', title='Created', description='Project created')
+    created = WS('created', 'Created')
+    """Project created."""

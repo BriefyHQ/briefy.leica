@@ -13,8 +13,16 @@ class LocationContactInfoMixin:
     """A mixin to manage contact information of a professional."""
 
     contact = sa.Column(sa.String(255), nullable=True, unique=False)
+    """Name of the contact person at the location.
+
+    Fullname of the person that will receive the professional at the Job Location.
+    """
+
     email = sa.Column(sa.String(255), nullable=True, unique=False)
+    """Email of the contact person."""
+
     mobile = sa.Column(sa.String(255), nullable=True, unique=False)
+    """Mobile phone number of the contact person."""
 
 
 class JobLocation(LocationContactInfoMixin, AddressMixin, mixins.LeicaMixin, Base):
@@ -40,3 +48,7 @@ class JobLocation(LocationContactInfoMixin, AddressMixin, mixins.LeicaMixin, Bas
             }
         }
     )
+    """Job ID.
+
+    Reference to the Job this location is attached to.
+    """

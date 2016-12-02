@@ -27,8 +27,8 @@ class Link(mixins.LeicaMixin, Base):
     url = sa.Column(URLType, nullable=False)
 
     @declared_attr
-    def is_social(cls):
-        """Check if this is a social network?."""
+    def is_social(cls) -> bool:
+        """Check if this link points to a social network?."""
         cls_name = cls.__name__.lower()
         default = False if cls_name in ('link', 'porfolio') else True
         return sa.Column(sa.Boolean, default=default)
@@ -46,7 +46,10 @@ class Link(mixins.LeicaMixin, Base):
 
     @declared_attr
     def __tablename__(self):
-        """Define tablename."""
+        """Define tablename.
+
+        For all subtypes we will use the same table.
+        """
         return 'links'
 
 

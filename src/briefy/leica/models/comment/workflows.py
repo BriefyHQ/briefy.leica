@@ -1,6 +1,6 @@
 """Comment Workflow."""
 from briefy.common.workflow import BriefyWorkflow
-from briefy.common.workflow import WorkflowState
+from briefy.common.workflow import WorkflowState as WS
 
 import logging
 
@@ -14,4 +14,5 @@ class CommentWorkflow(BriefyWorkflow):
     entity = 'comments'
     initial_state = 'created'
 
-    created = WorkflowState('created', title='Created', description='Comment created')
+    created = WS('created', 'Created')
+    """Comment created."""

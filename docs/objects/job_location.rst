@@ -97,6 +97,6 @@ Database model
 Database diagram for the JobLocation data model:
 
 .. sadisplay::
-    :module: briefy.leica.models.job.location.JobLocation
+    :module: briefy.leica.models.job.location
     :alt: Job locations data model
-    :render: plantuml
+    :render: graphviz

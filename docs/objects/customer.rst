@@ -94,4 +94,4 @@ Database diagram for the Customer data model:
 .. sadisplay::
     :module: briefy.leica.models.customer
     :alt: Customer data model
-    :render: plantuml
+    :render: graphviz

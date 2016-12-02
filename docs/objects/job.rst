@@ -245,4 +245,4 @@ Database diagram for the Job data model:
 .. sadisplay::
     :module: briefy.leica.models.job
     :alt: Job data model
-    :render: plantuml
+    :render: graphviz

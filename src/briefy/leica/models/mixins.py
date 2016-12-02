@@ -116,7 +116,6 @@ class JobFinancialInfo:
         """
         return self._price
 
-
     @hybrid_property
     def costs(self) -> int:
         """Sum of costs for this job.
