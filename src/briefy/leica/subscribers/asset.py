@@ -30,10 +30,8 @@ def asset_updated_handler(event):
     safe_update_metadata(obj)
 
 
-def asset_submit_handler(event):
+def asset_submit(event):
     """Handle asset submitted event."""
-    if event.event_name != 'asset.workflow.submit':
-        return
     obj = event.obj
     transitions = []
     # Impersonate the System here
@@ -48,3 +46,20 @@ def asset_submit_handler(event):
             ('invalidate', error_message)
         )
     safe_workflow_trigger_transitions(event, transitions=transitions, state='validation')
+
+
+def transition_handler(event):
+    """Handle asset transition events."""
+    event_name = event.event_name
+    parts = event_name.split('.')
+    model = parts[0]
+    transition = parts[-1]
+    if model not in ('asset', 'image', 'threesixtyimage', 'video'):
+        return
+
+    handlers = {
+        'submit': asset_submit,
+    }
+    handler = handlers.get(transition, None)
+    if handler:
+        handler(event)

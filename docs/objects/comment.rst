@@ -94,4 +94,4 @@ Database diagram for the Comment data model:
 .. sadisplay::
     :module: briefy.leica.models.comment
     :alt: Comment data model
-    :render: plantuml
+    :render: graphviz

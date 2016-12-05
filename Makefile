@@ -70,7 +70,8 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr htmlcov/
 
 lint: ## check style with flake8
-	flake8 src/briefy/leica tests setup.py migrations
+	flake8 src/briefy/leica setup.py migrations
+	flake8 --ignore=D102,D103,D205,D101,D400,D210,D401,D100 tests
 
 test: lint ## run tests quickly with the default Python
 	py.test --cov-report term-missing --cov=briefy.leica tests

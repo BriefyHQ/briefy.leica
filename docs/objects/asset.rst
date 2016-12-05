@@ -189,4 +189,4 @@ Database diagram for the Asset data model:
 .. sadisplay::
     :module: briefy.leica.models.asset
     :alt: Asset data model
-    :render: plantuml
+    :render: graphviz

@@ -11,4 +11,4 @@ Complete database models ER diagram.
     :module: briefy.leica.models
     :link:
     :alt: Briefy Leica database models diagram.
-    :render: plantuml
+    :render: graphviz

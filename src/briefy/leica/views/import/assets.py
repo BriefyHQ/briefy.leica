@@ -41,12 +41,11 @@ class AssetImportService:
         data = self.request.json.get('data')
         success = False
         result = {}
-
         if data:
             asset_rows = []
             for item in data:
                 asset_rows.append(
-                    (item['job_id'], item['s3_path'], item['image_size'],
+                    (item['job_id'], item['professional_id'], item['s3_path'], item['image_size'],
                      item['image_width'], item['image_height'])
                 )
             session = self.request.db

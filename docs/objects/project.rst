@@ -150,4 +150,4 @@ Database diagram for the Project data model:
 .. sadisplay::
     :module: briefy.leica.models.project
     :alt: Project data model
-    :render: plantuml
+    :render: graphviz
