@@ -3,6 +3,6 @@ gevent==1.1.2
 pycountry==1.20
 cornice==1.2.1
 -e git+git@github.com:BriefyHQ/briefy.knack.git@develop#egg=briefy.knack
--e git+git@github.com:BriefyHQ/briefy.common.git@develop#egg=briefy.common[db]
+-e git+git@github.com:BriefyHQ/briefy.common.git@1.1.2#egg=briefy.common[db]
 -e git+git@github.com:BriefyHQ/briefy.ws.git@develop#egg=briefy.ws
 -e .
