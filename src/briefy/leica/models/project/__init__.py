@@ -214,7 +214,6 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     )
     """Path to release template file."""
 
-
     def _apply_actors_info(self, data: dict) -> dict:
         """Apply actors information for a given data dictionary.
 

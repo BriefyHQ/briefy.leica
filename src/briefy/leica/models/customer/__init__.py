@@ -8,14 +8,12 @@ from sqlalchemy.ext.declarative import declared_attr
 from zope.interface import Interface
 from zope.interface import implementer
 
-import colander
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils
 
 
 class ICustomer(Interface):
     """Marker interface for a Customer"""
-
 
 
 class TaxInfo:
@@ -94,6 +92,3 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.KLeicaVersionedMixin, Base)
         data = super().to_dict()
         add_user_info_to_state_history(self.state_history)
         return data
-
-    def __repr__(self):
-        return '<Customer-proxy \'{0}\'>'.format(self.title)
