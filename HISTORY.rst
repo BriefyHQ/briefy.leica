@@ -17,6 +17,7 @@ History
      * LEICA-70: New endpoint to log requests from knack. (rudaporto)
      * Moved import/sync endpoints path to reside inside /knack namespace. (rudaporto)
      * Integrate HEAD method improvements of briefy.ws. (rudaporto)
+     * Use last version of briefy.ws. (aivuk)
 
 1.1.0 (2016-10-04)
 ------------------
