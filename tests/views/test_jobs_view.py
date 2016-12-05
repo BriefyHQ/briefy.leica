@@ -24,7 +24,7 @@ class TestJobView(BaseVersionedTestView):
     NOT_FOUND_MESSAGE = ''
     update_map = {
         'title': 'New Job Title',
-        'job_id': '10',
+        'job_id': 10,
         'project_id': '36d359f0-8e92-41bb-8d1c-fedfd60e7046'
     }
 
