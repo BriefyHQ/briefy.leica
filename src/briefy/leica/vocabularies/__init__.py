@@ -60,3 +60,12 @@ options = [
 
 
 JobInputSource = LabeledEnum('JobInputSource', options)
+
+
+options = [
+    ('billing', 'billing', 'Billing contact'),
+    ('business', 'business', 'Business contact'),
+]
+
+
+ContactTypes = LabeledEnum('ContactTypes', options)

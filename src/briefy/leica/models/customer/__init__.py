@@ -10,41 +10,79 @@ from zope.interface import implementer
 
 import colander
 import sqlalchemy as sa
+import sqlalchemy_utils as sautils
 
 
 class ICustomer(Interface):
     """Marker interface for a Customer"""
 
 
-@implementer(ICustomer)
-class Customer(mixins.KLeicaVersionedMixin, Base):
-    """Customer model."""
 
-    version = None
+class TaxInfo:
+    """Tax information"""
+
+    tax_id = sa.Column(sa.String(50), nullable=True)
+    """Tax ID for this customer.
+
+    i.e.: 256.018.208-49
+    """
+
+    tax_id_type = sa.Column(sa.String(50), nullable=True)
+    """Tax ID type.
+
+    i.e.: CPF
+    """
+
+    tax_country = sa.Column(sautils.CountryType, nullable=True)
+    """Tax Country
+
+    i.e.: BR
+    """
+
+
+@implementer(ICustomer)
+class Customer(TaxInfo, mixins.PolaroidMixin, mixins.KLeicaVersionedMixin, Base):
+    """A Customer for Briefy."""
 
     _workflow = workflows.CustomerWorkflow
 
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state', '_slug']}
 
-    projects = sa.orm.relationship('Project', back_populates='customer')
-    external_id = sa.Column(sa.String,
-                            nullable=True,
-                            info={'colanderalchemy': {
-                                'title': 'External ID',
-                                'missing': colander.drop}}
-                            )
+    legal_name = sa.Column(sa.String(255), nullable=True)
+    """Legal name of the company.
+
+    i.e.: Insta Stock GmbH
+    """
+
+    addresses = orm.relationship(
+        'CustomerBillingAddress',
+        backref=orm.backref('customer', lazy='joined'),
+        lazy='dynamic'
+    )
+    """List of Billing Addresses for a Customer
+
+    Returns a collection of :class:`briefy.leica.models.customer.addrees.CustomerBillingAddress`.
+    """
 
     projects = orm.relationship(
         'Project',
         backref=orm.backref('customer', lazy='joined'),
         lazy='dynamic'
     )
+    """List of Projects of this Customer.
+
+    Returns a collection of :class:`briefy.leica.models.project.Project`.
+    """
 
     jobs = orm.relationship(
         'Job',
         backref=orm.backref('customer', lazy='joined'),
         lazy='dynamic'
     )
+    """List of Jobs of this Customer.
+
+    Returns a collection of :class:`briefy.leica.models.job.Job`.
+    """
 
     @declared_attr
     def _external_model_(cls):

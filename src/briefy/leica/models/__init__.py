@@ -5,6 +5,8 @@ from briefy.leica.models.asset import ThreeSixtyImage
 from briefy.leica.models.asset import Video
 from briefy.leica.models.comment import Comment
 from briefy.leica.models.customer import Customer
+from briefy.leica.models.customer.address import CustomerBillingAddress
+from briefy.leica.models.customer.contact import CustomerContact
 from briefy.leica.models.job import IJob  # noQA
 from briefy.leica.models.job import Job
 from briefy.leica.models.job.location import JobLocation
@@ -36,6 +38,8 @@ ALL_MODELS = [
     Video,
     Comment,
     Customer,
+    CustomerBillingAddress,
+    CustomerContact,
     Facebook,
     Flickr,
     Instagram,

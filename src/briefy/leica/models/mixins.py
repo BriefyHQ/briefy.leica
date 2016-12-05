@@ -190,3 +190,9 @@ class KLeicaVersionedMixin(KnackMixin, LeicaVersionedMixin):
     """
 
     pass
+
+
+class PolaroidMixin:
+    """Mixin to handle Polaroid integration."""
+
+    pass

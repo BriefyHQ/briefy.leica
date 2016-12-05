@@ -225,6 +225,7 @@ class Job(JobDates, BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersioned
 
     Options come from :module:`briefy.common.vocabularies.categories`.
     """
+
     source = sa.Column(
         sautils.ChoiceType(JobInputSource, impl=sa.String()),
         default='briefy',
