@@ -18,6 +18,7 @@ History
      * Moved import/sync endpoints path to reside inside /knack namespace. (rudaporto)
      * Integrate HEAD method improvements of briefy.ws. (rudaporto)
      * Use last version of Briefy.ws. (aivuk)
+     * Configure job service to allow filter and sort usign Project.title. (aivuk)
 
 1.1.0 (2016-10-04)
 ------------------
