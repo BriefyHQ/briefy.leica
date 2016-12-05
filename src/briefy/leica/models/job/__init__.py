@@ -198,6 +198,8 @@ class Job(JobDates, BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersioned
     """Professional ID.
 
     Relationship with :class:`briefy.leica.models.professional.Professional`.
+
+    This will be deprecated as soon as Assignments is implemented
     """
 
     # Job details
@@ -210,6 +212,18 @@ class Job(JobDates, BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersioned
 
     Relationship with :class:`briefy.leica.models.job.location.JobLocation`.
     """
+
+    # Job Assignments
+    assignments = orm.relationship(
+        'JobAssignment',
+        backref=orm.backref('job', lazy='joined'),
+        lazy='joined'
+    )
+    """Job Assignments.
+
+    Relationship with :class:`briefy.leica.models.job.assignment.JobAssignment`.
+    """
+
     requirements = sa.Column(sa.Text, default='')
     """Human-readable requirements for a Job."""
 

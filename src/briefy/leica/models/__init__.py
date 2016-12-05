@@ -9,6 +9,7 @@ from briefy.leica.models.customer.address import CustomerBillingAddress
 from briefy.leica.models.customer.contact import CustomerContact
 from briefy.leica.models.job import IJob  # noQA
 from briefy.leica.models.job import Job
+from briefy.leica.models.job.assignment import JobAssignment
 from briefy.leica.models.job.location import JobLocation
 from briefy.leica.models.professional import Photographer
 from briefy.leica.models.professional import Professional
@@ -44,6 +45,7 @@ ALL_MODELS = [
     Flickr,
     Instagram,
     Job,
+    JobAssignment,
     JobLocation,
     Link,
     MainWorkingLocation,

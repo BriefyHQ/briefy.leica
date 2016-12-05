@@ -280,8 +280,33 @@ class JobLocationWorkflow(BriefyWorkflow):
     initial_state = 'created'
 
     # States
-    created = WS(
-        'created',
-        'Created',
-        'Job created by the customer.',
-    )
+    created = WS('created', 'Created')
+    """Job Location inserted on the database."""
+
+
+class AssignmentWorkflow(BriefyWorkflow):
+    """Workflow for a Job Assignment."""
+
+    entity = 'job_assignment'
+    initial_state = 'active'
+
+    # States
+    active = WS('active', 'Active')
+    """Job Assignment is active."""
+
+    inactive = WS('inactive', 'Inactive')
+    """Job Assignment that is not active."""
+
+    # Transitions
+    @active.transition(inactive, 'can_inactivate')
+    def submit(self):
+        """Transition: Inactivate an existing Assignment."""
+        pass
+
+    @Permission(groups=[LR['qa_manager'], G['qa'], G['pm'], ])
+    def can_inactivate(self):
+        """Permission: Validate if user can inactivate the Assignment.
+
+        Groups: g:qa, g:pm, r:qa_manager
+        """
+        return True

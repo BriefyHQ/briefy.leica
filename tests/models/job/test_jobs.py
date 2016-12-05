@@ -118,7 +118,7 @@ class TestJobModel(BaseModelTest):
         wf.context = roles['professional']
         wf.upload()
 
-        job.number_of_photos = 0
+        job.number_of_assets = 0
         wf.context = roles['qa']
         wf.approve()
         assert job.state == 'approved'
