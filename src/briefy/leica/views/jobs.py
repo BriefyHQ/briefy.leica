@@ -42,6 +42,7 @@ class JobService(RESTService):
     model = Job
     friendly_name = model.__name__
     default_order_by = 'created_at'
+    filter_related_fields = ['project.title']
 
     _default_notify_events = {
         'POST': events.JobCreatedEvent,
