@@ -1,4 +1,6 @@
 """Database models to work within the briefy.leica system."""
+from briefy.common.db.models.roles import LocalRole
+from briefy.leica.db import Session
 from briefy.leica.models.asset import Asset
 from briefy.leica.models.asset import Image
 from briefy.leica.models.asset import ThreeSixtyImage
@@ -31,6 +33,8 @@ from briefy.ws.listeners import register_workflow_context_listeners
 import sqlalchemy as sa
 
 
+LocalRole.__session__ = Session
+
 ALL_MODELS = [
     AdditionalWorkingLocation,
     Asset,
@@ -48,6 +52,7 @@ ALL_MODELS = [
     JobAssignment,
     JobLocation,
     Link,
+    LocalRole,
     MainWorkingLocation,
     Photographer,
     Portfolio,

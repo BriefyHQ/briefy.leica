@@ -16,7 +16,10 @@ class TestJobView(BaseVersionedTestView):
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json')
     ]
-    ignore_validation_fields = ['state_history', 'state', 'project', 'customer', 'updated_at']
+    ignore_validation_fields = [
+        'state_history', 'state', 'project', 'customer', 'updated_at',
+        'qa_manager', 'project_manager', 'scout_manager',
+    ]
     file_path = 'data/jobs.json'
     model = models.Job
     initial_wf_state = 'pending'

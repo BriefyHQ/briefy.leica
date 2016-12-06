@@ -1,6 +1,7 @@
 """Briefy Leica mixins."""
 from briefy.common.db.mixins import BaseMetadata
 from briefy.common.db.mixins import KnackMixin
+from briefy.common.db.mixins import LocalRolesMixin
 from briefy.common.db.mixins import Mixin
 from briefy.leica.db import Session
 from sqlalchemy.ext.declarative import declared_attr
@@ -156,7 +157,7 @@ class VersionMixin:
         pass
 
 
-class LeicaMixin(Mixin):
+class LeicaMixin(LocalRolesMixin, Mixin):
     """Base  mixin for Leica objects."""
 
     __session__ = Session

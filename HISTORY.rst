@@ -20,6 +20,13 @@ History
      * Integrate HEAD method improvements of briefy.ws. (rudaporto)
      * Use last version of Briefy.ws. (aivuk)
      * Configure job service to allow filter and sort usign Project.title. (aivuk)
+     * LEICA-73: Document Leica data models and improve fields/relationships (ericof)
+     * LEICA-61: Merge from AGFA. (ericof)
+     * LEICA-95: Update Professional model (merge from AGFA). (ericof)
+     * LEICA-71: Add "Extra Compensation" Field to Jobs. (ericof)
+     * LEICA-92: Update Job model. (ericof)
+     * LEICA-93: Update Customer model. (ericof)
+     * LEICA-94: Update Project model. (ericof)
 
 1.1.0 (2016-10-04)
 ------------------

@@ -224,7 +224,6 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
             ('qa_manager', 'qa_manager'),
             ('project_manager', 'project_manager'),
             ('scout_manager', 'scout_manager'),
-            ('finance_manager', 'finance_manager'),
         )
         for key, attr in actors:
             data[key] = get_public_user_info(getattr(self, attr))

@@ -1,6 +1,6 @@
 """Job workflow."""
 from briefy.common.vocabularies.roles import Groups as G
-from briefy.common.vocabularies.roles import LocalRoles as LR
+from briefy.common.vocabularies.roles import LocalRolesChoices as LR
 from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import Permission
 from briefy.common.workflow import WorkflowState as WS
