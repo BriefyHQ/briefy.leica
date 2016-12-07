@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 class JobWorkflow(BriefyWorkflow):
     """Workflow for a Job."""
 
-    entity = 'jobs'
+    entity = 'job'
     initial_state = 'created'
 
     # States
@@ -302,7 +302,7 @@ class JobWorkflow(BriefyWorkflow):
 class JobLocationWorkflow(BriefyWorkflow):
     """Workflow for a JobLocation."""
 
-    entity = 'job_location'
+    entity = 'joblocation'
     initial_state = 'created'
 
     # States
@@ -315,7 +315,7 @@ class JobLocationWorkflow(BriefyWorkflow):
 class AssignmentWorkflow(BriefyWorkflow):
     """Workflow for a Job Assignment."""
 
-    entity = 'job_assignment'
+    entity = 'jobassignment'
     initial_state = 'active'
 
     # States

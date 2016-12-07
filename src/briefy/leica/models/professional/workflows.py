@@ -73,7 +73,7 @@ class SkillWorkflow(BriefyWorkflow):
 class LocationWorkflow(BriefyWorkflow):
     """Workflow for a Working Location."""
 
-    entity = 'working_location'
+    entity = 'workinglocation'
     initial_state = 'created'
 
     # States

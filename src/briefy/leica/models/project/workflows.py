@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class ProjectWorkflow(BriefyWorkflow):
     """Workflow for a Project."""
 
-    entity = 'projects'
+    entity = 'project'
     initial_state = 'created'
 
     created = WS(

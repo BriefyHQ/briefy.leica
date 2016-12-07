@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class CommentWorkflow(BriefyWorkflow):
     """Workflow for a Comment."""
 
-    entity = 'comments'
+    entity = 'comment'
     initial_state = 'created'
 
     created = WS(
