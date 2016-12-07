@@ -17,35 +17,55 @@ class AssetWorkflow(BriefyWorkflow):
     initial_state = 'created'
 
     # States
-    created = WS('created', 'Created')
-    """State: Asset created."""
+    created = WS(
+        'created', 'Created',
+        'State: Asset created.'
+    )
 
-    edit = WS('edit', 'Edit')
-    """State: Request asset edit."""
+    edit = WS(
+        'edit', 'Edit',
+        'State: Request asset edit.'
+    )
 
-    deleted = WS('deleted', 'Deleted')
-    """State: Asset is deleted."""
+    deleted = WS(
+        'deleted', 'Deleted',
+        'State: Asset is deleted.'
+    )
 
-    validation = WS('validation', 'In Validation')
-    """State: Under machine validation."""
+    validation = WS(
+        'validation', 'In Validation',
+        'State: Under machine validation.'
+    )
 
-    discarded = WS('discarded', 'Discarded')
-    """State: Asset was discarded."""
+    discarded = WS(
+        'discarded', 'Discarded',
+        'State: Asset was discarded.'
+    )
 
-    pending = WS('pending', 'Pending Approval')
-    """State: Under QA validation."""
+    pending = WS(
+        'pending', 'Pending Approval',
+        'State: Under QA validation.'
+    )
 
-    reserved = WS('reserved', 'Reserved')
-    """State: Reserved for future use."""
+    reserved = WS(
+        'reserved', 'Reserved',
+        'State: Reserved for future use.'
+    )
 
-    post_processing = WS('post_processing', 'Post Processing')
-    """State: Asset under manual post-processing"""
+    post_processing = WS(
+        'post_processing', 'Post Processing',
+        'State: Asset under manual post-processing'
+    )
 
-    approved = WS('approved', 'Approved')
-    """State: Ready for delivery."""
+    approved = WS(
+        'approved', 'Approved',
+        'State: Ready for delivery.'
+    )
 
-    refused = WS('refused', 'Refused')
-    """State: Customer refused the asset."""
+    refused = WS(
+        'refused', 'Refused',
+        'State: Customer refused the asset.'
+    )
 
     # Transitions:
     @created.transition(validation, 'can_submit')

@@ -14,5 +14,7 @@ class ProjectWorkflow(BriefyWorkflow):
     entity = 'projects'
     initial_state = 'created'
 
-    created = WS('created', 'Created')
-    """Project created."""
+    created = WS(
+        'created', 'Created',
+        'Project created.'
+    )

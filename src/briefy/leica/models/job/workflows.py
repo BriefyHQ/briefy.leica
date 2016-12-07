@@ -21,44 +21,70 @@ class JobWorkflow(BriefyWorkflow):
     initial_state = 'created'
 
     # States
-    created = WS('created', 'Created')
-    """Job created by the customer."""
+    created = WS(
+        'created', 'Created',
+        'Job created by the customer.'
+    )
 
-    validation = WS('validation', 'Validation')
-    """Under system validation."""
+    validation = WS(
+        'validation', 'Validation',
+        'Under system validation.'
+    )
 
-    edit = WS('edit', 'Edit')
-    """Customer must edit job in order to be approved."""
+    edit = WS(
+        'edit', 'Edit',
+        'Customer must edit job in order to be approved.'
+    )
 
-    pending = WS('pending', 'Pending')
-    """Awaiting professional assignment by Briefy."""
+    pending = WS(
+        'pending', 'Pending',
+        'Awaiting professional assignment by Briefy.'
+    )
 
-    published = WS('published', 'Job Pool')
-    """Available for Professional self assignment."""
+    published = WS(
+        'published', 'Job Pool',
+        'Available for Professional self assignment.'
+    )
 
-    assigned = WS('assigned', 'Assigned')
-    """Job assigned, waiting for scheduling."""
+    assigned = WS(
+        'assigned', 'Assigned',
+        'Job assigned, waiting for scheduling.'
+    )
 
-    scheduled = WS('scheduled', 'Scheduled')
-    """Job scheduled."""
+    scheduled = WS(
+        'scheduled', 'Scheduled',
+        'Job scheduled.'
+    )
 
-    cancelled = WS('cancelled', 'Cancelled')
-    """Job was cancelled by the customer."""
+    cancelled = WS(
+        'cancelled', 'Cancelled',
+        'Job was cancelled by the customer.'
+    )
 
-    awaiting_assets = WS('awaiting_assets', 'Awaiting Uploads')
-    """Waiting for content to be upload to the system."""
+    awaiting_assets = WS(
+        'awaiting_assets', 'Awaiting Uploads',
+        'Waiting for content to be upload to the system.'
+    )
 
-    in_qa = WS('in_qa', 'Quality assurance')
-    """Job is under quality assurance."""
+    in_qa = WS(
+        'in_qa', 'Quality assurance',
+        'Job is under quality assurance.'
+    )
 
-    approved = WS('approved', 'Content approved')
-    """Content was approved by Briefy quality assurance team"""
+    approved = WS(
+        'approved', 'Content approved',
+        'Content was approved by Briefy quality assurance team'
+    )
 
-    refused = WS('refused', 'Customer refused')
-    """Job was rejected by the customer."""
+    refused = WS(
+        'refused', 'Customer refused',
+        'Job was rejected by the customer.'
+    )
 
-    completed = WS('completed', 'Completed')
-    """Job is completed."""
+    completed = WS(
+        'completed', 'Completed',
+        'Job is completed.'
+    )
 
     # Transitions
     @created.transition(validation, 'can_submit')
@@ -280,8 +306,10 @@ class JobLocationWorkflow(BriefyWorkflow):
     initial_state = 'created'
 
     # States
-    created = WS('created', 'Created')
-    """Job Location inserted on the database."""
+    created = WS(
+        'created', 'Created',
+        'Job Location inserted on the database.'
+    )
 
 
 class AssignmentWorkflow(BriefyWorkflow):
@@ -291,11 +319,15 @@ class AssignmentWorkflow(BriefyWorkflow):
     initial_state = 'active'
 
     # States
-    active = WS('active', 'Active')
-    """Job Assignment is active."""
+    active = WS(
+        'active', 'Active',
+        'Job Assignment is active.'
+    )
 
-    inactive = WS('inactive', 'Inactive')
-    """Job Assignment that is not active."""
+    inactive = WS(
+        'inactive', 'Inactive',
+        'Job Assignment that is not active.'
+    )
 
     # Transitions
     @active.transition(inactive, 'can_inactivate')

@@ -14,8 +14,10 @@ class CustomerWorkflow(BriefyWorkflow):
     entity = 'customer'
     initial_state = 'created'
 
-    created = WS('created', 'Created')
-    """Customer created."""
+    created = WS(
+        'created', 'Created',
+        'Customer created.'
+    )
 
 
 class BillingAddressWorkflow(BriefyWorkflow):
@@ -24,8 +26,10 @@ class BillingAddressWorkflow(BriefyWorkflow):
     entity = 'customerbillingaddress'
     initial_state = 'created'
 
-    created = WS('created', 'Created')
-    """Customer Billing Address created."""
+    created = WS(
+        'created', 'Created',
+        'Customer Billing Address created.'
+    )
 
 
 class ContactWorkflow(BriefyWorkflow):
@@ -34,5 +38,7 @@ class ContactWorkflow(BriefyWorkflow):
     entity = 'customercontact'
     initial_state = 'created'
 
-    created = WS('created', 'Created')
-    """Customer Contact created."""
+    created = WS(
+        'created', 'Created',
+        'Customer Contact created.'
+    )

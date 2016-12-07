@@ -14,5 +14,7 @@ class CommentWorkflow(BriefyWorkflow):
     entity = 'comments'
     initial_state = 'created'
 
-    created = WS('created', 'Created')
-    """Comment created."""
+    created = WS(
+        'created', 'Created',
+        'Comment created.'
+    )
