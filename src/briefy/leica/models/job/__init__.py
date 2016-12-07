@@ -254,12 +254,12 @@ class Job(JobDates, BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersioned
     job_id = sa.Column(sa.Integer, nullable=True, index=True)
     """Job ID was the main Briefy id for a Job.
 
-    This field was used on Knack as an auto-increment.
+    This field was used on Knack as an auto-incremented field named 'internal_job_id'.
     """
     customer_job_id = sa.Column(sa.String, default='', index=True)
     """ID of the job for the customer.
 
-    Reference for the customer to find this job.
+    Reference for the customer to find this job. On Knack this field was refered as 'job_id'.
     """
 
     # Assets for this job
@@ -321,6 +321,8 @@ class Job(JobDates, BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersioned
     )
     """Path to the assets submission.
 
+    On Knack it usually pointed to a google-drive folder where
+    the Professional have write-permission.
     This will be deprecated when assets upload is handled also using Leica.
     """
 
@@ -337,14 +339,14 @@ class Job(JobDates, BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersioned
     )
     """Delivery links.
 
-    JSON with a collection of delivery links. Should be accessed using delivery attribute.
+    JSON with a collection of delivery links. Should be accessed using the 'delivery' attribute.
     """
 
     @hybrid_property
     def delivery(self) -> dict:
         """Return delivery info for a Job.
 
-        This should return a dict with delivery method and link
+        This should return a dict with the delivery method and URL
         i.e.::
 
             {
