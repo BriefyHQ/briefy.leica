@@ -67,7 +67,7 @@ class CommercialInfoMixin:
     def price(self) -> int:
         """Price of this job.
 
-        :return: Return the price, in cents, of this job.
+        :return: Return the price, in `.price_currency` cents, of this job
         """
         return self._price
 

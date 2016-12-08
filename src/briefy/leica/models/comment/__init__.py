@@ -23,7 +23,17 @@ class Comment(mixins.LeicaMixin, Base):
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'entity_type', 'type']}
 
     content = sa.Column(sa.Text, nullable=False)
+    """Content.
+
+    Main body of a comment
+    """
+
     comment_order = sa.Column(sa.Integer, default=0)
+    """Comment order.
+
+    The cronolgical order in which this comment was added
+    to its target subject
+    """
     author_id = sa.Column(sautils.UUIDType,
                           nullable=False,
                           info={'colanderalchemy': {
@@ -31,6 +41,7 @@ class Comment(mixins.LeicaMixin, Base):
                               'validator': colander.uuid,
                               'typ': colander.String}}
                           )
+    """Author ID."""
 
     in_reply_to = sa.Column(sautils.UUIDType,
                             sa.ForeignKey('comments.id'),
@@ -41,14 +52,27 @@ class Comment(mixins.LeicaMixin, Base):
                                 'missing': None,
                                 'typ': colander.String}}
                             )
+    """In Reply To.
+
+    Comment which this one replies. Used for stablishing comment threads.
+    """
 
     entity_type = sa.Column(sa.String(255))
+    """Entity Type.
+
+    To which object type (model) this comment is attached to.
+
+    """
     entity_id = sa.Column(sautils.UUIDType,
                           info={'colanderalchemy': {
                               'title': 'ID',
                               'validator': colander.uuid,
                               'typ': colander.String}}
                           )
+    """Entity ID.
+
+    Entity this comment is attached to.
+    """
 
     entity = sautils.generic_relationship(entity_type, entity_id)
 

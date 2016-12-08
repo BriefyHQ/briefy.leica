@@ -59,11 +59,12 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
         },
     )
 
-    # Denormalized string with the name of the OWNER of
-    # an asset under copyright law, disregarding whether them are a Briefy system user
     owner = sa.Column(sa.String(255), nullable=False)
+    """Denormalized string with the name of the OWNER of an asset.
 
-    # Refers to a system user - reachable through microservices/redis
+    Owner as in under copyright law, disregarding whether them are a Briefy system user
+    """
+
     professional_id = sa.Column(
         sautils.UUIDType,
         sa.ForeignKey('professionals.id'),
@@ -76,10 +77,8 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
         },
         nullable=False
     )
+   """ Refers to a system user - reachable through microservices/redis. """
 
-    # Refers to a system user - reachable through microservices/redis
-    # This field exists because a QA could be the one that uploaded the image,
-    # So this field needs to express that
     uploaded_by = sa.Column(
         sautils.UUIDType,
         info={
@@ -91,6 +90,11 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
         },
         nullable=False
     )
+    """ Refers to a system user - reachable through microservices/redis.
+
+    Sometimes an internal briefy staff - other than the assigned professional
+    needs to update an asset. This records the one who actually uploaded the item.
+    """
 
     job_id = sa.Column(
         sautils.UUIDType,
@@ -104,15 +108,24 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
             }
         }
     )
+    """
+    Job ID.
 
-    # history is an unified list where each entry can refer to:
-    # - A  new comment by some user (comments are full objects with workflow)
-    # - A transition on the object workflow
-    # - An editing operation on the mains asset that results in a new binary -
-    #        this can be the result of:
-    #        - a new upload that superseeds an earlier version,
-    #        - an internal operation (crop, filter, so on)
+    Job shooting under which this asset has been generated.
+    """
+
     history = sa.Column(sautils.JSONType, nullable=True)
+    """History.
+
+    An unified list of comments and transitions and modifications -
+    Each item can refer to:
+      - A  new comment by some user (comments are full objects with workflow)
+      - A transition on the object workflow
+      - An editing operation on the mains asset that results in a new binary -
+        this can be the result of:
+             - a new upload that superseeds an earlier version,
+             - an internal operation (crop, filter, so on)
+    """
 
     comments = orm.relationship(
         'Comment',
@@ -120,6 +133,7 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
         order_by='asc(Comment.created_at)',
         primaryjoin='Comment.entity_id == Asset.id'
     )
+    """Comments."""
 
     @property
     def tech_requirements(self) -> dict:
@@ -262,7 +276,7 @@ class ThreeSixtyImage(asset.ThreeSixtyImageMixin, Asset):
 
         :return: A list with validation failures, if any.
         """
-        # TOOD: Check requirements
+        # TODO: Check requirements
         return True
 
 
@@ -291,5 +305,5 @@ class Video(asset.VideoMixin, Asset):
 
         :return: A list with validation failures, if any.
         """
-        # TOOD: Check requirements
+        # TODO: Check requirements
         return True
