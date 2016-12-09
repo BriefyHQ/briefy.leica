@@ -9,11 +9,11 @@ Inheritance diagram for the Professional class:
 .. inheritance-diagram:: briefy.leica.models.professional.Professional
 
 
+Workflow
+++++++++
 
-State Machine
-+++++++++++++
-
-TODO
+.. workflow::
+   :class: briefy.leica.models.professional.workflows.ProfessionalWorkflow
 
 
 Database model

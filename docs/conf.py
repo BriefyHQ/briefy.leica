@@ -10,13 +10,13 @@ major_version = version[0]
 minor_version = version[1]
 
 extensions = [
+    'briefy.common.docs.workflow',
     'sphinx.ext.autodoc',
     'sphinx_autodoc_typehints',
     'sphinx.ext.coverage',
     'sphinx.ext.doctest',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
-    'sphinxcontrib.plantuml',
     'sphinxcontrib.sadisp',
     'sphinx.ext.inheritance_diagram',
 ]
@@ -59,11 +59,12 @@ html_theme_options = {
     'bootstrap_version': "3",
 }
 
-plantuml = 'java -jar /usr/local/bin/plantuml.jar'.split()
-graphviz = 'dot -Tpng'.split()
-sadisplay_default_render = 'plantuml'
+suppress_warnings = ['image.nonlocal_uri']
 
-inheritance_graph_attrs = dict(rankdir="LR", fontsize=16, size='"10.0, 4.0"',
+graphviz = 'dot -Tpng'.split()
+sadisplay_default_render = 'graphviz'
+
+inheritance_graph_attrs = dict(rankdir="TD", fontsize=16, size='"10.0, 4.0"',
                                ratio='expand')
 
 inheritance_node_attrs = dict(shape='ellipse', fontsize=16, height=0.75,

@@ -77,7 +77,7 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
         },
         nullable=False
     )
-   """ Refers to a system user - reachable through microservices/redis. """
+    """Refer to a system user - reachable through microservices/redis."""
 
     uploaded_by = sa.Column(
         sautils.UUIDType,
@@ -90,7 +90,7 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
         },
         nullable=False
     )
-    """ Refers to a system user - reachable through microservices/redis.
+    """Refer to a system user - reachable through microservices/redis.
 
     Sometimes an internal briefy staff - other than the assigned professional
     needs to update an asset. This records the one who actually uploaded the item.
@@ -108,8 +108,7 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
             }
         }
     )
-    """
-    Job ID.
+    """Job ID.
 
     Job shooting under which this asset has been generated.
     """
@@ -117,14 +116,17 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
     history = sa.Column(sautils.JSONType, nullable=True)
     """History.
 
-    An unified list of comments and transitions and modifications -
+    An unified list of comments and transitions and modifications.
+
     Each item can refer to:
-      - A  new comment by some user (comments are full objects with workflow)
-      - A transition on the object workflow
-      - An editing operation on the mains asset that results in a new binary -
+
+      * A  new comment by some user (comments are full objects with workflow)
+      * A transition on the object workflow
+      * An editing operation on the mains asset that results in a new binary,
         this can be the result of:
-             - a new upload that superseeds an earlier version,
-             - an internal operation (crop, filter, so on)
+        * a new upload that superseeds an earlier version,
+        * an internal operation (crop, filter, so on)
+
     """
 
     comments = orm.relationship(

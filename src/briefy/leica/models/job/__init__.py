@@ -237,7 +237,7 @@ class Job(JobDates, BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersioned
     )
     """Category of this job.
 
-    Options come from :module:`briefy.common.vocabularies.categories`.
+    Options come from :mod:`briefy.common.vocabularies.categories`.
     """
 
     source = sa.Column(
@@ -248,7 +248,7 @@ class Job(JobDates, BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersioned
     """Source of this job.
 
     This field stores which part created this job, Customer or Briefy.
-    Options come from :module:`briefy.leica.vocabularies`.
+    Options come from :mod:`briefy.leica.vocabularies`.
     """
     # Job Identifiers
     job_id = sa.Column(sa.Integer, nullable=True, index=True)

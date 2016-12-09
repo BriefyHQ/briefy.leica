@@ -9,10 +9,11 @@ Inheritance diagram for the WorkingLocation class:
 .. inheritance-diagram:: briefy.leica.models.professional.location.WorkingLocation
 
 
-State Machine
-+++++++++++++
+Workflow
+++++++++
 
-TODO
+.. workflow::
+   :class: briefy.leica.models.professional.workflows.LocationWorkflow
 
 
 Database model

@@ -1,5 +1,5 @@
 Codebase
-=================
+========
 
 Documentation for *briefy.leica* codebase.
 
