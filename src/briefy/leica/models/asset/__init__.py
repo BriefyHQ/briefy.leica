@@ -77,7 +77,7 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
         },
         nullable=False
     )
-   """ Refers to a system user - reachable through microservices/redis. """
+    """ Refers to a system user - reachable through microservices/redis. """
 
     uploaded_by = sa.Column(
         sautils.UUIDType,

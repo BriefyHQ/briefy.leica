@@ -97,7 +97,17 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.KLeicaVersionedMixin, Base)
     )
     """List of Billing Addresses for a Customer
 
-    Returns a collection of :class:`briefy.leica.models.customer.addrees.CustomerBillingAddress`.
+    Returns a collection of :class:`briefy.leica.models.customer.address.CustomerBillingAddress`.
+    """
+
+    contacts = orm.relationship(
+        'CustomerContact',
+        backref=orm.backref('customer', lazy='joined'),
+        lazy='dynamic'
+    )
+    """List of Contacts for a Customer
+
+    Returns a collection of :class:`briefy.leica.models.customer.contact.CustomerContact`.
     """
 
     projects = orm.relationship(
@@ -128,5 +138,8 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.KLeicaVersionedMixin, Base)
     def to_dict(self):
         """Return a dict representation of this object."""
         data = super().to_dict()
+        addresses = [address.to_dict(excludes='customer') for address in self.addresses.all()]
+        contacts = [contact.to_dict(excludes='customer') for contact in self.contacts.all()]
+        data.update(addresses=addresses, contacts=contacts)
         add_user_info_to_state_history(self.state_history)
         return data

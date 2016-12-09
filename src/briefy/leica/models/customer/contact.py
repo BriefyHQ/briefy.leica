@@ -41,7 +41,7 @@ class CustomerContact(NameMixin, BaseMetadata, mixins.LeicaMixin, Base):
     """Contact type.
 
     This field define what type of contact this one is.
-    Options come from :module:`briefy.leica.vocabularies`.
+    Options come from :mod:`briefy.leica.vocabularies`.
     """
 
     position = sa.Column(sa.String(255), nullable=True, unique=False)
