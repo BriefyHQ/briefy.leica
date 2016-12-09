@@ -1,20 +1,24 @@
+"""Import and sync Knack Job to Leica Job."""
 from briefy.common.vocabularies.categories import CategoryChoices
+from briefy.leica import logger
 from briefy.leica.models import Job
+from briefy.leica.models import JobLocation
 from briefy.leica.models import Project
 from briefy.leica.sync import ModelSync
-from briefy.leica.sync.job_location import create_location
+from briefy.leica.sync.location import create_location_dict
 
 
-# Initial workflow state based on field ['client_job_status']
-knack_status_mapping = {
-  'Job received': 'pending',
-  'In scheduling process': 'scheduling',
-  'Scheduled': 'scheduled',
-  'In QA process': 'in_qa',
-  'Completed': 'approved',
-  'In revision ': 'revision',
-  'Resolved': 'completed',
-  'Cancelled ': 'cancelled'
+job_status_mapping = {
+    'Pending': 'pending',
+    'Published': 'published',
+    'Scheduled': 'scheduled',
+    'Assigned': 'assigned',
+    'Cancelled ': 'cancelled',
+    'Awaiting Assets': 'awaiting_assets',
+    'Approved': 'approved',
+    'Completed': 'completed',
+    'Refused': 'refused',
+    'In QA': 'in_qa',
 }
 
 
@@ -55,11 +59,11 @@ class JobSync(ModelSync):
         """Add new Job to database."""
         obj = super().add(kobj, briefy_id)
 
-        knack_status = list(kobj.client_job_status)
+        knack_status = list(kobj.approval_status)
         if knack_status:
-            status = knack_status_mapping.get(knack_status[0], 'in_qa')
+            status = job_status_mapping.get(knack_status[0])
         else:
-            status = 'in_qa'
+            status = 'pending'
 
         history = dict(
             message='Imported in this state from Knack database',
@@ -69,9 +73,18 @@ class JobSync(ModelSync):
         obj.state_history = [history]
         obj.status = status
 
-        location_dict = kobj.__dict__['job_location']
-        job_location = create_location(location_dict, obj, self.session)
-        if job_location:
-            obj.job_locations.append(job_location)
+        location_dict = create_location_dict('job_location', kobj)
+        if location_dict:
+            location_dict['job_id'] = obj.id
+
+        try:
+            location = JobLocation(**location_dict)
+            self.session.add(location)
+            self.session.flush()
+        except Exception as error:
+            msg = 'Failure to create location for Job: {job}. Error: {error}'
+            logger.error(msg.format(job=obj.customer_job_id, error=error))
+        else:
+            obj.job_locations.append(location)
 
         return obj
