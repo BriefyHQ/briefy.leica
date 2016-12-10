@@ -90,7 +90,7 @@ docs: ## generate Sphinx HTML documentation, including API docs
 	rm -rf $(BUILDDIR)/*
 	rm -f docs/codebase/briefy*
 	rm -f docs/codebase/modules.rst
-	$(SPHINXAPIDOC) -o docs/codebase src/briefy
+	$(SPHINXAPIDOC) -M -d 1 -o docs/codebase src/briefy
 	rm -f docs/codebase/modules.rst
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
 
