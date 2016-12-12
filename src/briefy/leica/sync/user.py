@@ -1,3 +1,4 @@
+from briefy.common.utils.cache import timeout_cache
 from briefy.leica import config
 from briefy.leica import logger
 
@@ -38,6 +39,7 @@ def login():
         raise Exception('Login failed. Message: \n{msg}'.format(msg=response.text))
 
 
+@timeout_cache(300)
 def get_rosetta() -> dict:
     """Get user map between Knack and Rolleiflex"""
     response = requests.get(config.ROSETTA_ENDPOINT, headers=get_headers(), auth=JwtAuth())
