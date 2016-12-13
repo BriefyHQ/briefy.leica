@@ -1,6 +1,8 @@
+from briefy.leica import logger
 from briefy.leica.models import Customer
 from briefy.leica.models import Project
 from briefy.leica.sync import ModelSync
+from briefy.leica.sync import get_model_and_data
 from briefy.leica.sync.customer import CustomerSync
 
 
@@ -9,11 +11,18 @@ class ProjectSync(ModelSync):
 
     model = Project
     knack_model_name = 'Project'
+    all_company = None
 
     def get_customer(self, kobj):
         """Get Customer object for this Project."""
-        customer_sync = CustomerSync(self.session)
-        knack_company = customer_sync.get_knack_item(kobj.company[0]['id'])
+        if not self.all_company:
+            logger.debug('Get Company data from knack.')
+            _, self.all_company = get_model_and_data('Company')
+        knack_company = None
+        for item in self.all_company:
+            if item.id == kobj.company[0]['id']:
+                knack_company = item
+                break
         customer = Customer.query().filter_by(external_id=knack_company.id).one()
         return customer, knack_company
 

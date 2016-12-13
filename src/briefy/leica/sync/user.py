@@ -29,22 +29,26 @@ def get_headers():
 def login():
     """Use briefy.rolleiflex email login to get a valid token."""
     data = dict(username=config.API_USERNAME, password=config.API_PASSWORD)
-    print('Login')
+    logger.debug('Login on rolleiflex to get a valid token.')
     response = requests.post(config.LOGIN_ENDPOINT, data=data, headers=get_headers())
     if response.status_code == 200:
         result = response.json()
         JwtAuth.token = result.get('token')
         JwtAuth.user = result.get('user')
     else:
-        raise Exception('Login failed. Message: \n{msg}'.format(msg=response.text))
+        error = 'Login failed. Message: \n{msg}'.format(msg=response.text)
+        logger.error(error)
+        raise Exception(error)
 
 
 @timeout_cache(300)
 def get_rosetta() -> dict:
     """Get user map between Knack and Rolleiflex"""
+    logger.debug('Requesting rosetta user mapping from Rolleiflex service.')
     response = requests.get(config.ROSETTA_ENDPOINT, headers=get_headers(), auth=JwtAuth())
     if response.status_code == 200:
         return response.json()
     else:
-        logger.error('Fail to get rosetta user mapping.')
-        return {}
+        error = 'Fail to get rosetta user mapping.'
+        logger.error(error)
+        raise Exception(error)

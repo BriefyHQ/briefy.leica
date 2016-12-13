@@ -1,6 +1,7 @@
 from briefy.leica.db import Session
 from briefy.leica.sync.db import configure
 from briefy.leica.sync.customer import CustomerSync
+from briefy.leica.tools import logger # noqa
 
 
 import transaction
@@ -8,8 +9,7 @@ import transaction
 
 def main(session):
     """Import customer script"""
-    created, updated = CustomerSync(session)()
-    print(len(created), len(updated))
+    CustomerSync(session)()
 
 
 if __name__ == '__main__':
