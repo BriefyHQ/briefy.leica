@@ -252,12 +252,16 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         """
         data = super().to_listing_dict()
         customer = self.customer
-        data['customer'] = customer.to_summary_dict() if customer else None
+        data['customer'] = customer.to_listing_dict() if customer else None
+        data = self._apply_actors_info(data)
         return data
 
     def to_dict(self):
         """Return a dict representation of this object."""
         data = super().to_dict()
+        customer = self.customer
+        data['customer'] = customer.to_listing_dict() if customer else None
+        data = self._apply_actors_info(data)
         add_user_info_to_state_history(self.state_history)
         # Apply actor information to data
         data = self._apply_actors_info(data)

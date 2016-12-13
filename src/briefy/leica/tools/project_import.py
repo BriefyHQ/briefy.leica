@@ -1,6 +1,6 @@
-from briefy.leica import logger
 from briefy.leica.db import Session
 from briefy.leica.sync.db import configure
+from briefy.leica.sync.customer import CustomerSync
 from briefy.leica.sync.project import ProjectSync
 from briefy.leica.tools import logger # noqa
 
@@ -8,7 +8,8 @@ import transaction
 
 
 def main(session):
-    """Import customer script"""
+    """Import Project script."""
+    CustomerSync(session)()
     ProjectSync(session)()
 
 

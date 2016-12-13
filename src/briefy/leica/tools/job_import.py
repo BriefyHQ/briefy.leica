@@ -7,7 +7,7 @@ import transaction
 
 
 def main(session):
-    """Import customer script"""
+    """Import Job script."""
     JobSync(session)()
 
 
