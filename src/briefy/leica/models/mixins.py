@@ -13,8 +13,8 @@ import sqlalchemy as sa
 import sqlalchemy_utils as sautils
 
 
-class JobFinancialInfo:
-    """Mixin containing financial information of a job."""
+class AssignmentFinancialInfo:
+    """Mixin containing financial information of a jobAssignment."""
 
     # Photographer Payout
     payout_currency = sa.Column(
@@ -81,6 +81,36 @@ class JobFinancialInfo:
     This value is expressed in cents.
     """
 
+    payable = sa.Column(
+        sa.Boolean,
+        nullable=False,
+        default=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Is this Assignment Payable?',
+                'missing': True,
+                'typ': colander.Boolean
+            }
+        }
+    )
+    """Payout should be payable or not?.
+
+    By default all assignments should be paid but there are exceptions to this when a customer
+    rejects a Job and we have to reassign it to a new Professional.
+    """
+
+    @hybrid_property
+    def costs(self) -> int:
+        """Sum of costs for this job.
+
+        :return: Return the sum of costs, in cents, of this job.
+        """
+        return self.payout_value + self.travel_expenses + self.additional_compensation
+
+
+class OrderFinancialInfo:
+    """Mixin containing financial information of a JobOrder."""
+
     # Set price
     price_currency = sa.Column(
         sautils.CurrencyType,
@@ -116,14 +146,6 @@ class JobFinancialInfo:
         :return: Return the price, in cents, of this job.
         """
         return self._price
-
-    @hybrid_property
-    def costs(self) -> int:
-        """Sum of costs for this job.
-
-        :return: Return the sum of costs, in cents, of this job.
-        """
-        return self.payout_value + self.travel_expenses + self.additional_compensation
 
 
 class VersionMixin:

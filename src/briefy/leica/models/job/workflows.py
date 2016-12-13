@@ -312,33 +312,143 @@ class JobLocationWorkflow(BriefyWorkflow):
     )
 
 
-class AssignmentWorkflow(BriefyWorkflow):
-    """Workflow for a Job Assignment."""
+class JobOrderWorkflow(BriefyWorkflow):
+    """Workflow for a JobOrder."""
 
-    entity = 'jobassignment'
-    initial_state = 'active'
+    entity = 'joborder'
+    initial_state = 'received'
 
     # States
-    active = WS(
-        'active', 'Active',
-        'Job Assignment is active.'
+    received = WS(
+        'received', 'Received',
+        'Job Order received to be executed.'
     )
 
-    inactive = WS(
-        'inactive', 'Inactive',
-        'Job Assignment that is not active.'
+    assigned = WS(
+        'assigned', 'Assigned',
+        'Job Order assigned to a Professional.'
+    )
+
+    scheduled = WS(
+        'scheduled', 'Scheduled',
+        'Job Order scheduled to be executed.'
+    )
+
+    in_qa = WS(
+        'in_qa', 'In QA',
+        'Job Order in the quality assurance validation.'
+    )
+
+    cancelled = WS(
+        'cancelled', 'Cancelled',
+        'Job Order cancelled.'
+    )
+
+    approved = WS(
+        'approved', 'Approved',
+        'Job Order approved by quality assurance.'
+    )
+
+    refused = WS(
+        'refused', 'Refused',
+        'Job Order refused.'
+
     )
 
     # Transitions
-    @active.transition(inactive, 'can_inactivate')
-    def submit(self):
-        """Transition: Inactivate an existing Assignment."""
+    @received.transition(assigned, 'can_assign')
+    def assign(self):
+        """Transition: Inform the assignment to the customer."""
         pass
 
-    @Permission(groups=[LR['qa_manager'], G['qa'], G['pm'], ])
-    def can_inactivate(self):
-        """Permission: Validate if user can inactivate the Assignment.
+    @Permission(groups=[LR['project_manager'], G['pm'], G['scout'], ])
+    def can_assign(self):
+        """Permission: Validate if user can assign a JobOrder.
 
-        Groups: g:qa, g:pm, r:qa_manager
+        Groups: g:pm, g:scout, r:project_manager
+        """
+        return True
+
+    @scheduled.transition(cancelled, 'can_cancel')
+    @assigned.transition(cancelled, 'can_cancel')
+    @received.transition(cancelled, 'can_cancel')
+    def cancel(self):
+        """Transition: Cancel the JobOrder."""
+        pass
+
+    @Permission(groups=[LR['project_manager'], G['pm'], G['customers'], G['finance']])
+    def can_cancel(self):
+        """Permission: Validate if user can move the JobOrder to the cancelled state.
+
+        Groups: g:pm, g:finance, g:customers, r:project_manager
+        """
+        # TODO: validate if the restrictions before cancel the JobOrder
+        return True
+
+    @received.transition(scheduled, 'can_schedule')
+    @assigned.transition(scheduled, 'can_schedule')
+    def schedule(self):
+        """Transition: Inform the schedule to the customer."""
+        pass
+
+    @Permission(groups=[LR['project_manager'], G['pm'], G['scout'], ])
+    def can_schedule(self):
+        """Permission: Validate if user can schedule a JobOrder.
+
+        Groups: g:pm, g:scout, r:project_manager
+        """
+        return True
+
+    @scheduled.transition(in_qa, 'can_start_qa')
+    def start_qa(self):
+        """Transition: Inform the start of QA to the customer."""
+        pass
+
+    @Permission(groups=[LR['project_manager'], LR['professional'], G['pm'], G['qa'], ])
+    def can_start_qa(self):
+        """Permission: Validate if user can move JobOrder the in_qa state.
+
+        Groups: g:pm, g:qa, r:project_manager, r:professional
+        """
+        return True
+
+    @in_qa.transition(approved, 'can_approve')
+    def approve(self):
+        """Transition: Inform the approval of the JobOrder to the customer."""
+        pass
+
+    @Permission(groups=[LR['qa_manager'], G['qa'], ])
+    def can_approve(self):
+        """Permission: Validate if user can approve the JobOrder.
+
+        Groups: g:qa, r:qa_manager
+        """
+        return True
+
+    @approved.transition(refused, 'can_refuse')
+    def refuse(self):
+        """Transition: Customer refuse the JobOrder."""
+        pass
+
+    # TODO: add LR pm_customer
+    @Permission(groups=[G['pm']])
+    def can_refuse(self):
+        """Permission: Validate if user can refuse the JobOrder.
+
+        Groups: g:pm, r:pm_customer
+        """
+        return True
+
+    @in_qa.transition(assigned, 'can_reassign')
+    @refused.transition(assigned, 'can_reassign')
+    def reassign(self):
+        """Transition: Inform the re-assignment of the JobOrder the customer."""
+        pass
+
+    @Permission(groups=[LR['project_manager'], G['pm'], ])
+    def can_reassign(self):
+        """Permission: Validate if user reassign a JobOrder.
+
+        Groups: g:pm, r:project_manager
         """
         return True

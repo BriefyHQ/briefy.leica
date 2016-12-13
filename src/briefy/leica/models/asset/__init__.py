@@ -98,7 +98,7 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
 
     job_id = sa.Column(
         sautils.UUIDType,
-        sa.ForeignKey('jobs.id'),
+        sa.ForeignKey('jobassignments.id'),
         nullable=False,
         info={
             'colanderalchemy': {

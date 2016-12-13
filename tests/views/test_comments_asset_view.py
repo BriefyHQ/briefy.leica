@@ -16,7 +16,7 @@ class TestAssetComment(BaseTestView):
         (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
-        (models.Job, 'data/jobs.json'),
+        (models.JobAssignment, 'data/jobs.json'),
         (models.Image, 'data/images.json')
     ]
     file_path = 'data/comments.json'

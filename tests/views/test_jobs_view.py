@@ -21,7 +21,7 @@ class TestJobView(BaseVersionedTestView):
         'qa_manager', 'project_manager', 'scout_manager',
     ]
     file_path = 'data/jobs.json'
-    model = models.Job
+    model = models.JobAssignment
     initial_wf_state = 'pending'
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''

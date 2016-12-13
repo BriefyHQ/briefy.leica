@@ -1,6 +1,6 @@
 """Views to handle Jobs creation."""
 from briefy.leica.events import job as events
-from briefy.leica.models import Job
+from briefy.leica.models import JobAssignment
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources import BaseResource
 from briefy.ws.resources import RESTService
@@ -18,7 +18,7 @@ PATH = COLLECTION_PATH + '/{id}'
 class JobFactory(BaseFactory):
     """Job context factory."""
 
-    model = Job
+    model = JobAssignment
 
     @property
     def __base_acl__(self) -> list:
@@ -39,7 +39,7 @@ class JobFactory(BaseFactory):
 class JobService(RESTService):
     """Jobs service."""
 
-    model = Job
+    model = JobAssignment
     friendly_name = model.__name__
     default_order_by = 'created_at'
     filter_related_fields = ['project.title']
@@ -61,8 +61,8 @@ class JobService(RESTService):
 class JobWorkflow(WorkflowAwareResource):
     """Job workflow resource."""
 
-    model = Job
-    friendly_name = Job.__name__
+    model = JobAssignment
+    friendly_name = JobAssignment.__name__
 
 
 @resource(
@@ -74,8 +74,8 @@ class JobWorkflow(WorkflowAwareResource):
 class JobVersions(BaseResource):
     """Versioning of Jobs."""
 
-    model = Job
-    friendly_name = Job.__name__
+    model = JobAssignment
+    friendly_name = JobAssignment.__name__
 
     @view(validators='_run_validators')
     def collection_get(self):

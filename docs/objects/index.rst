@@ -12,6 +12,7 @@ Objects defined in this package.
    customer
    project
    job
+   joborder
    job_location
    asset
    comment

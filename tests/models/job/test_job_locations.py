@@ -13,7 +13,7 @@ class TestJobLocationModel(BaseModelTest):
         (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
-        (models.Job, 'data/jobs.json'),
+        (models.JobAssignment, 'data/jobs.json'),
     ]
     file_path = 'data/job_locations.json'
     model = models.JobLocation

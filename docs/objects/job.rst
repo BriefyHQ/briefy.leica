@@ -6,7 +6,7 @@ Inheritance
 
 Inheritance diagram for the Job class:
 
-.. inheritance-diagram:: briefy.leica.models.job.Job
+.. inheritance-diagram:: briefy.leica.models.job.JobAssignment
 
 
 Workflow

@@ -180,13 +180,13 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     """
 
     jobs = orm.relationship(
-        'Job',
+        'JobOrder',
         backref=orm.backref('project', lazy='joined'),
         lazy='dynamic'
     )
     """List of Jobs of this project.
 
-    Returns a collection of :class:`briefy.leica.models.job.Job`.
+    Returns a collection of :class:`briefy.leica.models.job.order.JobOrder`.
     """
 
     @sautils.aggregated('jobs', sa.Column(sa.Integer, default=0))

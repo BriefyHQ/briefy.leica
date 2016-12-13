@@ -15,7 +15,7 @@ class TestJobModel(BaseModelTest):
         (models.Project, 'data/projects.json')
     ]
     file_path = 'data/jobs.json'
-    model = models.Job
+    model = models.JobAssignment
 
     def test_workflow(self, instance_obj, roles):
         """Test workflow for this model."""
