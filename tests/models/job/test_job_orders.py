@@ -16,4 +16,3 @@ class TestJobOrderModel(BaseModelTest):
     file_path = 'data/job_orders.json'
     model = models.JobOrder
     initial_wf_state = 'received'
-
