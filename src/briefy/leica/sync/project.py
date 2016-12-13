@@ -3,7 +3,6 @@ from briefy.leica.models import Customer
 from briefy.leica.models import Project
 from briefy.leica.sync import ModelSync
 from briefy.leica.sync import get_model_and_data
-from briefy.leica.sync.customer import CustomerSync
 
 
 class ProjectSync(ModelSync):
