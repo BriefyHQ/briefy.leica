@@ -1,13 +1,11 @@
 Briefy Leica
-================================
+============
 
 Leica is the internal sysem to handle images and other assets
 from upload by the professionals up to delivering, including internal
 QA steps and so on.
 
-
-TODO
-----
+A comprehensive documentation is available at the `Developer Documentation`_ server.
 
 
 Code Health
@@ -28,3 +26,4 @@ Branch       Status
 
 .. _`master`: https://github.com/BriefyHQ/briefy.leica/tree/master
 .. _`develop`: https://github.com/BriefyHQ/briefy.leica/tree/develop
+.. _`Developer Documentation`: https://docs.stg.briefy.co/briefy.leica/
