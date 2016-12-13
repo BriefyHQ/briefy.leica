@@ -237,8 +237,8 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         info = self._actors_info()
         for key, attr in actors:
             try:
-                value = info.get(attr, None).pop()
-            except (IndexError, ValueError):
+                value = info.get(attr).pop()
+            except (AttributeError, IndexError):
                 data[key] = None
             else:
                 data[key] = get_public_user_info(value) if value else None

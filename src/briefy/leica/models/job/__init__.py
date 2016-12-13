@@ -418,8 +418,12 @@ class Job(JobDates, BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersioned
         info = self._actors_info()
         for key, attr in actors:
             key = key if key != 'professional_id' else 'professional'
-            value = info.get(attr, None)
-            data[key] = get_public_user_info(value) if value else None
+            try:
+                value = info.get(attr).pop()
+            except (AttributeError, IndexError):
+                data[key] = None
+            else:
+                data[key] = get_public_user_info(value) if value else None
         return data
 
     def _summarize_relationships(self) -> dict:
@@ -455,7 +459,7 @@ class Job(JobDates, BriefyRoles, mixins.JobFinancialInfo, mixins.KLeicaVersioned
         """
         data = super().to_listing_dict()
         data.update(self._summarize_relationships())
-        # data = self._apply_actors_info(data)
+        data = self._apply_actors_info(data)
         return data
 
     def to_dict(self):
