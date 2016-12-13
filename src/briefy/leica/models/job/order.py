@@ -1,4 +1,5 @@
 """Briefy Leica Order to a Job."""
+from briefy.common.db.mixins import BriefyRoles
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
@@ -21,7 +22,7 @@ __summary_attributes__ = [
 __listing_attributes__ = __summary_attributes__
 
 
-class JobOrder(mixins.OrderFinancialInfo, mixins.KLeicaVersionedMixin, Base):
+class JobOrder(mixins.OrderFinancialInfo, BriefyRoles, mixins.KLeicaVersionedMixin, Base):
     """A Job Order from the customer."""
 
     _workflow = workflows.JobOrderWorkflow

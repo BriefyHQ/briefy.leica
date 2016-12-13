@@ -12,7 +12,8 @@ class TestJobModel(BaseModelTest):
     dependencies = [
         (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
-        (models.Project, 'data/projects.json')
+        (models.Project, 'data/projects.json'),
+        (models.JobOrder, 'data/job_orders.json'),
     ]
     file_path = 'data/jobs.json'
     model = models.JobAssignment
@@ -118,7 +119,7 @@ class TestJobModel(BaseModelTest):
         wf.context = roles['professional']
         wf.upload()
 
-        job.number_of_assets = 0
+        job.order.number_of_assets = 0
         wf.context = roles['qa']
         wf.approve()
         assert job.state == 'approved'

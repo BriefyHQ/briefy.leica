@@ -26,11 +26,11 @@ def job_submit(event):
 def transition_handler(event):
     """Handle job transition events."""
     event_name = event.event_name
-    if not event_name.startswith('job.workflow'):
+    if not event_name.startswith('jobassignment.workflow'):
         return
 
     handlers = {
-        'job.workflow.submit': job_submit
+        'jobassignment.workflow.submit': job_submit
     }
     handler = handlers.get(event_name, None)
     if handler:

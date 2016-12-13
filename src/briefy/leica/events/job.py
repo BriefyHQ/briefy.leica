@@ -6,14 +6,14 @@ from briefy.ws.resources import events
 class JobCreatedEvent(events.ObjectCreatedEvent):
     """Event to notify job creation."""
 
-    event_name = 'job.created'
+    event_name = 'jobassignment.created'
     logger = logger
 
 
 class JobUpdatedEvent(events.ObjectUpdatedEvent):
     """Event to notify job update."""
 
-    event_name = 'job.updated'
+    event_name = 'jobassignment.updated'
     logger = logger
 
 

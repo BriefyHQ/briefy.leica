@@ -144,7 +144,7 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
         :return: A dictionary with technical requirements for an asset.
         """
         job = self.job
-        return job.tech_requirements
+        return job.order.tech_requirements
 
     @property
     def check_requirements(self) -> list:

@@ -227,7 +227,7 @@ class JobAssignment(JobAssignmentDates, BriefyRoles, mixins.AssignmentFinancialI
         :returns: Boolean indicating if it is possible to approve this job.
         """
         approvable_assets_count = self.total_approvable_assets
-        check_images = self.number_of_assets <= approvable_assets_count
+        check_images = self.order.number_of_assets <= approvable_assets_count
         return check_images
 
     @property

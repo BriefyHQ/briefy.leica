@@ -15,6 +15,7 @@ class TestImageModel(BaseModelTest):
         (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
+        (models.JobOrder, 'data/job_orders.json'),
         (models.JobAssignment, 'data/jobs.json')
     ]
 
@@ -49,7 +50,7 @@ class TestImageModel(BaseModelTest):
         """Test if the asset is valid."""
         asset = instance_obj
         job = asset.job
-        project = job.project
+        project = job.order.project
         project.tech_requirements = {
             'dimensions': {'value': '5760x3840', 'operator': 'eq'},
         }

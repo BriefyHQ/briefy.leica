@@ -147,6 +147,14 @@ class OrderFinancialInfo:
         """
         return self._price
 
+    @price.setter
+    def price(self, value: int):
+        """Set Price of this job.
+
+        :return: Set the price, in cents, of this job.
+        """
+        self._price = value
+
 
 class VersionMixin:
     """Versioning support for Leica objects."""
