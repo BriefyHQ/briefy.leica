@@ -1,6 +1,6 @@
 from briefy.leica import logger
 from briefy.leica.models import Job
-from briefy.leica.models import Asset
+from briefy.leica.models import Image
 
 import csv
 import os
@@ -16,15 +16,15 @@ def import_assets(session, asset_rows):
     previous_job_id = None
     created = updated = count = 0
     failed = []
-    for job_id, s3_path, image_size, image_width, image_height in asset_rows:
+    for job_id, professional_id, s3_path, image_size, image_width, image_height in asset_rows:
         if job_id != previous_job_id:
             job = Job.query().get(job_id)
             previous_job_id = job_id
 
-        if job.professional_id:
+        if not professional_id and job.professional_id:
             professional_id = job.professional_id
         else:
-            professional_id = SENTINEL_PROFESSIONAL_UUID
+            professional_id = professional_id if professional_id else SENTINEL_PROFESSIONAL_UUID
 
         filename = s3_path.split('/')[-1]
         title = filename.strip('-_ ')
@@ -37,7 +37,6 @@ def import_assets(session, asset_rows):
         # asset = Asset.query().filter_by(source_path=source_path).first()
 
         possible_duplicate = [asset for asset in job.assets if asset.filename == filename]
-
         if len(possible_duplicate) >= 1:
             asset = possible_duplicate[0]
             updated += 1
@@ -51,15 +50,17 @@ def import_assets(session, asset_rows):
         else:
             created += 1
             new_asset = True
-            asset = Asset()
+            asset = Image()
 
             # Main data updating:
             asset.update(dict(
                 job_id=job_id,
                 title=title,
+                type='image',
                 description="",
+                content_type='image/jpeg',
                 owner=str(professional_id),
-                author_id=professional_id,
+                professional_id=professional_id,
                 uploaded_by=professional_id,
                 #  Image Mixin fields:
                 source_path=os.path.join(S3_SOURCE_PREFIX, s3_path.lstrip('/')),
@@ -97,6 +98,6 @@ def import_assets(session, asset_rows):
             if not count % 70:
                 print()
 
-    logger.info('{} new assets imported into Leica'.format(created))
-    logger.info('{} new assets updated into Leica'.format(updated))
+    logger.info('{0} new assets imported into Leica'.format(created))
+    logger.info('{0} new assets updated into Leica'.format(updated))
     return {'created': created, 'updated': updated, 'failed': failed}

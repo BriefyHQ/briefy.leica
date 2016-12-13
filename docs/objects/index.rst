@@ -1,10 +1,17 @@
 Objects
 ========
 
-Objects used by Leica
+Objects defined in this package.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
+   professional
+   working_location
+   link
+   customer
+   project
    job
+   job_location
    asset
+   comment

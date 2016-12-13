@@ -17,7 +17,6 @@
     ],
     "updated_at": "2016-09-18T18:55:21.145763+00:00",
     "entity_type": null,
-    "type": "comment",
     "author_id": "a90a4275-a83b-45ca-a869-9a387504cfb9",
     "created_at": "2016-09-18T18:55:21.145741+00:00",
     "content": "Nice comment!!!"
@@ -40,7 +39,6 @@
     ],
     "updated_at": "2016-09-18T18:55:21.563661+00:00",
     "entity_type": null,
-    "type": "comment",
     "author_id": "a90a4275-a83b-45ca-a869-9a387504cfb9",
     "created_at": "2016-09-18T18:55:21.563632+00:00",
     "content": "Nice image!"
@@ -63,7 +61,6 @@
     ],
     "updated_at": "2016-09-18T18:55:23.945482+00:00",
     "entity_type": null,
-    "type": "comment",
     "author_id": "a90a4275-a83b-45ca-a869-9a387504cfb9",
     "created_at": "2016-09-18T18:55:23.945466+00:00",
     "content": "Nice comment!!!"
@@ -86,7 +83,6 @@
     ],
     "updated_at": "2016-09-18T18:55:24.348502+00:00",
     "entity_type": null,
-    "type": "comment",
     "author_id": "a90a4275-a83b-45ca-a869-9a387504cfb9",
     "created_at": "2016-09-18T18:55:24.348478+00:00",
     "content": "Nice image!"
@@ -109,7 +105,6 @@
     ],
     "updated_at": "2016-09-18T18:55:26.751776+00:00",
     "entity_type": null,
-    "type": "comment",
     "author_id": "a90a4275-a83b-45ca-a869-9a387504cfb9",
     "created_at": "2016-09-18T18:55:26.751723+00:00",
     "content": "Nice comment!!!"
@@ -132,7 +127,6 @@
     ],
     "updated_at": "2016-09-18T18:55:27.149751+00:00",
     "entity_type": null,
-    "type": "comment",
     "author_id": "a90a4275-a83b-45ca-a869-9a387504cfb9",
     "created_at": "2016-09-18T18:55:27.149735+00:00",
     "content": "Nice image!"
@@ -155,7 +149,6 @@
     ],
     "updated_at": "2016-09-18T18:55:29.444507+00:00",
     "entity_type": null,
-    "type": "comment",
     "author_id": "a90a4275-a83b-45ca-a869-9a387504cfb9",
     "created_at": "2016-09-18T18:55:29.444487+00:00",
     "content": "Nice comment!!!"
@@ -178,7 +171,6 @@
     ],
     "updated_at": "2016-09-18T18:55:29.840529+00:00",
     "entity_type": null,
-    "type": "comment",
     "author_id": "a90a4275-a83b-45ca-a869-9a387504cfb9",
     "created_at": "2016-09-18T18:55:29.840511+00:00",
     "content": "Nice image!"
@@ -201,7 +193,6 @@
     ],
     "updated_at": "2016-09-18T18:55:32.146487+00:00",
     "entity_type": null,
-    "type": "comment",
     "author_id": "a90a4275-a83b-45ca-a869-9a387504cfb9",
     "created_at": "2016-09-18T18:55:32.146469+00:00",
     "content": "Nice comment!!!"
@@ -224,7 +215,6 @@
     ],
     "updated_at": "2016-09-18T18:55:32.590414+00:00",
     "entity_type": null,
-    "type": "comment",
     "author_id": "a90a4275-a83b-45ca-a869-9a387504cfb9",
     "created_at": "2016-09-18T18:55:32.590388+00:00",
     "content": "Nice image!"

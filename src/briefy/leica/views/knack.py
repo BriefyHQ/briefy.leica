@@ -13,11 +13,10 @@ class KnackLoggerFactory(BaseFactory):
     """Internal context factory for knack logger service."""
 
     @property
-    def __base_acl__(self):
+    def __base_acl__(self) -> list:
         """KnackLoggerFactory custom acl.
 
-        :return list of acl for the current logged user plus defaults.
-        :rtype list
+        :return List of acl for the current logged user plus defaults.
         """
         return [
             (Allow, Everyone, ['add']),
@@ -36,7 +35,7 @@ class KnackLoggerService:
         self.request = request
 
     @view(permission='add')
-    def post(self):
+    def post(self) -> dict:
         """Get payload from knack, add user and referrer and sent to logger.info."""
         referrer = self.request.referrer
         user = self.request.user

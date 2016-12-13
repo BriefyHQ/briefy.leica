@@ -22,7 +22,7 @@ install:
 - pip install flake8
 script:
 - tox -e ${TOXENV}
-- flake8 src/briefy/leica tests setup.py
+- make lint
 after_success:
 - make docs
 notifications:
@@ -30,14 +30,22 @@ notifications:
 deploy:
   provider: deis
   controller: https://deis.stg.briefy.co
-  cli_version: v2.2.0
+  cli_version: v2.4.0
   app: briefy-leica
   username: ci
   password:
     secure: QFFi1datgLUGGIndn8M5Ht5+rgvNxcMP2M+5jK+8awWR3HoAV5i0s0/9ykDWe5/qX7C78BO703qCYrNUYyTIPqbGHcvL8rx2c1mCNUfdToc32ohias3alZn+14LintzodZz6qnxZogJgNPljCD2G5mOjGEXD1rY/mjRu593y4gB48e+KXYuLj8qL8SMjQWgp5K0g1HUlQacJ3CyrAyku8WVSFBGHbgbUx1y+//XA40vWKDDOonusl6SVPms2+Z/E2NvvBPuIbgPLEArygTLCJ7CGnQQvUA335+g3Uhc9YEDV4curfUgDKcW3d63nTsv0L4dKlVmMy5sB+06XKvoAaoF8ASEpJ1pIRO1T4b2kL7pPqnU5Ce4fMZmMsh0xCy2gz/AktX7MqPQWDGe7VIcIfSrKmji0OsXbSziIx6grcugz5yYbfw1B5aa9iM+0KGg0Sh8Fap16ZXaM1r6YifqrhRqV3teEGMcdmiKq4fo4KwWe8fvmxMil4DO/VFzqbH9cVVG4pikcyMhVTslt9pClTLq2g2iRzeIksdrn/V6Ol47HIC+EemX/ld9XYC2yFfLky3sFiIlS0OmLNXI4nhWckcHDZ+EvaQJ4DYQnmXx/BfQ6eC+UPh/oSpwW2jiLZBER9WoTcKosUp3am71+9ErCt07MBmGW+XFlgkRKjzcRGd0=
-  edge:
-    source: mattk42/dpl
-    branch: deis-v2-exit-status
   on:
     repo: BriefyHQ/briefy.leica
     branch: develop
+    tags: true
+addons:
+  artifacts:
+    key:
+      secure: cPkRUt53frER83PIqsRP/5CmwcQnTMNSkvAzg/b8gSwYn/J/XIYkY8+HSrl3RuTGbD1bog1FXOe8lcyHdNzLDf5sMpcAJD1jpU2rq7eSoM1KmnHPDq4mIduoLptVGCmxOjFGwTrgKp23bTwSIVwIMMAjFSPpdZ5BrYZj38+IoLDkdV0A9D33A6XgvCsseEPclIFV0IPzEOgo9OPYHysqmnGubiTiDh0MA1c8y1XRvvIwDONC6fYKLtOqSV+oM2zYZCEub+JklWFLdTETQenZnvevMZAsTyZ4ItAbfo8Q0Ll3ReFnHyUtQei2wXY4lBLXzUi+fFQvgf3fTFC8NYXQicOqDoERkSrio87Qb1QQc3DW18r+Y5g5Tg4CIed4nWUYveYMCbSiDYg6qhEBT/oiDsyzKIu/dDZkx1gTEWgn8o86UcXcEN/XdPek19k5qC22/h0AnyUgQTrw9l2pEUxh5r42LoOzzD2lAm2rW28BNELxnsO3l7YP1OYlBA5TqaSgtPEGqkijppC9d9RM6PngfyoVEuhBLCT+/KW/KZnFmtwp9zw4R5Ai/PAvkPZ4DtaDx8pKNtb59RZTEbiCk09ipRlYBoJ97mCU4aGbmrHi+Yu0Si0OpLZx5TkCKdSpse7sfsl3PZyYK5HRGId2vsMlznuzR6DXThzGhtfahA2I6DY=
+    secret:
+      secure: S+uvTzT/jmicPgihLwlBCK+saDJzeAm0YHrPjQARRy5UIKcl994y8eMXWMWgTTNHOGkO0taus8m6VXC00jo09BL47tvovqkx8pluXvH5R0DLC+dt6RGlFiXCk7C3HVnnv9mi29HfugP2dG52LLKEOk0t1cm1CqaOywcPEGI6Z7Zf7k+h5hUkyAEbk/hkKlaXIlRFwuqyU3kfUtKaFH4ePmdAZjU6wZu/rfvsYXSRp6aZQUb4wfLOZ4yCPpKbkCnj5JCdvv5VHEqFZZGoVDjAZxhXN3VXLVUQxJ2QGpTSvGTUT3swWAdf/dzxYxrqw0Y5X1/W3tb6afpkVtA0vQTWzwSHmYyT1/OImd2yumK9EfPV+WcN6mso0XJ5JwjeDRqNFTHNEkr2w3qF7d/GY8ht6QxvtSVBng1JVSA15YmlIHYgop2AOevXjL+mLlNUYYI26MTn7FCO5NyCsittz/8w7jYWNzDslFiP0oXSACg8a0PNSm2KorfqBBfZcqaDUsm3uAWTC3Qqtv/38unOwkOtYbVDays8Zq+6Ye7DLfd1X1M3Obw5qOCT/WnenBh5pjetyKS5CjlkiNaYAE2IsGxWQowckFmqz5hIC1DEYu4Kmxs8+7qcnK4e41jrhW7k5b7w5Waqq8OsHFhNyVI12vk/2/gAZ5mWKteq5a5lfZqOLYg=
+    bucket: briefy-dev-docs
+    target_paths: briefy.leica
+    paths:
+      - docs/_build/dirhtml/

@@ -1,9 +1,9 @@
 """Views to handle Comments creation."""
+from briefy.leica.events import comment as events
 from briefy.leica.models import Comment
-from briefy.leica.models.events import comment as events
+from briefy.ws import CORS_POLICY
 from briefy.ws.resources import RESTService
 from briefy.ws.resources import WorkflowAwareResource
-from briefy.ws import CORS_POLICY
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
 from pyramid.security import Allow

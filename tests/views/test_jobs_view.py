@@ -1,29 +1,33 @@
 """Test jobs view."""
 from briefy.leica import models
-from conftest import BaseTestView
+from conftest import BaseVersionedTestView
 
 import pytest
 import transaction
 
 
 @pytest.mark.usefixtures('create_dependencies')
-class TestJobView(BaseTestView):
+class TestJobView(BaseVersionedTestView):
     """Test JobService view."""
 
     base_path = '/jobs'
     dependencies = [
+        (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json')
     ]
-    ignore_validation_fields = ['state_history', 'state', 'project', 'customer', 'updated_at']
+    ignore_validation_fields = [
+        'state_history', 'state', 'project', 'customer', 'updated_at',
+        'qa_manager', 'project_manager', 'scout_manager',
+    ]
     file_path = 'data/jobs.json'
     model = models.Job
     initial_wf_state = 'pending'
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {
-        'title': 'Job Title',
-        'job_id': '10',
+        'title': 'New Job Title',
+        'job_id': 10,
         'project_id': '36d359f0-8e92-41bb-8d1c-fedfd60e7046'
     }
 
@@ -33,7 +37,7 @@ class TestJobView(BaseTestView):
         payload = {
             'owner': 'Professional Name',
             'id': '264b3e66-c327-4bbd-9cc7-271716fce178',
-            'author_id': '23d94a43-3947-42fc-958c-09245ecca5f2',
+            'professional_id': '23d94a43-3947-42fc-958c-09245ecca5f2',
             'uploaded_by': '23d94a43-3947-42fc-958c-09245ecca5f2',
             'description': '',
             'updated_at': '2016-09-18T18:55:20.696061+00:00',

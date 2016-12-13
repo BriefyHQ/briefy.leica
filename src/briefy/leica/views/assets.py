@@ -1,16 +1,15 @@
 """Views to handle Assets creation."""
-from briefy.leica.models import Asset
-from briefy.leica.models.events import asset as events
+from briefy.leica.events import asset as events
+from briefy.leica.models import Image
+from briefy.ws import CORS_POLICY
 from briefy.ws.resources import BaseResource
 from briefy.ws.resources import RESTService
 from briefy.ws.resources import WorkflowAwareResource
-from briefy.ws import CORS_POLICY
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
 from cornice.resource import view
 from pyramid.httpexceptions import HTTPNotFound as NotFound
 from pyramid.security import Allow
-
 
 COLLECTION_PATH = '/jobs/{job_id}/assets'
 PATH = COLLECTION_PATH + '/{id}'
@@ -19,7 +18,9 @@ PATH = COLLECTION_PATH + '/{id}'
 class AssetFactory(BaseFactory):
     """Asset context factory."""
 
-    model = Asset
+    # model = Asset
+    # For now all assets will be images
+    model = Image
 
     @property
     def __base_acl__(self) -> list:
@@ -40,8 +41,8 @@ class AssetFactory(BaseFactory):
 class AssetService(RESTService):
     """Assets service."""
 
-    model = Asset
-    friendly_name = Asset.__name__
+    model = Image
+    friendly_name = Image.__name__
     items_per_page = 150
     default_order_by = 'created_at'
 
@@ -66,7 +67,7 @@ class AssetService(RESTService):
         job_id = self.request.matchdict.get('job_id')
         filters = list(super().default_filters)
         if job_id:
-            filters.append((Asset.job_id == job_id))
+            filters.append((self.model.job_id == job_id))
         return tuple(filters)
 
 
@@ -79,8 +80,8 @@ class AssetService(RESTService):
 class AssetWorkflow(WorkflowAwareResource):
     """Assets workflow resource."""
 
-    model = Asset
-    friendly_name = Asset.__name__
+    model = Image
+    friendly_name = Image.__name__
 
 
 @resource(
@@ -92,8 +93,8 @@ class AssetWorkflow(WorkflowAwareResource):
 class AssetVersions(BaseResource):
     """Versioning of assets."""
 
-    model = Asset
-    friendly_name = Asset.__name__
+    model = Image
+    friendly_name = Image.__name__
 
     @view(validators='_run_validators')
     def collection_get(self):

@@ -63,7 +63,5 @@ setup(
     entry_points="""
     [paste.app_factory]
      main = briefy.leica:main
-
-
     """,
 )

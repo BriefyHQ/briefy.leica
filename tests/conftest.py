@@ -8,6 +8,7 @@ from briefy.leica.db import Session as DBSession
 from briefy.ws.auth import AuthenticatedUser
 from briefy.ws.config import JWT_EXPIRATION
 from briefy.ws.config import JWT_SECRET
+from datetime import date
 from datetime import datetime
 from pyramid import testing
 from pyramid_jwt.policy import JWTAuthenticationPolicy
@@ -172,6 +173,30 @@ class BaseModelTest:
             assert len(wf.transitions) == self.number_of_wf_transtions
 
 
+@pytest.mark.usefixtures('db_transaction', 'create_dummy_request')
+class BaseLocationTest(BaseModelTest):
+    """Base class to test locations."""
+
+    def test_working_location_base_class(self, instance_obj):
+        """Test inheritance to models.WorkingLocation."""
+        assert isinstance(instance_obj, leica.models.WorkingLocation)
+
+
+@pytest.mark.usefixtures('db_transaction', 'create_dummy_request')
+class BaseLinkTest(BaseModelTest):
+    """Base class to test Links."""
+
+    social = True
+
+    def test_link_base_class(self, instance_obj):
+        """Test inheritance to models.Link."""
+        assert isinstance(instance_obj, leica.models.Link)
+
+    def test_is_social(self, instance_obj):
+        """Test is_social flat."""
+        assert instance_obj.is_social is self.social
+
+
 @pytest.fixture(scope='class')
 def instance_obj(request, session, obj_payload):
     """Create instance object an dependencies using hook methods.
@@ -295,7 +320,7 @@ class BaseTestView:
         for key, value in payload.items():
             if key not in self.ignore_validation_fields:
                 obj_value = getattr(db_obj, key)
-                if isinstance(obj_value, (datetime, uuid.UUID, enum.Enum)):
+                if isinstance(obj_value, (date, datetime, uuid.UUID, enum.Enum)):
                     obj_value = to_serializable(obj_value)
                 assert obj_value == value
 
@@ -313,7 +338,7 @@ class BaseTestView:
 
         for key, value in db_obj.to_dict().items():
             if key not in self.ignore_validation_fields:
-                if isinstance(value, (datetime, uuid.UUID, enum.Enum)):
+                if isinstance(value, (date, datetime, uuid.UUID, enum.Enum)):
                     value = to_serializable(value)
                 assert result.get(key) == value
 
@@ -349,7 +374,7 @@ class BaseTestView:
         updated_obj = self.model.get(obj_id)
         for key, value in payload.items():
             obj_value = getattr(updated_obj, key)
-            if isinstance(obj_value, (datetime, uuid.UUID, enum.Enum)):
+            if isinstance(obj_value, (date, datetime, uuid.UUID, enum.Enum)):
                 obj_value = to_serializable(obj_value)
             assert obj_value == value
 
@@ -392,6 +417,67 @@ class BaseTestView:
         assert error['name'] == 'id'
         assert error['location'] == 'path'
         assert error['description'] == 'The id informed is not 16 byte uuid valid.'
+
+
+@pytest.mark.usefixtures('db_transaction', 'login')
+class BaseVersionedTestView(BaseTestView):
+    """Test resources with versions."""
+
+    def test_versions_get_item(self, app, obj_payload):
+        """Test get a item."""
+        payload = obj_payload
+        obj_id = payload['id']
+        # Get original version
+        request = app.get(
+            '{base}/{id}/versions/0'.format(
+                base=self.base_path, id=obj_id
+            ),
+            headers=self.headers,
+            status=200
+        )
+        result = request.json
+        db_obj = self.model.query().get(obj_id)
+        assert db_obj.title != result['title']
+        assert db_obj.versions[0].title == result['title']
+
+    def test_versions_get_item_wrong_id(self, app, obj_payload):
+        """Test get a item passing the wrong id."""
+        payload = obj_payload
+        obj_id = payload['id']
+        # Get version 42 (does not exist here)
+        request = app.get(
+            '{base}/{id}/versions/42'.format(
+                base=self.base_path, id=obj_id
+            ),
+            headers=self.headers,
+            status=404
+        )
+        result = request.json
+        assert 'with version: 42 not found' in result['message']
+
+    def test_versions_get_collection(self, app, obj_payload):
+        """Test get list of versions of an item."""
+        payload = obj_payload
+        obj_id = payload['id']
+        request = app.get(
+            '{base}/{id}/versions'.format(
+                base=self.base_path, id=obj_id
+            ),
+            headers=self.headers,
+            status=200
+        )
+        result = request.json
+        assert 'versions' in result
+        assert 'total' in result
+        assert result['total'] == len(result['versions'])
+
+        assert 'id' in result['versions'][0]
+        assert 'updated_at' in result['versions'][0]
+        assert 'id' in result['versions'][1]
+        assert 'updated_at' in result['versions'][1]
+
+        assert result['versions'][1]['id'] > result['versions'][0]['id']
+        assert result['versions'][1]['updated_at'] > result['versions'][0]['updated_at']
 
 
 @pytest.fixture()
