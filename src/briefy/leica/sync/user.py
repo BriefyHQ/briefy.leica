@@ -47,7 +47,7 @@ def get_rosetta() -> dict:
     logger.debug('Requesting rosetta user mapping from Rolleiflex service.')
     response = requests.get(config.ROSETTA_ENDPOINT, headers=get_headers(), auth=JwtAuth())
     if response.status_code == 200:
-        return response.json()
+        return response.json().get('data')
     else:
         error = 'Fail to get rosetta user mapping.'
         logger.error(error)
