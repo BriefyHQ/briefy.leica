@@ -72,6 +72,14 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.KLeicaVersionedMixin, Base)
 
     _workflow = workflows.CustomerWorkflow
 
+    __summary_attributes__ = [
+        'id', 'title', 'description', 'created_at', 'updated_at', 'state', 'external_id'
+    ]
+
+    __listing_attributes__ = [
+        'id', 'title', 'description', 'created_at', 'updated_at', 'state', 'external_id',
+    ]
+
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state', '_slug']}
 
     legal_name = sa.Column(
