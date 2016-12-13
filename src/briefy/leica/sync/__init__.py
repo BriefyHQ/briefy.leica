@@ -72,8 +72,8 @@ class ModelSync:
         for key, value in payload.items():
             setattr(item, key, value)
         model_name = self.model.__name__
-        logger.info('{model_name} updated: {id}'.format(model_name=model_name,
-                                                        id=item.id))
+        logger.debug('{model_name} updated: {id}'.format(model_name=model_name,
+                                                         id=item.id))
 
     def add(self, kobj, briefy_id):
         """Add new database item from knack obj."""
@@ -83,13 +83,14 @@ class ModelSync:
         session.add(obj)
         session.flush()
         model_name = self.model.__name__
-        logger.info('{model_name} added: {id}'.format(model_name=model_name,
-                                                      id=obj.id))
+        logger.debug('{model_name} added: {id}'.format(model_name=model_name,
+                                                       id=obj.id))
         return obj
 
     def sync_knack(self):
         """Sync all created objects back to knack updating briefy_id."""
         objs_map = list(self.created.items()) + list(self.updated.items())
+        logger.debug('Begin to sync back knack items.')
         for briefy_id, kobj in objs_map:
             if kobj.briefy_id:
                 continue
@@ -134,4 +135,10 @@ class ModelSync:
                 created[item.id] = kobj
 
         self.sync_knack()
+        msg = '{model} created: {created} / {model} updated: {updated}'.format(
+            model=str(self.model.__name__),
+            created=len(created),
+            updated=len(updated)
+        )
+        logger.info(msg)
         return created, updated

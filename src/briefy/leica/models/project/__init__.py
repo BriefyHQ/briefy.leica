@@ -115,6 +115,19 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         'total_jobs'
     ]
 
+    __raw_acl__ = (
+        ('list', ('g:briefy_qa', 'g:briefy_pm', 'g:system')),
+        ('view', ()),
+        ('edit', ()),
+        ('delete', ()),
+    )
+
+    __actors__ = (
+        'project_manager',
+        'scout_manager',
+        'qa_manager',
+    )
+
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'customer']}
 
     customer_id = sa.Column(sautils.UUIDType,
@@ -220,14 +233,15 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         :param data: Data dictionary.
         :return: Data dictionary.
         """
-        actors = (
-            ('qa_manager', 'qa_manager'),
-            ('project_manager', 'project_manager'),
-            ('scout_manager', 'scout_manager'),
-        )
+        actors = [(k, k) for k in self.__actors__]
+        info = self._actors_info()
         for key, attr in actors:
-            data[key] = get_public_user_info(getattr(self, attr))
-
+            try:
+                value = info.get(attr).pop()
+            except (AttributeError, IndexError):
+                data[key] = None
+            else:
+                data[key] = get_public_user_info(value) if value else None
         return data
 
     def to_listing_dict(self) -> dict:
@@ -238,12 +252,16 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         """
         data = super().to_listing_dict()
         customer = self.customer
-        data['customer'] = customer.to_summary_dict() if customer else None
+        data['customer'] = customer.to_listing_dict() if customer else None
+        data = self._apply_actors_info(data)
         return data
 
     def to_dict(self):
         """Return a dict representation of this object."""
         data = super().to_dict()
+        customer = self.customer
+        data['customer'] = customer.to_listing_dict() if customer else None
+        data = self._apply_actors_info(data)
         add_user_info_to_state_history(self.state_history)
         # Apply actor information to data
         data = self._apply_actors_info(data)
