@@ -30,14 +30,11 @@ notifications:
 deploy:
   provider: deis
   controller: https://deis.stg.briefy.co
-  cli_version: v2.2.0
+  cli_version: v2.4.0
   app: briefy-leica
   username: ci
   password:
     secure: QFFi1datgLUGGIndn8M5Ht5+rgvNxcMP2M+5jK+8awWR3HoAV5i0s0/9ykDWe5/qX7C78BO703qCYrNUYyTIPqbGHcvL8rx2c1mCNUfdToc32ohias3alZn+14LintzodZz6qnxZogJgNPljCD2G5mOjGEXD1rY/mjRu593y4gB48e+KXYuLj8qL8SMjQWgp5K0g1HUlQacJ3CyrAyku8WVSFBGHbgbUx1y+//XA40vWKDDOonusl6SVPms2+Z/E2NvvBPuIbgPLEArygTLCJ7CGnQQvUA335+g3Uhc9YEDV4curfUgDKcW3d63nTsv0L4dKlVmMy5sB+06XKvoAaoF8ASEpJ1pIRO1T4b2kL7pPqnU5Ce4fMZmMsh0xCy2gz/AktX7MqPQWDGe7VIcIfSrKmji0OsXbSziIx6grcugz5yYbfw1B5aa9iM+0KGg0Sh8Fap16ZXaM1r6YifqrhRqV3teEGMcdmiKq4fo4KwWe8fvmxMil4DO/VFzqbH9cVVG4pikcyMhVTslt9pClTLq2g2iRzeIksdrn/V6Ol47HIC+EemX/ld9XYC2yFfLky3sFiIlS0OmLNXI4nhWckcHDZ+EvaQJ4DYQnmXx/BfQ6eC+UPh/oSpwW2jiLZBER9WoTcKosUp3am71+9ErCt07MBmGW+XFlgkRKjzcRGd0=
-  edge:
-    source: mattk42/dpl
-    branch: deis-v2-exit-status
   on:
     repo: BriefyHQ/briefy.leica
     branch: develop
