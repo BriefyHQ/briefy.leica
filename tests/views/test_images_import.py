@@ -17,7 +17,8 @@ class TestAssetImportView():
         (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
-        (models.Job, 'data/jobs.json')
+        (models.JobOrder, 'data/job_orders.json'),
+        (models.JobAssignment, 'data/jobs.json')
     ]
 
     @property

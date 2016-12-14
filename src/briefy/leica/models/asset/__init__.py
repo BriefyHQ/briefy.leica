@@ -98,7 +98,7 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
 
     job_id = sa.Column(
         sautils.UUIDType,
-        sa.ForeignKey('jobs.id'),
+        sa.ForeignKey('jobassignments.id'),
         nullable=False,
         info={
             'colanderalchemy': {
@@ -144,7 +144,7 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
         :return: A dictionary with technical requirements for an asset.
         """
         job = self.job
-        return job.tech_requirements
+        return job.order.tech_requirements
 
     @property
     def check_requirements(self) -> list:

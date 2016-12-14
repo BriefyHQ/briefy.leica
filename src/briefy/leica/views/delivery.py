@@ -1,6 +1,6 @@
 """Views to handle Projects creation."""
 from briefy.leica.config import AGODA_DELIVERY_GDRIVE
-from briefy.leica.models import Job
+from briefy.leica.models import JobAssignment
 from briefy.leica.views import InternalFactory
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources.validation import validate_id
@@ -54,7 +54,7 @@ DELIVERY_SETTINGS = {
 class DeliveryFactory(InternalFactory):
     """Internal context factory for jobs delivery service."""
 
-    model = Job
+    model = JobAssignment
 
 
 @resource(path='/internal/jobs/{id}/delivery',
@@ -79,7 +79,7 @@ class DeliveryService:
     def get_one(self):
         """Get on Job from the database."""
         job_id = self.request.matchdict.get('id')
-        return Job.query().get(job_id)
+        return JobAssignment.query().get(job_id)
 
     @view(permission='view', validators=[validate_id])
     def get(self):

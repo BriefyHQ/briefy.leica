@@ -1,4 +1,4 @@
-"""Test Jobs location database model."""
+"""Test JobLocation database model."""
 from briefy.leica import models
 from conftest import BaseModelTest
 
@@ -10,10 +10,9 @@ class TestJobLocationModel(BaseModelTest):
     """Test JobLocation."""
 
     dependencies = [
-        (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
-        (models.Job, 'data/jobs.json'),
+        (models.JobOrder, 'data/job_orders.json'),
     ]
     file_path = 'data/job_locations.json'
     model = models.JobLocation

@@ -1,7 +1,7 @@
 """Import and sync Knack Job to Leica Job."""
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica import logger
-from briefy.leica.models import Job
+from briefy.leica.models import JobAssignment
 from briefy.leica.models import JobLocation
 from briefy.leica.models import Project
 from briefy.leica.sync import ModelSync
@@ -25,7 +25,7 @@ job_status_mapping = {
 class JobSync(ModelSync):
     """Syncronize Jobs."""
 
-    model = Job
+    model = JobAssignment
     knack_model_name = 'Job'
 
     def get_payload(self, kobj, briefy_id=None):

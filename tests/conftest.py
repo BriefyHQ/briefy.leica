@@ -112,6 +112,7 @@ class BaseModelTest:
     payload_position = 0
     model = None
     request = None
+    initial_wf_state = 'created'
 
     def setup_class(cls):
         """Setup test class."""
@@ -169,7 +170,7 @@ class BaseModelTest:
         """Test if we have a workflow setup in here, some objects d'ont have."""
         wf = instance_obj.workflow
         if wf is not None:
-            assert instance_obj.state == 'created'
+            assert instance_obj.state == self.initial_wf_state
             assert len(wf.transitions) == self.number_of_wf_transtions
 
 
@@ -423,6 +424,8 @@ class BaseTestView:
 class BaseVersionedTestView(BaseTestView):
     """Test resources with versions."""
 
+    check_versions_field = 'title'
+
     def test_versions_get_item(self, app, obj_payload):
         """Test get a item."""
         payload = obj_payload
@@ -437,8 +440,10 @@ class BaseVersionedTestView(BaseTestView):
         )
         result = request.json
         db_obj = self.model.query().get(obj_id)
-        assert db_obj.title != result['title']
-        assert db_obj.versions[0].title == result['title']
+        field = self.check_versions_field
+        assert getattr(db_obj, field) != result[field]
+        version = db_obj.versions[0]
+        assert getattr(version, field) == result[field]
 
     def test_versions_get_item_wrong_id(self, app, obj_payload):
         """Test get a item passing the wrong id."""

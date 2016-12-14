@@ -29,7 +29,6 @@ def get_info_from_job(job: Base) -> dict:
     """Return information about the job."""
     result = {
         'id': job.id,
-        'external_id': job.external_id,
         'comments': _get_comments_from_job(job),
     }
     return result
