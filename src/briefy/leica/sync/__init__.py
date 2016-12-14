@@ -1,6 +1,6 @@
 from briefy.leica import logger
 from briefy.leica.sync.user import get_rosetta
-
+from briefy.knack.base import KnackEntity
 import briefy.knack as knack
 import uuid
 
@@ -34,6 +34,9 @@ class ModelSync:
     knack_model_name = ''
     created = {}
     updated = {}
+    knack_parents = None
+    knack_parent_model = ''
+    parent_model = None
 
     def __init__(self, session, parent=None):
         """Initialize syncronizer"""
@@ -74,6 +77,20 @@ class ModelSync:
         model_name = self.model.__name__
         logger.debug('{model_name} updated: {id}'.format(model_name=model_name,
                                                          id=item.id))
+
+    def get_parents(self, kobj: KnackEntity, field_name: str ='') -> tuple:
+        """Get parent objects (knack and model instances) for one item."""
+        if not self.knack_parents:
+            parent_model = self.knack_parent_model
+            _, self.knack_parents = get_model_and_data(parent_model)
+        knack_parent = None
+        for item in self.knack_parents:
+            value_id = getattr(kobj, field_name)[0]['id']
+            if item.id == value_id:
+                knack_parent = item
+                break
+        db_parent = self.parent_model.query().filter_by(external_id=knack_parent.id).one()
+        return db_parent, knack_parent
 
     def add(self, kobj, briefy_id):
         """Add new database item from knack obj."""
