@@ -40,7 +40,6 @@ deploy:
     branch: develop
     tags: true
 addons:
-addons:
   apt:
     packages:
     - graphviz
