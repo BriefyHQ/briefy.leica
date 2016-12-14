@@ -9,10 +9,7 @@ import logging
 logger = logging.getLogger('briefy.leica')
 logger.setLevel(logging.INFO)
 
-if KNACK_API_KEY and KNACK_APPLICATION_ID:
-    KJob = K.get_model('Job')
-else:
-    KJob = None
+KJob = None
 
 
 def _get_comments_from_job(job: Base) -> list:
@@ -40,8 +37,12 @@ def get_knack_job(job_info: dict) -> KJob:
     :param job_info: Internal Briefy Job information.
     :return: A connect Job on Knack.
     """
+    global KJob
     if not KJob:
-        raise ValueError('Knack bridge is not configured')
+        if KNACK_API_KEY and KNACK_APPLICATION_ID:
+            KJob = K.get_model('Job')
+        else:
+            raise ValueError('Knack bridge is not configured')
 
     knack_id = job_info['external_id']
     if not knack_id:

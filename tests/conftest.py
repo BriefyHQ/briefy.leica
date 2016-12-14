@@ -5,12 +5,11 @@ from briefy.common.utils.transformers import to_serializable
 from briefy.leica.db import Base
 from briefy.leica.db import create_engine
 from briefy.leica.db import Session as DBSession
-from briefy.ws.auth import AuthenticatedUser
 from briefy.ws.config import JWT_EXPIRATION
 from briefy.ws.config import JWT_SECRET
 from datetime import date
 from datetime import datetime
-from pyramid import testing
+from prettyconf import config
 from pyramid_jwt.policy import JWTAuthenticationPolicy
 from pyramid.paster import get_app
 from webtest import TestApp
@@ -26,12 +25,22 @@ import os
 import uuid
 
 
-@pytest.fixture
-def queue_url():
-    """Return the url for the SQS server."""
-    host = os.environ.get('SQS_IP', '127.0.0.1')
-    port = os.environ.get('SQS_PORT', '5000')
-    return 'http://{}:{}'.format(host, port)
+@pytest.fixture(scope='session', autouse=True)
+def mock_boto():
+    """Mock botocore endpoint to use the docker image."""
+    host = config('SQS_IP', default='127.0.0.1')
+    port = config('SQS_PORT', default='5000')
+    queue_url = 'http://{host}:{port}'.format(host=host, port=port)
+
+    class MockEndpoint(botocore.endpoint.Endpoint):
+        def __init__(self, host, *args, **kwargs):
+            super().__init__(queue_url, *args, **kwargs)
+
+    if not hasattr(botocore.endpoint, 'OrigEndpoint'):
+        botocore.endpoint.OrigEndpoint = botocore.endpoint.Endpoint
+    botocore.endpoint.Endpoint = MockEndpoint
+
+    XMLConfig('configure.zcml', leica)()
 
 
 @pytest.fixture(scope='session')
@@ -47,7 +56,7 @@ def db_settings():
     return config.get('app:main', 'sqlalchemy.url')
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope='session')
 def sql_engine(request, db_settings):
     """Create new engine based on db_settings fixture.
 
@@ -102,7 +111,7 @@ def session():
     return DBSession()
 
 
-@pytest.mark.usefixtures('db_transaction', 'create_dummy_request')
+@pytest.mark.usefixtures('db_transaction')
 class BaseModelTest:
     """Base class to test all models."""
     cardinality = 1
@@ -113,28 +122,6 @@ class BaseModelTest:
     model = None
     request = None
     initial_wf_state = 'created'
-
-    def setup_class(cls):
-        """Setup test class."""
-        class MockEndpoint(botocore.endpoint.Endpoint):
-            def __init__(self, host, *args, **kwargs):
-                super().__init__(queue_url(), *args, **kwargs)
-
-        if not hasattr(botocore.endpoint, 'OrigEndpoint'):
-            botocore.endpoint.OrigEndpoint = botocore.endpoint.Endpoint
-        botocore.endpoint.Endpoint = MockEndpoint
-
-        XMLConfig('configure.zcml', leica)()
-
-    def setup_method(self, method):
-        """Setup testing environment."""
-        self.config = testing.setUp(request=self.request)
-        app = get_app('configs/testing.ini#main')
-        self.testapp = TestApp(app)
-
-    def teardown_method(self, method):
-        """Teardown testing environment."""
-        testing.tearDown()
 
     def test_obj_is_instance_of_model(self, instance_obj):
         """Test if the created object is an instance of self.model klass."""
@@ -174,7 +161,7 @@ class BaseModelTest:
             assert len(wf.transitions) == self.number_of_wf_transtions
 
 
-@pytest.mark.usefixtures('db_transaction', 'create_dummy_request')
+@pytest.mark.usefixtures('db_transaction')
 class BaseLocationTest(BaseModelTest):
     """Base class to test locations."""
 
@@ -183,7 +170,7 @@ class BaseLocationTest(BaseModelTest):
         assert isinstance(instance_obj, leica.models.WorkingLocation)
 
 
-@pytest.mark.usefixtures('db_transaction', 'create_dummy_request')
+@pytest.mark.usefixtures('db_transaction')
 class BaseLinkTest(BaseModelTest):
     """Base class to test Links."""
 
@@ -265,19 +252,6 @@ class BaseTestView:
     update_map = {}
     initial_wf_state = 'created'
     ignore_validation_fields = ['state_history', 'state']
-
-    def setup_class(cls):
-        """Setup test class."""
-        class MockEndpoint(botocore.endpoint.Endpoint):
-            def __init__(self, host, *args, **kwargs):
-                super().__init__(queue_url(), *args, **kwargs)
-
-        if not hasattr(botocore.endpoint, 'OrigEndpoint'):
-            botocore.endpoint.OrigEndpoint = botocore.endpoint.Endpoint
-
-        botocore.endpoint.Endpoint = MockEndpoint
-
-        XMLConfig('configure.zcml', leica)()
 
     @property
     def headers(self):
@@ -485,7 +459,7 @@ class BaseVersionedTestView(BaseTestView):
         assert result['versions'][1]['updated_at'] > result['versions'][0]['updated_at']
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def app():
     """Fixture to create new app instance.
 
@@ -515,23 +489,9 @@ def login(request):
     return user_payload
 
 
-@pytest.fixture('class')
-def create_dummy_request(request, login):
-    """Create and attach a DummyRequest on the test class."""
-    dummy_request = testing.DummyRequest()
-    user_id = login.pop('id')
-    dummy_request.user = AuthenticatedUser(user_id, login)
-    # this request is py.test request (who declare the fixture)
-    cls = request.cls
-    # this request is web request
-    cls.request = dummy_request
-
-
-@pytest.fixture(autouse=True)
-def mock_api(monkeypatch):
-    """Mock all api calls."""
-
-    def mock_request(self, method, url, *args, **kwargs):
+@pytest.fixture(scope='session')
+def mock_request():
+    def mock_requests_response(self, method, url, *args, **kwargs):
         """Mock a response"""
         if 'briefy-thumbor' in url:
             filename = 'data/thumbor.json'
@@ -547,11 +507,16 @@ def mock_api(monkeypatch):
         resp.headers = headers
         resp._content = data.encode('utf8')
         return resp
+    return mock_requests_response
 
+
+@pytest.fixture(autouse=True)
+def mock_api(monkeypatch, mock_request):
+    """Mock all api calls."""
     monkeypatch.setattr(requests.sessions.Session, 'request', mock_request)
 
 
-@pytest.fixture('class')
+@pytest.fixture('session')
 def roles():
     """Mock request to briefy-thumbor."""
     data = json.load(open(os.path.join(__file__.rsplit('/', 1)[0], 'data/roles.json')))
