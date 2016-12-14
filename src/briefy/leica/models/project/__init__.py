@@ -18,7 +18,7 @@ class IProject(Interface):
     """Marker interface for Job"""
 
 
-class CommercialInfoMixin:
+class CommercialInfoMixin(mixins.ProfessionalPayoutInfo, mixins.OrderFinancialInfo):
     """Commercial details about a project."""
 
     contract = sa.Column(
@@ -34,70 +34,6 @@ class CommercialInfoMixin:
         }
     )
     """Path to contract."""
-
-    # Set price
-    price_currency = sa.Column(
-        sautils.CurrencyType,
-        default='EUR'
-    )
-    """Price currency.
-
-    ISO4217 code for the currency to be used by customer to pay Briefy.
-    """
-
-    _price = sa.Column(
-        'price',
-        sa.Integer,
-        nullable=True,
-        info={
-            'colanderalchemy': {
-                'title': 'Set Price',
-                'missing': None,
-                'typ': colander.Integer
-            }
-        }
-    )
-    """Price to be paid, by the customer, for each job.
-
-    Amount to be paid by the customer for each job.
-    This value is expressed in cents.
-    """
-
-    @property
-    def price(self) -> int:
-        """Price of this job.
-
-        :return: Return the price, in `.price_currency` cents, of this job
-        """
-        return self._price
-
-    # Photographer Payout
-    payout_currency = sa.Column(
-        sautils.CurrencyType,
-        default='EUR'
-    )
-    """Professional Payout currency.
-
-    ISO4217 code for the currency to be used to payout the professional.
-    """
-
-    payout_value = sa.Column(
-        sa.Integer,
-        nullable=False,
-        default=0,
-        info={
-            'colanderalchemy': {
-                'title': 'Photographer Payout',
-                'missing': None,
-                'typ': colander.Integer
-            }
-        }
-    )
-    """Professional Payout value.
-
-    How much the professional will be paid for each Job.
-    This value is expressed in cents.
-    """
 
 
 @implementer(IProject)
