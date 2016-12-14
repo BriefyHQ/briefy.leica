@@ -85,7 +85,7 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.KLeicaVersionedMixin, Base)
     parent_customer_id = sa.Column(
         sautils.UUIDType,
         sa.ForeignKey('customers.id'),
-        nullable=False,
+        nullable=True,
         info={'colanderalchemy': {
                 'title': 'Customer',
                 'validator': colander.uuid,
