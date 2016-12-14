@@ -322,7 +322,7 @@ class JobOrder(mixins.OrderFinancialInfo, BriefyRoles, mixins.KLeicaVersionedMix
         data['description'] = self.description
         data['briefing'] = self.project.briefing
         data['availability'] = self.availability
-        data['_price'] = self.price
+        data['price'] = self.price
         data.update(self._summarize_relationships())
 
         # Workflow history

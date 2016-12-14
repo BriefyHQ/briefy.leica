@@ -26,6 +26,6 @@ class TestJobOrderView(BaseVersionedTestView):
     NOT_FOUND_MESSAGE = ''
     update_map = {
         'title': 'New Order Title changed!',
-        '_price': 10000,
+        'price': 10000,
         'price_currency': 'USD'
     }
