@@ -80,7 +80,7 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.KLeicaVersionedMixin, Base)
         'id', 'slug', 'title', 'description', 'created_at', 'updated_at', 'state', 'external_id',
     ]
 
-    __colanderalchemy_config__ = {'excludes': ['state_history', 'state' ]}
+    __colanderalchemy_config__ = {'excludes': ['state_history', 'state']}
 
     parent_customer_id = sa.Column(
         sautils.UUIDType,
@@ -96,7 +96,8 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.KLeicaVersionedMixin, Base)
      )
     """Parent Customer ID.
 
-    Recursive relationship to represent composed companies :class:`briefy.leica.models.customer.Customer`.
+    Recursive relationship to represent composed companies
+    :class:`briefy.leica.models.customer.Customer`.
     """
 
     legal_name = sa.Column(
