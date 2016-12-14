@@ -95,7 +95,7 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.KLeicaVersionedMixin, Base)
      )
     """Parent Customer ID.
 
-    Recursive relationship to represent composed companies :class:`briefy.leica.models.customer.Customer`.
+    Auto reference to represent composed companies :class:`briefy.leica.models.customer.Customer`.
     """
 
     legal_name = sa.Column(
