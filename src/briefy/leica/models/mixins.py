@@ -139,7 +139,7 @@ class OrderFinancialInfo:
     This value is expressed in cents.
     """
 
-    @property
+    @hybrid_property
     def price(self) -> int:
         """Price of this job.
 

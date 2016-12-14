@@ -12,12 +12,12 @@
     "requirements": "Requirement 1",
     "source": "briefy",
     "scout_manager": null,
-    "price": 20000,
+    "_price": 20000,
     "price_currency": "EUR",
     "number_of_assets": 100,
     "order_id": "aaaa",
     "state": "received",
-    "title": "Job Title",
+    "title": "Job Title 1",
     "external_id": "ID1111",
     "state_history": [
       {
@@ -44,12 +44,12 @@
     "requirements": "Requirement 2",
     "source": "briefy",
     "scout_manager": null,
-    "price": 20100,
+    "_price": 20100,
     "price_currency": "USD",
     "number_of_assets": 100,
     "order_id": "bbbb",
     "state": "received",
-    "title": "Job Title",
+    "title": "Job Title 2",
     "external_id": "ID2222",
     "state_history": [
       {
@@ -76,12 +76,12 @@
     "requirements": "Requirement 3",
     "source": "customer",
     "scout_manager": null,
-    "price": 23000,
+    "_price": 23000,
     "price_currency": "EUR",
     "number_of_assets": 100,
     "order_id": "cccc",
     "state": "received",
-    "title": "Job Title",
+    "title": "Job Title 3",
     "external_id": "ID3333",
     "state_history": [
       {
@@ -108,12 +108,12 @@
     "requirements": "Requirement 4",
     "source": "customer",
     "scout_manager": null,
-    "price": 30100,
+    "_price": 30100,
     "price_currency": "EUR",
     "number_of_assets": 100,
     "order_id": "eeee",
     "state": "received",
-    "title": "Job Title",
+    "title": "Job Title 4",
     "external_id": "ID4444",
     "state_history": [
       {
@@ -140,12 +140,12 @@
     "requirements": "Requirement 5",
     "source": "briefy",
     "scout_manager": null,
-    "price": 40200,
+    "_price": 40200,
     "price_currency": "USD",
     "number_of_assets": 100,
     "order_id": "ffffs",
     "state": "received",
-    "title": "Job Title",
+    "title": "Job Title 5",
     "external_id": "ID5555",
     "state_history": [
       {

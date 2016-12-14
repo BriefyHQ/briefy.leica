@@ -16,7 +16,7 @@ import sqlalchemy_utils as sautils
 
 __summary_attributes__ = [
     'id', 'title', 'description', 'created_at', 'updated_at', 'state',
-    'number_of_assets', 'total_assets'
+    '_price', 'number_of_assets', 'total_assets'
 ]
 
 __listing_attributes__ = __summary_attributes__
@@ -52,7 +52,6 @@ class JobOrder(mixins.OrderFinancialInfo, BriefyRoles, mixins.KLeicaVersionedMix
         info={
             'colanderalchemy': {
                 'title': 'Job Order ID',
-                'validator': colander.string_types,
                 'typ': colander.String
             }
         }
@@ -317,12 +316,22 @@ class JobOrder(mixins.OrderFinancialInfo, BriefyRoles, mixins.KLeicaVersionedMix
         data = self._apply_actors_info(data)
         return data
 
+    def to_summary_dict(self) -> dict:
+        """Return a summarized version of the dict representation of this Class.
+
+        Used to serialize this object within a parent object serialization.
+        :returns: Dictionary with fields and values used by this Class
+        """
+        data = super().to_summary_dict()
+        return data
+
     def to_dict(self):
         """Return a dict representation of this object."""
         data = super().to_dict(excludes=['internal_comments'])
         data['description'] = self.description
         data['briefing'] = self.project.briefing
         data['availability'] = self.availability
+        data['_price'] = self.price
         data.update(self._summarize_relationships())
 
         # Workflow history
