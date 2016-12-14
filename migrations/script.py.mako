@@ -6,12 +6,14 @@ Create Date: ${create_date}
 """
 from alembic import op
 from briefy.common.db.types.aware_datetime import AwareDateTime
-from sqlalchemy_utils.types.timezone import TimezoneType
-from sqlalchemy_utils.types.uuid import UUIDType
+from briefy.common.vocabularies.categories import CategoryChoices
+from briefy.common.vocabularies.person import GenderCategories
+from briefy.leica.vocabularies import JobInputSource
+from sqlalchemy.dialects import postgresql
 from sqlalchemy_utils import types
+from sqlalchemy_utils.types.uuid import UUIDType
 ${imports if imports else ""}
 
-import briefy.common
 import sqlalchemy as sa
 import sqlalchemy_utils
 

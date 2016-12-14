@@ -13,8 +13,8 @@ import sqlalchemy as sa
 import sqlalchemy_utils as sautils
 
 
-class AssignmentFinancialInfo:
-    """Mixin containing financial information of a jobAssignment."""
+class ProfessionalPayoutInfo:
+    """Professional payout information."""
 
     # Photographer Payout
     payout_currency = sa.Column(
@@ -43,6 +43,10 @@ class AssignmentFinancialInfo:
     How much the professional will be paid for this Job.
     This value is expressed in cents.
     """
+
+
+class AssignmentFinancialInfo(ProfessionalPayoutInfo):
+    """Mixin containing financial information of a jobAssignment."""
 
     # Photographer Expenses
     travel_expenses = sa.Column(

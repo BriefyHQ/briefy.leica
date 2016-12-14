@@ -2,7 +2,6 @@ from briefy.leica import logger
 from briefy.leica.models import Customer
 from briefy.leica.models import Project
 from briefy.leica.sync import ModelSync
-from briefy.leica.sync import get_model_and_data
 
 
 class ProjectSync(ModelSync):
@@ -10,25 +9,13 @@ class ProjectSync(ModelSync):
 
     model = Project
     knack_model_name = 'Project'
-    all_company = None
-
-    def get_customer(self, kobj):
-        """Get Customer object for this Project."""
-        if not self.all_company:
-            logger.debug('Get Company data from knack.')
-            _, self.all_company = get_model_and_data('Company')
-        knack_company = None
-        for item in self.all_company:
-            if item.id == kobj.company[0]['id']:
-                knack_company = item
-                break
-        customer = Customer.query().filter_by(external_id=knack_company.id).one()
-        return customer, knack_company
+    knack_parent_model = 'Company'
+    parent_model = Customer
 
     def get_payload(self, kobj, briefy_id=None):
         """Create payload for customer object."""
         result = super().get_payload(kobj, briefy_id)
-        customer, company = self.get_customer(kobj)
+        customer, company = self.get_parents(kobj, 'company')
 
         # TODO: Local roles and comments
         # 'clients_project_manager'
