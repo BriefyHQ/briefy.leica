@@ -82,6 +82,22 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.KLeicaVersionedMixin, Base)
 
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state', '_slug']}
 
+    parent_customer_id = sa.Column(
+        sautils.UUIDType,
+        sa.ForeignKey('customers.id'),
+        nullable=False,
+        info={'colanderalchemy': {
+                'title': 'Customer',
+                'validator': colander.uuid,
+                'typ': colander.String
+            }
+        }
+     )
+    """Parent Customer ID.
+
+    Recursive relationship to represent composed companies :class:`briefy.leica.models.customer.Customer`.
+    """
+
     legal_name = sa.Column(
         sa.String(255),
         nullable=True,
