@@ -3,7 +3,7 @@ from briefy.leica import models
 from conftest import BaseTestView
 
 
-class TestProjectView(BaseTestView):
+class TestCustomerView(BaseTestView):
     """Test CustomerService view."""
 
     base_path = '/customers'

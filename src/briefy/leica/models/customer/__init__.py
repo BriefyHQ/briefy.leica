@@ -73,14 +73,14 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.KLeicaVersionedMixin, Base)
     _workflow = workflows.CustomerWorkflow
 
     __summary_attributes__ = [
-        'id', 'title', 'description', 'created_at', 'updated_at', 'state', 'external_id'
+        'id', 'slug', 'title', 'description', 'created_at', 'updated_at', 'state', 'external_id'
     ]
 
     __listing_attributes__ = [
-        'id', 'title', 'description', 'created_at', 'updated_at', 'state', 'external_id',
+        'id', 'slug', 'title', 'description', 'created_at', 'updated_at', 'state', 'external_id',
     ]
 
-    __colanderalchemy_config__ = {'excludes': ['state_history', 'state', '_slug']}
+    __colanderalchemy_config__ = {'excludes': ['state_history', 'state']}
 
     parent_customer_id = sa.Column(
         sautils.UUIDType,
@@ -88,6 +88,7 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.KLeicaVersionedMixin, Base)
         nullable=True,
         info={'colanderalchemy': {
                 'title': 'Customer',
+                'missing': None,
                 'validator': colander.uuid,
                 'typ': colander.String
             }
@@ -162,6 +163,7 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.KLeicaVersionedMixin, Base)
     def to_dict(self):
         """Return a dict representation of this object."""
         data = super().to_dict()
+        data['slug'] = self.slug
         addresses = [address.to_dict(excludes='customer') for address in self.addresses.all()]
         contacts = [contact.to_dict(excludes='customer') for contact in self.contacts.all()]
         data.update(addresses=addresses, contacts=contacts)
