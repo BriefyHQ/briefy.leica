@@ -1,12 +1,12 @@
-Job
----
+Assignment
+----------
 
 Inheritance
 +++++++++++
 
-Inheritance diagram for the Job class:
+Inheritance diagram for the Assignment class:
 
-.. inheritance-diagram:: briefy.leica.models.job.Job
+.. inheritance-diagram:: briefy.leica.models.job.JobAssignment
 
 
 Workflow
@@ -18,9 +18,9 @@ Workflow
 
 Database model
 ++++++++++++++
-Database diagram for the Job data model:
+Database diagram for the Assignment data model:
 
 .. sadisplay::
     :module: briefy.leica.models.job
-    :alt: Job data model
+    :alt: Assignment data model
     :render: graphviz

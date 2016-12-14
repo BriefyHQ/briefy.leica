@@ -38,7 +38,11 @@ deploy:
   on:
     repo: BriefyHQ/briefy.leica
     branch: develop
+    tags: true
 addons:
+  apt:
+    packages:
+    - graphviz
   artifacts:
     key:
       secure: cPkRUt53frER83PIqsRP/5CmwcQnTMNSkvAzg/b8gSwYn/J/XIYkY8+HSrl3RuTGbD1bog1FXOe8lcyHdNzLDf5sMpcAJD1jpU2rq7eSoM1KmnHPDq4mIduoLptVGCmxOjFGwTrgKp23bTwSIVwIMMAjFSPpdZ5BrYZj38+IoLDkdV0A9D33A6XgvCsseEPclIFV0IPzEOgo9OPYHysqmnGubiTiDh0MA1c8y1XRvvIwDONC6fYKLtOqSV+oM2zYZCEub+JklWFLdTETQenZnvevMZAsTyZ4ItAbfo8Q0Ll3ReFnHyUtQei2wXY4lBLXzUi+fFQvgf3fTFC8NYXQicOqDoERkSrio87Qb1QQc3DW18r+Y5g5Tg4CIed4nWUYveYMCbSiDYg6qhEBT/oiDsyzKIu/dDZkx1gTEWgn8o86UcXcEN/XdPek19k5qC22/h0AnyUgQTrw9l2pEUxh5r42LoOzzD2lAm2rW28BNELxnsO3l7YP1OYlBA5TqaSgtPEGqkijppC9d9RM6PngfyoVEuhBLCT+/KW/KZnFmtwp9zw4R5Ai/PAvkPZ4DtaDx8pKNtb59RZTEbiCk09ipRlYBoJ97mCU4aGbmrHi+Yu0Si0OpLZx5TkCKdSpse7sfsl3PZyYK5HRGId2vsMlznuzR6DXThzGhtfahA2I6DY=

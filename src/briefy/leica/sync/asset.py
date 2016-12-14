@@ -1,5 +1,5 @@
 from briefy.leica import logger
-from briefy.leica.models import Job
+from briefy.leica.models import JobAssignment
 from briefy.leica.models import Image
 
 import csv
@@ -18,7 +18,7 @@ def import_assets(session, asset_rows):
     failed = []
     for job_id, professional_id, s3_path, image_size, image_width, image_height in asset_rows:
         if job_id != previous_job_id:
-            job = Job.query().get(job_id)
+            job = JobAssignment.query().get(job_id)
             previous_job_id = job_id
 
         if not professional_id and job.professional_id:
@@ -28,8 +28,8 @@ def import_assets(session, asset_rows):
 
         filename = s3_path.split('/')[-1]
         title = filename.strip('-_ ')
-        if title.lower().startswith(job.customer_job_id.lower()):
-            title = title[len(job.customer_job_id):].strip(" -+")
+        if title.lower().startswith(job.order.order_id.lower()):
+            title = title[len(job.order.order_id):].strip(" -+")
         title = title.replace("_", " ")
         # source_path = os.path.join(S3_SOURCE_PREFIX, s3_path.lstrip('/'))
 

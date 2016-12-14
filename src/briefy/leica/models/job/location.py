@@ -38,7 +38,7 @@ class JobLocation(LocationContactInfoMixin, AddressMixin, mixins.LeicaMixin, Bas
 
     job_id = sa.Column(
         sautils.UUIDType,
-        sa.ForeignKey('jobs.id'),
+        sa.ForeignKey('joborders.id'),
         nullable=False,
         info={
             'colanderalchemy': {

@@ -36,11 +36,12 @@ release = release
 language = 'en'
 
 exclude_patterns = ['_build']
-# add_module_names = True
+add_module_names = False
 # show_authors = False
 pygments_style = 'sphinx'
 todo_include_todos = True
 
+html_last_updated_fmt = '%Y-%m-%d %H:%M:%S'
 html_theme = 'bootstrap'
 html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 html_static_path = ['_static']

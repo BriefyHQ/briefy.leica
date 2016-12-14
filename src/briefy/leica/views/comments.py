@@ -111,3 +111,27 @@ class AssetCommentService(CommentService):
 )
 class AssetCommentWorkflowService(CommentsWorkflowService):
     """AssetComment workflow resource."""
+
+
+COLLECTION_PATH = '/orders/{entity_id}/comments'
+PATH = COLLECTION_PATH + '/{id}'
+
+
+@resource(
+    collection_path=COLLECTION_PATH,
+    path=PATH,
+    cors_policy=CORS_POLICY,
+    factory=CommentFactory
+)
+class JobOrderCommentService(CommentService):
+    """Comments for a Job Order."""
+
+
+@resource(
+    collection_path=PATH + '/transitions',
+    path=PATH + '/transitions/{transition_id}',
+    cors_policy=CORS_POLICY,
+    factory=CommentFactory
+)
+class JobOrderCommentWorkflowService(CommentsWorkflowService):
+    """JobOrderComment workflow resource."""

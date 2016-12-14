@@ -1,6 +1,6 @@
 """Views to handle Jobs creation."""
-from briefy.leica.events import job as events
-from briefy.leica.models import JobAssignment
+from briefy.leica.events import joborder as events
+from briefy.leica.models import JobOrder
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources import BaseResource
 from briefy.ws.resources import RESTService
@@ -11,14 +11,14 @@ from cornice.resource import view
 from pyramid.httpexceptions import HTTPNotFound as NotFound
 from pyramid.security import Allow
 
-COLLECTION_PATH = '/jobs'
+COLLECTION_PATH = '/orders'
 PATH = COLLECTION_PATH + '/{id}'
 
 
-class JobFactory(BaseFactory):
-    """Job context factory."""
+class JobOrderFactory(BaseFactory):
+    """Job order context factory."""
 
-    model = JobAssignment
+    model = JobOrder
 
     @property
     def __base_acl__(self) -> list:
@@ -27,7 +27,8 @@ class JobFactory(BaseFactory):
         :rtype: list
         """
         _acls = [
-            (Allow, 'g:briefy_pm', ['add', 'delete', 'edit', 'list', 'view'])
+            (Allow, 'g:briefy_pm', ['add', 'delete', 'edit', 'list', 'view']),
+            (Allow, 'g:customers', ['add'])
         ]
         return _acls
 
@@ -35,20 +36,20 @@ class JobFactory(BaseFactory):
 @resource(collection_path=COLLECTION_PATH,
           path=PATH,
           cors_policy=CORS_POLICY,
-          factory=JobFactory)
-class JobService(RESTService):
-    """Jobs service."""
+          factory=JobOrderFactory)
+class JobOrderService(RESTService):
+    """Job Orders service."""
 
-    model = JobAssignment
+    model = JobOrder
     friendly_name = model.__name__
     default_order_by = 'created_at'
     filter_related_fields = ['project.title']
 
     _default_notify_events = {
-        'POST': events.JobCreatedEvent,
-        'PUT': events.JobUpdatedEvent,
-        'GET': events.JobLoadedEvent,
-        'DELETE': events.JobDeletedEvent,
+        'POST': events.JobOrderCreatedEvent,
+        'PUT': events.JobOrderUpdatedEvent,
+        'GET': events.JobOrderLoadedEvent,
+        'DELETE': events.JobOrderDeletedEvent,
     }
 
 
@@ -56,26 +57,26 @@ class JobService(RESTService):
     collection_path=PATH + '/transitions',
     path=PATH + '/transitions/{transition_id}',
     cors_policy=CORS_POLICY,
-    factory=JobFactory
+    factory=JobOrderFactory
 )
-class JobWorkflow(WorkflowAwareResource):
-    """Job workflow resource."""
+class JobOrderWorkflow(WorkflowAwareResource):
+    """Job order workflow resource."""
 
-    model = JobAssignment
-    friendly_name = JobAssignment.__name__
+    model = JobOrder
+    friendly_name = model.__name__
 
 
 @resource(
     collection_path=PATH + '/versions',
     path=PATH + '/versions/{version_id}',
     cors_policy=CORS_POLICY,
-    factory=JobFactory
+    factory=JobOrderFactory
 )
-class JobVersions(BaseResource):
-    """Versioning of Jobs."""
+class JobOrderVersions(BaseResource):
+    """Versioning of Job orders."""
 
-    model = JobAssignment
-    friendly_name = JobAssignment.__name__
+    model = JobOrder
+    friendly_name = model.__name__
 
     @view(validators='_run_validators')
     def collection_get(self):

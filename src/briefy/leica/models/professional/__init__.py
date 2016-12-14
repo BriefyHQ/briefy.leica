@@ -54,7 +54,7 @@ class Professional(ProfessionalMixin, Base):
 
     # Jobs
     jobs = orm.relationship(
-        'Job',
+        'JobAssignment',
         backref=orm.backref('professional', lazy='joined'),
         lazy='dynamic'
     )
