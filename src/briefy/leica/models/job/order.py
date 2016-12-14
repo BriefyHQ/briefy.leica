@@ -170,6 +170,18 @@ class JobOrder(mixins.OrderFinancialInfo, BriefyRoles, mixins.KLeicaVersionedMix
     Access to it should be done using the hybrid_property availability.
     """
 
+    comments = orm.relationship(
+        'Comment',
+        foreign_keys='Comment.entity_id',
+        order_by='asc(Comment.created_at)',
+        primaryjoin='Comment.entity_id == JobOrder.id',
+        lazy='dynamic'
+    )
+    """Comments connected to this job order.
+
+    Collection of :class:`briefy.leica.models.comment.Comment`.
+    """
+
     @hybrid_property
     def availability(self) -> list:
         """Return availability for a Job.
@@ -311,8 +323,6 @@ class JobOrder(mixins.OrderFinancialInfo, BriefyRoles, mixins.KLeicaVersionedMix
         data['description'] = self.description
         data['briefing'] = self.project.briefing
         data['availability'] = self.availability
-        data['assignment_date'] = self.assignment_date
-
         data.update(self._summarize_relationships())
 
         # Workflow history

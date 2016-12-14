@@ -15,6 +15,7 @@ class TestAssetView(BaseVersionedTestView):
         (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
+        (models.JobOrder, 'data/job_orders.json'),
         (models.JobAssignment, 'data/jobs.json')
     ]
     file_path = 'data/images.json'
@@ -113,7 +114,7 @@ class TestAssetView(BaseVersionedTestView):
         payload['id'] = '560a6697-11d2-4fe9-9757-a279c126b6bf'
         with transaction.manager:
             job = JobAssignment.get(payload['job_id'])
-            project = job.project
+            project = job.order.project
             project.tech_requirements = {
                 'dimensions': {'value': '800x600', 'operator': 'eq'},
             }

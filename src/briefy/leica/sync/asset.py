@@ -28,8 +28,8 @@ def import_assets(session, asset_rows):
 
         filename = s3_path.split('/')[-1]
         title = filename.strip('-_ ')
-        if title.lower().startswith(job.customer_job_id.lower()):
-            title = title[len(job.customer_job_id):].strip(" -+")
+        if title.lower().startswith(job.order.order_id.lower()):
+            title = title[len(job.order.order_id):].strip(" -+")
         title = title.replace("_", " ")
         # source_path = os.path.join(S3_SOURCE_PREFIX, s3_path.lstrip('/'))
 

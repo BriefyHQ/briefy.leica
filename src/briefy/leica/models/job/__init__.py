@@ -19,8 +19,8 @@ import sqlalchemy_utils as sautils
 
 
 __summary_attributes__ = [
-    'id', 'title', 'description', 'created_at', 'updated_at', 'state', 'approvable',
-    'number_of_assets', 'total_assets', 'total_approvable_assets'
+    'id', 'title', 'description', 'created_at', 'updated_at', 'state',
+    'approvable', 'total_assets', 'total_approvable_assets'
 ]
 
 __listing_attributes__ = __summary_attributes__
@@ -101,7 +101,7 @@ class JobAssignment(JobAssignmentDates, BriefyRoles, mixins.AssignmentFinancialI
 
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', 'project', 'comments', 'customer', 'professional',
+            'state_history', 'state', 'order', 'comments', 'professional', 'assets',
         ]
     }
 

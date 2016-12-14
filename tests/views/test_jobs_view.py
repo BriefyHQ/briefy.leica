@@ -14,21 +14,23 @@ class TestJobView(BaseVersionedTestView):
     dependencies = [
         (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
-        (models.Project, 'data/projects.json')
+        (models.Project, 'data/projects.json'),
+        (models.JobOrder, 'data/job_orders.json'),
     ]
     ignore_validation_fields = [
-        'state_history', 'state', 'project', 'customer', 'updated_at',
+        'state_history', 'state', 'order', 'updated_at', 'customer', 'project',
         'qa_manager', 'project_manager', 'scout_manager',
     ]
     file_path = 'data/jobs.json'
     model = models.JobAssignment
     initial_wf_state = 'pending'
+    check_versions_field = 'payout_currency'
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {
-        'title': 'New Job Title',
-        'job_id': 10,
-        'project_id': '36d359f0-8e92-41bb-8d1c-fedfd60e7046'
+        'payable': False,
+        'travel_expenses': 1000,
+        'payout_currency': 'USD'
     }
 
     def test_workflow(self, app, session, instance_obj):
