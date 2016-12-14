@@ -4,8 +4,6 @@ from briefy.common.vocabularies.roles import LocalRolesChoices as LR
 from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import Permission
 from briefy.common.workflow import WorkflowState as WS
-from briefy.leica import internal_actions
-from briefy.leica.utils import bridge
 from briefy.leica.utils import transitions
 
 import logging
@@ -160,17 +158,11 @@ class JobWorkflow(BriefyWorkflow):
             )
         # Transition all pending assets to approved
         transitions.approve_assets_in_job(job, self.context)
-        job_info = bridge.get_info_from_job(job)
-        # Update state and comments on Knack
-        internal_actions.submit(bridge.approve_job, job_info)
 
     @in_qa.transition(awaiting_assets, 'can_approve', require_message=True)
     def reject(self):
         """QA rejects a Job."""
-        # Update state and comments on Knack
-        job = self.document
-        job_info = bridge.get_info_from_job(job)
-        internal_actions.submit(bridge.reject_job, job_info)
+        pass
 
     @approved.transition(in_qa, 'can_retract_approval')
     @refused.transition(in_qa, 'can_retract_approval_customer')
