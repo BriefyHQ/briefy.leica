@@ -316,15 +316,6 @@ class JobOrder(mixins.OrderFinancialInfo, BriefyRoles, mixins.KLeicaVersionedMix
         data = self._apply_actors_info(data)
         return data
 
-    def to_summary_dict(self) -> dict:
-        """Return a summarized version of the dict representation of this Class.
-
-        Used to serialize this object within a parent object serialization.
-        :returns: Dictionary with fields and values used by this Class
-        """
-        data = super().to_summary_dict()
-        return data
-
     def to_dict(self):
         """Return a dict representation of this object."""
         data = super().to_dict(excludes=['internal_comments'])
