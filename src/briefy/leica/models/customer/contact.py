@@ -47,8 +47,8 @@ class CustomerContact(NameMixin, BaseMetadata, mixins.LeicaMixin, Base):
     position = sa.Column(sa.String(255), nullable=True, unique=False)
     """Position of the contact person on the customer."""
 
-    email = sa.Column(sa.String(255), nullable=True, unique=False)
+    email = sa.Column(sautils.types.EmailType(), nullable=True, unique=False)
     """Email of the contact person."""
 
-    mobile = sa.Column(sa.String(255), nullable=True, unique=False)
+    mobile = sa.Column(sautils.types.PhoneNumberType(), nullable=True, unique=False)
     """Mobile phone number of the contact person."""

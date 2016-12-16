@@ -191,7 +191,7 @@ def upgrade():
         sa.Column('state', sa.String(length=100), autoincrement=False, nullable=True),
         sa.Column('price_currency', types.CurrencyType(), autoincrement=False, nullable=True),
         sa.Column('price', sa.Integer(), autoincrement=False, nullable=True),
-        sa.Column('order_id', sa.String(), autoincrement=False, nullable=True),
+        sa.Column('customer_order_id', sa.String(), autoincrement=False, nullable=True),
         sa.Column('job_id', sa.String(), autoincrement=False, nullable=True),
         sa.Column('customer_id', types.UUIDType(), autoincrement=False, nullable=True),
         sa.Column('project_id', types.UUIDType(), autoincrement=False, nullable=True),
@@ -222,8 +222,8 @@ def upgrade():
         op.f('ix_joborders_version_operation_type'),
         'joborders_version', ['operation_type'], unique=False)
     op.create_index(
-        op.f('ix_joborders_version_order_id'),
-        'joborders_version', ['order_id'], unique=False)
+        op.f('ix_joborders_version_customer_order_id'),
+        'joborders_version', ['customer_order_id'], unique=False)
     op.create_index(
         op.f('ix_joborders_version_slug'),
         'joborders_version', ['slug'], unique=False)
@@ -301,8 +301,8 @@ def upgrade():
         sa.Column('state_history', types.JSONType(), nullable=True),
         sa.Column('internal', sa.Boolean(), nullable=True),
         sa.Column('partners', sa.Boolean(), nullable=True),
-        sa.Column('main_email', sa.String(length=255), nullable=True),
-        sa.Column('main_mobile', sa.String(length=255), nullable=True),
+        sa.Column('main_email', types.EmailType(), nullable=True),
+        sa.Column('main_mobile', types.PhoneNumberType(), nullable=True),
         sa.Column('id', types.UUIDType(), nullable=False),
         sa.Column('photo_path', sa.String(length=255), nullable=True),
         sa.Column('type', sa.String(length=50), nullable=False),
@@ -329,8 +329,8 @@ def upgrade():
         sa.Column('state', sa.String(length=100), autoincrement=False, nullable=True),
         sa.Column('internal', sa.Boolean(), autoincrement=False, nullable=True),
         sa.Column('partners', sa.Boolean(), autoincrement=False, nullable=True),
-        sa.Column('main_email', sa.String(length=255), autoincrement=False, nullable=True),
-        sa.Column('main_mobile', sa.String(length=255), autoincrement=False, nullable=True),
+        sa.Column('main_email', types.EmailType(), autoincrement=False, nullable=True),
+        sa.Column('main_mobile', types.PhoneNumberType(), autoincrement=False, nullable=True),
         sa.Column('id', types.UUIDType(), autoincrement=False, nullable=False),
         sa.Column('photo_path', sa.String(length=255), autoincrement=False, nullable=True),
         sa.Column('type', sa.String(length=50), autoincrement=False, nullable=True),
@@ -487,8 +487,8 @@ def upgrade():
         sa.Column('customer_id', types.UUIDType(), nullable=False),
         sa.Column('type', types.ChoiceType(ContactTypes, impl=sa.String()), nullable=False),
         sa.Column('position', sa.String(length=255), nullable=True),
-        sa.Column('email', sa.String(length=255), nullable=True),
-        sa.Column('mobile', sa.String(length=255), nullable=True),
+        sa.Column('email', types.EmailType(), nullable=True),
+        sa.Column('mobile', types.PhoneNumberType(), nullable=True),
         sa.ForeignKeyConstraint(['customer_id'], ['customers.id'], ),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('id')
@@ -585,7 +585,7 @@ def upgrade():
         sa.Column('state_history', types.JSONType(), nullable=True),
         sa.Column('price_currency', types.CurrencyType(), nullable=True),
         sa.Column('price', sa.Integer(), nullable=True),
-        sa.Column('order_id', sa.String(), nullable=True),
+        sa.Column('customer_order_id', sa.String(), nullable=True),
         sa.Column('job_id', sa.String(), nullable=True),
         sa.Column('customer_id', types.UUIDType(), nullable=True),
         sa.Column('project_id', types.UUIDType(), nullable=False),
@@ -603,7 +603,7 @@ def upgrade():
     op.create_index(
         op.f('ix_joborders_job_id'), 'joborders', ['job_id'], unique=False)
     op.create_index(
-        op.f('ix_joborders_order_id'), 'joborders', ['order_id'], unique=False)
+        op.f('ix_joborders_customer_order_id'), 'joborders', ['customer_order_id'], unique=False)
     op.create_index(
         op.f('ix_joborders_slug'), 'joborders', ['slug'], unique=False)
     op.create_table(
@@ -641,14 +641,47 @@ def upgrade():
         sa.Column('updated_at', AwareDateTime(), nullable=True),
         sa.Column('state', sa.String(length=100), nullable=True),
         sa.Column('state_history', types.JSONType(), nullable=True),
-        sa.Column('contact', sa.String(length=255), nullable=True),
-        sa.Column('email', sa.String(length=255), nullable=True),
-        sa.Column('mobile', sa.String(length=255), nullable=True),
-        sa.Column('job_id', types.UUIDType(), nullable=False),
-        sa.ForeignKeyConstraint(['job_id'], ['joborders.id'], ),
+        sa.Column('additional_phone', types.PhoneNumberType(), nullable=True),
+        sa.Column('first_name', sa.String(length=255), nullable=False),
+        sa.Column('last_name', sa.String(length=255), nullable=False),
+        sa.Column('mobile', types.PhoneNumberType(), nullable=True),
+        sa.Column('email', types.EmailType(), nullable=True),
+        sa.Column('order_id', types.UUIDType(), nullable=False),
+        sa.ForeignKeyConstraint(['order_id'], ['joborders.id'], ),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('id')
     )
+    op.create_table(
+        'joblocations_version',
+        sa.Column('country', types.CountryType, autoincrement=False, nullable=True),
+        sa.Column('locality', sa.String(length=255), autoincrement=False, nullable=True),
+        sa.Column('info', types.JSONType(), autoincrement=False, nullable=True),
+        sa.Column('timezone', types.TimezoneType(), autoincrement=False, nullable=True),
+        sa.Column('coordinates', geo.POINT(), autoincrement=False, nullable=True),
+        sa.Column('id', types.UUIDType(), autoincrement=False, nullable=False),
+        sa.Column('first_name', sa.String(length=255), autoincrement=False, nullable=True),
+        sa.Column('last_name', sa.String(length=255), autoincrement=False, nullable=True),
+        sa.Column('created_at', AwareDateTime(), autoincrement=False, nullable=True),
+        sa.Column('updated_at', AwareDateTime(), autoincrement=False, nullable=True),
+        sa.Column('state', sa.String(length=100), autoincrement=False, nullable=True),
+        sa.Column('email', types.EmailType(), autoincrement=False, nullable=True),
+        sa.Column('mobile', types.PhoneNumberType(), autoincrement=False, nullable=True),
+        sa.Column('additional_phone', types.PhoneNumberType(), autoincrement=False, nullable=True),
+        sa.Column('order_id', types.UUIDType(), autoincrement=False, nullable=True),
+        sa.Column('transaction_id', sa.BigInteger(), autoincrement=False, nullable=False),
+        sa.Column('end_transaction_id', sa.BigInteger(), nullable=True),
+        sa.Column('operation_type', sa.SmallInteger(), nullable=False),
+        sa.PrimaryKeyConstraint('id', 'transaction_id')
+    )
+    op.create_index(
+        op.f('ix_joblocations_version_end_transaction_id'),
+        'joblocations_version', ['end_transaction_id'], unique=False)
+    op.create_index(
+        op.f('ix_joblocations_version_operation_type'),
+        'joblocations_version', ['operation_type'], unique=False)
+    op.create_index(
+        op.f('ix_joblocations_version_transaction_id'),
+        'joblocations_version', ['transaction_id'], unique=False)
     op.create_table(
         'assets',
         sa.Column('source_path', sa.String(length=1000), nullable=False),
@@ -782,7 +815,7 @@ def downgrade():
                   table_name='joborders_version')
     op.drop_index(op.f('ix_joborders_version_slug'),
                   table_name='joborders_version')
-    op.drop_index(op.f('ix_joborders_version_order_id'),
+    op.drop_index(op.f('ix_joborders_version_customer_order_id'),
                   table_name='joborders_version')
     op.drop_index(op.f('ix_joborders_version_operation_type'),
                   table_name='joborders_version')

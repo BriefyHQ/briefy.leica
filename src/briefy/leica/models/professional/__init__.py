@@ -12,13 +12,14 @@ from sqlalchemy_utils import UUIDType
 
 import colander
 import sqlalchemy as sa
+import sqlalchemy_utils as sautils
 
 
 class ContactInfoMixin:
     """A mixin to manage contact information of a professional."""
 
-    main_email = sa.Column(sa.String(255), nullable=True, unique=False)
-    main_mobile = sa.Column(sa.String(255), nullable=True, unique=False)
+    main_email = sa.Column(sautils.types.EmailType(), nullable=True, unique=False)
+    main_mobile = sa.Column(sautils.types.PhoneNumberType(), nullable=True, unique=False)
 
 
 class ProfessionalMixin(ContactInfoMixin, PersonalInfoMixin, OptIn, mixins.KLeicaVersionedMixin):

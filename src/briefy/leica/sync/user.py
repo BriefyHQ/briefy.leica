@@ -1,7 +1,9 @@
 from briefy.common.utils.cache import timeout_cache
 from briefy.leica import config
 from briefy.leica import logger
+from concurrent.futures import ThreadPoolExecutor
 
+import briefy.knack as knack
 import requests
 
 
@@ -52,3 +54,41 @@ def get_rosetta() -> dict:
         error = 'Fail to get rosetta user mapping.'
         logger.error(error)
         raise Exception(error)
+
+
+def print_update_user(future):
+    """Print result of async user update."""
+    print(future.result())
+
+
+def update_user_briefy_id(profile='User'):
+    """Find user brief_id and update back to knack."""
+    rosetta = get_rosetta()
+    user_model = knack.get_model(profile)
+    all_users = user_model.query.all()
+
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        for user in all_users:
+            if user.briefy_id:
+                continue
+            briefy_id = rosetta.get(user.id)
+            if briefy_id:
+                user.briefy_id = briefy_id
+                future = executor.submit(knack.commit_knack_object, user)
+                future.add_done_callback(print_update_user)
+
+
+if __name__ == '__main__':
+    user_profiles = (
+        'User',
+        'Photographer',
+        'Client',
+        'ProjectManager',
+        'Qa',
+        'ScoutingManager',
+        'Supervisor',
+        'AccountManager'
+    )
+    for profile in user_profiles:
+        print('Update briefy_id for profile: {profile}'.format(profile=profile))
+        update_user_briefy_id(profile)

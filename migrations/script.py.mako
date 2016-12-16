@@ -5,6 +5,7 @@ Revises: ${down_revision | comma,n}
 Create Date: ${create_date}
 """
 from alembic import op
+from briefy.common.db.types import geo
 from briefy.common.db.types.aware_datetime import AwareDateTime
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.common.vocabularies.person import GenderCategories

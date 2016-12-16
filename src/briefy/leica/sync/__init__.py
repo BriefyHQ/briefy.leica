@@ -37,6 +37,8 @@ class ModelSync:
     knack_parents = None
     knack_parent_model = ''
     parent_model = None
+    bulk_insert = False
+    bulk_insert_items = None
 
     def __init__(self, session, parent=None):
         """Initialize syncronizer"""
@@ -45,6 +47,7 @@ class ModelSync:
         self.created = {}
         self.updated = {}
         self.rosetta = get_rosetta()
+        self.bulk_insert_items = []
 
     def get_knack_item(self, knack_id) -> object:
         """Get one item from knack service."""
@@ -78,31 +81,49 @@ class ModelSync:
         logger.debug('{model_name} updated: {id}'.format(model_name=model_name,
                                                          id=item.id))
 
-    def get_parents(self, kobj: KnackEntity, field_name: str ='') -> tuple:
-        """Get parent objects (knack and model instances) for one item."""
+    def parse_decimal(self, value):
+        """Parse decimal money values to integer."""
+        return value * 100 if value else None
+
+    def get_parent(self, kobj: KnackEntity, field_name: str ='',
+                   knack_parent_model=None, parent_model=None) -> tuple:
+        """Get parent objects (knack and model instance) for one item."""
+        if not knack_parent_model:
+            knack_parent_model = self.knack_parent_model
+        if not parent_model:
+            parent_model = self.parent_model
+
         if not self.knack_parents:
-            parent_model = self.knack_parent_model
-            _, self.knack_parents = get_model_and_data(parent_model)
+            _, self.knack_parents = get_model_and_data(knack_parent_model)
         knack_parent = None
         for item in self.knack_parents:
             value_id = getattr(kobj, field_name)[0]['id']
             if item.id == value_id:
                 knack_parent = item
                 break
-        db_parent = self.parent_model.query().filter_by(external_id=knack_parent.id).one()
+
+        db_parent = parent_model.query().filter_by(external_id=knack_parent.id).one()
         return db_parent, knack_parent
 
     def add(self, kobj, briefy_id):
         """Add new database item from knack obj."""
         session = self.session
         payload = self.get_payload(kobj, briefy_id)
-        obj = self.model(**payload)
-        session.add(obj)
-        session.flush()
         model_name = self.model.__name__
-        logger.debug('{model_name} added: {id}'.format(model_name=model_name,
-                                                       id=obj.id))
-        return obj
+        if not self.bulk_insert:
+            obj = self.model(**payload)
+            session.add(obj)
+            session.flush()
+            logger.debug('{model_name} added: {id}'.format(model_name=model_name,
+                                                           id=obj.id))
+            return obj
+        else:
+            self.bulk_insert_items.append(payload)
+            logger.debug('{model_name} included in the bulk insert: {id}'.format(
+                model_name=model_name,
+                id=payload.get('id')
+            ))
+            return payload
 
     def sync_knack(self):
         """Sync all created objects back to knack updating briefy_id."""
@@ -133,6 +154,7 @@ class ModelSync:
         """Syncronize one or all items from knack to sqlalchemy model."""
         created = self.created
         updated = self.updated
+        model_name = str(self.model.__name__)
         items = []
 
         if knack_id:
@@ -142,18 +164,26 @@ class ModelSync:
         else:
             items = self.get_items()
 
-        for kobj in items:
+        total = len(items)
+        for i, kobj in enumerate(items):
             item = self.get_db_item(kobj)
             if item:
+                logger.debug('Try to update item {0}: {1} of {2}'.format(model_name, i, total))
                 self.update(kobj, item)
                 updated[item.id] = kobj
             else:
+                logger.debug('Try to add item {0}: {1} of {2}'.format(model_name, i, total))
                 item = self.add(kobj, kobj.briefy_id)
-                created[item.id] = kobj
+                if not self.bulk_insert:
+                    created[item.id] = kobj
+
+        if self.bulk_insert:
+            self.session.bulk_insert_mappings(self.model, self.bulk_insert_items)
+            self.session.flush()
 
         self.sync_knack()
         msg = '{model} created: {created} / {model} updated: {updated}'.format(
-            model=str(self.model.__name__),
+            model=model_name,
             created=len(created),
             updated=len(updated)
         )

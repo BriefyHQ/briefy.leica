@@ -67,8 +67,8 @@ def create_location_dict(address_field: str, kobj: KnackEntity) -> dict:
         )
 
     else:
-        print(klocation.country)
-        logger.info(
-            'Country not found: {country}.'.format(country=klocation.country)
-        )
+        msg = 'Country not found: {country}. Field: {field}'
+        msg = msg.format(country=klocation.country, field=address_field)
+        print(msg)
+        logger.info(msg)
         return {}
