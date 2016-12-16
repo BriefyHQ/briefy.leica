@@ -15,7 +15,7 @@ requires = [
     'briefy.common',
     'briefy.ws',
     'colanderalchemy',
-    'cornice',
+    'cornice==2.2.0',
     'newrelic',
     'phonenumbers',
     'pycountry',
