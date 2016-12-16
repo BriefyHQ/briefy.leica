@@ -27,6 +27,10 @@ History
      * LEICA-92: Update Job model. (ericof)
      * LEICA-93: Update Customer model. (ericof)
      * LEICA-94: Update Project model. (ericof)
+     * Update models, migration and tests (rudaporto).
+     * Sync JobOrder (Location, Assignment, Comment) and Photographer(working locations) (rudaporto).
+     * New sync code to update brief_id in all profiles objects in knack (rudaporto).
+
 
 1.1.0 (2016-10-04)
 ------------------
