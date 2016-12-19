@@ -32,7 +32,6 @@ from briefy.ws.listeners import register_workflow_context_listeners
 
 import sqlalchemy as sa
 
-
 LocalRole.__session__ = Session
 
 ALL_MODELS = [

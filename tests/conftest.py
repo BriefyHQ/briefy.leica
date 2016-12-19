@@ -12,6 +12,7 @@ from datetime import datetime
 from prettyconf import config
 from pyramid_jwt.policy import JWTAuthenticationPolicy
 from pyramid.paster import get_app
+from sqlalchemy_utils import PhoneNumber
 from webtest import TestApp
 from zope.configuration.xmlconfig import XMLConfig
 
@@ -295,7 +296,7 @@ class BaseTestView:
         for key, value in payload.items():
             if key not in self.ignore_validation_fields:
                 obj_value = getattr(db_obj, key)
-                if isinstance(obj_value, (date, datetime, uuid.UUID, enum.Enum)):
+                if isinstance(obj_value, (date, datetime, uuid.UUID, enum.Enum, PhoneNumber)):
                     obj_value = to_serializable(obj_value)
                 assert obj_value == value
 
@@ -313,7 +314,7 @@ class BaseTestView:
 
         for key, value in db_obj.to_dict().items():
             if key not in self.ignore_validation_fields:
-                if isinstance(value, (date, datetime, uuid.UUID, enum.Enum)):
+                if isinstance(value, (date, datetime, uuid.UUID, enum.Enum, PhoneNumber)):
                     value = to_serializable(value)
                 assert result.get(key) == value
 

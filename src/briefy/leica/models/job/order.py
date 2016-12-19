@@ -45,13 +45,13 @@ class JobOrder(mixins.OrderFinancialInfo, BriefyRoles, mixins.KLeicaVersionedMix
         ]
     }
 
-    order_id = sa.Column(
+    customer_order_id = sa.Column(
         sa.String,
         default='',
         index=True,
         info={
             'colanderalchemy': {
-                'title': 'Job Order ID',
+                'title': 'Customer Order ID',
                 'typ': colander.String
             }
         }
@@ -134,7 +134,7 @@ class JobOrder(mixins.OrderFinancialInfo, BriefyRoles, mixins.KLeicaVersionedMix
 
     locations = orm.relationship(
         'JobLocation',
-        backref=orm.backref('job', lazy='joined'),
+        backref=orm.backref('order', lazy='joined'),
         lazy='joined'
     )
     """Job Locations.
