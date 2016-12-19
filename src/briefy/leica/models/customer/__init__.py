@@ -67,7 +67,8 @@ class TaxInfo:
 
 
 @implementer(ICustomer)
-class Customer(TaxInfo, mixins.PolaroidMixin, mixins.KLeicaVersionedMixin, Base):
+class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
+               mixins.KLeicaVersionedMixin, Base):
     """A Customer for Briefy."""
 
     _workflow = workflows.CustomerWorkflow

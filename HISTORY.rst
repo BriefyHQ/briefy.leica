@@ -30,6 +30,9 @@ History
      * Update models, migration and tests (rudaporto).
      * Sync JobOrder (Location, Assignment, Comment) and Photographer(working locations) (rudaporto).
      * New sync code to update brief_id in all profiles objects in knack (rudaporto).
+     * New mixin for LeicaRoles and mixins for local roles of Customer, Project, Order and Assignment (rudaporto).
+     * Improve sync classes to get roles from the knack obj, convert to rolleiflex id and add as local role (rudaporto).
+     * Some minor improvents to import more phone numbers from Photographers (rudaporto).
 
 
 1.1.0 (2016-10-04)

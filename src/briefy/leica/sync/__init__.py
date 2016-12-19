@@ -65,12 +65,30 @@ class ModelSync:
         briefy_id = briefy_id or str(uuid.uuid4())
         return dict(id=briefy_id)
 
-    def get_user(self, kobj, attr=''):
+    def get_user(self, kobj, attr):
+        """Map knack user ID to rolleiflex user ID."""
         kuser = getattr(kobj, attr, None)
         if kuser:
             return self.rosetta.get(kuser[0]['id'])
         else:
             return None
+
+    def get_local_roles(self, kobj, attr) -> list:
+        """Return a list of local users ID from the list of knack users."""
+        knack_roles = getattr(kobj, attr, None)
+        result = []
+        for krole in knack_roles:
+            briefy_user = self.rosetta.get(krole['id'])
+            if briefy_user:
+                result.append(briefy_user)
+        return result
+
+    def update_local_roles(self, obj, new_users, attr):
+        """Update local roles for DB objects using a list of roles."""
+        actual_users = [role.user_id for role in getattr(obj, attr)]
+        for user_id in new_users:
+            if user_id not in actual_users:
+                setattr(obj, attr, user_id)
 
     def update(self, kobj, item):
         """Update database item from knack obj."""
@@ -139,14 +157,13 @@ class ModelSync:
     def get_db_item(self, kobj):
         """Try to find existent db item for a kobj."""
         item = None
-        if hasattr(self.model, 'external_id'):
+        briefy_id = kobj.briefy_id
+        if briefy_id:
+            item = self.model.get(briefy_id)
+
+        if hasattr(self.model, 'external_id') and not item:
             filter_query = self.model.query().filter_by(external_id=kobj.id)
             item = filter_query.one_or_none()
-
-        if not item:
-            briefy_id = kobj.briefy_id
-            if briefy_id:
-                item = self.model.get(briefy_id)
 
         return item
 

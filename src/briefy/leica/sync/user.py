@@ -28,6 +28,7 @@ def get_headers():
     return headers
 
 
+@timeout_cache(300)
 def login():
     """Use briefy.rolleiflex email login to get a valid token."""
     data = dict(username=config.API_USERNAME, password=config.API_PASSWORD)
@@ -68,6 +69,7 @@ def update_user_briefy_id(profile='User'):
     all_users = user_model.query.all()
 
     with ThreadPoolExecutor(max_workers=10) as executor:
+        print('Total of {0} users: {1}'.format(profile, len(all_users)))
         for user in all_users:
             if user.briefy_id:
                 continue
@@ -78,7 +80,9 @@ def update_user_briefy_id(profile='User'):
                 future.add_done_callback(print_update_user)
 
 
-if __name__ == '__main__':
+def update_users():
+    """Update briefy_id field for all user profiles using information from rosetta service."""
+
     user_profiles = (
         'User',
         'Photographer',
@@ -92,3 +96,8 @@ if __name__ == '__main__':
     for profile in user_profiles:
         print('Update briefy_id for profile: {profile}'.format(profile=profile))
         update_user_briefy_id(profile)
+
+
+if __name__ == '__main__':
+    update_user_briefy_id(profile='Photographer')
+    # update_users()

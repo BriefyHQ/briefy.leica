@@ -18,7 +18,8 @@ class IProject(Interface):
     """Marker interface for Job"""
 
 
-class CommercialInfoMixin(mixins.ProfessionalPayoutInfo, mixins.OrderFinancialInfo):
+class CommercialInfoMixin(mixins.ProfessionalPayoutInfo, mixins.ProjectBriefyRoles,
+                          mixins.OrderFinancialInfo):
     """Commercial details about a project."""
 
     contract = sa.Column(

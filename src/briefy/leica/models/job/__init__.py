@@ -1,12 +1,10 @@
 """Briefy Leica Job model."""
-from briefy.common.db.mixins import BriefyRoles
 from briefy.common.db.types import AwareDateTime
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.job import workflows
 from briefy.leica.utils.transitions import get_transition_date
 from briefy.ws.utils.user import add_user_info_to_state_history
-from briefy.ws.utils.user import get_public_user_info
 from datetime import datetime
 from sqlalchemy import orm
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -76,8 +74,9 @@ class JobAssignmentDates:
 
 
 @implementer(IJob)
-class JobAssignment(JobAssignmentDates, BriefyRoles, mixins.AssignmentFinancialInfo,
-                    mixins.LeicaMixin, mixins.VersionMixin, Base):
+class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
+                    mixins.AssignmentFinancialInfo, mixins.LeicaMixin,
+                    mixins.VersionMixin, Base):
     """A Job within a Project."""
 
     _workflow = workflows.JobWorkflow
@@ -90,13 +89,6 @@ class JobAssignment(JobAssignmentDates, BriefyRoles, mixins.AssignmentFinancialI
         ('view', ()),
         ('edit', ()),
         ('delete', ()),
-    )
-
-    __actors__ = (
-        'professional_id',
-        'project_manager',
-        'scout_manager',
-        'qa_manager',
     )
 
     __colanderalchemy_config__ = {
@@ -249,24 +241,6 @@ class JobAssignment(JobAssignmentDates, BriefyRoles, mixins.AssignmentFinancialI
     def assigned(self) -> bool:
         """Return if this job is assigned or not."""
         return True if (self.assignment_date and self.professional_id) else False
-
-    def _apply_actors_info(self, data: dict) -> dict:
-        """Apply actors information for a given data dictionary.
-
-        :param data: Data dictionary.
-        :return: Data dictionary.
-        """
-        actors = [(k, k) for k in self.__actors__]
-        info = self._actors_info()
-        for key, attr in actors:
-            key = key if key != 'professional_id' else 'professional'
-            try:
-                value = info.get(attr).pop()
-            except (AttributeError, IndexError):
-                data[key] = None
-            else:
-                data[key] = get_public_user_info(value) if value else None
-        return data
 
     def _summarize_relationships(self) -> dict:
         """Summarize relationship information.

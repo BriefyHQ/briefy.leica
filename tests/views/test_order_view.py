@@ -17,7 +17,7 @@ class TestJobOrderView(BaseVersionedTestView):
     ]
     ignore_validation_fields = [
         'state_history', 'state', 'updated_at', 'customer', 'project',
-        'qa_manager', 'project_manager', 'scout_manager',
+        'customer_user', 'project_manager', 'scout_manager',
     ]
     file_path = 'data/job_orders.json'
     model = models.JobOrder
