@@ -95,6 +95,15 @@ class CustomerSync(ModelSync):
     def add(self, kobj, briefy_id):
         """Add new Customer to database."""
         obj = super().add(kobj, briefy_id)
+
+        # customer context roles
+        customer_roles = self.get_local_roles(kobj, 'company_user')
+        self.update_local_roles(obj, customer_roles, 'customer_user')
+
+        # account manager context roles
+        account_roles = self.get_local_roles(kobj, 'account_manager')
+        self.update_local_roles(obj, account_roles, 'account_manager')
+
         self.add_address(kobj, obj)
         self.add_business_contact(kobj, obj)
         self.add_billing_contact(kobj, obj)

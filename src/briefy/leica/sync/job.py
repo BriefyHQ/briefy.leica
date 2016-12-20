@@ -41,7 +41,6 @@ class JobSync(ModelSync):
         """Create payload for customer object."""
 
         order_payload = super().get_payload(kobj, briefy_id)
-        get_user = self.get_user
         project, kproject = self.get_parent(kobj, 'project')
 
         order_payload.update(
@@ -58,9 +57,6 @@ class JobSync(ModelSync):
                 requirements=kobj.client_specific_requirement,
                 number_of_assets=kobj.number_of_photos,
                 source=isource_mapping.get(str(kobj.input_source), 'briefy'),
-                qa_manager=get_user(kobj, 'qa_manager'),
-                scout_manager=get_user(kobj, 'scouting_manager'),
-                project_manager=get_user(kobj, 'project_manager')
             )
         )
         return order_payload
@@ -87,16 +83,13 @@ class JobSync(ModelSync):
         payload = create_location_dict('job_location', kobj)
         if payload:
             payload['order_id'] = obj.id
-            additional_phone = kobj.contact_number_2
-            additional_phone = additional_phone.get('number') if additional_phone else None
             payload.update(
-                mobile=kobj.contact_number_1.get('number') if kobj.contact_number_1 else None,
-                additional_phone=additional_phone,
+                mobile=self.parse_phonenumber(kobj, 'contact_number_1'),
+                additional_phone=self.parse_phonenumber(kobj, 'contact_number_2'),
                 email=kobj.contact_email.email or 'abc123@gmail.com',
                 first_name=kobj.contact_person.first or 'first name',
                 last_name=kobj.contact_person.last or 'last name',
             )
-
             try:
                 location = JobLocation(**payload)
                 self.session.add(location)
@@ -110,35 +103,78 @@ class JobSync(ModelSync):
 
     def add_comment(self, obj, kobj):
         """Add Project Manager comment to the Order."""
+        project_manager = obj.project.project_manager[0].id if obj.project.project_manager else None
         payload = dict(
             entity_id=obj.id,
             entity_type=obj.__tablename__,
-            author_id=obj.project.project_manager[0].id if obj.project.project_manager else None,
+            author_id=project_manager,
             content=kobj.project_manager_comment
         )
         session = self.session
         session.add(Comment(**payload))
         session.flush()
 
+    def add_assigment_comments(self, obj, kobj):
+        """Import assigment comments"""
+        # TODO: internal comment, photographer comment, quality assurance feedback
+        pass
+
     def add_assigment(self, obj, kobj):
         """Add a related assign object."""
         # TODO: dates should be created as workflow history transitions
         # assignment_date = kobj.assignment_date
+        # add comments
+
+        payable = True
+        if kobj.approval_status == {'Cancelled'}:
+            payable = False
 
         payload = dict(
+            order_id=obj.id,
             professional_id=self.get_user(kobj, 'responsible_photographer'),
+            payout_value=self.parse_decimal(kobj.photographer_payout),
+            payout_currency=kobj.currency_payout or 'EUR',
+            additional_compensation=self.parse_decimal(kobj.additional_compensation),
+            payable=payable,
+            submission_path=str(kobj.photo_submission_link),
+            travel_expenses=self.parse_decimal(kobj.travel_expenses),
         )
-        return JobAssignment(**payload)
+        assignment = JobAssignment(**payload)
+        self.session.add(assignment)
+        self.session.flush()
+        logger.debug('Assignment added: {id}'.format(id=assignment.id))
+
+        # qa manager context roles
+        qa_manager_roles = self.get_local_roles(kobj, 'qa_manager')
+        self.update_local_roles(assignment, qa_manager_roles, 'qa_manager')
+
+        # scout manager context roles
+        scout_manager_roles = self.get_local_roles(kobj, 'scouting_manager')
+        self.update_local_roles(assignment, scout_manager_roles, 'scout_manager')
+
+        # project manager context roles
+        pm_roles_roles = [role.user_id for role in obj.project.project_manager]
+        self.update_local_roles(assignment, pm_roles_roles, 'project_manager')
 
     def add(self, kobj, briefy_id):
         """Add new Job to database."""
         obj = super().add(kobj, briefy_id)
-        try:
-            self.add_history(obj, kobj)
-            self.add_location(obj, kobj)
-            self.add_comment(obj, kobj)
-        except Exception as exc:
-            print(exc)
-        else:
-            logger.info('Additional data imported for this order: History, Location, Comment.')
+
+        # customer context roles
+        customer_roles = [role.user_id for role in obj.project.customer_user]
+        self.update_local_roles(obj, customer_roles, 'customer_user')
+
+        # scout manager context roles
+        scout_manager_roles = self.get_local_roles(kobj, 'scouting_manager')
+        self.update_local_roles(obj, scout_manager_roles, 'scout_manager')
+
+        # project manager context roles
+        pm_roles_roles = [role.user_id for role in obj.project.project_manager]
+        self.update_local_roles(obj, pm_roles_roles, 'project_manager')
+
+        self.add_history(obj, kobj)
+        self.add_location(obj, kobj)
+        self.add_comment(obj, kobj)
+        self.add_assigment(obj, kobj)
+        logger.info('Additional data imported for this order: History, Location, Comment.')
         return obj

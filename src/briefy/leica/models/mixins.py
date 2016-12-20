@@ -1,9 +1,11 @@
 """Briefy Leica mixins."""
 from briefy.common.db.mixins import BaseMetadata
 from briefy.common.db.mixins import KnackMixin
+from briefy.common.db.mixins import BaseBriefyRoles
 from briefy.common.db.mixins import LocalRolesMixin
 from briefy.common.db.mixins import Mixin
 from briefy.leica.db import Session
+from briefy.ws.utils.user import get_public_user_info
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_continuum.utils import count_versions
@@ -11,6 +13,204 @@ from sqlalchemy_continuum.utils import count_versions
 import colander
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils
+
+
+class LeicaBriefyRoles(BaseBriefyRoles):
+    """Base class for leica local roles."""
+
+    def _apply_actors_info(self, data: dict) -> dict:
+        """Apply actors information for a given data dictionary.
+
+        :param data: Data dictionary.
+        :return: Data dictionary.
+        """
+        actors = [(k, k) for k in self.__actors__]
+        info = self._actors_info()
+        for key, attr in actors:
+            # TODO: improve this case of different names
+            key = key if key != 'professional_id' else 'professional'
+            try:
+                value = info.get(attr).pop()
+            except (AttributeError, IndexError):
+                data[key] = None
+            else:
+                data[key] = get_public_user_info(value) if value else None
+        return data
+
+
+class CustomerBriefyRoles(LeicaBriefyRoles):
+    """Local roles for the Customer context."""
+
+    __actors__ = (
+        'customer_user',
+        'account_manager',
+    )
+
+    @property
+    def customer_user(self) -> list:
+        """Return a list of ids of customer users.
+
+        :return: IDs of the customer users.
+        """
+        roles = self.local_roles
+        return self._filter_lr_by_name(roles, 'customer_user')
+
+    @customer_user.setter
+    def customer_user(self, user_id: str) -> None:
+        """Set a new customer_user for this object.
+
+        :param user_id: ID of the customer_user.
+        """
+        self._add_local_role_user_id(user_id, 'customer_user')
+
+    @property
+    def account_manager(self) -> list:
+        """Return a list of ids of account_manager.
+
+        :return: IDs of the account_manager.
+        """
+        roles = self.local_roles
+        return self._filter_lr_by_name(roles, 'account_manager')
+
+    @account_manager.setter
+    def account_manager(self, user_id: str) -> None:
+        """Set a new account_manager for this object.
+
+        :param user_id: IDs of the account_manager.
+        """
+        self._add_local_role_user_id(user_id, 'account_manager')
+
+
+class ProjectBriefyRoles(LeicaBriefyRoles):
+    """Local roles for the Project context."""
+
+    __actors__ = (
+        'customer_user',
+        'project_manager',
+    )
+
+    @property
+    def customer_user(self) -> list:
+        """Return a list of ids of customer users.
+
+        :return: IDs of the customer users.
+        """
+        roles = self.local_roles
+        return self._filter_lr_by_name(roles, 'customer_user')
+
+    @customer_user.setter
+    def customer_user(self, user_id: str) -> None:
+        """Set a new customer_user for this object.
+
+        :param user_id: ID of the customer_user.
+        """
+        self._add_local_role_user_id(user_id, 'customer_user')
+
+    @property
+    def project_manager(self) -> list:
+        """Return a list of ids of project_manager.
+
+        :return: IDs of the project_manager.
+        """
+        roles = self.local_roles
+        return self._filter_lr_by_name(roles, 'project_manager')
+
+    @project_manager.setter
+    def project_manager(self, user_id: str) -> None:
+        """Set a new project_manager for this object.
+
+        :param user_id: IDs of the project_manager.
+        """
+        self._add_local_role_user_id(user_id, 'project_manager')
+
+
+class OrderBriefyRoles(ProjectBriefyRoles):
+    """Local roles for the Order context."""
+
+    __actors__ = (
+        'customer_user',
+        'project_manager',
+        'scout_manager',
+    )
+
+    @property
+    def scout_manager(self) -> list:
+        """Return a list of ids of scout_managers.
+
+        :return: ID of the scout_manager.
+        """
+        roles = self.local_roles
+        return self._filter_lr_by_name(roles, 'scout_manager')
+
+    @scout_manager.setter
+    def scout_manager(self, user_id: str) -> None:
+        """Set a new scout_manager for this object.
+
+        :param user_id: ID of the scout_manager.
+        """
+        self._add_local_role_user_id(user_id, 'scout_manager')
+
+
+class AssignmentBriefyRoles(LeicaBriefyRoles):
+    """Local roles for the Assignment context."""
+
+    __actors__ = (
+        'professional_id',
+        'project_manager',
+        'scout_manager',
+        'qa_manager',
+    )
+
+    @property
+    def project_manager(self) -> list:
+        """Return a list of ids of project managers.
+
+        :return: ID of the project_manager.
+        """
+        roles = self.local_roles
+        return self._filter_lr_by_name(roles, 'project_manager')
+
+    @project_manager.setter
+    def project_manager(self, user_id: str) -> None:
+        """Set a new project_manager for this object.
+
+        :param user_id: ID of the project_manager.
+        """
+        self._add_local_role_user_id(user_id, 'project_manager')
+
+    @property
+    def qa_manager(self) -> list:
+        """Return a list of ids of qa_managers.
+
+        :return: ID of the qa_manager.
+        """
+        roles = self.local_roles
+        return self._filter_lr_by_name(roles, 'qa_manager')
+
+    @qa_manager.setter
+    def qa_manager(self, user_id: str) -> None:
+        """Set a new qa_manager for this object.
+
+        :param user_id: ID of the qa_manager.
+        """
+        self._add_local_role_user_id(user_id, 'qa_manager')
+
+    @property
+    def scout_manager(self) -> list:
+        """Return a list of ids of scout_managers.
+
+        :return: ID of the scout_manager.
+        """
+        roles = self.local_roles
+        return self._filter_lr_by_name(roles, 'scout_manager')
+
+    @scout_manager.setter
+    def scout_manager(self, user_id: str) -> None:
+        """Set a new scout_manager for this object.
+
+        :param user_id: ID of the scout_manager.
+        """
+        self._add_local_role_user_id(user_id, 'scout_manager')
 
 
 class ProfessionalPayoutInfo:

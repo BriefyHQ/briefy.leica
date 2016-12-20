@@ -16,9 +16,7 @@ class ProjectSync(ModelSync):
         result = super().get_payload(kobj, briefy_id)
         customer, company = self.get_parent(kobj, 'company')
 
-        # TODO: Local roles and comments
-        # 'clients_project_manager'
-        # 'project_comment'
+        # TODO: 'project_comment' but not really used on knack
 
         result.update(
             dict(
@@ -31,7 +29,6 @@ class ProjectSync(ModelSync):
                 payout_currency=kobj.currency_set_price or 'EUR',
                 payout_value=self.parse_decimal(kobj.project_payout_set_price),
                 cancellation_window=kobj.cancellation_window or 0,
-                project_manager=self.get_user(kobj, 'project_manager'),
                 contract=company.link_to_contract.url,
                 price=self.parse_decimal(kobj.project_set_price),
                 price_currency=kobj.currency_set_price or 'EUR',
@@ -42,3 +39,17 @@ class ProjectSync(ModelSync):
             )
         )
         return result
+
+    def add(self, kobj, briefy_id):
+        """Add new Project to database."""
+        obj = super().add(kobj, briefy_id)
+
+        # briefy project manager context roles
+        pm_briefy_roles = self.get_local_roles(kobj, 'project_manager')
+        self.update_local_roles(obj, pm_briefy_roles, 'project_manager')
+
+        # customer pm user context roles
+        customer_roles = self.get_local_roles(kobj, 'clients_project_manager')
+        self.update_local_roles(obj, customer_roles, 'customer_user')
+
+        return obj

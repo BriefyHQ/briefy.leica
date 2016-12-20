@@ -67,7 +67,8 @@ class TaxInfo:
 
 
 @implementer(ICustomer)
-class Customer(TaxInfo, mixins.PolaroidMixin, mixins.KLeicaVersionedMixin, Base):
+class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
+               mixins.KLeicaVersionedMixin, Base):
     """A Customer for Briefy."""
 
     _workflow = workflows.CustomerWorkflow
@@ -96,8 +97,7 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.KLeicaVersionedMixin, Base)
      )
     """Parent Customer ID.
 
-    Recursive relationship to represent composed companies
-    :class:`briefy.leica.models.customer.Customer`.
+    Auto reference to represent composed companies :class:`briefy.leica.models.customer.Customer`.
     """
 
     legal_name = sa.Column(
@@ -138,7 +138,7 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.KLeicaVersionedMixin, Base)
 
     projects = orm.relationship(
         'Project',
-        backref=orm.backref('customer', lazy='joined'),
+        backref=orm.backref('customer'),
         lazy='dynamic'
     )
     """List of Projects of this Customer.
@@ -148,7 +148,7 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.KLeicaVersionedMixin, Base)
 
     jobs = orm.relationship(
         'JobOrder',
-        backref=orm.backref('customer', lazy='joined'),
+        backref=orm.backref('customer'),
         lazy='dynamic'
     )
     """List of Jobs of this Customer.

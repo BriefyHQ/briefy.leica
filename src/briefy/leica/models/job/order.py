@@ -1,12 +1,10 @@
 """Briefy Leica Order to a Job."""
-from briefy.common.db.mixins import BriefyRoles
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.job import workflows
 from briefy.leica.vocabularies import JobInputSource
 from briefy.ws.utils.user import add_user_info_to_state_history
-from briefy.ws.utils.user import get_public_user_info
 from sqlalchemy import orm
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -16,27 +14,26 @@ import sqlalchemy_utils as sautils
 
 __summary_attributes__ = [
     'id', 'title', 'description', 'created_at', 'updated_at', 'state',
-    '_price', 'number_of_assets', 'total_assets'
+    'price', 'number_of_assets',
 ]
 
 __listing_attributes__ = __summary_attributes__
 
 
-class JobOrder(mixins.OrderFinancialInfo, BriefyRoles, mixins.KLeicaVersionedMixin, Base):
+class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
+               mixins.KLeicaVersionedMixin, Base):
     """A Job Order from the customer."""
 
     _workflow = workflows.JobOrderWorkflow
+
+    __summary_attributes__ = __summary_attributes__
+    __listing_attributes__ = __listing_attributes__
 
     __raw_acl__ = (
         ('list', ('l:customer', 'g:briefy_qa', 'g:briefy_bizdev', 'g:briefy_pm', 'g:system')),
         ('view', ()),
         ('edit', ()),
         ('delete', ()),
-    )
-
-    __actors__ = (
-        'project_manager',
-        'scout_manager',
     )
 
     __colanderalchemy_config__ = {
@@ -134,8 +131,7 @@ class JobOrder(mixins.OrderFinancialInfo, BriefyRoles, mixins.KLeicaVersionedMix
 
     locations = orm.relationship(
         'JobLocation',
-        backref=orm.backref('order', lazy='joined'),
-        lazy='joined'
+        backref=orm.backref('order')
     )
     """Job Locations.
 
@@ -145,8 +141,7 @@ class JobOrder(mixins.OrderFinancialInfo, BriefyRoles, mixins.KLeicaVersionedMix
     # Job Assignments
     assignments = orm.relationship(
         'JobAssignment',
-        backref=orm.backref('order', lazy='joined'),
-        lazy='joined'
+        backref=orm.backref('order')
     )
     """Job Assignments.
 
@@ -262,23 +257,6 @@ class JobOrder(mixins.OrderFinancialInfo, BriefyRoles, mixins.KLeicaVersionedMix
         """
         project = self.project
         return project.tech_requirements
-
-    def _apply_actors_info(self, data: dict) -> dict:
-        """Apply actors information for a given data dictionary.
-
-        :param data: Data dictionary.
-        :return: Data dictionary.
-        """
-        actors = [(k, k) for k in self.__actors__]
-        info = self._actors_info()
-        for key, attr in actors:
-            try:
-                value = info.get(attr).pop()
-            except (AttributeError, IndexError):
-                data[key] = None
-            else:
-                data[key] = get_public_user_info(value) if value else None
-        return data
 
     def _summarize_relationships(self) -> dict:
         """Summarize relationship information.

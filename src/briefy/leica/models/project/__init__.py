@@ -18,7 +18,8 @@ class IProject(Interface):
     """Marker interface for Job"""
 
 
-class CommercialInfoMixin(mixins.ProfessionalPayoutInfo, mixins.OrderFinancialInfo):
+class CommercialInfoMixin(mixins.ProfessionalPayoutInfo, mixins.ProjectBriefyRoles,
+                          mixins.OrderFinancialInfo):
     """Commercial details about a project."""
 
     contract = sa.Column(
@@ -47,8 +48,8 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     ]
 
     __listing_attributes__ = [
-        'id', 'title', 'description', 'created_at', 'updated_at', 'state', 'external_id',
-        'total_jobs'
+        'id', 'title', 'description', 'created_at', 'updated_at', 'state',
+        'external_id', 'total_jobs'
     ]
 
     __raw_acl__ = (
@@ -56,12 +57,6 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         ('view', ()),
         ('edit', ()),
         ('delete', ()),
-    )
-
-    __actors__ = (
-        'project_manager',
-        'scout_manager',
-        'qa_manager',
     )
 
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'customer']}
@@ -117,7 +112,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
 
     jobs = orm.relationship(
         'JobOrder',
-        backref=orm.backref('project', lazy='joined'),
+        backref=orm.backref('project'),
         lazy='dynamic'
     )
     """List of Jobs of this project.
@@ -188,7 +183,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         """
         data = super().to_listing_dict()
         customer = self.customer
-        data['customer'] = customer.to_listing_dict() if customer else None
+        data['customer'] = customer.to_summary_dict() if customer else None
         data = self._apply_actors_info(data)
         return data
 

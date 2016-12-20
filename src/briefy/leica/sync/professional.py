@@ -37,8 +37,27 @@ class PhotographerSync(ModelSync):
         first_name = kobj.display_name.first or 'first name'
         last_name = kobj.display_name.last or 'last name'
         main_mobile = kobj.phone.get('number') if kobj.phone else None
+        location = create_location_dict('working_location_1', kobj)
+        country = 'EMPTY'
+        if location:
+            country = location.get('country')
+
         if main_mobile:
             try:
+                if main_mobile[:2] == '00':
+                    print('Assuming international number: {0}. Country: {1}'.format(main_mobile,
+                                                                                    country))
+                    main_mobile = '+' + main_mobile[2:]
+                elif main_mobile[:1] == '0':
+                    if country == 'DE':
+                        print('Assuming German number: {0}. Country: {1}'.format(main_mobile,
+                                                                                 country))
+                        main_mobile = '+49' + main_mobile[1:]
+                elif len(main_mobile) > 11 and main_mobile[0] != '+':
+                    print('Assuming international number: {0}. Country: {1}'.format(main_mobile,
+                                                                                    country))
+                    main_mobile = '+' + main_mobile
+
                 main_mobile = PhoneNumber(main_mobile)
             except Exception as exc:
                 msg = 'Briefy ID: {0} Number: {1}. Error: {2}'
