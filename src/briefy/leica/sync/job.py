@@ -65,18 +65,21 @@ class JobSync(ModelSync):
         """Add state_history and state information to the Order."""
         knack_status = list(kobj.approval_status)
         if knack_status:
-            status = job_status_mapping.get(knack_status[0])
+            state = job_status_mapping.get(knack_status[0])
         else:
             msg = 'Status was not found in the mapping. Job ID {job_id}'
             logger.info(msg.format(job_id=obj.customer_order_id))
-            status = 'pending'
+            state = 'pending'
         history = dict(
             message='Imported in this state from Knack database',
             actor='g:system',
-            to=status
+            to=state
         )
         obj.state_history = [history]
-        obj.status = status
+        obj.state = state
+        self.session.add(obj)
+        model = obj.__class__.__name__
+        logger.debug('{model} imported with state: {state}'.format(model=model, state=state))
 
     def add_location(self, obj, kobj):
         """Add Job location to the Order."""
@@ -155,6 +158,9 @@ class JobSync(ModelSync):
         # project manager context roles
         pm_roles_roles = [role.user_id for role in obj.project.project_manager]
         self.update_local_roles(assignment, pm_roles_roles, 'project_manager')
+
+        # update assignment state history
+        self.add_history(assignment, kobj)
 
     def add(self, kobj, briefy_id):
         """Add new Job to database."""

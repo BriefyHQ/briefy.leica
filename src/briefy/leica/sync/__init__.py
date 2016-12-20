@@ -180,7 +180,7 @@ class ModelSync:
             if kobj.briefy_id:
                 continue
             else:
-                kobj.briefy_id = briefy_id
+                kobj.briefy_id = str(briefy_id)
                 knack.commit_knack_object(kobj, only_fields=['briefy_id'])
 
     def get_db_item(self, kobj):
