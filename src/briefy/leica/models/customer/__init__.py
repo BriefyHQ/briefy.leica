@@ -138,7 +138,7 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
 
     projects = orm.relationship(
         'Project',
-        backref=orm.backref('customer', lazy='joined'),
+        backref=orm.backref('customer'),
         lazy='dynamic'
     )
     """List of Projects of this Customer.
@@ -148,7 +148,7 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
 
     jobs = orm.relationship(
         'JobOrder',
-        backref=orm.backref('customer', lazy='joined'),
+        backref=orm.backref('customer'),
         lazy='dynamic'
     )
     """List of Jobs of this Customer.

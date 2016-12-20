@@ -131,8 +131,7 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     locations = orm.relationship(
         'JobLocation',
-        backref=orm.backref('order', lazy='joined'),
-        lazy='joined'
+        backref=orm.backref('order')
     )
     """Job Locations.
 
@@ -142,8 +141,7 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     # Job Assignments
     assignments = orm.relationship(
         'JobAssignment',
-        backref=orm.backref('order', lazy='joined'),
-        lazy='joined'
+        backref=orm.backref('order')
     )
     """Job Assignments.
 

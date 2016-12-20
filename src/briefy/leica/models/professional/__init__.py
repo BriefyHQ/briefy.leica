@@ -72,7 +72,6 @@ class Professional(ProfessionalMixin, Base):
         'Link',
         backref='professional',
         cascade='all, delete-orphan',
-        lazy='joined'
     )
 
     # Locations
@@ -82,7 +81,6 @@ class Professional(ProfessionalMixin, Base):
             'professional', lazy='joined'
         ),
         cascade='all, delete-orphan',
-        lazy='joined'
     )
 
     type = sa.Column(sa.String(50), nullable=False)
