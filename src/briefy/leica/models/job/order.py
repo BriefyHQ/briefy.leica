@@ -14,7 +14,7 @@ import sqlalchemy_utils as sautils
 
 __summary_attributes__ = [
     'id', 'title', 'description', 'created_at', 'updated_at', 'state',
-    '_price', 'number_of_assets', 'total_assets'
+    'price', 'number_of_assets',
 ]
 
 __listing_attributes__ = __summary_attributes__
@@ -25,6 +25,9 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     """A Job Order from the customer."""
 
     _workflow = workflows.JobOrderWorkflow
+
+    __summary_attributes__ = __summary_attributes__
+    __listing_attributes__ = __listing_attributes__
 
     __raw_acl__ = (
         ('list', ('l:customer', 'g:briefy_qa', 'g:briefy_bizdev', 'g:briefy_pm', 'g:system')),

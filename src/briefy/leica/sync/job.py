@@ -83,16 +83,13 @@ class JobSync(ModelSync):
         payload = create_location_dict('job_location', kobj)
         if payload:
             payload['order_id'] = obj.id
-            additional_phone = kobj.contact_number_2
-            additional_phone = additional_phone.get('number') if additional_phone else None
             payload.update(
-                mobile=kobj.contact_number_1.get('number') if kobj.contact_number_1 else None,
-                additional_phone=additional_phone,
+                mobile=self.parse_phonenumber(kobj, 'contact_number_1'),
+                additional_phone=self.parse_phonenumber(kobj, 'contact_number_2'),
                 email=kobj.contact_email.email or 'abc123@gmail.com',
                 first_name=kobj.contact_person.first or 'first name',
                 last_name=kobj.contact_person.last or 'last name',
             )
-
             try:
                 location = JobLocation(**payload)
                 self.session.add(location)

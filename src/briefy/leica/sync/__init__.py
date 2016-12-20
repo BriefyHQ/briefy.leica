@@ -1,6 +1,8 @@
 from briefy.leica import logger
 from briefy.leica.sync.user import get_rosetta
 from briefy.knack.base import KnackEntity
+from sqlalchemy_utils import PhoneNumber
+
 import briefy.knack as knack
 import uuid
 
@@ -102,6 +104,33 @@ class ModelSync:
     def parse_decimal(self, value):
         """Parse decimal money values to integer."""
         return value * 100 if value else None
+
+    def parse_phonenumber(self, kobj, attr):
+        """Parse phone number from knack before input in the database."""
+        number_attr = getattr(kobj, attr, None)
+        if number_attr:
+            number = number_attr.get('number')
+            number = number.strip('-')
+            number = number.strip(' ')
+            try:
+                if number[:2] == '00':
+                    print('Assuming international number: {0}.'.format(number))
+                    number = '+' + number[2:]
+                elif number[:1] == '0':
+                    pass
+                elif len(number) > 10 and number[0] != '+':
+                    print('Assuming international number: {0}.'.format(number))
+                    number = '+' + number
+
+                number = PhoneNumber(number)
+            except Exception as exc:
+                msg = 'Briefy ID: {0} Number: {1}. Error: {2}'
+                print(msg.format(kobj.briefy_id, number, exc))
+                number = None
+        else:
+            number = None
+
+        return number
 
     def get_parent(self, kobj: KnackEntity, field_name: str ='',
                    knack_parent_model=None, parent_model=None) -> tuple:

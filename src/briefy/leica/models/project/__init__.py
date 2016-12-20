@@ -59,12 +59,6 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         ('delete', ()),
     )
 
-    __actors__ = (
-        'project_manager',
-        'scout_manager',
-        'qa_manager',
-    )
-
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'customer']}
 
     customer_id = sa.Column(sautils.UUIDType,
