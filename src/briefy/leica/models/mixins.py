@@ -27,6 +27,8 @@ class LeicaBriefyRoles(BaseBriefyRoles):
         actors = [(k, k) for k in self.__actors__]
         info = self._actors_info()
         for key, attr in actors:
+            # TODO: improve this case of different names
+            key = key if key != 'professional_id' else 'professional'
             try:
                 value = info.get(attr).pop()
             except (AttributeError, IndexError):
@@ -209,24 +211,6 @@ class AssignmentBriefyRoles(LeicaBriefyRoles):
         :param user_id: ID of the scout_manager.
         """
         self._add_local_role_user_id(user_id, 'scout_manager')
-
-    def _apply_actors_info(self, data: dict) -> dict:
-        """Apply actors information for a given data dictionary.
-
-        :param data: Data dictionary.
-        :return: Data dictionary.
-        """
-        actors = [(k, k) for k in self.__actors__]
-        info = self._actors_info()
-        for key, attr in actors:
-            key = key if key != 'professional_id' else 'professional'
-            try:
-                value = info.get(attr).pop()
-            except (AttributeError, IndexError):
-                data[key] = None
-            else:
-                data[key] = get_public_user_info(value) if value else None
-        return data
 
 
 class ProfessionalPayoutInfo:
