@@ -33,6 +33,9 @@ History
      * New mixin for LeicaRoles and mixins for local roles of Customer, Project, Order and Assignment (rudaporto).
      * Improve sync classes to get roles from the knack obj, convert to rolleiflex id and add as local role (rudaporto).
      * Some minor improvents to import more phone numbers from Photographers (rudaporto).
+     * BODY-91: Remove all load strategy with lazy="joined" (rudaporto).
+     * Fix Project __actors__, listing, and summary fields (rudaporto).
+     * Improve sync to parse phone numbers for the JobOrder contact (rudaporto).
 
 
 1.1.0 (2016-10-04)
