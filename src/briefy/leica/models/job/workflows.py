@@ -396,7 +396,7 @@ class JobOrderWorkflow(BriefyWorkflow):
         """Transition: Inform the start of QA to the customer."""
         pass
 
-    @Permission(groups=[LR['project_manager'], LR['professional'], G['pm'], G['qa'], ])
+    @Permission(groups=[LR['project_manager'], LR['professional_user'], G['pm'], G['qa'], ])
     def can_start_qa(self):
         """Permission: Validate if user can move JobOrder the in_qa state.
 

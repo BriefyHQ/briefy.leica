@@ -37,6 +37,9 @@ History
      * Fix Project __actors__, listing, and summary fields (rudaporto).
      * Improve sync to parse phone numbers for the JobOrder contact (rudaporto).
      * Create new column_property attributes using subquery to easy filter JobAssignment by some JobOrder attributes (rudaporto).
+     * Update all Leica local roles to use new relationship and association_proxy attributes (rudaporto).
+     * Update sync to the new association_proxy attributes (rudaporto).
+     * Update JobAssignment sync to create local role also for the professional (rudaporto).
 
 
 1.1.0 (2016-10-04)
