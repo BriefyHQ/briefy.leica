@@ -3,10 +3,13 @@ from briefy.common.db.types import AwareDateTime
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.job import workflows
+from briefy.leica.models.job.order import JobOrder
 from briefy.leica.utils.transitions import get_transition_date
 from briefy.ws.utils.user import add_user_info_to_state_history
 from datetime import datetime
 from sqlalchemy import orm
+from sqlalchemy import select
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from zope.interface import implementer
 from zope.interface import Interface
@@ -93,7 +96,7 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
 
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', 'order', 'comments', 'professional', 'assets',
+            'state_history', 'state', 'order', 'comments', 'professional', 'assets', 'project'
         ]
     }
 
@@ -222,15 +225,36 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
         check_images = self.order.number_of_assets <= approvable_assets_count
         return check_images
 
-    @property
-    def title(self) -> str:
+    @declared_attr
+    def title(cls) -> str:
         """Return the title of the JobOrder."""
-        return self.order.title
+        return orm.column_property(
+            select([JobOrder.title]).where(
+                JobOrder.id == cls.order_id
+            ),
+        )
 
-    @property
-    def description(self) -> str:
+    @declared_attr
+    def description(cls) -> str:
         """Return the description of the JobOrder."""
-        return self.order.description
+        return orm.column_property(
+            select([JobOrder.description]).where(
+                JobOrder.id == cls.order_id
+            ),
+        )
+
+    project = orm.relationship(
+        'Project',
+        secondary="join(JobOrder, Project, JobOrder.project_id == Project.id)",
+        secondaryjoin="JobOrder.project_id == Project.id",
+        primaryjoin="JobOrder.id == JobAssignment.order_id",
+        viewonly=True,
+        uselist=False
+    )
+    """Project related to this JobAssignment.
+
+    Instance of :class:`briefy.leica.models.project.Project`.
+    """
 
     @property
     def briefing(self) -> str:
@@ -248,7 +272,7 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
         :return: Dictionary with summarized info for relationships.
         """
         data = {}
-        project = self.order.project
+        project = self.project
         comments = self.comments
         locations = self.order.locations
         to_summarize = [

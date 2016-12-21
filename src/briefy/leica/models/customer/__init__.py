@@ -169,4 +169,6 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
         contacts = [contact.to_dict(excludes='customer') for contact in self.contacts.all()]
         data.update(addresses=addresses, contacts=contacts)
         add_user_info_to_state_history(self.state_history)
+        # Apply actor information to data
+        data = self._apply_actors_info(data)
         return data
