@@ -4,10 +4,14 @@ from briefy.common.db.mixins import KnackMixin
 from briefy.common.db.mixins import BaseBriefyRoles
 from briefy.common.db.mixins import LocalRolesMixin
 from briefy.common.db.mixins import Mixin
+from briefy.common.db.models.roles import LocalRole
+from briefy.common.vocabularies.roles import LocalRolesChoices
 from briefy.leica.db import Session
 from briefy.ws.utils.user import get_public_user_info
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy import orm
 from sqlalchemy_continuum.utils import count_versions
 
 import colander
@@ -18,6 +22,50 @@ import sqlalchemy_utils as sautils
 class LeicaBriefyRoles(BaseBriefyRoles):
     """Base class for leica local roles."""
 
+    @classmethod
+    def get_role_relationship(cls, role_name):
+        return orm.relationship(
+            'LocalRole',
+            foreign_keys='LocalRole.entity_id',
+            primaryjoin='''and_(
+                        LocalRole.entity_id=={entity}.id,
+                        LocalRole.entity_type=="{entity}",
+                        LocalRole.role_name=="{role_name}"
+                    )'''.format(
+                entity=cls.__name__,
+                role_name=role_name
+            )
+        )
+
+    @classmethod
+    def get_association_proxy(cls, role_name, remote_attr):
+        """Get a new association proxy instance."""
+
+        def creator(user_id):
+            return cls.create_local_role(user_id, role_name)
+        local_attr = '_{role_name}'.format(role_name=role_name)
+        return association_proxy(local_attr, remote_attr, creator=creator)
+
+    @classmethod
+    def create_local_role(cls, user_id, role_name):
+        """Create local LocalRole instance for role and user_id."""
+        # TODO: find a way to do this validation here..
+        # query = LocalRole.query().filter_by(entity_id=cls.id,
+        #                                    user_id=user_id,
+        #                                    entity_type=cls.__name__,
+        #                                    role_name=role_name)
+        # proxy = getattr(cls, role_name)
+        # has_users = query.all()
+        # if has_users:
+        #    raise Exception('User already has local role: {items}'.format(items=has_users))
+
+        return LocalRole(
+            entity_id=cls.id,
+            user_id=user_id,
+            entity_type=cls.__name__,
+            role_name=getattr(LocalRolesChoices, role_name)
+        )
+
     def _apply_actors_info(self, data: dict) -> dict:
         """Apply actors information for a given data dictionary.
 
@@ -27,8 +75,6 @@ class LeicaBriefyRoles(BaseBriefyRoles):
         actors = [(k, k) for k in self.__actors__]
         info = self._actors_info()
         for key, attr in actors:
-            # TODO: improve this case of different names
-            key = key if key != 'professional_id' else 'professional'
             try:
                 value = info.get(attr).pop()
             except (AttributeError, IndexError):
@@ -46,39 +92,37 @@ class CustomerBriefyRoles(LeicaBriefyRoles):
         'account_manager',
     )
 
-    @property
-    def customer_user(self) -> list:
+    @declared_attr
+    def _customer_user(cls):
+        """Relationship: return a list of LocalRoles.
+
+        :return: LocalRoles instances of customer_user role_name.
+        """
+        return cls.get_role_relationship('customer_user')
+
+    @declared_attr
+    def customer_user(cls):
         """Return a list of ids of customer users.
 
         :return: IDs of the customer users.
         """
-        roles = self.local_roles
-        return self._filter_lr_by_name(roles, 'customer_user')
+        return cls.get_association_proxy('customer_user', 'user_id')
 
-    @customer_user.setter
-    def customer_user(self, user_id: str) -> None:
-        """Set a new customer_user for this object.
+    @declared_attr
+    def _account_manager(cls) -> list:
+        """Relationship: return a list of LocalRoles.
 
-        :param user_id: ID of the customer_user.
+        :return: LocalRoles instances of account_manager role_name.
         """
-        self._add_local_role_user_id(user_id, 'customer_user')
+        return cls.get_role_relationship('account_manager')
 
-    @property
-    def account_manager(self) -> list:
-        """Return a list of ids of account_manager.
+    @declared_attr
+    def account_manager(cls):
+        """Return a list of ids of account manager users.
 
-        :return: IDs of the account_manager.
+        :return: IDs of the account manager users.
         """
-        roles = self.local_roles
-        return self._filter_lr_by_name(roles, 'account_manager')
-
-    @account_manager.setter
-    def account_manager(self, user_id: str) -> None:
-        """Set a new account_manager for this object.
-
-        :param user_id: IDs of the account_manager.
-        """
-        self._add_local_role_user_id(user_id, 'account_manager')
+        return cls.get_association_proxy('account_manager', 'user_id')
 
 
 class ProjectBriefyRoles(LeicaBriefyRoles):
@@ -89,42 +133,40 @@ class ProjectBriefyRoles(LeicaBriefyRoles):
         'project_manager',
     )
 
-    @property
-    def customer_user(self) -> list:
+    @declared_attr
+    def _customer_user(cls):
+        """Relationship: return a list of LocalRoles.
+
+        :return: LocalRoles instances of customer_user role_name.
+        """
+        return cls.get_role_relationship('customer_user')
+
+    @declared_attr
+    def customer_user(cls):
         """Return a list of ids of customer users.
 
         :return: IDs of the customer users.
         """
-        roles = self.local_roles
-        return self._filter_lr_by_name(roles, 'customer_user')
+        return cls.get_association_proxy('customer_user', 'user_id')
 
-    @customer_user.setter
-    def customer_user(self, user_id: str) -> None:
-        """Set a new customer_user for this object.
+    @declared_attr
+    def _project_manager(cls):
+        """Relationship: return a list of LocalRoles.
 
-        :param user_id: ID of the customer_user.
+        :return: LocalRoles instances of project_manager role_name.
         """
-        self._add_local_role_user_id(user_id, 'customer_user')
+        return cls.get_role_relationship('project_manager')
 
-    @property
-    def project_manager(self) -> list:
-        """Return a list of ids of project_manager.
+    @declared_attr
+    def project_manager(cls):
+        """Return a list of ids of project manager users.
 
-        :return: IDs of the project_manager.
+        :return: IDs of the project manager users.
         """
-        roles = self.local_roles
-        return self._filter_lr_by_name(roles, 'project_manager')
-
-    @project_manager.setter
-    def project_manager(self, user_id: str) -> None:
-        """Set a new project_manager for this object.
-
-        :param user_id: IDs of the project_manager.
-        """
-        self._add_local_role_user_id(user_id, 'project_manager')
+        return cls.get_association_proxy('project_manager', 'user_id')
 
 
-class OrderBriefyRoles(ProjectBriefyRoles):
+class OrderBriefyRoles(LeicaBriefyRoles):
     """Local roles for the Order context."""
 
     __actors__ = (
@@ -133,84 +175,128 @@ class OrderBriefyRoles(ProjectBriefyRoles):
         'scout_manager',
     )
 
-    @property
-    def scout_manager(self) -> list:
-        """Return a list of ids of scout_managers.
+    @declared_attr
+    def _customer_user(cls):
+        """Relationship: return a list of LocalRoles.
 
-        :return: ID of the scout_manager.
+        :return: LocalRoles instances of customer_user role_name.
         """
-        roles = self.local_roles
-        return self._filter_lr_by_name(roles, 'scout_manager')
+        return cls.get_role_relationship('customer_user')
 
-    @scout_manager.setter
-    def scout_manager(self, user_id: str) -> None:
-        """Set a new scout_manager for this object.
+    @declared_attr
+    def customer_user(cls):
+        """Return a list of ids of customer users.
 
-        :param user_id: ID of the scout_manager.
+        :return: IDs of the customer users.
         """
-        self._add_local_role_user_id(user_id, 'scout_manager')
+        return cls.get_association_proxy('customer_user', 'user_id')
+
+    @declared_attr
+    def _project_manager(cls):
+        """Relationship: return a list of LocalRoles.
+
+        :return: LocalRoles instances of project_manager role_name.
+        """
+        return cls.get_role_relationship('project_manager')
+
+    @declared_attr
+    def project_manager(cls):
+        """Return a list of ids of project manager users.
+
+        :return: IDs of the project manager users.
+        """
+        return cls.get_association_proxy('project_manager', 'user_id')
+
+    @declared_attr
+    def _scout_manager(cls):
+        """Relationship: return a list of LocalRoles.
+
+        :return: LocalRoles instances of scout_manager role_name.
+        """
+        return cls.get_role_relationship('scout_manager')
+
+    @declared_attr
+    def scout_manager(cls):
+        """Return a list of ids of scout manager users.
+
+        :return: IDs of the scout manager users.
+        """
+        return cls.get_association_proxy('scout_manager', 'user_id')
 
 
 class AssignmentBriefyRoles(LeicaBriefyRoles):
     """Local roles for the Assignment context."""
 
     __actors__ = (
-        'professional_id',
+        'professional_user',
         'project_manager',
         'scout_manager',
         'qa_manager',
     )
 
-    @property
-    def project_manager(self) -> list:
-        """Return a list of ids of project managers.
+    @declared_attr
+    def _professional_user(cls):
+        """Relationship: return a list of LocalRoles.
 
-        :return: ID of the project_manager.
+        :return: LocalRoles instances of professional_user role_name.
         """
-        roles = self.local_roles
-        return self._filter_lr_by_name(roles, 'project_manager')
+        return cls.get_role_relationship('professional_user')
 
-    @project_manager.setter
-    def project_manager(self, user_id: str) -> None:
-        """Set a new project_manager for this object.
+    @declared_attr
+    def professional_user(cls):
+        """Return a list of ids of professional users.
 
-        :param user_id: ID of the project_manager.
+        :return: IDs of the professional users.
         """
-        self._add_local_role_user_id(user_id, 'project_manager')
+        return cls.get_association_proxy('professional_user', 'user_id')
 
-    @property
-    def qa_manager(self) -> list:
-        """Return a list of ids of qa_managers.
+    @declared_attr
+    def _project_manager(cls):
+        """Relationship: return a list of LocalRoles.
 
-        :return: ID of the qa_manager.
+        :return: LocalRoles instances of project_manager role_name.
         """
-        roles = self.local_roles
-        return self._filter_lr_by_name(roles, 'qa_manager')
+        return cls.get_role_relationship('project_manager')
 
-    @qa_manager.setter
-    def qa_manager(self, user_id: str) -> None:
-        """Set a new qa_manager for this object.
+    @declared_attr
+    def project_manager(cls):
+        """Return a list of ids of project manager users.
 
-        :param user_id: ID of the qa_manager.
+        :return: IDs of the project manager users.
         """
-        self._add_local_role_user_id(user_id, 'qa_manager')
+        return cls.get_association_proxy('project_manager', 'user_id')
 
-    @property
-    def scout_manager(self) -> list:
-        """Return a list of ids of scout_managers.
+    @declared_attr
+    def _scout_manager(cls):
+        """Relationship: return a list of LocalRoles.
 
-        :return: ID of the scout_manager.
+        :return: LocalRoles instances of scout_manager role_name.
         """
-        roles = self.local_roles
-        return self._filter_lr_by_name(roles, 'scout_manager')
+        return cls.get_role_relationship('scout_manager')
 
-    @scout_manager.setter
-    def scout_manager(self, user_id: str) -> None:
-        """Set a new scout_manager for this object.
+    @declared_attr
+    def scout_manager(cls):
+        """Return a list of ids of scout manager users.
 
-        :param user_id: ID of the scout_manager.
+        :return: IDs of the scout manager users.
         """
-        self._add_local_role_user_id(user_id, 'scout_manager')
+        return cls.get_association_proxy('scout_manager', 'user_id')
+
+    @declared_attr
+    def _qa_manager(cls):
+        """Relationship: return a list of LocalRoles.
+
+        :return: LocalRoles instances of qa_manager role_name.
+        """
+        return cls.get_role_relationship('qa_manager')
+
+    @declared_attr
+    def qa_manager(cls):
+        """Return a list of ids of qa manager users.
+
+        :return: IDs of the qa manager users.
+        """
+        return cls.get_association_proxy('qa_manager', 'user_id')
 
 
 class ProfessionalPayoutInfo:

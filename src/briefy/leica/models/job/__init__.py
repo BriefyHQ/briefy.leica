@@ -132,7 +132,15 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
 
     Relationship with :class:`briefy.leica.models.professional.Professional`.
 
-    This will be deprecated as soon as Assignments is implemented
+    Professional ID linked with this Assignment.
+    """
+
+    professional = orm.relationship(
+        'Professional',
+    )
+    """Relationship with :class:`briefy.leica.models.professional.Professional`.
+
+    Professional instance linked with this Assignment.
     """
 
     # Assets for this job
