@@ -24,7 +24,7 @@ requires = [
     'pyramid_zcml',
     'requests',
     'setuptools',
-    's3transfer==0.1.2',
+    's3transfer==0.1.10',
     'sqlalchemy',
     'sqlalchemy_continuum',
     'waitress',
