@@ -37,6 +37,7 @@ History
      * Fix Project __actors__, listing, and summary fields (rudaporto).
      * Improve sync to parse phone numbers for the JobOrder contact (rudaporto).
      * Create new column_property attributes using subquery to easy filter JobAssignment by some JobOrder attributes (rudaporto).
+     * Fix: upgrade s3transfer from 1.1.2 to 0.1.10 to fix conflict version with boto libs (rudaporto).
 
 
 1.1.0 (2016-10-04)
