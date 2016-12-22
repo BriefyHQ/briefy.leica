@@ -87,13 +87,13 @@ class Professional(ProfessionalMixin, Base):
         return orm.column_property(cls.first_name + " " + cls.last_name)
 
     @synonym_for("main_email")
-    @declared_attr
+    @property
     def email(self):
         """Return the Professional email."""
         return self.main_email
 
     @synonym_for("main_mobile")
-    @declared_attr
+    @property
     def mobile(self):
         """Return the Professional mobile phone."""
         return self.main_mobile
