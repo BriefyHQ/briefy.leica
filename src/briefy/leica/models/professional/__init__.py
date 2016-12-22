@@ -33,6 +33,12 @@ class Professional(ProfessionalMixin, Base):
 
     _workflow = ProfessionalWorkflow
 
+    __summary_attributes__ = [
+        'id', 'title', 'description', 'created_at', 'updated_at', 'state', 'email', 'mobile'
+    ]
+
+    __listing_attributes__ = __summary_attributes__
+
     __colanderalchemy_config__ = {
         'excludes': [
             'state_history', 'state', 'profiles', 'links', 'locations', 'type'
@@ -49,6 +55,21 @@ class Professional(ProfessionalMixin, Base):
               'missing': colander.drop,
               'typ': colander.String}}
     )
+
+    @declared_attr
+    def title(cls):
+        """Return the Professional fullname."""
+        return orm.column_property(cls.first_name + " " + cls.last_name)
+
+    @declared_attr
+    def email(cls):
+        """Return the Professional email."""
+        return orm.column_property(cls.main_email)
+
+    @declared_attr
+    def mobile(cls):
+        """Return the Professional mobile phone."""
+        return orm.column_property(cls.main_mobile)
 
     # Profile information
     photo_path = sa.Column(sa.String(255), nullable=True)

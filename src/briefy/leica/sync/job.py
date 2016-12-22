@@ -73,6 +73,7 @@ class JobSync(ModelSync):
         history = dict(
             message='Imported in this state from Knack database',
             actor='g:system',
+            transition='',
             to=state
         )
         obj.state_history = [history]
