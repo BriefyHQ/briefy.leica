@@ -42,9 +42,11 @@ class JobService(RESTService):
     model = JobAssignment
     friendly_name = model.__name__
     default_order_by = 'created_at'
-    filter_related_fields = ['project.title', 'title', 'professional.title',
-                             'project.id', 'description', 'location.locality',
-                             'location.country', 'location.fullname', 'location.email']
+    filter_related_fields = [
+        'project.title', 'title', 'professional.title', 'professional.email',
+        'project.id', 'description', 'location.locality', 'location.country',
+        'location.fullname', 'location.email'
+    ]
 
     _default_notify_events = {
         'POST': events.JobCreatedEvent,
