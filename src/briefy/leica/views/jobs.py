@@ -43,7 +43,7 @@ class JobService(RESTService):
     friendly_name = model.__name__
     default_order_by = 'created_at'
     filter_related_fields = [
-        'project.title', 'title', 'professional.title', 'professional.email',
+        'project.title', 'title', 'professional.title', 'professional.main_email',
         'project.id', 'description', 'location.locality', 'location.country',
         'location.fullname', 'location.email'
     ]

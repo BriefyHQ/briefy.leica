@@ -7,6 +7,7 @@ from briefy.leica.models.professional.workflows import ProfessionalWorkflow
 from briefy.leica.models.professional.workflows import SkillWorkflow
 from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.declarative import synonym_for
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import UUIDType
 
@@ -18,8 +19,31 @@ import sqlalchemy_utils as sautils
 class ContactInfoMixin:
     """A mixin to manage contact information of a professional."""
 
-    main_email = sa.Column(sautils.types.EmailType(), nullable=True, unique=False)
-    main_mobile = sa.Column(sautils.types.PhoneNumberType(), nullable=True, unique=False)
+    main_email = sa.Column(
+        sautils.types.EmailType(),
+        nullable=True,
+        unique=False,
+        info={
+            'colanderalchemy': {
+                'title': 'Email',
+                'default': '',
+                'typ': colander.String
+            }
+        }
+    )
+
+    main_mobile = sa.Column(
+        sautils.types.PhoneNumberType(),
+        nullable=True,
+        unique=False,
+        info={
+            'colanderalchemy': {
+                'title': 'Mobile phone number',
+                'default': '',
+                'typ': colander.String
+            }
+        }
+    )
 
 
 class ProfessionalMixin(ContactInfoMixin, PersonalInfoMixin, OptIn, mixins.KLeicaVersionedMixin):
@@ -34,7 +58,8 @@ class Professional(ProfessionalMixin, Base):
     _workflow = ProfessionalWorkflow
 
     __summary_attributes__ = [
-        'id', 'title', 'description', 'created_at', 'updated_at', 'state', 'email', 'mobile'
+        'id', 'title', 'description', 'created_at', 'updated_at', 'state',
+        'main_email', 'main_mobile'
     ]
 
     __listing_attributes__ = __summary_attributes__
@@ -61,15 +86,17 @@ class Professional(ProfessionalMixin, Base):
         """Return the Professional fullname."""
         return orm.column_property(cls.first_name + " " + cls.last_name)
 
+    @synonym_for("main_email")
     @declared_attr
-    def email(cls):
+    def email(self):
         """Return the Professional email."""
-        return orm.column_property(cls.main_email)
+        return self.main_email
 
+    @synonym_for("main_mobile")
     @declared_attr
-    def mobile(cls):
+    def mobile(self):
         """Return the Professional mobile phone."""
-        return orm.column_property(cls.main_mobile)
+        return self.main_mobile
 
     # Profile information
     photo_path = sa.Column(sa.String(255), nullable=True)
