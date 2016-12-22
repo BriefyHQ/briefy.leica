@@ -69,6 +69,7 @@ class PhotographerSync(ModelSync):
                 main_email=kobj.email.email or 'abc123@gmail.com',
                 first_name=first_name,
                 last_name=last_name,
+                # TODO: this will be removed when update DB (title is now a computed value)
                 title='{0} {1}'.format(first_name, last_name),
                 main_mobile=main_mobile
             )

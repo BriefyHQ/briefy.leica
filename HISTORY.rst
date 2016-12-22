@@ -41,6 +41,10 @@ History
      * Update all Leica local roles to use new relationship and association_proxy attributes (rudaporto).
      * Update sync to the new association_proxy attributes (rudaporto).
      * Update JobAssignment sync to create local role also for the professional (rudaporto)
+     * LEICA-120: include additional fields from JobOrder to JobAssignment and expose then in /jobs search (rudaporto).
+     * Update Professional and JobLocation summary fields (rudaporto).
+     * Small fixes in the sync classes (rudaporto).
+
 
 1.1.0 (2016-10-04)
 ------------------

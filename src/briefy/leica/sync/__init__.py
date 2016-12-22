@@ -211,7 +211,7 @@ class ModelSync:
         else:
             items = self.get_items()
 
-        items = items[0:500]
+        items = items[0:700]
         total = len(items)
         for i, kobj in enumerate(items):
             item = self.get_db_item(kobj)

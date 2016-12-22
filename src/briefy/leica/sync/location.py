@@ -62,7 +62,7 @@ def create_location_dict(address_field: str, kobj: KnackEntity) -> dict:
         return dict(
             country=country_id,
             info=info,
-            locality=city,
+            locality=city.strip(' '),
             **extra_location_info
         )
 

@@ -286,7 +286,7 @@ def upgrade():
     op.create_table(
         'professionals',
         sa.Column('external_id', sa.String(), nullable=True),
-        sa.Column('title', sa.String(), nullable=False),
+        sa.Column('title', sa.String(), nullable=True),
         sa.Column('slug', sa.String(length=255), nullable=True),
         sa.Column('first_name', sa.String(length=255), nullable=False),
         sa.Column('last_name', sa.String(length=255), nullable=False),

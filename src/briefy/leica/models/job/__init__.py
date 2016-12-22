@@ -24,7 +24,9 @@ __summary_attributes__ = [
     'approvable', 'total_assets', 'total_approvable_assets'
 ]
 
-__listing_attributes__ = __summary_attributes__
+__listing_attributes__ = __summary_attributes__ + [
+    'assignment_date', 'last_approval_date', 'submission_date'
+]
 
 
 class IJob(Interface):
@@ -96,7 +98,8 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
 
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', 'order', 'comments', 'professional', 'assets', 'project'
+            'state_history', 'state', 'order', 'comments',
+            'professional', 'assets', 'project', 'location'
         ]
     }
 
@@ -207,6 +210,32 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
     This will be deprecated when assets upload is handled also using Leica.
     """
 
+    project = orm.relationship(
+        'Project',
+        secondary="join(JobOrder, Project, JobOrder.project_id == Project.id)",
+        secondaryjoin="JobOrder.project_id == Project.id",
+        primaryjoin="JobOrder.id == JobAssignment.order_id",
+        viewonly=True,
+        uselist=False
+    )
+    """Project related to this JobAssignment.
+
+    Instance of :class:`briefy.leica.models.project.Project`.
+    """
+
+    location = orm.relationship(
+        'JobLocation',
+        secondary="join(JobOrder, JobLocation, JobOrder.id == JobLocation.order_id)",
+        secondaryjoin="JobOrder.id == JobLocation.order_id",
+        primaryjoin="JobOrder.id == JobAssignment.order_id",
+        viewonly=True,
+        uselist=False
+    )
+    """JobLocations related to this JobAssignment.
+
+    Instance of :class:`briefy.leica.models.job.location.JobLocation`.
+    """
+
     @sautils.aggregated('assets', sa.Column(sa.Integer, default=0))
     def total_assets(self):
         """Total number of assets.
@@ -251,18 +280,32 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
             ),
         )
 
-    project = orm.relationship(
-        'Project',
-        secondary="join(JobOrder, Project, JobOrder.project_id == Project.id)",
-        secondaryjoin="JobOrder.project_id == Project.id",
-        primaryjoin="JobOrder.id == JobAssignment.order_id",
-        viewonly=True,
-        uselist=False
-    )
-    """Project related to this JobAssignment.
+    @declared_attr
+    def customer_order_id(cls) -> str:
+        """Return the customer_order_id of the JobOrder."""
+        return orm.column_property(
+            select([JobOrder.customer_order_id]).where(
+                JobOrder.id == cls.order_id
+            ),
+        )
 
-    Instance of :class:`briefy.leica.models.project.Project`.
-    """
+    @declared_attr
+    def job_id(cls) -> str:
+        """Return the job_id of the JobOrder."""
+        return orm.column_property(
+            select([JobOrder.job_id]).where(
+                JobOrder.id == cls.order_id
+            ),
+        )
+
+    @declared_attr
+    def number_required_assets(cls) -> str:
+        """Return the number_of_assets of the JobOrder."""
+        return orm.column_property(
+            select([JobOrder.number_of_assets]).where(
+                JobOrder.id == cls.order_id
+            ),
+        )
 
     @property
     def briefing(self) -> str:
@@ -282,21 +325,25 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
         data = {}
         project = self.project
         comments = self.comments
-        locations = self.order.locations
+        location = self.location
+        professional = self.professional
         to_summarize = [
             ('project', project),
             ('comments', comments),
-            ('locations', locations),
+            ('location', location),
+            ('professional', professional),
         ]
         if project:
             to_summarize.append(('customer', project.customer))
 
-        for k, obj in to_summarize:
-            if isinstance(obj, Base):
-                serialized = obj.to_summary_dict() if obj else None
+        for key, obj in to_summarize:
+            if obj is None:
+                serialized = None
+            elif isinstance(obj, Base):
+                serialized = obj.to_summary_dict()
             else:
-                serialized = [o.to_summary_dict() for o in obj]
-            data[k] = serialized
+                serialized = [item.to_summary_dict() for item in obj if item]
+            data[key] = serialized
         return data
 
     def to_listing_dict(self) -> dict:
