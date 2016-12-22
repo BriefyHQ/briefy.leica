@@ -109,6 +109,14 @@ dist: clean ## builds source and wheel package
 install: clean ## install the package to the active Python's site-packages
 	python setup.py install
 
+import_clean_db: stop_dockers run_dockers
+	echo "Waiting Posgtres to start"
+	sleep 10
+	alembic upgrade head
+	python src/briefy/leica/tools/customer_import.py
+	python src/briefy/leica/tools/project_import.py
+	python src/briefy/leica/tools/photographer_import.py
+	python src/briefy/leica/tools/job_import.py
 
 stop_dockers: ## stop and remove docker containers
 	# sqs
