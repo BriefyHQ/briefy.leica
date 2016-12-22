@@ -23,11 +23,11 @@ class LeicaBriefyRoles(BaseBriefyRoles):
     """Base class for leica local roles."""
 
     @classmethod
-    def get_role_relationship(cls, role_name, view_only=False, uselist=True):
+    def get_role_relationship(cls, role_name, viewonly=False, uselist=True):
         return orm.relationship(
             'LocalRole',
             foreign_keys='LocalRole.entity_id',
-            viewonly=view_only,
+            viewonly=viewonly,
             uselist=uselist,
             primaryjoin='''and_(
                         LocalRole.entity_id=={entity}.id,
