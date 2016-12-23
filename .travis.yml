@@ -11,7 +11,7 @@ env:
   global:
   - AWS_ACCESS_KEY_ID='foo' AWS_DEFAULT_REGION='us-east-1' AWS_SECRET_ACCESS_KEY='bar'
     DATABASE_TEST_URL=postgresql://briefy:briefy@127.0.0.1:9998/briefy-leica-unit_test SQS_IP=127.0.0.1
-    DATABASE__URL=postgresql://briefy:briefy@127.0.0.1:9998/briefy-leica-unit_test SQS_IP=127.0.0.1
+    DATABASE_URL=postgresql://briefy:briefy@127.0.0.1:9998/briefy-leica-unit_test SQS_IP=127.0.0.1
     SQS_PORT=5000 USER_SERVICE_BASE=https://api.stg.briefy.co/internal BOTO_CONFIG=/tmp/nowhere
   matrix:
   - TOXENV=py35
