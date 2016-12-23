@@ -79,7 +79,10 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
 
     __listing_attributes__ = __summary_attributes__
 
-    __colanderalchemy_config__ = {'excludes': ['state_history', 'state']}
+    __colanderalchemy_config__ = {'excludes': [
+        'state_history', 'state', '_account_manager', '_customer_user',
+        'billing_contact', 'business_contact'
+    ]}
 
     parent_customer_id = sa.Column(
         sautils.UUIDType,
@@ -162,7 +165,6 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
     Returns an instance of :class:`briefy.leica.models.customer.contact.CustomerContact`.
     """
 
-
     projects = orm.relationship(
         'Project',
         backref=orm.backref('customer'),
@@ -207,7 +209,7 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
         data = super().to_dict()
         data['slug'] = self.slug
         addresses = [address.to_dict(excludes='customer') for address in self.addresses.all()]
-        data.update(addresses=addresses, contacts=contacts)
+        data.update(addresses=addresses)
         add_user_info_to_state_history(self.state_history)
         # Apply actor information to data
         data = self._apply_actors_info(data)
