@@ -44,6 +44,10 @@ History
      * LEICA-120: include additional fields from JobOrder to JobAssignment and expose then in /jobs search (rudaporto).
      * Update Professional and JobLocation summary fields (rudaporto).
      * Small fixes in the sync classes (rudaporto).
+     * Change default LeicaRolesMixin association_proxy to return only a single element: this enable filter by the user ID. (rudaporto)
+     * Add all local role association_proxy fields as filter_related_fields to be searchable on the views using the user ID. (rudaporto)
+     * Improve Customer model with new relationships that return business and billing addres as a attribute and expose then in the payload (rudaporto).
+     * Improve CustomerContact model defining summary and listing attributes (rudaporto).
 
 
 1.1.0 (2016-10-04)

@@ -77,9 +77,7 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
         'id', 'slug', 'title', 'description', 'created_at', 'updated_at', 'state', 'external_id'
     ]
 
-    __listing_attributes__ = [
-        'id', 'slug', 'title', 'description', 'created_at', 'updated_at', 'state', 'external_id',
-    ]
+    __listing_attributes__ = __summary_attributes__
 
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state']}
 
@@ -119,7 +117,7 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
     addresses = orm.relationship(
         'CustomerBillingAddress',
         backref=orm.backref('customer', lazy='joined'),
-        lazy='dynamic'
+        lazy='dynamic',
     )
     """List of Billing Addresses for a Customer
 
@@ -128,13 +126,42 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
 
     contacts = orm.relationship(
         'CustomerContact',
-        backref=orm.backref('customer', lazy='joined'),
+        backref=orm.backref('customer'),
         lazy='dynamic'
     )
     """List of Contacts for a Customer
 
     Returns a collection of :class:`briefy.leica.models.customer.contact.CustomerContact`.
     """
+
+    business_contact = orm.relationship(
+        'CustomerContact',
+        primaryjoin='''and_(
+            Customer.id == CustomerContact.customer_id,
+            CustomerContact.type == "business"
+        )''',
+        viewonly=True,
+        uselist=False,
+    )
+    """Customer business contact.
+
+    Returns an instance of :class:`briefy.leica.models.customer.contact.CustomerContact`.
+    """
+
+    billing_contact = orm.relationship(
+        'CustomerContact',
+        primaryjoin='''and_(
+            Customer.id == CustomerContact.customer_id,
+            CustomerContact.type == "billing"
+        )''',
+        viewonly=True,
+        uselist=False,
+    )
+    """Customer billing contact.
+
+    Returns an instance of :class:`briefy.leica.models.customer.contact.CustomerContact`.
+    """
+
 
     projects = orm.relationship(
         'Project',
@@ -161,12 +188,25 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
         """Name of the model on Knack."""
         return 'Company'
 
+    def to_listing_dict(self) -> dict:
+        """Return a summarized version of the dict representation of this Class.
+
+        Used to serialize this object within a parent object serialization.
+        :returns: Dictionary with fields and values used by this Class
+        """
+        billing_contact = self.billing_contact
+        business_contact = self.business_contact
+        data = super().to_listing_dict()
+        data = self._apply_actors_info(data)
+        data['billing_contact'] = billing_contact.to_summary_dict() if billing_contact else None
+        data['business_contact'] = business_contact.to_summary_dict() if business_contact else None
+        return data
+
     def to_dict(self):
         """Return a dict representation of this object."""
         data = super().to_dict()
         data['slug'] = self.slug
         addresses = [address.to_dict(excludes='customer') for address in self.addresses.all()]
-        contacts = [contact.to_dict(excludes='customer') for contact in self.contacts.all()]
         data.update(addresses=addresses, contacts=contacts)
         add_user_info_to_state_history(self.state_history)
         # Apply actor information to data
