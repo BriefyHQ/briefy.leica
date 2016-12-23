@@ -162,7 +162,7 @@ class JobSync(ModelSync):
 
         # project manager context roles
         pm_roles_roles = [role.user_id for role in obj.project.local_roles
-                          if role.role_name == 'project_manager']
+                          if role.role_name.value == 'project_manager']
         self.update_local_roles(assignment, pm_roles_roles, 'project_manager')
 
         # update assignment state history
@@ -171,10 +171,11 @@ class JobSync(ModelSync):
     def add(self, kobj, briefy_id):
         """Add new Job to database."""
         obj = super().add(kobj, briefy_id)
+        project = obj.project
 
         # customer context roles
-        customer_roles = [role.user_id for role in obj.project.local_roles
-                          if role.role_name == 'customer_user']
+        customer_roles = [role.user_id for role in project.local_roles
+                          if role.role_name.value == 'customer_user']
         self.update_local_roles(obj, customer_roles, 'customer_user')
 
         # scout manager context roles
@@ -182,8 +183,8 @@ class JobSync(ModelSync):
         self.update_local_roles(obj, scout_manager_roles, 'scout_manager')
 
         # project manager context roles
-        pm_roles_roles = [role.user_id for role in obj.project.local_roles
-                          if role.role_name == 'project_manager']
+        pm_roles_roles = [role.user_id for role in project.local_roles
+                          if role.role_name.value == 'project_manager']
         self.update_local_roles(obj, pm_roles_roles, 'project_manager')
 
         self.add_history(obj, kobj)
