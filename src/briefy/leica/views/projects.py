@@ -48,6 +48,10 @@ class ProjectService(RESTService):
         'DELETE': events.ProjectDeletedEvent,
     }
 
+    filter_related_fields = [
+        'customer_user', 'project_manager', 'customer.title',
+    ]
+
 
 @resource(
     collection_path=PATH + '/transitions',

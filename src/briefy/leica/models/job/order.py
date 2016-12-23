@@ -39,6 +39,7 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     __colanderalchemy_config__ = {
         'excludes': [
             'state_history', 'state', 'project', 'comments', 'customer',
+            '_project_manager', '_scout_manager', '_customer_user'
         ]
     }
 

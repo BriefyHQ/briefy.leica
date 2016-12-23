@@ -99,7 +99,9 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
     __colanderalchemy_config__ = {
         'excludes': [
             'state_history', 'state', 'order', 'comments',
-            'professional', 'assets', 'project', 'location'
+            'professional', 'assets', 'project', 'location',
+            '_scout_manager', '_project_manager', '_qa_manager',
+            '_professional_user'
         ]
     }
 

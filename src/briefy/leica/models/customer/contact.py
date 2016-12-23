@@ -16,6 +16,15 @@ class CustomerContact(NameMixin, BaseMetadata, mixins.LeicaMixin, Base):
 
     _workflow = workflows.ContactWorkflow
 
+    __summary_attributes__ = [
+        'id', 'fullname', 'email', 'mobile', 'position',
+        'created_at', 'updated_at', 'state'
+    ]
+
+    __listing_attributes__ = __summary_attributes__
+
+    __colanderalchemy_config__ = {'excludes': ['state_history', 'state']}
+
     customer_id = sa.Column(
         sautils.UUIDType,
         sa.ForeignKey('customers.id'),
