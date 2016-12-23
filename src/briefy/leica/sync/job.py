@@ -107,7 +107,7 @@ class JobSync(ModelSync):
 
     def add_comment(self, obj, kobj):
         """Add Project Manager comment to the Order."""
-        project_manager = obj.project.project_manager[0] if obj.project.project_manager else None
+        project_manager = obj.project.project_manager if obj.project.project_manager else None
         payload = dict(
             entity_id=obj.id,
             entity_type=obj.__tablename__,
@@ -161,7 +161,8 @@ class JobSync(ModelSync):
         self.update_local_roles(assignment, scout_manager_roles, 'scout_manager')
 
         # project manager context roles
-        pm_roles_roles = [user_id for user_id in obj.project.project_manager]
+        pm_roles_roles = [role.user_id for role in obj.project.local_roles
+                          if role.role_name == 'project_manager']
         self.update_local_roles(assignment, pm_roles_roles, 'project_manager')
 
         # update assignment state history
@@ -172,7 +173,8 @@ class JobSync(ModelSync):
         obj = super().add(kobj, briefy_id)
 
         # customer context roles
-        customer_roles = [user_id for user_id in obj.project.customer_user]
+        customer_roles = [role.user_id for role in obj.project.local_roles
+                          if role.role_name == 'customer_user']
         self.update_local_roles(obj, customer_roles, 'customer_user')
 
         # scout manager context roles
@@ -180,7 +182,8 @@ class JobSync(ModelSync):
         self.update_local_roles(obj, scout_manager_roles, 'scout_manager')
 
         # project manager context roles
-        pm_roles_roles = [user_id for user_id in obj.project.project_manager]
+        pm_roles_roles = [role.user_id for role in obj.project.local_roles
+                          if role.role_name == 'project_manager']
         self.update_local_roles(obj, pm_roles_roles, 'project_manager')
 
         self.add_history(obj, kobj)

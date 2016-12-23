@@ -16,8 +16,8 @@ env:
   - TOXENV=py35
 install:
 - docker run -d -p 127.0.0.1:5000:5000 --name sqs briefy/aws-test:latest sqs
-- docker run -d -p 127.0.0.1:9999:5432 -e POSTGRES_PASSWORD=briefy -e POSTGRES_USER=briefy
-  -e POSTGRES_DB=briefy-leica --name briefy-leica-test mdillon/postgis:9.5
+- docker run -d -p 127.0.0.1:9998:5432 -e POSTGRES_PASSWORD=briefy -e POSTGRES_USER=briefy
+  -e POSTGRES_DB=briefy-leica --name briefy-leica-unit_test mdillon/postgis:9.5
 - pip install -r requirements/dev.txt
 - pip install flake8
 script:
