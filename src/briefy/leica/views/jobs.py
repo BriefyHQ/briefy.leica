@@ -42,7 +42,7 @@ class JobService(RESTService):
 
     model = JobAssignment
     friendly_name = model.__name__
-    default_order_by = 'created_at'
+    default_order_by = 'updated_at'
     filter_related_fields = [
         'project.title', 'title', 'professional.title', 'professional.main_email',
         'project.id', 'description', 'location.locality', 'location.country',

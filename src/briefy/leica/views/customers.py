@@ -39,7 +39,7 @@ class CustomersService(RESTService):
 
     model = Customer
     friendly_name = model.__name__
-    default_order_by = 'created_at'
+    default_order_by = 'title'
     filter_related_fields = [
         'customer_user', 'account_manager', 'business_contact.email', 'business_contact.fullname',
         'billing_contact.email', 'billing_contact.fullname'
