@@ -1,4 +1,4 @@
-"""Event subscribers for briefy.leica.models.job.Job"""
+"""Event subscribers for briefy.leica.models.job.Job."""
 from briefy.common.users import SystemUser
 from briefy.leica.events.job import JobCreatedEvent
 from briefy.leica.subscribers import safe_workflow_trigger_transitions

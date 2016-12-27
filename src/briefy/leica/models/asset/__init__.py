@@ -156,7 +156,7 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
 
     @property
     def is_valid(self) -> bool:
-        """Compare metadata with tech requirements
+        """Compare metadata with tech requirements.
 
         :return: A boolean indicating if this image is valid or not.
         """

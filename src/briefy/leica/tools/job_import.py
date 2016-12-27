@@ -1,3 +1,4 @@
+"""Main script to import Jobs."""
 from briefy.leica.db import Session
 from briefy.leica.sync.db import configure
 from briefy.leica.sync.job import JobSync

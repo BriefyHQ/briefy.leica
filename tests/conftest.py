@@ -116,6 +116,7 @@ def session():
 @pytest.mark.usefixtures('db_transaction')
 class BaseModelTest:
     """Base class to test all models."""
+
     cardinality = 1
     number_of_wf_transtions = 0
     dependencies = []
@@ -243,6 +244,7 @@ def create_dependencies(request, session):
 @pytest.mark.usefixtures('db_transaction', 'login')
 class BaseTestView:
     """BaseTestView class"""
+
     auth_header = None
     base_path = ''
     dependencies = []

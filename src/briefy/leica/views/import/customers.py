@@ -18,7 +18,7 @@ class CustomerImportFactory(BaseFactory):
 
     @property
     def __base_acl__(self):
-        """CustomerImportFactory custom acl.
+        """Factory for Customer Import with custom acl.
 
         :return list of acl for the current logged user plus defaults.
         :rtype list

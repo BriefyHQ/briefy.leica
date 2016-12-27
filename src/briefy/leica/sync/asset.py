@@ -1,3 +1,4 @@
+"""Syncronize Assets."""
 from briefy.leica import logger
 from briefy.leica.models import JobAssignment
 from briefy.leica.models import Image
@@ -12,7 +13,7 @@ SENTINEL_PROFESSIONAL_UUID = 'ca6083a9-bc94-4309-be3c-a80a0d1f2370'
 
 
 def import_assets(session, asset_rows):
-
+    """Import assets."""
     previous_job_id = None
     created = updated = count = 0
     failed = []

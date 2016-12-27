@@ -2,6 +2,7 @@
 alabaster==0.7.7
 coverage==4.1
 flake8
+flake8_docstrings
 httmock==1.2.5
 Jinja2==2.8
 moto==0.4.27

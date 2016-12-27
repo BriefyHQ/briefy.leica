@@ -240,7 +240,7 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     @property
     def assets(self):
-        """Assets from this JobOrder.
+        """Return Assets from this JobOrder.
 
         Collection of :class:`briefy.leica.models.asset.Asset`.
         """

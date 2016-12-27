@@ -1,3 +1,4 @@
+"""Deal with user import."""
 from briefy.common.utils.cache import timeout_cache
 from briefy.leica import config
 from briefy.leica import logger
@@ -46,7 +47,7 @@ def login():
 
 @timeout_cache(300)
 def get_rosetta() -> dict:
-    """Get user map between Knack and Rolleiflex"""
+    """Get user map between Knack and Rolleiflex."""
     logger.debug('Requesting rosetta user mapping from Rolleiflex service.')
     response = requests.get(config.ROSETTA_ENDPOINT, headers=get_headers(), auth=JwtAuth())
     if response.status_code == 200:
@@ -82,7 +83,6 @@ def update_user_briefy_id(profile='User'):
 
 def update_users():
     """Update briefy_id field for all user profiles using information from rosetta service."""
-
     user_profiles = (
         'User',
         'Photographer',

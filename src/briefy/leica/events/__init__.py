@@ -1,4 +1,4 @@
-"""Custom briefy.leica events and subscribers"""
+"""Custom briefy.leica events and subscribers."""
 from briefy.common.event import BaseEvent
 from briefy.common.event import IDataEvent
 from briefy.leica import logger

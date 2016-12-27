@@ -15,7 +15,7 @@ import sqlalchemy_utils as sautils
 
 
 class IProject(Interface):
-    """Marker interface for Job"""
+    """Marker interface for Job."""
 
 
 class CommercialInfoMixin(mixins.ProfessionalPayoutInfo, mixins.ProjectBriefyRoles,

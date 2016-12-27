@@ -6,6 +6,7 @@ from briefy.leica.models import JobAssignment
 from briefy.leica.models import JobLocation
 from briefy.leica.models import JobOrder
 from briefy.leica.models import Project
+from briefy.leica.sync import PLACEHOLDERS
 from briefy.leica.sync import ModelSync
 from briefy.leica.sync.location import create_location_dict
 from briefy.leica.vocabularies import JobInputSource as ISource
@@ -41,7 +42,6 @@ class JobSync(ModelSync):
 
     def get_payload(self, kobj, briefy_id=None):
         """Create payload for customer object."""
-
         order_payload = super().get_payload(kobj, briefy_id)
         project, kproject = self.get_parent(kobj, 'project')
 
@@ -88,14 +88,15 @@ class JobSync(ModelSync):
         """Add Job location to the Order."""
         payload = create_location_dict('job_location', kobj)
         if payload:
+            country = payload['country']
             payload['order_id'] = obj.id
             payload.update(
                 id=uuid.uuid4(),
-                mobile=self.parse_phonenumber(kobj, 'contact_number_1'),
-                additional_phone=self.parse_phonenumber(kobj, 'contact_number_2'),
-                email=kobj.contact_email.email or 'abc123@gmail.com',
-                first_name=kobj.contact_person.first or 'first name',
-                last_name=kobj.contact_person.last or 'last name',
+                mobile=self.parse_phonenumber(kobj, 'contact_number_1', country),
+                additional_phone=self.parse_phonenumber(kobj, 'contact_number_2', country),
+                email=kobj.contact_email.email or PLACEHOLDERS['email'],
+                first_name=kobj.contact_person.first or PLACEHOLDERS['first_name'],
+                last_name=kobj.contact_person.last or PLACEHOLDERS['last_name'],
             )
             try:
                 location = JobLocation(**payload)
@@ -121,7 +122,7 @@ class JobSync(ModelSync):
         session.add(Comment(**payload))
 
     def add_assigment_comments(self, obj, kobj):
-        """Import assigment comments"""
+        """Import assigment comments."""
         # TODO: internal comment, photographer comment, quality assurance feedback
         pass
 

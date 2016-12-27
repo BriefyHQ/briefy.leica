@@ -1,14 +1,50 @@
+"""Knack to Leica syncronization code."""
+from briefy.knack.base import KnackEntity
 from briefy.leica import logger
 from briefy.leica.sync.user import get_rosetta
-from briefy.knack.base import KnackEntity
 from sqlalchemy_utils import PhoneNumber
+from string import digits
+from typing import Union
 
 import briefy.knack as knack
+import phonenumbers
 import uuid
 
 
+PLACEHOLDERS = {
+    'city': 'EMPTY_CITY',
+    'country': '--',
+    'first_name': 'No Name',
+    'last_name': 'No Name',
+    'email': 'contact+import@briefy,co',
+}
+
+VALID_PHONE_CHARS = digits + '+'
+
+
+def cleanse_phone_number(value: str, country: str) -> Union[PhoneNumber, None]:
+    """Cleanse a phone number and return a PhoneNumber if valid."""
+    value = ''.join([v for v in value if v in VALID_PHONE_CHARS])
+    if len(value) < 10:
+        return None
+    elif value[:2] == '00' and len(set(value)) > 1:
+        value = '+' + value[2:]
+    elif len(value) > 11 and value[0] not in ('+', '0'):
+        value = '+' + value
+    elif len(value) == 11 and value[:2] == '66':
+        value = '+' + value
+
+    try:
+        parsed = phonenumbers.parse(value, country)
+        value = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.INTERNATIONAL)
+    except phonenumbers.NumberParseException:
+        logger.info('Error parsing {value}, {country}'.format(value=value, country=country))
+        return None
+    return PhoneNumber(value)
+
+
 def get_model_and_data(model_name):
-    """Load model and data dump from Knack"""
+    """Load model and data dump from Knack."""
     logger.info('Retrieving {0} model from Knack'.format(model_name))
     model = knack.get_model(model_name)
     logger.info('Querying all existing {0}s'.format(model_name))
@@ -21,10 +57,12 @@ class Auto:
     """Helper class to map dict to object."""
 
     def __init__(self, **attrs):
+        """Initialize the Auto mapper."""
         for k, v in attrs.items():
             setattr(self, k, v)
 
     def __getattr__(self, attr):
+        """Return an empty string if no attribute."""
         return ''
 
 
@@ -44,7 +82,7 @@ class ModelSync:
     batch_size = 10
 
     def __init__(self, session, transaction, parent=None):
-        """Initialize syncronizer"""
+        """Initialize syncronizer."""
         self.session = session
         self.transaction = transaction
         self.parent = parent
@@ -107,28 +145,11 @@ class ModelSync:
         """Parse decimal money values to integer."""
         return value * 100 if value else 0
 
-    def parse_phonenumber(self, kobj, attr):
+    def parse_phonenumber(self, kobj, attr, country=''):
         """Parse phone number from knack before input in the database."""
         number_attr = getattr(kobj, attr, None)
         if number_attr:
-            number = number_attr.get('number')
-            number = number.strip('-')
-            number = number.strip(' ')
-            try:
-                if number[:2] == '00':
-                    print('Assuming international number: {0}.'.format(number))
-                    number = '+' + number[2:]
-                elif number[:1] == '0':
-                    pass
-                elif len(number) > 10 and number[0] != '+':
-                    print('Assuming international number: {0}.'.format(number))
-                    number = '+' + number
-
-                number = PhoneNumber(number)
-            except Exception as exc:
-                msg = 'Briefy ID: {0} Number: {1}. Error: {2}'
-                print(msg.format(kobj.briefy_id, number, exc))
-                number = None
+            number = cleanse_phone_number(number_attr, country)
         else:
             number = None
 

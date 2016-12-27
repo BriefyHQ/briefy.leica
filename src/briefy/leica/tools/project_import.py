@@ -1,3 +1,4 @@
+"""Main script to import Projects."""
 from briefy.leica.db import Session
 from briefy.leica.sync.db import configure
 from briefy.leica.sync.project import ProjectSync
