@@ -30,8 +30,7 @@ class Link(mixins.LeicaMixin, Base):
     @hybrid_property
     def is_social(self) -> bool:
         """Check if this link points to a social network?."""
-        cls_name = self.__class__.__name__.lower()
-        return False if cls_name in ('link', 'porfolio') else True
+        return False if self.type in ('link', 'portfolio') else True
 
     @is_social.expression
     def is_social(cls):
