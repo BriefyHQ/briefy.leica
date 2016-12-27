@@ -48,6 +48,8 @@ History
      * Add all local role association_proxy fields as filter_related_fields to be searchable on the views using the user ID. (rudaporto)
      * Improve Customer model with new relationships that return business and billing addres as a attribute and expose then in the payload (rudaporto).
      * Improve CustomerContact model defining summary and listing attributes (rudaporto).
+     * Remove transaction manager and control commit manually in the import / sync classes and remove (rudaporto).
+     * Change migration to new address format from briefy.common (rudaporto).
 
 
 1.1.0 (2016-10-04)

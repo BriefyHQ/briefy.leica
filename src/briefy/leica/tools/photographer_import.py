@@ -3,15 +3,13 @@ from briefy.leica.sync.db import configure
 from briefy.leica.sync.professional import PhotographerSync
 from briefy.leica.tools import logger # noqa
 
-import transaction
 
-
-def main(session):
+def main(session, transaction):
     """Import Project script."""
-    PhotographerSync(session)()
+    PhotographerSync(session, transaction)()
 
 
 if __name__ == '__main__':
     session = configure(Session)
-    with transaction.manager:
-        main(session)
+    import transaction
+    main(session, transaction)

@@ -99,5 +99,5 @@ def update_users():
 
 
 if __name__ == '__main__':
-    update_user_briefy_id(profile='Photographer')
-    # update_users()
+    # update_user_briefy_id(profile='Photographer')
+    update_users()

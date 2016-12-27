@@ -7,19 +7,17 @@ from briefy.leica.sync.project import ProjectSync
 from briefy.leica.sync.user import update_users
 from briefy.leica.tools import logger # noqa
 
-import transaction
 
-
-def main(session):
+def main(session, transaction):
     """Import Project script."""
     update_users()
-    CustomerSync(session)()
-    ProjectSync(session)()
-    PhotographerSync(session)()
-    JobSync(session)()
+    CustomerSync(session, transaction)()
+    ProjectSync(session, transaction)()
+    PhotographerSync(session, transaction)()
+    JobSync(session, transaction)()
 
 
 if __name__ == '__main__':
     session = configure(Session)
-    with transaction.manager:
-        main(session)
+    import transaction
+    main(session, transaction)

@@ -41,10 +41,12 @@ class ModelSync:
     parent_model = None
     bulk_insert = False
     bulk_insert_items = None
+    batch_size = 10
 
-    def __init__(self, session, parent=None):
+    def __init__(self, session, transaction, parent=None):
         """Initialize syncronizer"""
         self.session = session
+        self.transaction = transaction
         self.parent = parent
         self.created = {}
         self.updated = {}
@@ -103,7 +105,7 @@ class ModelSync:
 
     def parse_decimal(self, value):
         """Parse decimal money values to integer."""
-        return value * 100 if value else None
+        return value * 100 if value else 0
 
     def parse_phonenumber(self, kobj, attr):
         """Parse phone number from knack before input in the database."""
@@ -210,7 +212,7 @@ class ModelSync:
         else:
             items = self.get_items()
 
-        items = items[0:700]
+        # items = items[0:710]
         total = len(items)
         for i, kobj in enumerate(items):
             item = self.get_db_item(kobj)
@@ -223,11 +225,16 @@ class ModelSync:
                 item = self.add(kobj, kobj.briefy_id)
                 if not self.bulk_insert:
                     created[item.id] = kobj
+            if i % self.batch_size == 0:
+                self.transaction.commit()
+
+            if i % 100 == 0:
+                logger.info('Updated / Added {items} {model}s'.format(items=i, model=model_name))
 
         if self.bulk_insert:
             self.session.bulk_insert_mappings(self.model, self.bulk_insert_items)
-            self.session.flush()
 
+        self.transaction.commit()
         self.sync_knack()
         msg = '{model} created: {created} / {model} updated: {updated}'.format(
             model=model_name,

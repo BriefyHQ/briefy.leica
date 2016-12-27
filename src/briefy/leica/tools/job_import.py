@@ -4,15 +4,13 @@ from briefy.leica.sync.job import JobSync
 
 from briefy.leica.tools import logger # noqa
 
-import transaction
 
-
-def main(session):
+def main(session, transaction):
     """Import Job script."""
-    JobSync(session)()
+    JobSync(session, transaction)()
 
 
 if __name__ == '__main__':
     session = configure(Session)
-    with transaction.manager:
-        main(session)
+    import transaction
+    main(session, transaction)
