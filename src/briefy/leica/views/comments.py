@@ -17,6 +17,7 @@ class CommentFactory(BaseFactory):
     @property
     def __base_acl__(self) -> list:
         """Hook to be use by subclasses to define default ACLs in context.
+
         :return: list of ACLs
         :rtype: list
         """
@@ -59,6 +60,7 @@ class CommentService(RESTService):
 
 class CommentsWorkflowService(WorkflowAwareResource):
     """Comments workflow service."""
+
     model = Comment
     friendly_name = Comment.__name__
 

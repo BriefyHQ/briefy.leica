@@ -20,6 +20,7 @@ class ProfessionalFactory(BaseFactory):
     @property
     def __base_acl__(self) -> list:
         """Hook to be use by subclasses to define default ACLs in context.
+
         :return: list of ACLs
         :rtype: list
         """

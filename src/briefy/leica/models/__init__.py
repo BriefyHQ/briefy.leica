@@ -17,9 +17,12 @@ from briefy.leica.models.professional import Photographer
 from briefy.leica.models.professional import Professional
 from briefy.leica.models.professional import Videographer
 from briefy.leica.models.professional.link import Facebook
+from briefy.leica.models.professional.link import FiveHundred
 from briefy.leica.models.professional.link import Flickr
+from briefy.leica.models.professional.link import GDrive
 from briefy.leica.models.professional.link import Instagram
 from briefy.leica.models.professional.link import Link  # noQA
+from briefy.leica.models.professional.link import Linkedin
 from briefy.leica.models.professional.link import Portfolio
 from briefy.leica.models.professional.link import Tumblr
 from briefy.leica.models.professional.link import Twitter
@@ -45,12 +48,15 @@ ALL_MODELS = [
     CustomerBillingAddress,
     CustomerContact,
     Facebook,
+    FiveHundred,
     Flickr,
+    GDrive,
     Instagram,
     JobAssignment,
     JobLocation,
     JobOrder,
     Link,
+    Linkedin,
     LocalRole,
     MainWorkingLocation,
     Photographer,

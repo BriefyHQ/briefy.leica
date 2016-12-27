@@ -1,6 +1,8 @@
+"""Import Projects to Leica."""
 from briefy.leica.models import Customer
 from briefy.leica.models import Project
 from briefy.leica.sync import ModelSync
+from briefy.leica.sync.project_constraints import CONSTRAINTS
 
 
 class ProjectSync(ModelSync):
@@ -18,9 +20,11 @@ class ProjectSync(ModelSync):
 
         # TODO: 'project_comment' but not really used on knack
 
+        name = kobj.project_name.strip()
+        tech_requirements = CONSTRAINTS[name]
         result.update(
             dict(
-                title=kobj.project_name.strip(),
+                title=name,
                 description=kobj.project_abstract,
                 customer_id=customer.id,
                 briefing=kobj.briefing,
@@ -34,8 +38,7 @@ class ProjectSync(ModelSync):
                 price_currency=kobj.currency_set_price or 'EUR',
                 external_id=kobj.id,
                 release_template=kobj.release_template,
-                # TODO: use ms.laure
-                tech_requirements={'dimension': '4000x3000'}
+                tech_requirements=tech_requirements
             )
         )
         return result

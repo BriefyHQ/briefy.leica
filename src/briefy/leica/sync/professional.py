@@ -1,11 +1,19 @@
+"""Import Professionals to Leica."""
 from briefy.leica import logger
-from briefy.leica.models import MainWorkingLocation
 from briefy.leica.models import AdditionalWorkingLocation
+from briefy.leica.models import Facebook
+from briefy.leica.models import FiveHundred
+from briefy.leica.models import Flickr
+from briefy.leica.models import GDrive
+from briefy.leica.models import Linkedin
+from briefy.leica.models import MainWorkingLocation
 from briefy.leica.models import Photographer
+from briefy.leica.models import Portfolio
+from briefy.leica.sync import cleanse_phone_number
 from briefy.leica.sync import ModelSync
+from briefy.leica.sync import PLACEHOLDERS
 from briefy.leica.sync.location import create_location_dict
-
-from sqlalchemy_utils import PhoneNumber
+from urllib.parse import urlparse
 
 
 class PhotographerSync(ModelSync):
@@ -25,7 +33,7 @@ class PhotographerSync(ModelSync):
             self.session.add(location)
             self.session.flush()
         except Exception as error:
-            msg = 'Failure to create location for Photorapher: {name}. Error: {error}'
+            msg = 'Failure to create location for Photographer: {name}. Error: {error}'
             logger.error(msg.format(customer=obj.first_name, error=error))
         else:
             obj.locations.append(location)
@@ -34,39 +42,20 @@ class PhotographerSync(ModelSync):
         """Create payload for a Professional object."""
         result = super().get_payload(kobj, briefy_id)
 
-        first_name = kobj.display_name.first or 'first name'
-        last_name = kobj.display_name.last or 'last name'
+        first_name = kobj.display_name.first or PLACEHOLDERS['first_name']
+        last_name = kobj.display_name.last or PLACEHOLDERS['last_name']
         main_mobile = kobj.phone.get('number') if kobj.phone else None
-        location = create_location_dict('working_location_1', kobj)
-        country = 'EMPTY'
-        if location:
+        country = kobj.country if kobj.country else ''
+        location = create_location_dict('working_location_1', kobj, country)
+        if location and not country:
             country = location.get('country')
 
         if main_mobile:
-            try:
-                if main_mobile[:2] == '00':
-                    print('Assuming international number: {0}. Country: {1}'.format(main_mobile,
-                                                                                    country))
-                    main_mobile = '+' + main_mobile[2:]
-                elif main_mobile[:1] == '0':
-                    if country == 'DE':
-                        print('Assuming German number: {0}. Country: {1}'.format(main_mobile,
-                                                                                 country))
-                        main_mobile = '+49' + main_mobile[1:]
-                elif len(main_mobile) > 11 and main_mobile[0] != '+':
-                    print('Assuming international number: {0}. Country: {1}'.format(main_mobile,
-                                                                                    country))
-                    main_mobile = '+' + main_mobile
-
-                main_mobile = PhoneNumber(main_mobile)
-            except Exception as exc:
-                msg = 'Briefy ID: {0} Number: {1}. Error: {2}'
-                print(msg.format(kobj.briefy_id, main_mobile, exc))
-                main_mobile = None
+            main_mobile = cleanse_phone_number(main_mobile, country)
 
         result.update(
             dict(
-                main_email=kobj.email.email or 'abc123@gmail.com',
+                main_email=kobj.email.email or PLACEHOLDERS['email'],
                 first_name=first_name,
                 last_name=last_name,
                 # TODO: this will be removed when update DB (title is now a computed value)
@@ -89,8 +78,52 @@ class PhotographerSync(ModelSync):
                                  location_model=model,
                                  field_name=location)
 
+    def add_links(self, kobj, obj):
+        """Add all professional links."""
+        url = kobj.portfolio_web_site.url or ''
+        # clean trash
+        url = url.strip().lower()
+        if 'testing.com' in url:
+            url = ''
+        elif '123.com' in url:
+            url = ''
+        elif 'Dumas' in url:
+            url = 'http://www.bdumasonline.com/'
+        elif 'bonis' in url:
+            url = ''
+
+        if not url:
+            return
+
+        url = url if url.startswith('http') else 'http://{url}'.format(url=url)
+        # Use urlparse to get properly formatted urls
+        o = urlparse(url)
+        url = o.geturl()
+
+        model = Portfolio
+        if 'facebook.com' in url:
+            model = Facebook
+        elif 'flickr' in url:
+            model = Flickr
+        elif 'drive.google.com' in url:
+            model = GDrive
+        elif '500px' in url:
+            model = FiveHundred
+        elif 'linkedin' in url:
+            model = Linkedin
+
+        payload = {'professional_id': obj.id, 'url': url}
+        try:
+            link = model(**payload)
+            self.session.add(link)
+            self.session.flush()
+        except Exception as error:
+            msg = 'Failure to create link for Photorapher: {name}. Error: {error}'
+            logger.error(msg.format(name=obj.first_name, error=error))
+
     def add(self, kobj, briefy_id):
         """Add new Photographer to database."""
         obj = super().add(kobj, briefy_id)
         self.add_locations(kobj, obj)
+        self.add_links(kobj, obj)
         return obj

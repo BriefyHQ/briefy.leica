@@ -111,7 +111,7 @@ install: clean ## install the package to the active Python's site-packages
 
 import_clean_db: clean_dockers create_dockers
 	echo "Waiting Posgtres to start"
-	sleep 10
+	sleep 40
 	alembic upgrade head
 	python src/briefy/leica/tools/customer_import.py
 	python src/briefy/leica/tools/project_import.py

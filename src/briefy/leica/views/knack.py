@@ -14,7 +14,7 @@ class KnackLoggerFactory(BaseFactory):
 
     @property
     def __base_acl__(self) -> list:
-        """KnackLoggerFactory custom acl.
+        """Factory for Knack integration with custom acl.
 
         :return List of acl for the current logged user plus defaults.
         """

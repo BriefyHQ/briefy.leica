@@ -24,6 +24,7 @@ class LeicaBriefyRoles(BaseBriefyRoles):
 
     @classmethod
     def get_role_relationship(cls, role_name, viewonly=False, uselist=False):
+        """Get Local Role relationship."""
         return orm.relationship(
             'LocalRole',
             foreign_keys='LocalRole.entity_id',
@@ -42,7 +43,6 @@ class LeicaBriefyRoles(BaseBriefyRoles):
     @classmethod
     def get_association_proxy(cls, role_name, remote_attr):
         """Get a new association proxy instance."""
-
         def creator(user_id):
             return cls.create_local_role(user_id, role_name)
 
@@ -472,7 +472,7 @@ class VersionMixin:
 
     @version.setter
     def version(self, value: int) -> int:
-        """Explicitly sets a version to the asset. (Deprecated)
+        """Explicitly sets a version to the asset (Deprecated).
 
         XXX: Here only to avoid issues if any client tries to set this.
         :param value:

@@ -14,11 +14,11 @@ import sqlalchemy_utils as sautils
 
 
 class ICustomer(Interface):
-    """Marker interface for a Customer"""
+    """Marker interface for a Customer."""
 
 
 class TaxInfo:
-    """Tax information"""
+    """Tax information."""
 
     tax_id = sa.Column(
         sa.String(50), nullable=True,

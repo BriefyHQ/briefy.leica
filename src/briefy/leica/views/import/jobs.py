@@ -20,7 +20,7 @@ class JobImportFactory(BaseFactory):
 
     @property
     def __base_acl__(self):
-        """JobImportFactory custom acl.
+        """Factory for Job Import with custom acl.
 
         :return list of acl for the current logged user plus defaults.
         :rtype list

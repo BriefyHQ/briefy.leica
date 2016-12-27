@@ -3,6 +3,7 @@ from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.professional import workflows
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import URLType
 from sqlalchemy_utils import UUIDType
 
@@ -26,12 +27,15 @@ class Link(mixins.LeicaMixin, Base):
     type = sa.Column(sa.String(50))
     url = sa.Column(URLType, nullable=False)
 
-    @declared_attr
-    def is_social(cls) -> bool:
+    @hybrid_property
+    def is_social(self) -> bool:
         """Check if this link points to a social network?."""
-        cls_name = cls.__name__.lower()
-        default = False if cls_name in ('link', 'porfolio') else True
-        return sa.Column(sa.Boolean, default=default)
+        return False if self.type in ('link', 'portfolio') else True
+
+    @is_social.expression
+    def is_social(cls):
+        """Check if this link points to a social network?."""
+        return sa.not_(cls.type.in_(('link', 'porfolio', )))
 
     @declared_attr
     def __mapper_args__(cls):
@@ -77,5 +81,17 @@ class Flickr(Link):
     """A Flickr profile for a Professional."""
 
 
+class FiveHundred(Link):
+    """A 500px profile for a Professional."""
+
+
 class Youtube(Link):
     """A Youtube profile for a Professional."""
+
+
+class GDrive(Link):
+    """A Google Drive profile for a Professional."""
+
+
+class Linkedin(Link):
+    """A Linkedin profile for a Professional."""

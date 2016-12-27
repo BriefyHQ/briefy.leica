@@ -1,9 +1,11 @@
 """Import and sync Knack Company to Leica Customer."""
 from briefy.leica import logger
+from briefy.leica.sync import cleanse_phone_number
 from briefy.leica.sync import ModelSync
 from briefy.leica.models import Customer
 from briefy.leica.models import CustomerContact
 from briefy.leica.models import CustomerBillingAddress
+from briefy.leica.sync.location import COUNTRY_MAPPING
 from briefy.leica.sync.location import create_location_dict
 
 
@@ -41,7 +43,13 @@ class CustomerSync(ModelSync):
 
     def add_business_contact(self, kobj, obj):
         """Add new business contact from knack instance."""
-        mobile = kobj.contact_phone.get('number') if kobj.contact_phone else ''
+        country = COUNTRY_MAPPING.get(
+            kobj.company_address.country
+        )[1] if kobj.company_address.country else 'DE'
+        mobile = cleanse_phone_number(
+            kobj.contact_phone.get('number'),
+            country
+        ) if kobj.contact_phone else ''
         contact_dict = dict(
             customer_id=obj.id,
             email=kobj.email.email,

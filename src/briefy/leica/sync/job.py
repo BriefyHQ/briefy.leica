@@ -6,9 +6,12 @@ from briefy.leica.models import JobAssignment
 from briefy.leica.models import JobLocation
 from briefy.leica.models import JobOrder
 from briefy.leica.models import Project
+from briefy.leica.sync import PLACEHOLDERS
 from briefy.leica.sync import ModelSync
 from briefy.leica.sync.location import create_location_dict
 from briefy.leica.vocabularies import JobInputSource as ISource
+
+import uuid
 
 
 job_status_mapping = {
@@ -39,7 +42,6 @@ class JobSync(ModelSync):
 
     def get_payload(self, kobj, briefy_id=None):
         """Create payload for customer object."""
-
         order_payload = super().get_payload(kobj, briefy_id)
         project, kproject = self.get_parent(kobj, 'project')
 
@@ -86,19 +88,20 @@ class JobSync(ModelSync):
         """Add Job location to the Order."""
         payload = create_location_dict('job_location', kobj)
         if payload:
+            country = payload['country']
             payload['order_id'] = obj.id
             payload.update(
-                mobile=self.parse_phonenumber(kobj, 'contact_number_1'),
-                additional_phone=self.parse_phonenumber(kobj, 'contact_number_2'),
-                email=kobj.contact_email.email or 'abc123@gmail.com',
-                first_name=kobj.contact_person.first or 'first name',
-                last_name=kobj.contact_person.last or 'last name',
+                id=uuid.uuid4(),
+                mobile=self.parse_phonenumber(kobj, 'contact_number_1', country),
+                additional_phone=self.parse_phonenumber(kobj, 'contact_number_2', country),
+                email=kobj.contact_email.email or PLACEHOLDERS['email'],
+                first_name=kobj.contact_person.first or PLACEHOLDERS['first_name'],
+                last_name=kobj.contact_person.last or PLACEHOLDERS['last_name'],
             )
             try:
                 location = JobLocation(**payload)
                 self.session.add(location)
                 obj.locations.append(location)
-                self.session.flush()
             except Exception as exc:
                 print(exc)
         else:
@@ -109,6 +112,7 @@ class JobSync(ModelSync):
         """Add Project Manager comment to the Order."""
         project_manager = obj.project.project_manager if obj.project.project_manager else None
         payload = dict(
+            id=uuid.uuid4(),
             entity_id=obj.id,
             entity_type=obj.__tablename__,
             author_id=project_manager,
@@ -116,10 +120,9 @@ class JobSync(ModelSync):
         )
         session = self.session
         session.add(Comment(**payload))
-        session.flush()
 
     def add_assigment_comments(self, obj, kobj):
-        """Import assigment comments"""
+        """Import assigment comments."""
         # TODO: internal comment, photographer comment, quality assurance feedback
         pass
 
@@ -135,6 +138,7 @@ class JobSync(ModelSync):
 
         professional_id = self.get_user(kobj, 'responsible_photographer')
         payload = dict(
+            id=uuid.uuid4(),
             order_id=obj.id,
             professional_id=professional_id,
             payout_value=self.parse_decimal(kobj.photographer_payout),
@@ -146,7 +150,6 @@ class JobSync(ModelSync):
         )
         assignment = JobAssignment(**payload)
         self.session.add(assignment)
-        self.session.flush()
         logger.debug('Assignment added: {id}'.format(id=assignment.id))
 
         if professional_id:
@@ -191,5 +194,5 @@ class JobSync(ModelSync):
         self.add_location(obj, kobj)
         self.add_comment(obj, kobj)
         self.add_assigment(obj, kobj)
-        logger.info('Additional data imported for this order: History, Location, Comment.')
+        logger.debug('Additional data imported for this order: History, Location, Comment.')
         return obj

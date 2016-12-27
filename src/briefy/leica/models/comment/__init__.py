@@ -12,11 +12,12 @@ import sqlalchemy_utils as sautils
 
 
 class IComment(Interface):
-    """Marker interface for a Comment"""
+    """Marker interface for a Comment."""
 
 
 @implementer(IComment)
 class Comment(mixins.LeicaMixin, Base):
+    """A comment to an object."""
 
     _workflow = workflows.CommentWorkflow
 

@@ -14,7 +14,7 @@ class AssetImportFactory(BaseFactory):
 
     @property
     def __base_acl__(self):
-        """AssetImportFactory custom acl.
+        """Factory for Asset Import with custom acl.
 
         :return list of acl for the current logged user plus defaults.
         :rtype list

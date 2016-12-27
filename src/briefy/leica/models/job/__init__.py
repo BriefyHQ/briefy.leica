@@ -30,7 +30,7 @@ __listing_attributes__ = __summary_attributes__ + [
 
 
 class IJob(Interface):
-    """Marker interface for Job"""
+    """Marker interface for Job."""
 
 
 class JobAssignmentDates:

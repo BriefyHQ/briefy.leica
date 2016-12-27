@@ -19,7 +19,7 @@ class ProjectImportFactory(BaseFactory):
 
     @property
     def __base_acl__(self):
-        """ProjectImportFactory custom acl.
+        """Factory for Project Import with custom acl.
 
         :return list of acl for the current logged user plus defaults.
         :rtype list
