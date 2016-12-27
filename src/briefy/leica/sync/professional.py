@@ -56,8 +56,8 @@ class PhotographerSync(ModelSync):
         result.update(
             dict(
                 main_email=kobj.email.email or PLACEHOLDERS['email'],
-                first_name=first_name,
-                last_name=last_name,
+                first_name=first_name.strip(),
+                last_name=last_name.strip(),
                 # TODO: this will be removed when update DB (title is now a computed value)
                 title='{0} {1}'.format(first_name, last_name),
                 main_mobile=main_mobile
