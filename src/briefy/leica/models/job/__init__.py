@@ -84,7 +84,7 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
                     mixins.VersionMixin, Base):
     """A Job within a Project."""
 
-    _workflow = workflows.JobWorkflow
+    _workflow = workflows.JobAssignmentWorkflow
 
     __summary_attributes__ = __summary_attributes__
     __listing_attributes__ = __listing_attributes__

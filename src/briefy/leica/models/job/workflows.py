@@ -12,36 +12,21 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class JobWorkflow(BriefyWorkflow):
-    """Workflow for a Job."""
+class JobAssignmentWorkflow(BriefyWorkflow):
+    """Workflow for a Job Assignment."""
 
     entity = 'job'
-    initial_state = 'created'
+    initial_state = 'pending'
 
     # States
-    created = WS(
-        'created', 'Created',
-        'Job created by the customer.'
-    )
-
-    validation = WS(
-        'validation', 'Validation',
-        'Under system validation.'
-    )
-
-    edit = WS(
-        'edit', 'Edit',
-        'Customer must edit job in order to be approved.'
-    )
-
     pending = WS(
         'pending', 'Pending',
-        'Awaiting professional assignment by Briefy.'
+        'Awaiting professional assignment by Briefy or availability dates from customer.'
     )
 
     published = WS(
         'published', 'Job Pool',
-        'Available for Professional self assignment.'
+        'Available for Professional self assignment using Job pool.'
     )
 
     assigned = WS(
@@ -56,7 +41,7 @@ class JobWorkflow(BriefyWorkflow):
 
     cancelled = WS(
         'cancelled', 'Cancelled',
-        'Job was cancelled by the customer.'
+        'Job was cancelled by the customer or pm.'
     )
 
     awaiting_assets = WS(
@@ -71,7 +56,7 @@ class JobWorkflow(BriefyWorkflow):
 
     approved = WS(
         'approved', 'Content approved',
-        'Content was approved by Briefy quality assurance team'
+        'Content was approved by Briefy quality assurance team.'
     )
 
     refused = WS(
@@ -81,76 +66,129 @@ class JobWorkflow(BriefyWorkflow):
 
     completed = WS(
         'completed', 'Completed',
-        'Job is completed.'
+        'Assignment is completed.'
+    )
+
+    perm_rejected = WS(
+        'perm_rejected', 'Permanently Rejected',
+        'Assignment was permanently rejected by QA.'
+    )
+
+    asset_validation = WS(
+        'asset_validation', 'Asset Validation',
+        'Assignment is awaiting automatic asset validation.'
     )
 
     # Transitions
-    @created.transition(validation, 'can_submit')
-    @edit.transition(validation, 'can_submit')
-    def submit(self):
-        """After job creation, or edition submit it to machine validation."""
-        pass
-
-    @validation.transition(pending, 'can_validate')
-    def validate(self):
-        """Validate a job."""
-        pass
-
-    @validation.transition(edit, 'can_validate')
-    def invalidate(self):
-        """Invalidate a job, sending it to edit."""
-        pass
-
     @pending.transition(assigned, 'can_assign')
     def assign(self):
-        """Assign a Job to a professional."""
+        """Define a Professional to the Assignment."""
         pass
+
+    @Permission(groups=[G['scout'], G['pm'], ])
+    def can_assign(self):
+        """Validate if user can set the Professional in the Assignment."""
+        return True
 
     @pending.transition(published, 'can_publish')
     def publish(self):
-        """Put the job to be self assigned."""
+        """Inform availability dates and move the enable Assignment to be self assigned."""
         pass
+
+    @Permission(groups=[G['customers'], G['pm'], G['scout'], G['system'], ])
+    def can_publish(self):
+        """Validate if user can publish this job (job pool)."""
+        return True
 
     @published.transition(pending, 'can_retract')
     def retract(self):
-        """Remove a job from Job Poll."""
+        """Remove availability dates and return Assignment to pending."""
         pass
 
-    @published.transition(assigned, 'can_self_assign')
+    @Permission(groups=[G['customers'], G['pm'], G['scout'], ])
+    def can_retract(self):
+        """Validate if user can retract job from job pool."""
+        return True
+
+    @published.transition(scheduled, 'can_self_assign')
     def self_assign(self):
-        """Professional gets a job."""
+        """Professional choose the Assignment from the Pool."""
         pass
+
+    @Permission(groups=[G['professionals'], G['pm'], G['scout'], ])
+    def can_self_assign(self):
+        """Validate if user is able to self assign this job."""
+        # TODO: Check for existing jobs in the same date.
+        return True
 
     @assigned.transition(scheduled, 'can_schedule')
-    @awaiting_assets.transition(scheduled, 'can_schedule')
     def schedule(self):
-        """Professional schedules the job."""
+        """Professional, Scout or PM schedule the Assignment."""
         pass
 
-    @assigned.transition(assigned, 'can_schedule')
-    def scheduling_issues(self):
-        """Professional reports scheduling issues."""
+    @Permission(groups=[G['professionals'], G['pm'], G['scout'], ])
+    def can_schedule(self):
+        """Validate if user can schedule an Assignment."""
+        return True
+
+    @awaiting_assets.transition(scheduled, 'can_reschedule')
+    @scheduled.transition(scheduled, 'can_reschedule')
+    def reschedule(self):
+        """Professional or PM reschedule an Assignment."""
         pass
+
+    @assigned.transition(assigned, 'can_reschedule')
+    def scheduling_issues(self):
+        """Professional or PM reports scheduling issues."""
+        pass
+
+    @Permission(groups=[G['professionals'], G['pm']])
+    def can_reschedule(self):
+        """Validate if user can reschedule an Assignment."""
+        return True
+
+    @scheduled.transition(assigned, 'can_remove_schedule')
+    def remove_schedule(self):
+        """Customer, Professional or PM removes the Assignment scheduled shoot datetime."""
+        pass
+
+    @Permission(groups=[G['professionals'], G['customers'], G['pm']])
+    def can_remove_reschedule(self):
+        """Validate if user can remove schedule shoot date time of an Assignment."""
+        return True
+
+    @awaiting_assets.transition(cancelled, 'can_cancel')
+    @pending.transition(cancelled, 'can_cancel')
+    @published.transition(cancelled, 'can_cancel')
+    @assigned.transition(cancelled, 'can_cancel')
+    @scheduled.transition(cancelled, 'can_cancel')
+    def cancel(self):
+        """Customer or PM cancel the Assignment."""
+        pass
+
+    @Permission(groups=[G['customers'], G['pm'], G['qa'], ])
+    def can_cancel(self):
+        """Validate if user can cancel an Assignment."""
+        return True
 
     @scheduled.transition(awaiting_assets, 'can_get_ready_for_upload')
     def ready_for_upload(self):
-        """System moves job to awaiting for upload."""
+        """System moves Assignment to awaiting assets (upload)."""
         pass
 
-    @awaiting_assets.transition(in_qa, 'can_upload')
-    def upload(self):
-        """Professional submits all assets for QA."""
-        pass
+    @Permission(groups=[G['system'], ])
+    def can_get_ready_for_upload(self):
+        """Validate if user can move an Assignment from scheduled to waiting for assets."""
+        return True
 
-    @in_qa.transition(pending, 'can_unassign')
-    def unassign(self):
-        """QA unassign a Job."""
-        # Update state and comments on Knack
+    @awaiting_assets.transition(in_qa, 'can_approve')
+    def retract_rejection(self):
+        """QA retract rejection or manually move to QA."""
         pass
 
     @in_qa.transition(approved, 'can_approve')
     def approve(self):
-        """QA approves a Job."""
+        """QA approves the Assignment Set."""
         job = self.document
         if not job.approvable:
             raise self.state.exception_transition(
@@ -161,133 +199,83 @@ class JobWorkflow(BriefyWorkflow):
 
     @in_qa.transition(awaiting_assets, 'can_approve', require_message=True)
     def reject(self):
-        """QA rejects a Job."""
+        """QA rejects Assignment Set."""
         pass
 
-    @approved.transition(in_qa, 'can_retract_approval')
-    @refused.transition(in_qa, 'can_retract_approval_customer')
+    @in_qa.transition(perm_rejected, 'can_approve')
+    def perm_reject(self):
+        """QA permanently reject the Assignment Set."""
+        pass
+
+    @approved.transition(in_qa, 'can_approve')
     def retract_approval(self):
         """QA retracts the approval."""
         pass
 
-    @approved.transition(completed, 'can_complete')
-    @refused.transition(completed, 'can_complete_from_refused')
-    def complete(self):
-        """Customer approve the job."""
+    @Permission(groups=[LR['qa_manager'], G['qa'], ])
+    def can_approve(self):
+        """Validate if user can approve or reject an Assignment Set."""
+        return True
+
+    @awaiting_assets.transition(asset_validation, 'can_upload')
+    def upload(self):
+        """Professional submits all assets for QA."""
         pass
+
+    @Permission(groups=[G['professionals'], G['qa'], G['pm'], ])
+    def can_upload(self):
+        """Validate if user can update submission link and move an Assignment to QA."""
+        return True
+
+    @asset_validation.transition(in_qa, 'can_validate_assets')
+    def validate_assets(self):
+        """System validate uploaded Assets."""
+        pass
+
+    @asset_validation.transition(awaiting_assets, 'can_validate_assets')
+    def invalidate_assets(self):
+        """System invalidate uploaded Assets."""
+        pass
+
+    @Permission(groups=[G['system'], ])
+    def can_validate_assets(self):
+        """Validate if the user can automatic validate or invalidate Assets from an Assignment Set."""
+        return True
+
+    @refused.transition(in_qa, 'can_return_to_qa')
+    def return_to_qa(self):
+        """PM move Assignment back to QA for further revision."""
+        pass
+
+    @Permission(groups=[G['pm'], ])
+    def can_return_to_qa(self):
+        """Validate if the user can return to QA (futher revision) an Assignment Set."""
+        return True
+
+    @approved.transition(completed, 'can_complete')
+    @refused.transition(completed, 'can_complete')
+    def complete(self):
+        """Customer, System or PM accept the Assignment Set."""
+        pass
+
+    @Permission(groups=[G['customers'], G['pm'], G['system']])
+    def can_complete(self):
+        """Validate if user can move an Assignment to completed."""
+        return True
 
     @approved.transition(refused, 'can_refuse', require_message=True)
     def refuse(self):
-        """Customer refuses the job."""
+        """Customer or PM refuses the Assignment Set."""
         pass
 
-    @approved.transition(approved, 'can_deliver')
-    def deliver(self):
-        """Execute the delivery of job assets."""
-        pass
-
-    @pending.transition(cancelled, 'can_cancel')
-    @published.transition(cancelled, 'can_cancel')
-    @assigned.transition(cancelled, 'can_cancel')
-    @scheduled.transition(scheduled, 'can_cancel')
-    def cancel(self):
-        """Customer or Briefy cancel the job.."""
-        pass
+    @Permission(groups=[G['customers'], G['pm'], ])
+    def can_refuse(self):
+        """Validate if user can refuse an Assignment Set."""
+        return True
 
     @Permission(groups=[G['customers'], G['bizdev'], G['system']])
     def can_submit(self):
         """Validate if user can submit the job."""
-        return True
-
-    @Permission(groups=[G['scout'], G['pm']])
-    def can_assign(self):
-        """Validate if user can assign the job to a professional."""
-        return True
-
-    @Permission(groups=[G['professionals'], ])
-    def can_self_assign(self):
-        """Validate if user is able to self assign this job."""
-        # TODO: Check for existing jobs in the same date.
-        return True
-
-    @Permission(groups=[G['system'], ])
-    def can_validate(self):
-        """Validate if user is system and job."""
-        return True
-
-    @Permission(groups=[G['customers'], G['pm'], G['scout'], G['system']])
-    def can_publish(self):
-        """Validate if user can publish this job (job pool)."""
-        return True
-
-    @Permission(groups=[G['customers'], G['pm'], G['scout']])
-    def can_retract(self):
-        """Validate if user can retract job from job pool."""
-        return True
-
-    @Permission(groups=[G['professionals'], G['pm']])
-    def can_schedule(self):
-        """Validate if user can schedule a job."""
-        return True
-
-    @Permission(groups=[G['system'], ])
-    def can_get_ready_for_upload(self):
-        """Validate if user can move Job to waiting for assets."""
-        return True
-
-    @Permission(groups=[G['professionals'], G['qa'], ])
-    def can_upload(self):
-        """Validate if user can move Job to qa."""
-        return True
-
-    @Permission(groups=[LR['qa_manager'], G['qa'], G['pm'], ])
-    def can_unassign(self):
-        """Validate if user can unassign a Job."""
-        return True
-
-    @Permission(groups=[LR['qa_manager'], G['qa'], ])
-    def can_approve(self):
-        """Validate if user can approve a Job."""
-        return True
-
-    @Permission(groups=[LR['qa_manager'], G['qa'], ])
-    def can_reject(self):
-        """Validate if user can reject a Job."""
-        return True
-
-    @Permission(groups=[LR['qa_manager'], G['qa'], ])
-    def can_retract_approval(self):
-        """Validate if user can retract an approval."""
-        return True
-
-    @Permission(groups=[LR['qa_manager'], G['qa'], G['pm']])
-    def can_retract_approval_customer(self):
-        """Validate if user can retract from customer_retract."""
-        return True
-
-    @Permission(groups=[G['customers'], G['pm'], G['system']])
-    def can_complete(self):
-        """Validate if user can move a job to completed."""
-        return True
-
-    @Permission(groups=[G['customers'], G['pm']])
-    def can_complete_from_refused(self):
-        """Validate if user can move a job to completed from refused state."""
-        return True
-
-    @Permission(groups=[G['customers'], ])
-    def can_refuse(self):
-        """Validate if user can reject a job as a customer."""
-        return True
-
-    @Permission(groups=[G['customers'], ])
-    def can_cancel(self):
-        """Validate if user can cancel a job as a customer."""
-        return True
-
-    @Permission(groups=[G['system'], ])
-    def can_deliver(self):
-        """Validate if user can execute a deliver transition."""
         return True
 
 
@@ -372,16 +360,58 @@ class JobOrderWorkflow(BriefyWorkflow):
         """
         return True
 
-    @received.transition(scheduled, 'can_self_assign')
-    def self_assign(self):
-        """Transition: Professional self assign the JobOrder."""
+    @assigned.transition(received, 'can_unassign')
+    @scheduled.transition(received, 'can_unassign')
+    def unassign(self):
+        """Transition: Inform the unassignment to the customer."""
         pass
 
-    @Permission(groups=[G['professionals'], ])
-    def can_self_assign(self):
-        """Permission: Validate if user can self assign a JobOrder.
+    @Permission(groups=[LR['project_manager'], G['pm'], ])
+    def can_unassign(self):
+        """Permission: Validate if user can unassign a JobOrder.
 
-        Groups: g:professionals
+        Groups: g:pm, r:project_manager
+        """
+        return True
+
+    @assigned.transition(received, 'can_remove_availability')
+    def remove_availability(self):
+        """Transition: Inform the removal of availability dates to the customer."""
+        pass
+
+    @Permission(groups=[LR['project_manager'], G['pm'], LR['customer_user'], G['customers'], ])
+    def can_remove_availability(self):
+        """Permission: Validate if user can remove availability dates of a JobOrder.
+
+        Groups: g:pm, r:project_manager, g:customers, r:customer_user
+        """
+        # TODO: make sure customer only unassign
+        return True
+
+    @assigned.transition(assigned, 'can_reassign')
+    @scheduled.transition(assigned, 'can_reassign')
+    def reassign(self):
+        """Transition: Inform the reassignment to the customer."""
+        pass
+
+    @Permission(groups=[LR['project_manager'], G['pm'], ])
+    def can_reassign(self):
+        """Permission: Validate if user can reassign a JobOrder.
+
+        Groups: g:pm, r:project_manager
+        """
+        return True
+
+    @scheduled.transition(assigned, 'can_remove_schedule')
+    def remove_schedule(self):
+        """Transition: Inform the removal of the schedule shoot datetime to the customer."""
+        pass
+
+    @Permission(groups=[LR['project_manager'], G['pm'], G['professionals'], G['customers'], ])
+    def can_remove_schedule(self):
+        """Permission: Validate if user can remove the schedule of a JobOrder.
+
+        Groups: g:pm, r:project_manager
         """
         return True
 
@@ -401,6 +431,7 @@ class JobOrderWorkflow(BriefyWorkflow):
         # TODO: validate if the restrictions before cancel the JobOrder
         return True
 
+    @received.transition(scheduled, 'can_schedule')
     @assigned.transition(scheduled, 'can_schedule')
     def schedule(self):
         """Transition: Inform the schedule to the customer."""
@@ -453,19 +484,31 @@ class JobOrderWorkflow(BriefyWorkflow):
         """
         return True
 
-    @in_qa.transition(received, 'can_reshoot')
     @in_qa.transition(assigned, 'can_reshoot')
-    @refused.transition(received, 'can_reshoot')
     @refused.transition(assigned, 'can_reshoot')
     def reshoot(self):
         """Transition: Inform the reshoot of the JobOrder the customer."""
         pass
 
-    @Permission(groups=[LR['project_manager'], LR['qa_manager'], G['pm'], G['qa'], ])
+    @Permission(groups=[LR['project_manager'], G['pm'], G['qa'], ])
     def can_reshoot(self):
-        """Permission: Validate if user reshoot a JobOrder.
+        """Permission: Validate if user reshoot JobOrder.
 
-        Groups: g:pm, g:qa, r:qa_manager, r:project_manager
+        Groups: g:pm, r:project_manager
+        """
+        return True
+
+    @in_qa.transition(received, 'can_new_shoot')
+    @refused.transition(received, 'can_new_shoot')
+    def new_shoot(self):
+        """Transition: Inform the new shoot of the JobOrder the customer."""
+        pass
+
+    @Permission(groups=[LR['project_manager'], G['pm'], G['qa'], ])
+    def can_new_shoot(self):
+        """Permission: Validate if user reshoot JobOrder.
+
+        Groups: g:pm, g:customers, r:project_manager, r:customer_user
         """
         return True
 
@@ -503,7 +546,5 @@ class JobOrderWorkflow(BriefyWorkflow):
     @Permission(groups=[G['pm'], G['customers'], LR['project_manager'], LR['customer_user'] ])
     def can_require_revision(self):
         """Permission: Validate if user can require revision of the JobOrder.
-
-        Groups: g:pm, g:customers, r:project_manager, r:customer_user
         """
         return True
