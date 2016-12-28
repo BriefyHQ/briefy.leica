@@ -219,7 +219,7 @@ class ModelSync:
 
         return item
 
-    def __call__(self, knack_id=None):
+    def __call__(self, knack_id=None, limit=None):
         """Syncronize one or all items from knack to sqlalchemy model."""
         created = self.created
         updated = self.updated
@@ -236,6 +236,8 @@ class ModelSync:
         # items = items[0:710]
         total = len(items)
         for i, kobj in enumerate(items):
+            if limit and i >= limit:
+                break
             item = self.get_db_item(kobj)
             if item:
                 logger.debug('Try to update item {0}: {1} of {2}'.format(model_name, i, total))
