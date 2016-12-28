@@ -79,16 +79,23 @@ class JobWorkflow(BriefyWorkflow):
         'Job was rejected by the customer.'
     )
 
+    # TODO: "completed" belongs to JobOrderWorkflow
     completed = WS(
         'completed', 'Completed',
         'Job is completed.'
     )
 
     # Transitions
+
+    @created.transition(pending, 'can_make_ready')
+    def make_ready(self):
+        pass
+
+    # TODO: the transition to 'validation' only makes sense after asset submission.
     @created.transition(validation, 'can_submit')
     @edit.transition(validation, 'can_submit')
     def submit(self):
-        """After job creation, or edition submit it to machine validation."""
+        """After job creation, or edition submit it to machine validation.""" # ????
         pass
 
     @validation.transition(pending, 'can_validate')
@@ -193,6 +200,11 @@ class JobWorkflow(BriefyWorkflow):
     def cancel(self):
         """Customer or Briefy cancel the job.."""
         pass
+
+    @Permission(groups=[G['system'], G['scout'], G['pm']])
+    def can_make_ready(self):
+        """Validate if job is ready to be assigned"""
+        return True
 
     @Permission(groups=[G['customers'], G['bizdev'], G['system']])
     def can_submit(self):
