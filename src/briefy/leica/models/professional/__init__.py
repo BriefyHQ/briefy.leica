@@ -4,7 +4,6 @@ from briefy.common.db.mixins.optin import OptIn
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.professional.workflows import ProfessionalWorkflow
-from briefy.leica.models.professional.workflows import SkillWorkflow
 from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.declarative import synonym_for
@@ -157,7 +156,7 @@ class Professional(ProfessionalMixin, Base):
 class Skill(mixins.LeicaMixin):
     """A Skill of a professional."""
 
-    _workflow = SkillWorkflow
+    _workflow = ProfessionalWorkflow
 
     @declared_attr
     def id(cls):
