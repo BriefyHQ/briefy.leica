@@ -41,6 +41,11 @@ def _status_after_or_equal(status_to_check, reference_status):
             return False
 
 
+def first(seq):
+    if not seq:
+        return None
+    return next(iter(seq))
+
 isource_mapping = {item.label: item.value for item in ISource.__members__.values()}
 category_mapping = {item.label: item.value for item in CategoryChoices.__members__.values()}
 
@@ -151,7 +156,7 @@ def add_order_history(session, obj, kobj):
         last_date = date
 
     # check for 'cancelled' status
-    if kobj.approval_status and kobj.approval_status.pop() == 'Cancelled':
+    if first(kobj.approval_status) == 'Cancelled':
         date = kobj.last_approval_date or last_date
         history.append({
             'date': _build_date(date, last_date),
@@ -164,7 +169,7 @@ def add_order_history(session, obj, kobj):
         last_date = date
 
     # check for 'refused' status
-    if kobj.approval_status and kobj.approval_status.pop() == 'Refused':
+    if first(kobj.approval_status) == 'Refused':
         date = kobj.delivery_date_to_client or last_date
         history.append({
             'date': _build_date(date, last_date),
@@ -212,7 +217,7 @@ def add_assignment_history(session, obj, kobj):
     # Except if we need an extra step of human validation for the metadata-  but
     # then we need an extra state.
     # Check for 'pending' status
-    if _status_after_or_equal(kobj.approval_status.pop(), 'Pending'):
+    if _status_after_or_equal(first(kobj.approval_status), 'Pending'):
         history.append({
             'date': _build_date(kobj.input_date),
             'message': 'Transitioned to pending',
@@ -306,7 +311,7 @@ def add_assignment_history(session, obj, kobj):
         last_date = date
 
     # Check for 'approved' status
-    if kobj.approval_status and kobj.approval_status.pop().lower() == 'approved':
+    if kobj.approval_status and first(kobj.approval_status).lower() == 'approved':
         person = _get_identifier(kobj, 'qa_manager', default='g:briefy_qa')
 
         date = kobj.last_approval_date or kobj.submission_date
@@ -323,7 +328,7 @@ def add_assignment_history(session, obj, kobj):
     # Check for 'completed' status # ERROR: 'completed' status should be on JobOrder
     # Check for 'edit' status # This can 't be reliably retrieved from Knack fields
     # Check for 'cancelled' status
-    if kobj.approval_status and kobj.approval_status.pop().lower() == 'cancelled':
+    if kobj.approval_status and first(kobj.approval_status).lower() == 'cancelled':
         date = kobj.last_approval_date or kobj.submission_date
         history.append({
             'date': _build_date(kobj.submission_date, last_date),
@@ -471,6 +476,7 @@ class JobSync(ModelSync):
 
         # update assignment state history
         add_assignment_history(self.session, assignment, kobj)
+
 
     def add(self, kobj, briefy_id):
         """Add new Job to database."""
