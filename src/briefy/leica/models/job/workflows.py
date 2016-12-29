@@ -16,9 +16,14 @@ class JobAssignmentWorkflow(BriefyWorkflow):
     """Workflow for a Job Assignment."""
 
     entity = 'job'
-    initial_state = 'pending'
+    initial_state = 'created'
 
     # States
+    created = WS(
+        'created', 'Created',
+        'Assignment created.'
+    )
+
     pending = WS(
         'pending', 'Pending',
         'Awaiting professional assignment by Briefy or availability dates from customer.'
@@ -80,6 +85,16 @@ class JobAssignmentWorkflow(BriefyWorkflow):
     )
 
     # Transitions
+    @created.transition(pending, 'can_submit')
+    def submit(self):
+        """Submit Assignment."""
+        pass
+
+    @Permission(groups=[G['customers'], G['pm'], G['bizdev'], G['system'], ])
+    def can_submit(self):
+        """Validate if user can submit an Assignment."""
+        return True
+
     @pending.transition(assigned, 'can_assign')
     def assign(self):
         """Define a Professional to the Assignment."""
@@ -274,11 +289,6 @@ class JobAssignmentWorkflow(BriefyWorkflow):
         """Validate if user can refuse an Assignment Set."""
         return True
 
-    @Permission(groups=[G['customers'], G['bizdev'], G['system']])
-    def can_submit(self):
-        """Validate if user can submit the job."""
-        return True
-
 
 class JobLocationWorkflow(BriefyWorkflow):
     """Workflow for a JobLocation."""
@@ -297,9 +307,14 @@ class JobOrderWorkflow(BriefyWorkflow):
     """Workflow for a JobOrder."""
 
     entity = 'joborder'
-    initial_state = 'received'
+    initial_state = 'created'
 
     # States
+    created = WS(
+        'created', 'Created',
+        'Order created.'
+    )
+
     received = WS(
         'received', 'Received',
         'Job Order received to be executed.'
@@ -348,9 +363,19 @@ class JobOrderWorkflow(BriefyWorkflow):
     )
 
     # Transitions
+    @created.transition(received, 'can_submit')
+    def submit(self):
+        """Submit Order."""
+        pass
+
+    @Permission(groups=[G['customers'], G['pm'], G['bizdev'], G['system'], ])
+    def can_submit(self):
+        """Validate if user can submit an JobOrder."""
+        return True
+
     @received.transition(assigned, 'can_assign')
     def assign(self):
-        """Transition: Assign a professional to the JobOder."""
+        """Transition: Assign a professional to the JobOrder."""
         pass
 
     @Permission(groups=[LR['project_manager'], G['pm'], G['scout'], ])
