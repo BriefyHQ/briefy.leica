@@ -40,7 +40,7 @@ class ProjectService(RESTService):
 
     model = Project
     friendly_name = model.__name__
-    default_order_by = 'created_at'
+    default_order_by = 'title'
 
     _default_notify_events = {
         'POST': events.ProjectCreatedEvent,

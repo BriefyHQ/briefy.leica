@@ -130,8 +130,10 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     requirements = sa.Column(sa.Text, default='')
     """Human-readable requirements for a Job."""
 
-    locations = orm.relationship(
+    location = orm.relationship(
         'JobLocation',
+        viewonly=True,
+        uselist=False,
         backref=orm.backref('order')
     )
     """Job Locations.
@@ -267,11 +269,11 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data = {}
         project = self.project
         comments = self.comments
-        locations = self.locations
+        location = self.location
         to_summarize = [
             ('project', project),
             ('comments', comments),
-            ('locations', locations),
+            ('location', location),
         ]
         if project:
             to_summarize.append(('customer', project.customer))

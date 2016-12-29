@@ -50,6 +50,11 @@ History
      * Improve CustomerContact model defining summary and listing attributes (rudaporto).
      * Remove transaction manager and control commit manually in the import / sync classes and remove (rudaporto).
      * Change migration to new address format from briefy.common (rudaporto).
+     * Update summary attributes for job location, professional and professional location (rudaporto).
+     * Update additional fielter fields for jobs, order, professional and projects views (rudaporto).
+     * Change field locations to location on JobOrder since for now we just have one location (rudaporto).
+     * New attribute (relationship uselist=False) on professional model: main_location (rudaporto).
+     * Customized to_dict and to_liting_dict on professional model (rudaporto).
 
 
 1.1.0 (2016-10-04)
