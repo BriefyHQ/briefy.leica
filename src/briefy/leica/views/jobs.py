@@ -46,8 +46,8 @@ class JobService(RESTService):
     filter_related_fields = [
         'project.title', 'title', 'professional.title', 'professional.main_email',
         'project.id', 'description', 'location.locality', 'location.country',
-        'location.fullname', 'location.email', 'professional_user', 'project_manager',
-        'scout_manager', 'qa_manager', 'customer.title'
+        'location.formatted_address', 'location.fullname', 'location.email',
+        'professional_user', 'project_manager', 'scout_manager', 'qa_manager', 'customer.title',
     ]
 
     _default_notify_events = {
@@ -82,6 +82,7 @@ class JobVersions(BaseResource):
 
     model = JobAssignment
     friendly_name = JobAssignment.__name__
+    default_order_by = 'title'
 
     @view(validators='_run_validators')
     def collection_get(self):

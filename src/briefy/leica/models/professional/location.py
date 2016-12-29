@@ -24,6 +24,13 @@ class WorkingLocation(Address, mixins.LeicaMixin, Base):
 
     _workflow = workflows.LocationWorkflow
 
+    __summary_attributes__ = [
+        'id', 'created_at', 'updated_at', 'state',
+        'locality', 'country', 'coordinates', 'formatted_address'
+    ]
+
+    __listing_attributes__ = __summary_attributes__
+
     professional_id = sa.Column(
         UUIDType(binary=False), sa.ForeignKey('professionals.id'), unique=False,
         info={'colanderalchemy': {
