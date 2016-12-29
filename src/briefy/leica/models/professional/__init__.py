@@ -67,7 +67,7 @@ class Professional(ProfessionalMixin, Base):
 
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', 'profiles', 'links', 'locations', 'type'
+            'state_history', 'state', 'profiles', 'links', 'locations', 'type', 'main_location'
         ]
     }
 
@@ -134,7 +134,7 @@ class Professional(ProfessionalMixin, Base):
     main_location = orm.relationship(
         'MainWorkingLocation',
         uselist=False,
-        viewonly=True,
+        viewonly=False,
         cascade='all, delete-orphan',
     )
 
@@ -171,8 +171,12 @@ class Professional(ProfessionalMixin, Base):
         main_location = self.main_location
         to_summarize = [
             ('links', links),
-            ('main_location', main_location),
         ]
+
+        if main_location:
+            to_summarize.append(
+                ('main_location', main_location)
+            )
 
         for k, obj in to_summarize:
             if isinstance(obj, Base):

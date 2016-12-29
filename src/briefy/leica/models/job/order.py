@@ -14,7 +14,7 @@ import sqlalchemy_utils as sautils
 
 __summary_attributes__ = [
     'id', 'title', 'description', 'created_at', 'updated_at', 'state',
-    'price', 'number_of_assets',
+    'price', 'number_of_assets', 'location'
 ]
 
 __listing_attributes__ = __summary_attributes__
@@ -39,7 +39,7 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     __colanderalchemy_config__ = {
         'excludes': [
             'state_history', 'state', 'project', 'comments', 'customer',
-            '_project_manager', '_scout_manager', '_customer_user'
+            '_project_manager', '_scout_manager', '_customer_user', 'location'
         ]
     }
 
@@ -132,11 +132,10 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     location = orm.relationship(
         'JobLocation',
-        viewonly=True,
         uselist=False,
         backref=orm.backref('order')
     )
-    """Job Locations.
+    """Job Location.
 
     Relationship with :class:`briefy.leica.models.job.location.JobLocation`.
     """
@@ -269,11 +268,9 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data = {}
         project = self.project
         comments = self.comments
-        location = self.location
         to_summarize = [
             ('project', project),
             ('comments', comments),
-            ('location', location),
         ]
         if project:
             to_summarize.append(('customer', project.customer))

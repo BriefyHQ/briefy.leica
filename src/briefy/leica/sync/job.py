@@ -101,7 +101,7 @@ class JobSync(ModelSync):
             try:
                 location = JobLocation(**payload)
                 self.session.add(location)
-                obj.locations.append(location)
+                obj.location = location
             except Exception as exc:
                 print(exc)
         else:
