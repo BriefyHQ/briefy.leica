@@ -13,7 +13,9 @@ from briefy.leica.vocabularies import JobInputSource as ISource
 from collections import OrderedDict
 from datetime import datetime
 
+import pytz
 import uuid
+
 
 # Field 'approval_status' on Knack.
 # (Actually maps to several states on JobOrder and associated JobAssignments)
@@ -204,7 +206,7 @@ def add_assignment_history(session, obj, kobj):
         'from': '',
         'to': 'created'
     })
-
+    last_date = kobj.input_date
     # Check for 'validation' status
     # TODO - Current 'JobWorkflow' is incorrect-  validations should be after photo submssion, not
     # after creation
@@ -272,7 +274,7 @@ def add_assignment_history(session, obj, kobj):
         last_date = date
 
     #  Check for 'awaiting_assets' status
-    if kobj.scheduled_shoot_date_time and datetime.utc_now() > kobj.scheduled_shoot_date_time:
+    if kobj.scheduled_shoot_date_time and datetime.now(tz=pytz.UTC) > kobj.scheduled_shoot_date_time:
         history.append({
             'date': _build_date(kobj.scheduled_shoot_date_time, last_date),
             'message': 'Waiting for asset upload (from data on Knack)',
@@ -405,6 +407,7 @@ class JobSync(ModelSync):
                 last_name=kobj.contact_person.last or PLACEHOLDERS['last_name'],
             )
             try:
+                payload.pop('formatted_address', None)
                 location = JobLocation(**payload)
                 self.session.add(location)
                 obj.locations.append(location)
