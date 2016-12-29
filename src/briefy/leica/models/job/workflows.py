@@ -110,7 +110,7 @@ class JobAssignmentWorkflow(BriefyWorkflow):
         """Validate if user can retract job from job pool."""
         return True
 
-    @published.transition(scheduled, 'can_self_assign')
+    @published.transition(assigned, 'can_self_assign')
     def self_assign(self):
         """Professional choose the Assignment from the Pool."""
         pass
@@ -169,6 +169,7 @@ class JobAssignmentWorkflow(BriefyWorkflow):
     @Permission(groups=[G['customers'], G['pm'], G['qa'], ])
     def can_cancel(self):
         """Validate if user can cancel an Assignment."""
+        # TODO: block cancel if is in awaiting assets after being reject first
         return True
 
     @scheduled.transition(awaiting_assets, 'can_get_ready_for_upload')
@@ -375,6 +376,7 @@ class JobOrderWorkflow(BriefyWorkflow):
         return True
 
     @assigned.transition(received, 'can_remove_availability')
+    @scheduled.transition(received, 'can_remove_availability')
     def remove_availability(self):
         """Transition: Inform the removal of availability dates to the customer."""
         pass
