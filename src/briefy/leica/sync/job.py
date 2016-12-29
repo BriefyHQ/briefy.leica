@@ -44,16 +44,19 @@ def _status_after_or_equal(status_to_check, reference_status):
 
 
 def first(seq):
+    """Return the first element of a sequence or None if it is empty.
+    """
     if not seq:
         return None
     return next(iter(seq))
+
 
 isource_mapping = {item.label: item.value for item in ISource.__members__.values()}
 category_mapping = {item.label: item.value for item in CategoryChoices.__members__.values()}
 
 
 def _build_date(dt, minimal=None):
-    """Returns a safe str representation for a datetime
+    """Return a safe str representation for a datetime.
 
     Given a valid datetime, or None and a valid minimal datetime,
     returns a valid str representation for it in i soformat-
@@ -68,7 +71,7 @@ def _build_date(dt, minimal=None):
 
 
 def _get_identifier(kobj, field, default='Unknown'):
-    """Retrieve the display name of given Knack relationship field"""
+    """Retrieve the display name of given Knack relationship field."""
     attr = getattr(kobj, field, [])
     if not attr:
         return default
@@ -77,7 +80,6 @@ def _get_identifier(kobj, field, default='Unknown'):
 
 def add_order_history(session, obj, kobj):
     """Add state_history and state information to the Order."""
-
     history = []
 
     # create 'received' status
@@ -192,7 +194,6 @@ def add_order_history(session, obj, kobj):
 
 def add_assignment_history(session, obj, kobj):
     """Add state_history and state information to the Assigment."""
-
     history = []
 
     # Check for 'created' status
@@ -274,7 +275,8 @@ def add_assignment_history(session, obj, kobj):
         last_date = date
 
     #  Check for 'awaiting_assets' status
-    if kobj.scheduled_shoot_date_time and datetime.now(tz=pytz.UTC) > kobj.scheduled_shoot_date_time:
+    dt = kobj.scheduled_shoot_date_time
+    if dt and datetime.now(tz=pytz.UTC) > dt:
         history.append({
             'date': _build_date(kobj.scheduled_shoot_date_time, last_date),
             'message': 'Waiting for asset upload (from data on Knack)',
@@ -410,7 +412,7 @@ class JobSync(ModelSync):
                 payload.pop('formatted_address', None)
                 location = JobLocation(**payload)
                 self.session.add(location)
-                obj.location = location
+                obj.locations.append(location)
             except Exception as exc:
                 print(exc)
         else:
@@ -479,7 +481,6 @@ class JobSync(ModelSync):
 
         # update assignment state history
         add_assignment_history(self.session, assignment, kobj)
-
 
     def add(self, kobj, briefy_id):
         """Add new Job to database."""
