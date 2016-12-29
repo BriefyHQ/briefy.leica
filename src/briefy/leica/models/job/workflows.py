@@ -240,7 +240,7 @@ class JobAssignmentWorkflow(BriefyWorkflow):
 
     @Permission(groups=[G['system'], ])
     def can_validate_assets(self):
-        """Validate if the user can automatic validate or invalidate Assets from an Assignment Set."""
+        """Validate if the user can automatic validate /invalidate Assets from an Assignment Set."""
         return True
 
     @refused.transition(in_qa, 'can_return_to_qa')
@@ -519,7 +519,9 @@ class JobOrderWorkflow(BriefyWorkflow):
         """Transition: Customer or PM accept the JobOrder."""
         pass
 
-    @Permission(groups=[G['pm'], G['customers'], G['system'], LR['project_manager'], LR['customer_user'], ])
+    @Permission(
+        groups=[G['pm'], G['customers'], G['system'], LR['project_manager'], LR['customer_user'], ]
+    )
     def can_accept(self):
         """Permission: Validate if user can accept the JobOrder.
 
@@ -532,7 +534,7 @@ class JobOrderWorkflow(BriefyWorkflow):
         """Transition: PM permanently refuse the JobOrder."""
         pass
 
-    @Permission(groups=[G['pm'], G['bizdev'], LR['project_manager'], ])
+    @Permission(groups=[G['pm'], G['bizdev'], LR['project_manager']])
     def can_perm_refuse(self):
         """Permission: Validate if user can permanently refuse the JobOrder.
 
@@ -545,8 +547,7 @@ class JobOrderWorkflow(BriefyWorkflow):
         """Transition: PM or Customer require revision of the JobOrder."""
         pass
 
-    @Permission(groups=[G['pm'], G['customers'], LR['project_manager'], LR['customer_user'] ])
+    @Permission(groups=[G['pm'], G['customers'], LR['project_manager'], LR['customer_user']])
     def can_require_revision(self):
-        """Permission: Validate if user can require revision of the JobOrder.
-        """
+        """Permission: Validate if user can require revision of the JobOrder."""
         return True
