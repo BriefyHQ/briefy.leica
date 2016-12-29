@@ -261,7 +261,7 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
         :returns: Boolean indicating if it is possible to approve this job.
         """
         approvable_assets_count = self.total_approvable_assets
-        check_images = self.order.number_of_assets <= approvable_assets_count
+        check_images = self.order.number_required_assets <= approvable_assets_count
         return check_images
 
     @declared_attr
@@ -302,9 +302,9 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
 
     @declared_attr
     def number_required_assets(cls) -> str:
-        """Return the number_of_assets of the JobOrder."""
+        """Return the number_required_assets of the JobOrder."""
         return orm.column_property(
-            select([JobOrder.number_of_assets]).where(
+            select([JobOrder.number_required_assets]).where(
                 JobOrder.id == cls.order_id
             ),
         )

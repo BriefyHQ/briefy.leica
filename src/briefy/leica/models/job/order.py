@@ -13,8 +13,8 @@ import sqlalchemy as sa
 import sqlalchemy_utils as sautils
 
 __summary_attributes__ = [
-    'id', 'title', 'description', 'created_at', 'updated_at', 'state',
-    'price', 'number_of_assets',
+    'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
+    'price', 'number_required_assets', 'location'
 ]
 
 __listing_attributes__ = __summary_attributes__
@@ -39,7 +39,7 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     __colanderalchemy_config__ = {
         'excludes': [
             'state_history', 'state', 'project', 'comments', 'customer',
-            '_project_manager', '_scout_manager', '_customer_user'
+            '_project_manager', '_scout_manager', '_customer_user', 'location'
         ]
     }
 
@@ -124,17 +124,18 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     Options come from :mod:`briefy.leica.vocabularies`.
     """
 
-    number_of_assets = sa.Column(sa.Integer(), default=20)
-    """Number of assets of a job."""
+    number_required_assets = sa.Column(sa.Integer(), default=20)
+    """Number of required assets of a job."""
 
     requirements = sa.Column(sa.Text, default='')
     """Human-readable requirements for a Job."""
 
-    locations = orm.relationship(
+    location = orm.relationship(
         'JobLocation',
+        uselist=False,
         backref=orm.backref('order')
     )
-    """Job Locations.
+    """Job Location.
 
     Relationship with :class:`briefy.leica.models.job.location.JobLocation`.
     """
@@ -267,11 +268,9 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data = {}
         project = self.project
         comments = self.comments
-        locations = self.locations
         to_summarize = [
             ('project', project),
             ('comments', comments),
-            ('locations', locations),
         ]
         if project:
             to_summarize.append(('customer', project.customer))

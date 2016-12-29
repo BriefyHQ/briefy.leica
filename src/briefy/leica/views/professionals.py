@@ -41,6 +41,10 @@ class ProfessionalService(RESTService):
     model = Professional
     friendly_name = model.__name__
     default_order_by = 'title'
+    filter_related_fields = [
+        'title', 'customer_user', 'project_manager', 'customer.title',
+        'main_location.formatted_address', 'main_location.country', 'main_location.locality'
+    ]
 
     _default_notify_events = {
         'POST': events.ProfessionalCreatedEvent,

@@ -40,10 +40,23 @@ class JobSync(ModelSync):
     parent_model = Project
     bulk_insert = False
 
+    def get_slug(self, job_id: int, assignment: int = 0):
+        """Create new slug for Order and Assignment."""
+        job_id = str(job_id)
+        while len(str(job_id)) < 4:
+            job_id = '0' + job_id
+
+        slug = '1701-PS{0}-{1}'.format(job_id[1], job_id[1:4])
+        if assignment:
+            slug = '{slug}_{assignment}'.format(slug=slug, assignment=assignment)
+
+        return slug
+
     def get_payload(self, kobj, briefy_id=None):
         """Create payload for customer object."""
         order_payload = super().get_payload(kobj, briefy_id)
         project, kproject = self.get_parent(kobj, 'project')
+        job_id = kobj.internal_job_id or kobj.job_id
 
         order_payload.update(
             dict(
@@ -54,10 +67,11 @@ class JobSync(ModelSync):
                 customer_id=project.customer.id,
                 price=self.parse_decimal(kobj.set_price),
                 customer_order_id=kobj.job_id,
-                job_id=kobj.internal_job_id or kobj.job_id,
+                slug=self.get_slug(job_id),
+                job_id=job_id,
                 external_id=kobj.id,
                 requirements=kobj.client_specific_requirement,
-                number_of_assets=kobj.number_of_photos,
+                number_required_assets=kobj.number_of_photos,
                 source=isource_mapping.get(str(kobj.input_source), 'briefy'),
             )
         )
@@ -101,7 +115,7 @@ class JobSync(ModelSync):
             try:
                 location = JobLocation(**payload)
                 self.session.add(location)
-                obj.locations.append(location)
+                obj.location = location
             except Exception as exc:
                 print(exc)
         else:

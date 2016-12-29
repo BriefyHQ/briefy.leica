@@ -4,6 +4,7 @@ from briefy.common.db.mixins.optin import OptIn
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.professional.workflows import ProfessionalWorkflow
+from briefy.ws.utils.user import add_user_info_to_state_history
 from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.declarative import synonym_for
@@ -58,14 +59,14 @@ class Professional(ProfessionalMixin, Base):
 
     __summary_attributes__ = [
         'id', 'title', 'description', 'created_at', 'updated_at', 'state',
-        'main_email', 'main_mobile'
+        'main_email', 'main_mobile', 'type', 'photo_path'
     ]
 
     __listing_attributes__ = __summary_attributes__
 
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', 'profiles', 'links', 'locations', 'type'
+            'state_history', 'state', 'profiles', 'links', 'locations', 'type', 'main_location'
         ]
     }
 
@@ -129,6 +130,13 @@ class Professional(ProfessionalMixin, Base):
         cascade='all, delete-orphan',
     )
 
+    main_location = orm.relationship(
+        'MainWorkingLocation',
+        uselist=False,
+        viewonly=False,
+        cascade='all, delete-orphan',
+    )
+
     type = sa.Column(sa.String(50), nullable=False)
 
     @hybrid_property
@@ -151,6 +159,51 @@ class Professional(ProfessionalMixin, Base):
         if cls_name == 'professional':
             args['polymorphic_on'] = cls.type
         return args
+
+    def _summarize_relationships(self) -> dict:
+        """Summarize relationship information.
+
+        :return: Dictionary with summarized info for relationships.
+        """
+        data = {}
+        links = self.links
+        main_location = self.main_location
+        to_summarize = [
+            ('links', links),
+        ]
+
+        if main_location:
+            to_summarize.append(
+                ('main_location', main_location)
+            )
+
+        for k, obj in to_summarize:
+            if isinstance(obj, Base):
+                serialized = obj.to_summary_dict() if obj else None
+            else:
+                serialized = [o.to_summary_dict() for o in obj]
+            data[k] = serialized
+        return data
+
+    def to_listing_dict(self) -> dict:
+        """Return a summarized version of the dict representation of this Class.
+
+        Used to serialize this object within a parent object serialization.
+        :returns: Dictionary with fields and values used by this Class
+        """
+        data = super().to_listing_dict()
+        data.update(self._summarize_relationships())
+        return data
+
+    def to_dict(self):
+        """Return a dict representation of this object."""
+        data = super().to_dict()
+        data.update(self._summarize_relationships())
+
+        # Workflow history
+        add_user_info_to_state_history(self.state_history)
+
+        return data
 
 
 class Skill(mixins.LeicaMixin):
