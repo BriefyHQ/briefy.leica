@@ -71,7 +71,7 @@ options = [
 ContactTypes = LabeledEnum('ContactTypes', options)
 
 options = [
-    ('new', 'new', 'New'),
+    ('new', 'new', 'New Set'),
     ('returned_photographer', 'returned_photographer', 'Returned by Photographer'),
     ('refused_customer', 'refused_customer', 'Refused by Customer'),
 ]

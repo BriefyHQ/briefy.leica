@@ -60,6 +60,7 @@ History
      * Remove the last lazy='joined' to improve listing latency (rudaporto).
      * Added new field set_type to show and filter different types of sets in QA (rudaporto).
      * Refactory _summarize_relationships and also insert it in the default to_dict and to_listing_dict (rudaporto).
+     * Update import Job to populate set_type and also added set_type to the JobAssignment listing (rudaporto).
 
 
 1.1.0 (2016-10-04)

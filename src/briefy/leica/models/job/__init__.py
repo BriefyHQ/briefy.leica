@@ -26,7 +26,7 @@ __summary_attributes__ = [
 ]
 
 __listing_attributes__ = __summary_attributes__ + [
-    'assignment_date', 'last_approval_date', 'submission_date'
+    'assignment_date', 'last_approval_date', 'submission_date', 'set_type'
 ]
 
 

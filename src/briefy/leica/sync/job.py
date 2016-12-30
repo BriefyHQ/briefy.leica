@@ -94,7 +94,16 @@ class JobSync(ModelSync):
         )
         obj.state_history = [history]
         obj.state = state
-        self.session.add(obj)
+        further_edit = kobj.further_editing_requested_by_client
+        if state == 'in_qa':
+            if kobj.new_set:
+                obj.set_type = 'new'
+            else:
+                obj.set_type = 'returned_photographer'
+
+            if further_edit:
+                obj.set_type = 'refused_customer'
+
         model = obj.__class__.__name__
         logger.debug('{model} imported with state: {state}'.format(model=model, state=state))
 
