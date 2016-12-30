@@ -1,4 +1,5 @@
 """Import and sync Knack Company to Leica Customer."""
+from briefy.common.utils.data import generate_slug
 from briefy.leica import logger
 from briefy.leica.sync import cleanse_phone_number
 from briefy.leica.sync import ModelSync
@@ -71,10 +72,13 @@ class CustomerSync(ModelSync):
         """Create payload for customer object."""
         result = super().get_payload(kobj, briefy_id)
         location_dict = create_location_dict('company_address', kobj)
+        title = kobj.company_name
+        slug = generate_slug(title)
         result.update(
             dict(
                 external_id=kobj.id,
-                title=kobj.company_name,
+                slug=slug,
+                title=title,
                 legal_name=kobj.legal_name,
                 tax_id=kobj.tax_id,
                 tax_country=location_dict.get('country'),
