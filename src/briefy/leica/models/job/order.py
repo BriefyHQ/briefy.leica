@@ -27,6 +27,7 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     _workflow = workflows.JobOrderWorkflow
 
     __summary_attributes__ = __summary_attributes__
+    __summary_attributes_relations__ = ['project', 'comments', 'customer']
     __listing_attributes__ = __listing_attributes__
 
     __raw_acl__ = (
@@ -260,29 +261,6 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         project = self.project
         return project.tech_requirements
 
-    def _summarize_relationships(self) -> dict:
-        """Summarize relationship information.
-
-        :return: Dictionary with summarized info for relationships.
-        """
-        data = {}
-        project = self.project
-        comments = self.comments
-        to_summarize = [
-            ('project', project),
-            ('comments', comments),
-        ]
-        if project:
-            to_summarize.append(('customer', project.customer))
-
-        for k, obj in to_summarize:
-            if isinstance(obj, Base):
-                serialized = obj.to_summary_dict() if obj else None
-            else:
-                serialized = [o.to_summary_dict() for o in obj]
-            data[k] = serialized
-        return data
-
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
 
@@ -290,7 +268,6 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_listing_dict()
-        data.update(self._summarize_relationships())
         data = self._apply_actors_info(data)
         return data
 
@@ -302,7 +279,6 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data['availability'] = self.availability
         data['price'] = self.price
         data['slug'] = self.slug
-        data.update(self._summarize_relationships())
 
         # Workflow history
         add_user_info_to_state_history(self.state_history)

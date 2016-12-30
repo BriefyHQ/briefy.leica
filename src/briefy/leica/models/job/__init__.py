@@ -5,6 +5,7 @@ from briefy.leica.models import mixins
 from briefy.leica.models.job import workflows
 from briefy.leica.models.job.order import JobOrder
 from briefy.leica.utils.transitions import get_transition_date
+from briefy.leica.vocabularies import TypesOfSetChoices
 from briefy.ws.utils.user import add_user_info_to_state_history
 from datetime import datetime
 from sqlalchemy import orm
@@ -87,6 +88,9 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
     _workflow = workflows.JobWorkflow
 
     __summary_attributes__ = __summary_attributes__
+    __summary_attributes_relations__ = [
+        'project', 'comments', 'location', 'professional' 'customer'
+    ]
     __listing_attributes__ = __listing_attributes__
 
     __raw_acl__ = (
@@ -104,6 +108,24 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
             '_professional_user'
         ]
     }
+
+    set_type = sa.Column(
+        sautils.ChoiceType(TypesOfSetChoices, impl=sa.String()),
+        nullable=True,
+        default=None,
+        info={
+            'colanderalchemy': {
+                'title': 'Type of Set',
+                'default': colander.null,
+                'missing': colander.drop,
+                'typ': colander.String
+            }
+        }
+    )
+    """Type of Set when in QA.
+
+    Define the type of set when in QA. It will be updated by the workflow.
+    """
 
     order_id = sa.Column(
         sautils.UUIDType,
@@ -151,7 +173,7 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
     # Assets for this job
     assets = orm.relationship(
         'Asset',
-        backref=orm.backref('job', lazy='joined'),
+        backref=orm.backref('job'),
         lazy='dynamic'
     )
     """Assets connected to this job.
@@ -319,35 +341,6 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
         """Return if this job is assigned or not."""
         return True if (self.assignment_date and self.professional_id) else False
 
-    def _summarize_relationships(self) -> dict:
-        """Summarize relationship information.
-
-        :return: Dictionary with summarized info for relationships.
-        """
-        data = {}
-        project = self.project
-        comments = self.comments
-        location = self.location
-        professional = self.professional
-        to_summarize = [
-            ('project', project),
-            ('comments', comments),
-            ('location', location),
-            ('professional', professional),
-        ]
-        if project:
-            to_summarize.append(('customer', project.customer))
-
-        for key, obj in to_summarize:
-            if obj is None:
-                serialized = None
-            elif isinstance(obj, Base):
-                serialized = obj.to_summary_dict()
-            else:
-                serialized = [item.to_summary_dict() for item in obj if item]
-            data[key] = serialized
-        return data
-
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
 
@@ -355,7 +348,6 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_listing_dict()
-        data.update(self._summarize_relationships())
         data = self._apply_actors_info(data)
         return data
 
@@ -366,8 +358,6 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
         data['description'] = self.description
         data['briefing'] = self.briefing
         data['assignment_date'] = self.assignment_date
-
-        data.update(self._summarize_relationships())
 
         # Workflow history
         add_user_info_to_state_history(self.state_history)

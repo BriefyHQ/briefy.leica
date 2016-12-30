@@ -4,7 +4,6 @@ from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.project import workflows
 from briefy.ws.utils.user import add_user_info_to_state_history
-from briefy.ws.utils.user import get_public_user_info
 from sqlalchemy import orm
 from zope.interface import Interface
 from zope.interface import implementer
@@ -46,6 +45,8 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     __summary_attributes__ = [
         'id', 'title', 'description', 'created_at', 'updated_at', 'state', 'external_id'
     ]
+
+    __summary_attributes_relations__ = ['customer']
 
     __listing_attributes__ = [
         'id', 'title', 'description', 'created_at', 'updated_at', 'state',
@@ -160,23 +161,6 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     )
     """Path to release template file."""
 
-    def _apply_actors_info(self, data: dict) -> dict:
-        """Apply actors information for a given data dictionary.
-
-        :param data: Data dictionary.
-        :return: Data dictionary.
-        """
-        actors = [(k, k) for k in self.__actors__]
-        info = self._actors_info()
-        for key, attr in actors:
-            try:
-                value = info.get(attr).pop()
-            except (AttributeError, IndexError):
-                data[key] = None
-            else:
-                data[key] = get_public_user_info(value) if value else None
-        return data
-
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
 
@@ -184,17 +168,13 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_listing_dict()
-        customer = self.customer
-        data['customer'] = customer.to_summary_dict() if customer else None
         data = self._apply_actors_info(data)
         return data
 
     def to_dict(self):
         """Return a dict representation of this object."""
         data = super().to_dict()
-        customer = self.customer
         data['slug'] = self.slug
-        data['customer'] = customer.to_listing_dict() if customer else None
         data = self._apply_actors_info(data)
         add_user_info_to_state_history(self.state_history)
         # Apply actor information to data

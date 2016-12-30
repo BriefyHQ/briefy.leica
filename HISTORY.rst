@@ -57,6 +57,9 @@ History
      * Customized to_dict and to_liting_dict on professional model (rudaporto).
      * Change number_of_assets Order field to number_required_assets (rudaporto).
      * Update import to generate the Order slug from the knack.job_id (internal) (rdaporto).
+     * Remove the last lazy='joined' to improve listing latency (rudaporto).
+     * Added new field set_type to show and filter different types of sets in QA (rudaporto).
+     * Refactory _summarize_relationships and also insert it in the default to_dict and to_listing_dict (rudaporto).
 
 
 1.1.0 (2016-10-04)

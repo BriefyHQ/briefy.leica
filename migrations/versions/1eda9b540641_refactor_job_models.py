@@ -16,6 +16,7 @@ from sqlalchemy_utils import types
 from briefy.leica.models.professional.location import DistanceUnits
 from briefy.leica.vocabularies import ContactTypes
 from briefy.leica.vocabularies import JobInputSource
+from briefy.leica.vocabularies import TypesOfSetChoices
 
 revision = '1eda9b540641'
 down_revision = None
@@ -155,6 +156,10 @@ def upgrade():
         sa.Column('created_at', AwareDateTime(), autoincrement=False, nullable=True),
         sa.Column('updated_at', AwareDateTime(), autoincrement=False, nullable=True),
         sa.Column('state', sa.String(length=100), autoincrement=False, nullable=True),
+        sa.Column('set_type',
+                  types.ChoiceType(TypesOfSetChoices, impl=sa.String()),
+                  autoincrement=False,
+                  nullable=True),
         sa.Column('payout_currency', types.CurrencyType(), autoincrement=False, nullable=True),
         sa.Column('payout_value', sa.Integer(), autoincrement=False, nullable=True),
         sa.Column('travel_expenses', sa.Integer(), autoincrement=False, nullable=True),
@@ -622,6 +627,10 @@ def upgrade():
         sa.Column('payable', sa.Boolean(), nullable=False),
         sa.Column('scheduled_datetime', AwareDateTime(), nullable=True),
         sa.Column('order_id', types.UUIDType(), nullable=False),
+        sa.Column('set_type',
+                  types.ChoiceType(TypesOfSetChoices, impl=sa.String()),
+                  autoincrement=False,
+                  nullable=True),
         sa.Column('professional_id', types.UUIDType(), nullable=True),
         sa.Column('submission_path', types.URLType(), nullable=True),
         sa.Column('total_assets', sa.Integer(), nullable=True),

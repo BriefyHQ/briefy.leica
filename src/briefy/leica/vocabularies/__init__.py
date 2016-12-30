@@ -69,3 +69,11 @@ options = [
 
 
 ContactTypes = LabeledEnum('ContactTypes', options)
+
+options = [
+    ('new', 'new', 'New'),
+    ('returned_photographer', 'returned_photographer', 'Returned by Photographer'),
+    ('refused_customer', 'refused_customer', 'Refused by Customer'),
+]
+
+TypesOfSetChoices = LabeledEnum('TypesOfSetChoices', options)
