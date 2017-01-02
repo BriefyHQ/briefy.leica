@@ -34,8 +34,8 @@ def create_slug_from_order(context):
     """Create the JobAssignment slug from the JobOrder slug."""
     order_id = context.current_parameters.get('order_id')
     job_order = JobOrder.get(order_id)
-    total = len(job_order.assignments)
-    return '{0}_{1}'.format(job_order.slug, total + 1)
+    total = len(job_order.assignments) + 1
+    return '{slug}_{total:02d}'.format(slug=job_order.slug, total=total)
 
 
 class IJob(Interface):

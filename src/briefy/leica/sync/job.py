@@ -42,14 +42,11 @@ class JobSync(ModelSync):
 
     def get_slug(self, job_id: str, assignment: int = 0):
         """Create new slug for Order and Assignment."""
-        # when kjob.internal_job_id is == 0 (knack bug) the value will the customer job id
-        job_id = job_id.replace('-', '')
-        while len(str(job_id)) < 4:
-            job_id = '0' + job_id
-        job_id = job_id[-4:]
+        # TODO: check jobs in knack with internal_job_id == 0
+        job_id = '{job_id:04d}'.format(job_id=int(job_id.replace('-', '')[:4]))
         slug = '1701-PS{0}-{1}'.format(job_id[0], job_id[1:4])
         if assignment:
-            slug = '{slug}_{assignment}'.format(slug=slug, assignment=assignment)
+            slug = '{slug}_{assignment:02d}'.format(slug=slug, assignment=assignment)
 
         return slug
 
