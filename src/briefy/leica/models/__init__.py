@@ -12,6 +12,8 @@ from briefy.leica.models.customer.contact import CustomerContact
 from briefy.leica.models.job import IJob  # noQA
 from briefy.leica.models.job import JobAssignment
 from briefy.leica.models.job.order import JobOrder
+from briefy.leica.models.job.pool import JobPool
+from briefy.leica.models.job.pool import ProfessionalsInPool
 from briefy.leica.models.job.location import JobLocation
 from briefy.leica.models.professional import Photographer
 from briefy.leica.models.professional import Professional
@@ -55,14 +57,16 @@ ALL_MODELS = [
     JobAssignment,
     JobLocation,
     JobOrder,
+    JobPool,
     Link,
     Linkedin,
     LocalRole,
     MainWorkingLocation,
     Photographer,
-    Portfolio,
     Professional,
+    ProfessionalsInPool,
     Project,
+    Portfolio,
     Tumblr,
     Twitter,
     Videographer,

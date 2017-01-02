@@ -64,6 +64,11 @@ History
      * Fix slug generation when import form knack (rudaporto).
      * Added new field slug in the JobAssingmnet and update db migration and import from knack (rudaporto).
      * New function that use the insert context to create JobAssigmnet slug from the JobOrder slug (rudaporto).
+     * Added database models: JobPool and ProfessionalsInPool (association model between JobPool and Professional) (rudaporto).
+     * Basic workflow for a JobPool model (rudaporto).
+     * Added new ForeignKey pool_id (nullable=True) in JobAssignment model to link an JobAssignment to a JobPool (rudaporto).
+     * Added resource view /pools to manage JobPools (rudaporto).
+     * Update database fixtures to support composed primary keys (rudaporto).
 
 
 1.1.0 (2016-10-04)

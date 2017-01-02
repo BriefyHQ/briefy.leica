@@ -140,6 +140,11 @@ class Professional(ProfessionalMixin, Base):
         cascade='all, delete-orphan',
     )
 
+    pools = orm.relationship(
+        'ProfessionalsInPool',
+        back_populates='professional'
+    )
+
     type = sa.Column(sa.String(50), nullable=False)
 
     @hybrid_property
