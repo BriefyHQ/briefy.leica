@@ -30,6 +30,14 @@ __listing_attributes__ = __summary_attributes__ + [
 ]
 
 
+def create_slug_from_order(context):
+    """Create the JobAssignment slug from the JobOrder slug."""
+    order_id = context.current_parameters.get('order_id')
+    job_order = JobOrder.get(order_id)
+    total = len(job_order.assignments)
+    return '{0}_{1}'.format(job_order.slug, total + 1)
+
+
 class IJob(Interface):
     """Marker interface for Job."""
 
@@ -113,9 +121,9 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
                       sa.String(255),
                       nullable=True,
                       index=True,
+                      default=create_slug_from_order,
                       info={'colanderalchemy': {
                           'title': 'Description',
-                          'missing': colander.drop,
                           'typ': colander.String}}
                       )
     """Slug -- friendly id -- for the object.
