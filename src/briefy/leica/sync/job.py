@@ -40,13 +40,14 @@ class JobSync(ModelSync):
     parent_model = Project
     bulk_insert = False
 
-    def get_slug(self, job_id: int, assignment: int = 0):
+    def get_slug(self, job_id: str, assignment: int = 0):
         """Create new slug for Order and Assignment."""
-        job_id = str(job_id)
+        # when kjob.internal_job_id is == 0 (knack bug) the value will the customer job id
+        job_id = job_id.replace('-', '')
         while len(str(job_id)) < 4:
             job_id = '0' + job_id
-
-        slug = '1701-PS{0}-{1}'.format(job_id[1], job_id[1:4])
+        job_id = job_id[-4:]
+        slug = '1701-PS{0}-{1}'.format(job_id[0], job_id[1:4])
         if assignment:
             slug = '{slug}_{assignment}'.format(slug=slug, assignment=assignment)
 
@@ -56,7 +57,7 @@ class JobSync(ModelSync):
         """Create payload for customer object."""
         order_payload = super().get_payload(kobj, briefy_id)
         project, kproject = self.get_parent(kobj, 'project')
-        job_id = kobj.internal_job_id or kobj.job_id
+        job_id = str(kobj.internal_job_id or kobj.job_id)
 
         order_payload.update(
             dict(
@@ -160,9 +161,11 @@ class JobSync(ModelSync):
             payable = False
 
         professional_id = self.get_user(kobj, 'responsible_photographer')
+        job_id = str(kobj.internal_job_id or kobj.job_id)
         payload = dict(
             id=uuid.uuid4(),
             order_id=obj.id,
+            slug=self.get_slug(job_id, assignment=1),
             professional_id=professional_id,
             payout_value=self.parse_decimal(kobj.photographer_payout),
             payout_currency=kobj.currency_payout or 'EUR',

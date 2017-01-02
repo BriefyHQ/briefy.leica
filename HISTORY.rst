@@ -61,6 +61,8 @@ History
      * Added new field set_type to show and filter different types of sets in QA (rudaporto).
      * Refactory _summarize_relationships and also insert it in the default to_dict and to_listing_dict (rudaporto).
      * Update import Job to populate set_type and also added set_type to the JobAssignment listing (rudaporto).
+     * Fix slug generation when import form knack (rudaporto).
+     * Added new field slug in the JobAssingmnet and update db migration and import from knack. (rudaporto).
 
 
 1.1.0 (2016-10-04)
