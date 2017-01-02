@@ -2,7 +2,6 @@
 from briefy.leica import models
 from conftest import BaseVersionedTestView
 
-import datetime
 import pytest
 
 
