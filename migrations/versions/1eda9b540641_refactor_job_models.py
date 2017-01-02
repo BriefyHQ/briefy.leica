@@ -160,6 +160,7 @@ def upgrade():
                   types.ChoiceType(TypesOfSetChoices, impl=sa.String()),
                   autoincrement=False,
                   nullable=True),
+        sa.Column('slug', sa.String(length=255), autoincrement=False, nullable=True),
         sa.Column('payout_currency', types.CurrencyType(), autoincrement=False, nullable=True),
         sa.Column('payout_value', sa.Integer(), autoincrement=False, nullable=True),
         sa.Column('travel_expenses', sa.Integer(), autoincrement=False, nullable=True),
@@ -183,6 +184,9 @@ def upgrade():
                     unique=False)
     op.create_index(op.f('ix_jobassignments_version_transaction_id'),
                     'jobassignments_version', ['transaction_id'],
+                    unique=False)
+    op.create_index(op.f('ix_jobassignments_version_slug'),
+                    'jobassignments_version', ['slug'],
                     unique=False)
     op.create_table(
         'joborders_version',
@@ -619,6 +623,7 @@ def upgrade():
         sa.Column('created_at', AwareDateTime(), nullable=True),
         sa.Column('updated_at', AwareDateTime(), nullable=True),
         sa.Column('state', sa.String(length=100), nullable=True),
+        sa.Column('slug', sa.String(length=255), autoincrement=False, nullable=True),
         sa.Column('state_history', types.JSONType(), nullable=True),
         sa.Column('payout_currency', types.CurrencyType(), nullable=True),
         sa.Column('payout_value', sa.Integer(), nullable=False),
@@ -640,6 +645,7 @@ def upgrade():
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('id')
     )
+    op.create_index(op.f('ix_jobassignments_slug'), 'jobassignments', ['slug'], unique=False)
     op.create_table(
         'joblocations',
         sa.Column('country', types.CountryType(), nullable=False),
@@ -841,6 +847,8 @@ def downgrade():
     op.drop_index(op.f('ix_jobassignments_version_operation_type'),
                   table_name='jobassignments_version')
     op.drop_index(op.f('ix_jobassignments_version_end_transaction_id'),
+                  table_name='jobassignments_version')
+    op.drop_index(op.f('ix_jobassignments_version_slug'),
                   table_name='jobassignments_version')
     op.drop_table('jobassignments_version')
     op.drop_index(op.f('ix_images_version_transaction_id'), table_name='images_version')
