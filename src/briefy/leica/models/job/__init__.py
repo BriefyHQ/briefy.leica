@@ -139,7 +139,6 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
         :func:`briefy.common.utils.data.generate_contextual_slug`
         :param value: Value of the new slug
         """
-        import pdb; pdb.set_trace()
         self._slug = value
 
     set_type = sa.Column(
