@@ -66,7 +66,7 @@ def upgrade():
         'assets_version', ['transaction_id'], unique=False)
     op.create_table(
         'comments',
-        sa.Column('id', types.UUIDType(), nullable=False),
+        sa.Column('id', types.UUIDType(), nullable=False, unique=True),
         sa.Column('created_at', AwareDateTime(), nullable=True),
         sa.Column('updated_at', AwareDateTime(), nullable=True),
         sa.Column('state', sa.String(length=100), nullable=True),
@@ -84,7 +84,7 @@ def upgrade():
     op.create_table(
         'customers',
         sa.Column('external_id', sa.String(), nullable=True),
-        sa.Column('id', types.UUIDType(), nullable=False),
+        sa.Column('id', types.UUIDType(), nullable=False, unique=True),
         sa.Column('parent_customer_id', types.UUIDType(), nullable=True),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('description', sa.Text(), nullable=True),
@@ -98,10 +98,63 @@ def upgrade():
         sa.Column('tax_country', types.CountryType(), nullable=True),
         sa.Column('legal_name', sa.String(length=255), nullable=True),
         sa.PrimaryKeyConstraint('id'),
-        sa.ForeignKeyConstraint(['id'], ['customers.id'],),
-        sa.UniqueConstraint('id')
+        sa.UniqueConstraint('id'),
+        sa.ForeignKeyConstraint(['parent_customer_id'], ['customers.id'], ),
     )
     op.create_index(op.f('ix_customers_slug'), 'customers', ['slug'], unique=False)
+
+    op.create_table(
+        'jobpools',
+        sa.Column('external_id', sa.String(), nullable=True),
+        sa.Column('id', types.UUIDType(), nullable=False, unique=True),
+        sa.Column('title', sa.String(), nullable=False),
+        sa.Column('description', sa.Text(), nullable=True),
+        sa.Column('slug', sa.String(length=255), nullable=True),
+        sa.Column('created_at', AwareDateTime(), nullable=True),
+        sa.Column('updated_at', AwareDateTime(), nullable=True),
+        sa.Column('state', sa.String(length=100), nullable=True),
+        sa.Column('state_history', types.JSONType(), nullable=True),
+        sa.Column('country', types.CountryType, nullable=False),
+        sa.PrimaryKeyConstraint('id'),
+        sa.UniqueConstraint('id')
+    )
+    op.create_index(op.f('ix_jobpools_slug'), 'jobpools', ['slug'], unique=False)
+
+    op.create_table(
+        'jobpools_version',
+        sa.Column('external_id', sa.String(), autoincrement=False, nullable=True),
+        sa.Column('id', types.UUIDType(), autoincrement=False, nullable=False),
+        sa.Column('title', sa.String(), autoincrement=False, nullable=True),
+        sa.Column('description', sa.Text(), autoincrement=False, nullable=True),
+        sa.Column('slug', sa.String(length=255), autoincrement=False, nullable=True),
+        sa.Column('created_at', AwareDateTime(), autoincrement=False,
+                  nullable=True),
+        sa.Column('updated_at', AwareDateTime(), autoincrement=False,
+                  nullable=True),
+        sa.Column('state', sa.String(length=100), autoincrement=False, nullable=True),
+        sa.Column('country', types.CountryType, nullable=True),
+        sa.Column('transaction_id', sa.BigInteger(), autoincrement=False, nullable=False),
+        sa.Column('end_transaction_id', sa.BigInteger(), nullable=True),
+        sa.Column('operation_type', sa.SmallInteger(), nullable=False),
+        sa.PrimaryKeyConstraint('id', 'transaction_id')
+    )
+    op.create_index(
+        op.f('ix_jobpools_version_end_transaction_id'),
+        'jobpools_version', ['end_transaction_id'],
+        unique=False)
+    op.create_index(
+        op.f('ix_jobpools_version_operation_type'),
+        'jobpools_version',
+        ['operation_type'],
+        unique=False)
+    op.create_index(
+        op.f('ix_jobpools_version_slug'), 'jobpools_version', ['slug'], unique=False)
+    op.create_index(
+        op.f('ix_jobpools_version_transaction_id'),
+        'jobpools_version',
+        ['transaction_id'],
+        unique=False)
+
     op.create_table(
         'customers_version',
         sa.Column('external_id', sa.String(), autoincrement=False, nullable=True),
@@ -168,6 +221,7 @@ def upgrade():
         sa.Column('payable', sa.Boolean(), autoincrement=False, nullable=True),
         sa.Column('scheduled_datetime', AwareDateTime(), autoincrement=False, nullable=True),
         sa.Column('order_id', types.UUIDType(), autoincrement=False, nullable=True),
+        sa.Column('pool_id', types.UUIDType(), autoincrement=False, nullable=True),
         sa.Column('professional_id', types.UUIDType(), autoincrement=False, nullable=True),
         sa.Column('submission_path', types.URLType(), autoincrement=False, nullable=True),
         sa.Column('total_assets', sa.Integer(), autoincrement=False, nullable=True),
@@ -241,7 +295,7 @@ def upgrade():
         'joborders_version', ['transaction_id'], unique=False)
     op.create_table(
         'localroles',
-        sa.Column('id', types.UUIDType(), nullable=False),
+        sa.Column('id', types.UUIDType(), nullable=False, unique=True),
         sa.Column('created_at', AwareDateTime(), nullable=True),
         sa.Column('updated_at', AwareDateTime(), nullable=True),
         sa.Column('entity_type', sa.String(length=255), nullable=False),
@@ -295,7 +349,6 @@ def upgrade():
     op.create_table(
         'professionals',
         sa.Column('external_id', sa.String(), nullable=True),
-        sa.Column('title', sa.String(), nullable=True),
         sa.Column('slug', sa.String(length=255), nullable=True),
         sa.Column('first_name', sa.String(length=255), nullable=False),
         sa.Column('last_name', sa.String(length=255), nullable=False),
@@ -312,7 +365,7 @@ def upgrade():
         sa.Column('partners', sa.Boolean(), nullable=True),
         sa.Column('main_email', types.EmailType(), nullable=True),
         sa.Column('main_mobile', types.PhoneNumberType(), nullable=True),
-        sa.Column('id', types.UUIDType(), nullable=False),
+        sa.Column('id', types.UUIDType(), nullable=False, unique=True),
         sa.Column('photo_path', sa.String(length=255), nullable=True),
         sa.Column('type', sa.String(length=50), nullable=False),
         sa.PrimaryKeyConstraint('id'),
@@ -320,10 +373,21 @@ def upgrade():
     )
     op.create_index(
         op.f('ix_professionals_slug'), 'professionals', ['slug'], unique=False)
+
+    op.create_table(
+        'professionals_in_pool',
+        sa.Column('created_at', AwareDateTime(), nullable=True),
+        sa.Column('updated_at', AwareDateTime(), nullable=True),
+        sa.Column('pool_id', types.UUIDType(), nullable=False),
+        sa.Column('professional_id', types.UUIDType(), nullable=False),
+        sa.ForeignKeyConstraint(['pool_id'], ['jobpools.id'], ),
+        sa.ForeignKeyConstraint(['professional_id'], ['professionals.id'], ),
+        sa.PrimaryKeyConstraint('pool_id', 'professional_id')
+    )
+
     op.create_table(
         'professionals_version',
         sa.Column('external_id', sa.String(), autoincrement=False, nullable=True),
-        sa.Column('title', sa.String(), autoincrement=False, nullable=True),
         sa.Column('slug', sa.String(length=255), autoincrement=False, nullable=True),
         sa.Column('first_name', sa.String(length=255), autoincrement=False, nullable=True),
         sa.Column('last_name', sa.String(length=255), autoincrement=False, nullable=True),
@@ -471,7 +535,7 @@ def upgrade():
         sa.Column('info', types.JSONType(), nullable=True),
         sa.Column('timezone', types.TimezoneType(), nullable=True),
         sa.Column('coordinates', geo.POINT(), nullable=True),
-        sa.Column('id', types.UUIDType(), nullable=False),
+        sa.Column('id', types.UUIDType(), nullable=False, unique=True),
         sa.Column('formatted_address', sa.String(255), nullable=True),
         sa.Column('created_at', AwareDateTime(), nullable=True),
         sa.Column('updated_at', AwareDateTime(), nullable=True),
@@ -484,7 +548,7 @@ def upgrade():
     )
     op.create_table(
         'customercontacts',
-        sa.Column('id', types.UUIDType(), nullable=False),
+        sa.Column('id', types.UUIDType(), nullable=False, unique=True),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('description', sa.Text(), nullable=True),
         sa.Column('slug', sa.String(length=255), nullable=True),
@@ -507,7 +571,7 @@ def upgrade():
         op.f('ix_customercontacts_slug'), 'customercontacts', ['slug'], unique=False)
     op.create_table(
         'links',
-        sa.Column('id', types.UUIDType(), nullable=False),
+        sa.Column('id', types.UUIDType(), nullable=False, unique=True),
         sa.Column('created_at', AwareDateTime(), nullable=True),
         sa.Column('updated_at', AwareDateTime(), nullable=True),
         sa.Column('state', sa.String(length=100), nullable=True),
@@ -515,21 +579,21 @@ def upgrade():
         sa.Column('professional_id', types.UUIDType(), nullable=True),
         sa.Column('type', sa.String(length=50), nullable=True),
         sa.Column('url', types.URLType(), nullable=False),
-        sa.Column('is_social', sa.Boolean(), nullable=True),
         sa.ForeignKeyConstraint(['professional_id'], ['professionals.id'], ),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('id')
     )
     op.create_table(
         'photographers',
-        sa.Column('id', types.UUIDType(), nullable=False),
+        sa.Column('id', types.UUIDType(), nullable=False, unique=True),
         sa.ForeignKeyConstraint(['id'], ['professionals.id'], ),
-        sa.PrimaryKeyConstraint('id')
+        sa.PrimaryKeyConstraint('id'),
+        sa.UniqueConstraint('id')
     )
     op.create_table(
         'projects',
         sa.Column('external_id', sa.String(), nullable=True),
-        sa.Column('id', types.UUIDType(), nullable=False),
+        sa.Column('id', types.UUIDType(), nullable=False, unique=True),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('description', sa.Text(), nullable=True),
         sa.Column('slug', sa.String(length=255), nullable=True),
@@ -558,7 +622,7 @@ def upgrade():
         op.f('ix_projects_slug'), 'projects', ['slug'], unique=False)
     op.create_table(
         'videographers',
-        sa.Column('id', types.UUIDType(), nullable=False),
+        sa.Column('id', types.UUIDType(), nullable=False, unique=True),
         sa.ForeignKeyConstraint(['id'], ['professionals.id'], ),
         sa.PrimaryKeyConstraint('id')
     )
@@ -570,7 +634,7 @@ def upgrade():
         sa.Column('timezone', types.TimezoneType(), nullable=True),
         sa.Column('coordinates', geo.POINT(), nullable=True),
         sa.Column('formatted_address', sa.String(255), nullable=True),
-        sa.Column('id', types.UUIDType(), nullable=False),
+        sa.Column('id', types.UUIDType(), nullable=False, unique=True),
         sa.Column('created_at', AwareDateTime(), nullable=True),
         sa.Column('updated_at', AwareDateTime(), nullable=True),
         sa.Column('state', sa.String(length=100), nullable=True),
@@ -586,7 +650,7 @@ def upgrade():
     op.create_table(
         'joborders',
         sa.Column('external_id', sa.String(), nullable=True),
-        sa.Column('id', types.UUIDType(), nullable=False),
+        sa.Column('id', types.UUIDType(), nullable=False, unique=True),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('description', sa.Text(), nullable=True),
         sa.Column('slug', sa.String(length=255), nullable=True),
@@ -619,7 +683,7 @@ def upgrade():
         op.f('ix_joborders_slug'), 'joborders', ['slug'], unique=False)
     op.create_table(
         'jobassignments',
-        sa.Column('id', types.UUIDType(), nullable=False),
+        sa.Column('id', types.UUIDType(), nullable=False, unique=True),
         sa.Column('created_at', AwareDateTime(), nullable=True),
         sa.Column('updated_at', AwareDateTime(), nullable=True),
         sa.Column('state', sa.String(length=100), nullable=True),
@@ -632,6 +696,7 @@ def upgrade():
         sa.Column('payable', sa.Boolean(), nullable=False),
         sa.Column('scheduled_datetime', AwareDateTime(), nullable=True),
         sa.Column('order_id', types.UUIDType(), nullable=False),
+        sa.Column('pool_id', types.UUIDType(), nullable=True),
         sa.Column('set_type',
                   types.ChoiceType(TypesOfSetChoices, impl=sa.String()),
                   autoincrement=False,
@@ -641,6 +706,7 @@ def upgrade():
         sa.Column('total_assets', sa.Integer(), nullable=True),
         sa.Column('total_approvable_assets', sa.Integer(), nullable=True),
         sa.ForeignKeyConstraint(['order_id'], ['joborders.id'], ),
+        sa.ForeignKeyConstraint(['pool_id'], ['jobpools.id'], ),
         sa.ForeignKeyConstraint(['professional_id'], ['professionals.id'], ),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('id')
@@ -653,7 +719,7 @@ def upgrade():
         sa.Column('info', types.JSONType(), nullable=True),
         sa.Column('timezone', types.TimezoneType(), nullable=True),
         sa.Column('coordinates', geo.POINT(), nullable=True),
-        sa.Column('id', types.UUIDType(), nullable=False),
+        sa.Column('id', types.UUIDType(), nullable=False, unique=True),
         sa.Column('formatted_address', sa.String(255), nullable=True),
         sa.Column('created_at', AwareDateTime(), nullable=True),
         sa.Column('updated_at', AwareDateTime(), nullable=True),
@@ -710,7 +776,7 @@ def upgrade():
         sa.Column('width', sa.Integer(), nullable=True),
         sa.Column('height', sa.Integer(), nullable=True),
         sa.Column('raw_metadata', types.JSONType(), nullable=True),
-        sa.Column('id', types.UUIDType(), nullable=False),
+        sa.Column('id', types.UUIDType(), nullable=False, unique=True),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('description', sa.Text(), nullable=True),
         sa.Column('slug', sa.String(length=255), nullable=True),
@@ -733,25 +799,76 @@ def upgrade():
         op.f('ix_assets_slug'), 'assets', ['slug'], unique=False)
     op.create_table(
         'images',
-        sa.Column('id', types.UUIDType(), nullable=False),
+        sa.Column('id', types.UUIDType(), nullable=False, unique=True),
         sa.ForeignKeyConstraint(['id'], ['assets.id'], ),
-        sa.PrimaryKeyConstraint('id')
+        sa.PrimaryKeyConstraint('id'),
+        sa.UniqueConstraint('id')
     )
     op.create_table(
         'threesixtyimages',
-        sa.Column('id', types.UUIDType(), nullable=False),
+        sa.Column('id', types.UUIDType(), nullable=False, unique=True),
         sa.ForeignKeyConstraint(['id'], ['assets.id'], ),
-        sa.PrimaryKeyConstraint('id')
+        sa.PrimaryKeyConstraint('id'),
+        sa.UniqueConstraint('id')
     )
     op.create_table(
         'videos',
         sa.Column('duration', sa.Integer(), nullable=True),
         sa.Column('codecs', sa.Text(), nullable=True),
         sa.Column('audio_channels', sa.Integer(), nullable=True),
-        sa.Column('id', types.UUIDType(), nullable=False),
+        sa.Column('id', types.UUIDType(), nullable=False, unique=True),
         sa.ForeignKeyConstraint(['id'], ['assets.id'], ),
-        sa.PrimaryKeyConstraint('id')
+        sa.PrimaryKeyConstraint('id'),
+        sa.UniqueConstraint('id')
     )
+
+    op.create_table(
+        'professionals_in_pool_version',
+        sa.Column('created_at', AwareDateTime(), autoincrement=False, nullable=True),
+        sa.Column('updated_at', AwareDateTime(), autoincrement=False, nullable=True),
+        sa.Column('pool_id', types.UUIDType(), autoincrement=False, nullable=False),
+        sa.Column('professional_id', types.UUIDType(), autoincrement=False, nullable=False),
+        sa.Column('transaction_id', sa.BigInteger(), autoincrement=False, nullable=False),
+        sa.Column('end_transaction_id', sa.BigInteger(), nullable=True),
+        sa.Column('operation_type', sa.SmallInteger(), nullable=False),
+        sa.PrimaryKeyConstraint('pool_id', 'professional_id', 'transaction_id')
+    )
+    op.create_index(
+        op.f('ix_professionals_in_pool_version_end_transaction_id'),
+        'professionals_in_pool_version', ['end_transaction_id'],
+        unique=False)
+    op.create_index(
+        op.f('ix_professionals_in_pool_version_operation_type'),
+        'professionals_in_pool_version',
+        ['operation_type'], unique=False)
+    op.create_index(
+        op.f('ix_professionals_in_pool_version_transaction_id'),
+        'professionals_in_pool_version', ['transaction_id'],
+        unique=False)
+
+    op.create_unique_constraint(None, 'assets', ['id'])
+    op.create_unique_constraint(None, 'comments', ['id'])
+    op.create_unique_constraint(None, 'customerbillingaddresses', ['id'])
+    op.create_unique_constraint(None, 'customercontacts', ['id'])
+    op.create_unique_constraint(None, 'customers', ['id'])
+    op.create_unique_constraint(None, 'jobassignments', ['id'])
+    op.create_unique_constraint(None, 'joblocations', ['id'])
+    op.create_unique_constraint(None, 'joborders', ['id'])
+    op.create_unique_constraint(None, 'jobpools', ['id'])
+    op.create_unique_constraint(None, 'links', ['id'])
+    op.create_unique_constraint(None, 'localroles', ['id'])
+    op.create_unique_constraint(None, 'professionals', ['id'])
+    op.create_unique_constraint(None, 'projects', ['id'])
+    op.create_unique_constraint(None, 'workinglocations', ['id'])
+
+    op.drop_index('idx_workinglocations_coordinates',
+                  table_name='workinglocations')
+    op.drop_index('idx_joblocations_version_coordinates',
+                  table_name='joblocations_version')
+    op.drop_index('idx_joblocations_coordinates',
+                  table_name='joblocations')
+    op.drop_index('idx_customerbillingaddresses_coordinates',
+                  table_name='customerbillingaddresses')
 
 
 def downgrade():

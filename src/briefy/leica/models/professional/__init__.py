@@ -141,8 +141,9 @@ class Professional(ProfessionalMixin, Base):
     )
 
     pools = orm.relationship(
-        'ProfessionalsInPool',
-        back_populates='professional'
+        'JobPool',
+        secondary='professionals_in_pool',
+        back_populates='professionals'
     )
 
     type = sa.Column(sa.String(50), nullable=False)

@@ -11,7 +11,7 @@ import sqlalchemy as sa
 import sqlalchemy_utils as sautils
 
 
-class ProfessionalsInPool(Timestamp, Base):
+class ProfessionalsInPool(mixins.VersionMixin, Timestamp, Base):
     """Relationshiop between Professional and JobPool."""
 
     __session__ = Session
@@ -54,8 +54,7 @@ class ProfessionalsInPool(Timestamp, Base):
     """
 
     pool = orm.relationship(
-        'JobPool',
-        back_populates='professionals'
+        'JobPool'
     )
     """Job Pool.
 
@@ -63,8 +62,7 @@ class ProfessionalsInPool(Timestamp, Base):
     """
 
     professional = orm.relationship(
-        'Professional',
-        back_populates='pools'
+        'Professional'
     )
     """Professional.
 
@@ -93,6 +91,13 @@ class JobPool(mixins.KLeicaVersionedMixin, Base):
         ('delete', ()),
     )
 
+    country = sa.Column(sautils.CountryType, nullable=False)
+    """Country of this JobPool.
+
+    Country will be stored as a ISO 3166-2 information.
+    i.e.: DE, BR, ID
+    """
+
     # Job Assignments
     assignments = orm.relationship(
         'JobAssignment',
@@ -104,8 +109,9 @@ class JobPool(mixins.KLeicaVersionedMixin, Base):
     """
 
     professionals = orm.relationship(
-        'ProfessionalsInPool',
-        back_populates='pool'
+        'Professional',
+        secondary='professionals_in_pool',
+        back_populates='pools'
     )
 
     def to_dict(self):

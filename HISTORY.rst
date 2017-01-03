@@ -69,6 +69,9 @@ History
      * Added new ForeignKey pool_id (nullable=True) in JobAssignment model to link an JobAssignment to a JobPool (rudaporto).
      * Added resource view /pools to manage JobPools (rudaporto).
      * Update database fixtures to support composed primary keys (rudaporto).
+     * Add JobPool sync/import script and classes (rudaporto).
+     * Fix JobPool and Professional association relationships (rudaporto).
+     * Update initial database migration script with all model changes (rudaporto).
 
 
 1.1.0 (2016-10-04)

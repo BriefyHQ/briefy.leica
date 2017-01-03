@@ -5,6 +5,7 @@ from briefy.leica.models import Comment
 from briefy.leica.models import JobAssignment
 from briefy.leica.models import JobLocation
 from briefy.leica.models import JobOrder
+from briefy.leica.models import JobPool
 from briefy.leica.models import Project
 from briefy.leica.sync import PLACEHOLDERS
 from briefy.leica.sync import ModelSync
@@ -43,7 +44,8 @@ class JobSync(ModelSync):
     def get_slug(self, job_id: str, assignment: int = 0):
         """Create new slug for Order and Assignment."""
         # TODO: check jobs in knack with internal_job_id == 0
-        job_id = '{job_id:04d}'.format(job_id=int(job_id.replace('-', '')[:4]))
+        job_id = job_id.replace('C', '')
+        job_id = '{job_id:04d}'.format(job_id=int(job_id.replace('-', '')[-4:]))
         slug = '1701-PS{0}-{1}'.format(job_id[0], job_id[1:4])
         if assignment:
             slug = '{slug}_{assignment:02d}'.format(slug=slug, assignment=assignment)
@@ -159,9 +161,14 @@ class JobSync(ModelSync):
 
         professional_id = self.get_user(kobj, 'responsible_photographer')
         job_id = str(kobj.internal_job_id or kobj.job_id)
+        kpool_id = kobj.job_pool[0]['id'] if kobj.job_pool else None
+        job_pool = JobPool.query().filter_by(external_id=kpool_id).one_or_none()
+        if kpool_id and not job_pool:
+            print('Knack Poll ID: {0} do not found in leica.'.format(kpool_id))
         payload = dict(
             id=uuid.uuid4(),
             order_id=obj.id,
+            pool=job_pool,
             slug=self.get_slug(job_id, assignment=1),
             professional_id=professional_id,
             payout_value=self.parse_decimal(kobj.photographer_payout),
