@@ -171,6 +171,7 @@ class Professional(ProfessionalMixin, Base):
     def to_dict(self):
         """Return a dict representation of this object."""
         data = super().to_dict()
+        data['slug'] = self.slug
 
         # Workflow history
         add_user_info_to_state_history(self.state_history)

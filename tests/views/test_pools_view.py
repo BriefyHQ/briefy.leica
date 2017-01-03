@@ -13,7 +13,7 @@ class TestPoolOrderView(BaseVersionedTestView):
     dependencies = [
     ]
     ignore_validation_fields = [
-        'state_history', 'state', 'slug'
+        'state_history', 'state'
     ]
     file_path = 'data/job_pools.json'
     model = models.JobPool

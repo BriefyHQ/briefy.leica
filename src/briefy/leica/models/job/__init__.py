@@ -147,7 +147,10 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
         :func:`briefy.common.utils.data.generate_contextual_slug`
         :param value: Value of the new slug
         """
-        self._slug = value
+        if self._slug:
+            raise Exception('Slug should not be changed.')
+        else:
+            self._slug = value
 
     set_type = sa.Column(
         sautils.ChoiceType(TypesOfSetChoices, impl=sa.String()),

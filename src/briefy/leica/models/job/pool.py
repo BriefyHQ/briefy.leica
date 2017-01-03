@@ -107,3 +107,9 @@ class JobPool(mixins.KLeicaVersionedMixin, Base):
         'ProfessionalsInPool',
         back_populates='pool'
     )
+
+    def to_dict(self):
+        """Return a dict representation of this object."""
+        data = super().to_dict()
+        data['slug'] = self.slug
+        return data
