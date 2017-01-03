@@ -2,9 +2,29 @@
 from briefy.leica import models
 from conftest import BaseModelTest
 
+import pytest
 
+
+@pytest.mark.usefixtures('create_dependencies')
 class TestProfessionalModel(BaseModelTest):
     """Test Professional."""
 
+    dependencies = [
+        (models.JobPool, 'data/job_pools.json'),
+    ]
     file_path = 'data/professionals.json'
     model = models.Professional
+
+    def test_add_pool_to_professional(self, instance_obj, session):
+        """Add job pools to the professional."""
+        pools = models.JobPool.query().all()
+        assert len(pools) == 3
+        assert len(instance_obj.pools) == 0
+
+        for item in pools:
+            instance_obj.pools.append(item)
+            assert instance_obj.id == str(item.professionals[0].id)
+            assert len(item.professionals) == 1
+
+        session.flush()
+        assert len(instance_obj.pools) == 3

@@ -10,8 +10,23 @@ class TestJobPoolModel(BaseModelTest):
     """Test JobPool."""
 
     dependencies = [
+        (models.Professional, 'data/professionals.json'),
     ]
     file_path = 'data/job_pools.json'
     model = models.JobPool
     initial_wf_state = 'created'
     number_of_wf_transtions = 1
+
+    def test_add_professional_to_pool(self, instance_obj, session):
+        """Add professionals to the job pool."""
+        professionals = models.Professional.query().all()
+        assert len(professionals) == 3
+        assert len(instance_obj.professionals) == 0
+
+        for prof in professionals:
+            instance_obj.professionals.append(prof)
+            assert instance_obj.id == str(prof.pools[0].id)
+            assert len(prof.pools) == 1
+
+        session.flush()
+        assert len(instance_obj.professionals) == 3

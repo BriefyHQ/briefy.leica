@@ -70,7 +70,7 @@ History
      * Added resource view /pools to manage JobPools (rudaporto).
      * Update database fixtures to support composed primary keys (rudaporto).
      * Add JobPool sync/import script and classes (rudaporto).
-     * Fix JobPool and Professional association relationships (rudaporto).
+     * Fix JobPool and Professional association relationships and update tests (rudaporto).
      * Update initial database migration script with all model changes (rudaporto).
 
 
