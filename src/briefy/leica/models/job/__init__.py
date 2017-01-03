@@ -113,7 +113,7 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
             'state_history', 'state', 'order', 'comments',
             'professional', 'assets', 'project', 'location',
             '_scout_manager', '_project_manager', '_qa_manager',
-            '_professional_user'
+            '_professional_user', 'pool'
         ]
     }
 
@@ -147,7 +147,10 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
         :func:`briefy.common.utils.data.generate_contextual_slug`
         :param value: Value of the new slug
         """
-        self._slug = value
+        if self._slug:
+            raise Exception('Slug should not be changed.')
+        else:
+            self._slug = value
 
     set_type = sa.Column(
         sautils.ChoiceType(TypesOfSetChoices, impl=sa.String()),
@@ -182,6 +185,24 @@ class JobAssignment(JobAssignmentDates, mixins.AssignmentBriefyRoles,
     """Job Order ID.
 
     Relantionship to :class:`briefy.leica.models.job.order.JobOrder`
+    """
+
+    pool_id = sa.Column(
+        sautils.UUIDType,
+        sa.ForeignKey('jobpools.id'),
+        nullable=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Job Pool ID',
+                'validator': colander.uuid,
+                'typ': colander.String,
+                'missing': colander.drop,
+            }
+        }
+    )
+    """Job Pool ID.
+
+    Relantionship to :class:`briefy.leica.models.job.pool.JobPool`
     """
 
     # Professional

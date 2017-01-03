@@ -16,7 +16,7 @@ class LocationContactInfoMixin(NameMixin):
     email = sa.Column(sautils.types.EmailType(), nullable=True, unique=False)
     """Email of the contact person."""
 
-    mobile = sa.Column(sautils.types.PhoneNumberType(), nullable=False, unique=False)
+    mobile = sa.Column(sautils.types.PhoneNumberType(), nullable=True, unique=False)
     """Mobile phone number of the contact person."""
 
     additional_phone = sa.Column(sautils.types.PhoneNumberType(), nullable=True, unique=False)

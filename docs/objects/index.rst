@@ -14,5 +14,6 @@ Objects defined in this package.
    job
    joborder
    job_location
+   jobpool
    asset
    comment

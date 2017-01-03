@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class JobWorkflow(BriefyWorkflow):
-    """Workflow for a Job."""
+    """Workflow for a JobAssignment."""
 
     entity = 'job'
     initial_state = 'created'
@@ -442,5 +442,67 @@ class JobOrderWorkflow(BriefyWorkflow):
         """Permission: Validate if user reassign a JobOrder.
 
         Groups: g:pm, r:project_manager
+        """
+        return True
+
+
+class JobPoolWorkflow(BriefyWorkflow):
+    """Workflow for a JobPool."""
+
+    entity = 'jobpool'
+    initial_state = 'created'
+
+    # States
+    created = WS(
+        'created', 'Created',
+        'JobPool created.'
+    )
+
+    active = WS(
+        'active', 'Active',
+        'JobPool is active.'
+    )
+
+    inactive = WS(
+        'inactive', 'Inactive',
+        'JobPool is inactive.'
+    )
+
+    @created.transition(active, 'submit')
+    def submit(self):
+        """Transition: JobPool was submitted."""
+        pass
+
+    @Permission(groups=[G['scout'], G['pm'], ])
+    def can_submit(self):
+        """Permission: Validate if user can submit a JobPool.
+
+        Groups: g:pm, g:scout
+        """
+        return True
+
+    @active.transition(inactive, 'can_disable')
+    def disable(self):
+        """Transition: JobPool was moved to inactive."""
+        pass
+
+    @Permission(groups=[G['scout'], G['pm'], ])
+    def can_disable(self):
+        """Permission: Validate if user can inactive a JobPool.
+
+        Groups: g:pm, g:scout
+        """
+        return True
+
+    @inactive.transition(active, 'can_reactivated')
+    def reactivated(self):
+        """Transition: JobPool was moved back to active."""
+        pass
+
+    @Permission(groups=[G['scout'], G['pm'], ])
+    def can_reactivated(self):
+        """Permission: Validate if user can reactivated a JobPool.
+
+        Groups: g:pm, g:scout
         """
         return True

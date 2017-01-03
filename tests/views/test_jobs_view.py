@@ -1,4 +1,4 @@
-"""Test jobs view."""
+"""Test job assignments (/jobs) view."""
 from briefy.leica import models
 from conftest import BaseVersionedTestView
 

@@ -140,6 +140,12 @@ class Professional(ProfessionalMixin, Base):
         cascade='all, delete-orphan',
     )
 
+    pools = orm.relationship(
+        'JobPool',
+        secondary='professionals_in_pool',
+        back_populates='professionals'
+    )
+
     type = sa.Column(sa.String(50), nullable=False)
 
     @hybrid_property
@@ -166,6 +172,7 @@ class Professional(ProfessionalMixin, Base):
     def to_dict(self):
         """Return a dict representation of this object."""
         data = super().to_dict()
+        data['slug'] = self.slug
 
         # Workflow history
         add_user_info_to_state_history(self.state_history)
