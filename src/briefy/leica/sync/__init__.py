@@ -234,7 +234,6 @@ class ModelSync:
         else:
             items = self.get_items()
 
-        # items = items[:730]
         total = len(items)
         for i, kobj in enumerate(items):
             if limit and i >= limit:
