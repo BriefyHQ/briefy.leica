@@ -499,6 +499,17 @@ class JobSync(ModelSync):
         # update assignment state history
         add_assignment_history(self.session, assignment, kobj)
 
+        # populate the set_type field
+        further_edit = kobj.further_editing_requested_by_client
+        state = obj.state
+        if state == 'in_qa':
+            if kobj.new_set:
+                obj.set_type = 'new'
+            else:
+                obj.set_type = 'returned_photographer'
+            if further_edit:
+                obj.set_type = 'refused_customer'
+
     def add(self, kobj, briefy_id):
         """Add new Job to database."""
         obj = super().add(kobj, briefy_id)
