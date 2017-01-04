@@ -1,4 +1,5 @@
 """Import Projects to Leica."""
+from briefy.common.utils.data import generate_slug
 from briefy.leica.models import Customer
 from briefy.leica.models import Project
 from briefy.leica.sync import ModelSync
@@ -20,11 +21,13 @@ class ProjectSync(ModelSync):
 
         # TODO: 'project_comment' but not really used on knack
 
-        name = kobj.project_name.strip()
-        tech_requirements = CONSTRAINTS[name]
+        title = kobj.project_name.strip()
+        slug = generate_slug(title)
+        tech_requirements = CONSTRAINTS[title]
         result.update(
             dict(
-                title=name,
+                title=title,
+                slug=slug,
                 description=kobj.project_abstract,
                 customer_id=customer.id,
                 briefing=kobj.briefing,

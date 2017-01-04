@@ -13,8 +13,8 @@ import sqlalchemy as sa
 import sqlalchemy_utils as sautils
 
 __summary_attributes__ = [
-    'id', 'title', 'description', 'created_at', 'updated_at', 'state',
-    'price', 'number_of_assets', 'location'
+    'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
+    'price', 'number_required_assets', 'location'
 ]
 
 __listing_attributes__ = __summary_attributes__
@@ -124,8 +124,8 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     Options come from :mod:`briefy.leica.vocabularies`.
     """
 
-    number_of_assets = sa.Column(sa.Integer(), default=20)
-    """Number of assets of a job."""
+    number_required_assets = sa.Column(sa.Integer(), default=20)
+    """Number of required assets of a job."""
 
     requirements = sa.Column(sa.Text, default='')
     """Human-readable requirements for a Job."""

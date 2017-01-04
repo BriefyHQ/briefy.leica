@@ -51,6 +51,14 @@ def first(seq):
     return next(iter(seq))
 
 
+def get_id_and_name(kobj, field_name):
+    """Given a Briefy.Knack object, retrieves its ID and Display friendly string."""
+    field = getattr(kobj, field_name, None)
+    if not field:
+        return None, None
+    return field[0]['id'], field[0]['identifier']
+
+
 isource_mapping = {item.label: item.value for item in ISource.__members__.values()}
 category_mapping = {item.label: item.value for item in CategoryChoices.__members__.values()}
 
@@ -78,7 +86,7 @@ def _get_identifier(kobj, field, default='Unknown'):
     return attr[0].get('identifier', default)
 
 
-def add_order_history(session, obj, kobj):
+def add_order_history(session, obj, kobj, qa=None):
     """Add state_history and state information to the Order."""
     history = []
 
@@ -192,7 +200,7 @@ def add_order_history(session, obj, kobj):
     logger.debug('{model} imported with state: {state}'.format(model=model, state=obj.state))
 
 
-def add_assignment_history(session, obj, kobj):
+def add_assignment_history(session, obj, kobj, qa=None, professional=None):
     """Add state_history and state information to the Assigment."""
     history = []
 
@@ -225,7 +233,7 @@ def add_assignment_history(session, obj, kobj):
             'date': _build_date(kobj.input_date),
             'message': 'Transitioned to pending',
             'actor': 'g:system',
-            'transition': 'make_ready',
+            'transition': 'submit',
             'from': 'created',
             'to': 'pending'
         })
@@ -371,10 +379,23 @@ class JobSync(ModelSync):
     parent_model = Project
     bulk_insert = False
 
+    def get_slug(self, job_id: int, assignment: int = 0):
+        """Create new slug for Order and Assignment."""
+        job_id = str(job_id)
+        while len(str(job_id)) < 4:
+            job_id = '0' + job_id
+
+        slug = '1701-PS{0}-{1}'.format(job_id[1], job_id[1:4])
+        if assignment:
+            slug = '{slug}_{assignment}'.format(slug=slug, assignment=assignment)
+
+        return slug
+
     def get_payload(self, kobj, briefy_id=None):
         """Create payload for customer object."""
         order_payload = super().get_payload(kobj, briefy_id)
         project, kproject = self.get_parent(kobj, 'project')
+        job_id = kobj.internal_job_id or kobj.job_id
 
         order_payload.update(
             dict(
@@ -385,10 +406,11 @@ class JobSync(ModelSync):
                 customer_id=project.customer.id,
                 price=self.parse_decimal(kobj.set_price),
                 customer_order_id=kobj.job_id,
-                job_id=kobj.internal_job_id or kobj.job_id,
+                slug=self.get_slug(job_id),
+                job_id=job_id,
                 external_id=kobj.id,
                 requirements=kobj.client_specific_requirement,
-                number_of_assets=kobj.number_of_photos,
+                number_required_assets=kobj.number_of_photos,
                 source=isource_mapping.get(str(kobj.input_source), 'briefy'),
             )
         )
@@ -448,6 +470,7 @@ class JobSync(ModelSync):
             payable = False
 
         professional_id = self.get_user(kobj, 'responsible_photographer')
+        _, professional_name = _get_identifier(kobj, 'responsible_photographer')
         payload = dict(
             id=uuid.uuid4(),
             order_id=obj.id,

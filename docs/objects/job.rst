@@ -13,7 +13,7 @@ Workflow
 ++++++++
 
 .. workflow::
-   :class: briefy.leica.models.job.workflows.JobWorkflow
+   :class: briefy.leica.models.job.workflows.JobAssignmentWorkflow
 
 
 Database model

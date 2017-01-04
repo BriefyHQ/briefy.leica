@@ -55,6 +55,8 @@ History
      * Change field locations to location on JobOrder since for now we just have one location (rudaporto).
      * New attribute (relationship uselist=False) on professional model: main_location (rudaporto).
      * Customized to_dict and to_liting_dict on professional model (rudaporto).
+     * Change number_of_assets Order field to number_required_assets (rudaporto).
+     * Update import to generate the Order slug from the knack.job_id (internal) (rdaporto).
 
 
 1.1.0 (2016-10-04)
