@@ -146,13 +146,22 @@ class BaseModelTest:
         assert self.cardinality == Model.query().count()
         assert obj in Model.query().all()
 
-    def test_can_persist_model_instance(self):
+    def test_can_persist_model_instance(self, obj_payload):
         """Test if we can persist a model instance."""
         Model = self.model
         obj = Model.query().first()
         objs = Model.query().all()
         assert len(objs) == self.cardinality
-        assert objs[0].id == obj.id
+
+        # composed primary keys
+        if isinstance(obj_payload['id'], list):
+            new_payload = dict(obj_payload.items())
+            new_payload.pop('id')
+            for key, value in new_payload.items():
+                assert getattr(objs[0], key) == getattr(obj, key)
+        else:
+            assert objs[0].id == obj.id
+
         assert objs[0].created_at == obj.created_at
         assert objs[0].updated_at == obj.updated_at
 
@@ -202,9 +211,16 @@ def instance_obj(request, session, obj_payload):
         cls.create_dependencies(session)
 
     payload = obj_payload
-    obj = model.get(payload['id'])
+    obj_id = payload['id']
+    obj = model.get(obj_id)
     if not obj:
-        obj = cls.model(**payload)
+        # composed primary keys
+        if isinstance(obj_id, list):
+            new_payload = dict(payload.items())
+            new_payload.pop('id')
+            obj = cls.model(**new_payload)
+        else:
+            obj = cls.model(**payload)
         session.add(obj)
         session.flush()
     return obj

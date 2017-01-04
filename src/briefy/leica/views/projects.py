@@ -60,7 +60,7 @@ class ProjectService(RESTService):
     cors_policy=CORS_POLICY,
     factory=ProjectFactory
 )
-class ProjectWorkflow(WorkflowAwareResource):
+class ProjectWorkflowService(WorkflowAwareResource):
     """Project workflow resource."""
 
     model = Project

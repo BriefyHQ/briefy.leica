@@ -335,7 +335,7 @@ class ProfessionalPayoutInfo:
 
 
 class AssignmentFinancialInfo(ProfessionalPayoutInfo):
-    """Mixin containing financial information of a jobAssignment."""
+    """Mixin containing financial information of a Assignment."""
 
     # Photographer Expenses
     travel_expenses = sa.Column(
@@ -402,7 +402,7 @@ class AssignmentFinancialInfo(ProfessionalPayoutInfo):
 
 
 class OrderFinancialInfo:
-    """Mixin containing financial information of a JobOrder."""
+    """Mixin containing financial information of an Order."""
 
     # Set price
     price_currency = sa.Column(

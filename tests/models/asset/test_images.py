@@ -15,8 +15,8 @@ class TestImageModel(BaseModelTest):
         (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
-        (models.JobOrder, 'data/job_orders.json'),
-        (models.JobAssignment, 'data/jobs.json')
+        (models.Order, 'data/orders.json'),
+        (models.Assignment, 'data/assignments.json')
     ]
 
     file_path = 'data/images.json'
@@ -49,8 +49,8 @@ class TestImageModel(BaseModelTest):
     def test_asset_is_valid(self, instance_obj):
         """Test if the asset is valid."""
         asset = instance_obj
-        job = asset.job
-        project = job.order.project
+        assignment = asset.assignment
+        project = assignment.order.project
         project.tech_requirements = {
             'dimensions': {'value': '5760x3840', 'operator': 'eq'},
         }
@@ -98,8 +98,8 @@ class TestImageModel(BaseModelTest):
     def test_workflow(self, instance_obj, roles):
         """Test workflow for this model."""
         asset = instance_obj
-        job = asset.job
-        job.state = 'awaiting_assets'
+        assignment = asset.assignment
+        assignment.state = 'awaiting_assets'
 
         wf = asset.workflow
 

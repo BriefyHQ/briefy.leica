@@ -1,4 +1,4 @@
-job_id,professional_id,s3_path,image_size,image_width,image_height
+assignment_id,professional_id,s3_path,image_size,image_width,image_height
 c04dc102-7d3b-4574-a261-4bf72db571db,23d94a43-3947-42fc-958c-09245ecca5f2,/c04dc102-7d3b-4574-a261-4bf72db571db/DE-34549-13-14.jpg,7227938,5042,3782
 c04dc102-7d3b-4574-a261-4bf72db571db,23d94a43-3947-42fc-958c-09245ecca5f2,/c04dc102-7d3b-4574-a261-4bf72db571db/DE-34549-13-7.jpg,9858851,5120,3840
 c04dc102-7d3b-4574-a261-4bf72db571db,23d94a43-3947-42fc-958c-09245ecca5f2,/c04dc102-7d3b-4574-a261-4bf72db571db/DE-34549-13-37.jpg,11493287,5022,3767

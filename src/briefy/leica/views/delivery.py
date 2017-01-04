@@ -1,6 +1,6 @@
-"""Views to handle Projects creation."""
+"""Views to handle Delivery."""
 from briefy.leica.config import AGODA_DELIVERY_GDRIVE
-from briefy.leica.models import JobAssignment
+from briefy.leica.models import Assignment
 from briefy.leica.views import InternalFactory
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources.validation import validate_id
@@ -15,7 +15,7 @@ DELIVERY_SETTINGS = {
 
     'default': [
         {'zip': {
-            'filename': '{job_id}.zip',
+            'filename': '{assignment_id}.zip',
             'folder_structure': 'simple',
             's3_bucket': 'delivery-{env}'.format(env=ENV),
             's3_path': '{client_id}/{project_id}/',
@@ -52,12 +52,12 @@ DELIVERY_SETTINGS = {
 
 
 class DeliveryFactory(InternalFactory):
-    """Internal context factory for jobs delivery service."""
+    """Internal context factory for assignments delivery service."""
 
-    model = JobAssignment
+    model = Assignment
 
 
-@resource(path='/internal/jobs/{id}/delivery',
+@resource(path='/internal/assignments/{id}/delivery',
           cors_policy=CORS_POLICY,
           factory=DeliveryFactory)
 class DeliveryService:
@@ -70,24 +70,24 @@ class DeliveryService:
 
     @staticmethod
     def settings(customer_id):
-        """Return settings for the current job/customer."""
+        """Return settings for the current assignment/customer."""
         result = DELIVERY_SETTINGS.get(str(customer_id), None)
         if not result:
             result = DELIVERY_SETTINGS.get('default')
         return result
 
     def get_one(self):
-        """Get on Job from the database."""
-        job_id = self.request.matchdict.get('id')
-        return JobAssignment.query().get(job_id)
+        """Get one Assignment from the database."""
+        assignment_id = self.request.matchdict.get('id')
+        return Assignment.query().get(assignment_id)
 
     @view(permission='view', validators=[validate_id])
     def get(self):
         """Return user UUID from knack profile ID."""
-        job = self.get_one()
-        if job:
+        assignment = self.get_one()
+        if assignment:
             approved_assets = []
-            for item in job.assets:
+            for item in assignment.assets:
                 if item.state == item.workflow.approved.name:
                     approved_assets.append(
                         dict(id=item.id,
@@ -97,11 +97,11 @@ class DeliveryService:
                              )
                     )
             result = {
-                'job_id': job.id,
-                'customer': job.project.customer_id,
-                'customer_job_id': job.customer_job_id,
+                'assignment_id': assignment.id,
+                'customer': assignment.project.customer_id,
+                'customer_assignment_id': assignment.customer_assignment_id,
                 'assets': approved_assets,
-                'settings': self.settings(job.project.customer_id)
+                'settings': self.settings(assignment.project.customer_id)
             }
             return result
 
@@ -109,18 +109,18 @@ class DeliveryService:
             self.request.response.status_code = 404
             return {
                 'status': 'notfound',
-                'message': 'Job not found.'
+                'message': 'Assignment not found.'
             }
 
     @view(permission='edit', validators=[validate_id])
     def put(self):
         """Update delivery link after briefy.courier build the delivey package."""
-        job = self.get_one()
-        if job:
+        assignment = self.get_one()
+        if assignment:
             pass
         else:
             self.request.response.status_code = 404
             return {
                 'status': 'notfound',
-                'message': 'Job not found.'
+                'message': 'Assignment not found.'
             }

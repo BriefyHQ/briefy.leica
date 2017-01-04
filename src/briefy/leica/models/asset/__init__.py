@@ -27,7 +27,7 @@ __listing_attributes__ = [
 
 
 class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
-    """A deliverable asset from a Job."""
+    """A deliverable asset from an Assignment."""
 
     _workflow = workflows.AssetWorkflow
 
@@ -48,7 +48,7 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
 
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'history',
                                                'raw_metadata', 'professional',
-                                               'comments', 'job']}
+                                               'comments', 'assignment']}
 
     type = sa.Column(
         sa.String(50), nullable=False,
@@ -96,9 +96,9 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
     needs to update an asset. This records the one who actually uploaded the item.
     """
 
-    job_id = sa.Column(
+    assignment_id = sa.Column(
         sautils.UUIDType,
-        sa.ForeignKey('jobassignments.id'),
+        sa.ForeignKey('assignments.id'),
         nullable=False,
         info={
             'colanderalchemy': {
@@ -108,9 +108,9 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
             }
         }
     )
-    """Job ID.
+    """Assignment ID.
 
-    Job shooting under which this asset has been generated.
+    Assignment shooting under which this asset has been generated.
     """
 
     history = sa.Column(sautils.JSONType, nullable=True)
@@ -143,8 +143,8 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
 
         :return: A dictionary with technical requirements for an asset.
         """
-        job = self.job
-        return job.order.tech_requirements
+        assignment = self.assignment
+        return assignment.order.tech_requirements
 
     @property
     def check_requirements(self) -> list:
@@ -168,7 +168,7 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
 
         :return: ID of the qa_manager.
         """
-        return self.job.qa_manager
+        return self.assignment.qa_manager
 
     def _apply_actors_info(self, data: dict) -> dict:
         """Apply actors information for a given data dictionary.
@@ -221,7 +221,7 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
 
 
 class Image(asset.ImageMixin, Asset):
-    """A deliverable Image from a Job."""
+    """A deliverable Image from an Assignment."""
 
     __tablename__ = 'images'
 
@@ -254,7 +254,7 @@ class Image(asset.ImageMixin, Asset):
 
 
 class ThreeSixtyImage(asset.ThreeSixtyImageMixin, Asset):
-    """A deliverable 360Image from a Job."""
+    """A deliverable 360Image from an Assignment."""
 
     __tablename__ = 'threesixtyimages'
 
@@ -283,7 +283,7 @@ class ThreeSixtyImage(asset.ThreeSixtyImageMixin, Asset):
 
 
 class Video(asset.VideoMixin, Asset):
-    """A deliverable Video from a Job."""
+    """A deliverable Video from an Assignment."""
 
     __tablename__ = 'videos'
 

@@ -76,7 +76,7 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
     __summary_attributes__ = [
         'id', 'slug', 'title', 'description', 'created_at', 'updated_at', 'state', 'tax_country'
     ]
-
+    __summary_attributes_relations__ = ['billing_contact', 'business_contact', 'addresses']
     __listing_attributes__ = __summary_attributes__
 
     __colanderalchemy_config__ = {'excludes': [
@@ -119,7 +119,7 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
 
     addresses = orm.relationship(
         'CustomerBillingAddress',
-        backref=orm.backref('customer', lazy='joined'),
+        backref=orm.backref('customer'),
         lazy='dynamic',
         info={
             'colanderalchemy': {
@@ -207,8 +207,8 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
     Returns a collection of :class:`briefy.leica.models.project.Project`.
     """
 
-    jobs = orm.relationship(
-        'JobOrder',
+    orders = orm.relationship(
+        'Order',
         backref=orm.backref('customer'),
         lazy='dynamic',
         info={
@@ -218,9 +218,9 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
             }
         }
     )
-    """List of Jobs of this Customer.
+    """List of Orders of this Customer.
 
-    Returns a collection of :class:`briefy.leica.models.job.order.JobOrders`.
+    Returns a collection of :class:`briefy.leica.models.job.order.Orders`.
     """
 
     @declared_attr
@@ -234,20 +234,14 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
         Used to serialize this object within a parent object serialization.
         :returns: Dictionary with fields and values used by this Class
         """
-        billing_contact = self.billing_contact
-        business_contact = self.business_contact
         data = super().to_listing_dict()
         data = self._apply_actors_info(data)
-        data['billing_contact'] = billing_contact.to_summary_dict() if billing_contact else None
-        data['business_contact'] = business_contact.to_summary_dict() if business_contact else None
         return data
 
     def to_dict(self):
         """Return a dict representation of this object."""
         data = super().to_dict()
         data['slug'] = self.slug
-        addresses = [address.to_dict(excludes='customer') for address in self.addresses.all()]
-        data.update(addresses=addresses)
         add_user_info_to_state_history(self.state_history)
         # Apply actor information to data
         data = self._apply_actors_info(data)

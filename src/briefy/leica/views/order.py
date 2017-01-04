@@ -1,6 +1,6 @@
-"""Views to handle Jobs creation."""
-from briefy.leica.events import joborder as events
-from briefy.leica.models import JobOrder
+"""Views to handle Orders creation."""
+from briefy.leica.events import order as events
+from briefy.leica.models import Order
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources import BaseResource
 from briefy.ws.resources import RESTService
@@ -15,10 +15,10 @@ COLLECTION_PATH = '/orders'
 PATH = COLLECTION_PATH + '/{id}'
 
 
-class JobOrderFactory(BaseFactory):
-    """Job order context factory."""
+class OrderFactory(BaseFactory):
+    """Order context factory."""
 
-    model = JobOrder
+    model = Order
 
     @property
     def __base_acl__(self) -> list:
@@ -37,11 +37,11 @@ class JobOrderFactory(BaseFactory):
 @resource(collection_path=COLLECTION_PATH,
           path=PATH,
           cors_policy=CORS_POLICY,
-          factory=JobOrderFactory)
-class JobOrderService(RESTService):
-    """Job Orders service."""
+          factory=OrderFactory)
+class OrderService(RESTService):
+    """Orders service."""
 
-    model = JobOrder
+    model = Order
     friendly_name = model.__name__
     default_order_by = 'created_at'
     filter_related_fields = [
@@ -50,10 +50,10 @@ class JobOrderService(RESTService):
     ]
 
     _default_notify_events = {
-        'POST': events.JobOrderCreatedEvent,
-        'PUT': events.JobOrderUpdatedEvent,
-        'GET': events.JobOrderLoadedEvent,
-        'DELETE': events.JobOrderDeletedEvent,
+        'POST': events.OrderCreatedEvent,
+        'PUT': events.OrderUpdatedEvent,
+        'GET': events.OrderLoadedEvent,
+        'DELETE': events.OrderDeletedEvent,
     }
 
 
@@ -61,12 +61,12 @@ class JobOrderService(RESTService):
     collection_path=PATH + '/transitions',
     path=PATH + '/transitions/{transition_id}',
     cors_policy=CORS_POLICY,
-    factory=JobOrderFactory
+    factory=OrderFactory
 )
-class JobOrderWorkflow(WorkflowAwareResource):
-    """Job order workflow resource."""
+class OrderWorkflowService(WorkflowAwareResource):
+    """Order workflow resource."""
 
-    model = JobOrder
+    model = Order
     friendly_name = model.__name__
 
 
@@ -74,12 +74,12 @@ class JobOrderWorkflow(WorkflowAwareResource):
     collection_path=PATH + '/versions',
     path=PATH + '/versions/{version_id}',
     cors_policy=CORS_POLICY,
-    factory=JobOrderFactory
+    factory=OrderFactory
 )
-class JobOrderVersions(BaseResource):
-    """Versioning of Job orders."""
+class OrderVersionsService(BaseResource):
+    """Versioning of Orders."""
 
-    model = JobOrder
+    model = Order
     friendly_name = model.__name__
 
     @view(validators='_run_validators')

@@ -176,9 +176,9 @@ class AssetWorkflow(BriefyWorkflow):
     @Permission(groups=[G['professionals'], ])
     def can_delete(self):
         """Validate if professional can delete this asset."""
-        allowed_job_status = ['awaiting_assets', ]
+        allowed_assignment_status = ['awaiting_assets', ]
         obj = self.document
-        job = obj.job
-        if job and job.state in allowed_job_status:
+        assignment = obj.assignment
+        if assignment and assignment.state in allowed_assignment_status:
             return True
         return False
