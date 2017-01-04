@@ -1,6 +1,6 @@
-"""Views to handle Jobs creation."""
-from briefy.leica.events import job as events
-from briefy.leica.models import JobAssignment
+"""Views to handle Assignments creation."""
+from briefy.leica.events import assignment as events
+from briefy.leica.models import Assignment
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources import BaseResource
 from briefy.ws.resources import RESTService
@@ -11,14 +11,14 @@ from cornice.resource import view
 from pyramid.httpexceptions import HTTPNotFound as NotFound
 from pyramid.security import Allow
 
-COLLECTION_PATH = '/jobs'
+COLLECTION_PATH = '/assignments'
 PATH = COLLECTION_PATH + '/{id}'
 
 
-class JobFactory(BaseFactory):
-    """Job context factory."""
+class AssignmentFactory(BaseFactory):
+    """Assignment context factory."""
 
-    model = JobAssignment
+    model = Assignment
 
     @property
     def __base_acl__(self) -> list:
@@ -36,11 +36,11 @@ class JobFactory(BaseFactory):
 @resource(collection_path=COLLECTION_PATH,
           path=PATH,
           cors_policy=CORS_POLICY,
-          factory=JobFactory)
-class JobService(RESTService):
-    """Jobs service."""
+          factory=AssignmentFactory)
+class AssignmentService(RESTService):
+    """Assignment service."""
 
-    model = JobAssignment
+    model = Assignment
     friendly_name = model.__name__
     default_order_by = 'updated_at'
     filter_related_fields = [
@@ -51,10 +51,10 @@ class JobService(RESTService):
     ]
 
     _default_notify_events = {
-        'POST': events.JobCreatedEvent,
-        'PUT': events.JobUpdatedEvent,
-        'GET': events.JobLoadedEvent,
-        'DELETE': events.JobDeletedEvent,
+        'POST': events.AssignmentCreatedEvent,
+        'PUT': events.AssignmentUpdatedEvent,
+        'GET': events.AssignmentLoadedEvent,
+        'DELETE': events.AssignmentDeletedEvent,
     }
 
 
@@ -62,26 +62,26 @@ class JobService(RESTService):
     collection_path=PATH + '/transitions',
     path=PATH + '/transitions/{transition_id}',
     cors_policy=CORS_POLICY,
-    factory=JobFactory
+    factory=AssignmentFactory
 )
-class JobWorkflow(WorkflowAwareResource):
-    """Job workflow resource."""
+class AssignmentWorkflowService(WorkflowAwareResource):
+    """Assignment workflow resource."""
 
-    model = JobAssignment
-    friendly_name = JobAssignment.__name__
+    model = Assignment
+    friendly_name = Assignment.__name__
 
 
 @resource(
     collection_path=PATH + '/versions',
     path=PATH + '/versions/{version_id}',
     cors_policy=CORS_POLICY,
-    factory=JobFactory
+    factory=AssignmentFactory
 )
-class JobVersions(BaseResource):
-    """Versioning of Jobs."""
+class AssignmentVersionsService(BaseResource):
+    """Versioning of Assignments."""
 
-    model = JobAssignment
-    friendly_name = JobAssignment.__name__
+    model = Assignment
+    friendly_name = Assignment.__name__
     default_order_by = 'title'
 
     @view(validators='_run_validators')

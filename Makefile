@@ -116,7 +116,7 @@ import_clean_db: clean_dockers create_dockers
 	python src/briefy/leica/tools/customer_import.py
 	python src/briefy/leica/tools/project_import.py
 	python src/briefy/leica/tools/photographer_import.py
-	python src/briefy/leica/tools/jobpool_import.py
+	python src/briefy/leica/tools/pool_import.py
 	python src/briefy/leica/tools/job_import.py
 
 start_dockers:

@@ -1,4 +1,4 @@
-"""Briefy Leica Job location model."""
+"""Briefy Leica OrderLocation model."""
 from briefy.common.db.mixins import Address as AddressMixin
 from briefy.common.db.mixins import NameMixin
 from briefy.leica.db import Base
@@ -23,11 +23,11 @@ class LocationContactInfoMixin(NameMixin):
     """Additional phone number of the contact person."""
 
 
-class JobLocation(LocationContactInfoMixin, AddressMixin,
-                  mixins.LeicaMixin, mixins.VersionMixin, Base):
+class OrderLocation(LocationContactInfoMixin, AddressMixin,
+                    mixins.LeicaMixin, mixins.VersionMixin, Base):
     """Order location model."""
 
-    _workflow = workflows.JobLocationWorkflow
+    _workflow = workflows.OrderLocationWorkflow
 
     __summary_attributes__ = [
         'id', 'country', 'locality', 'coordinates', 'email', 'mobile',
@@ -38,7 +38,7 @@ class JobLocation(LocationContactInfoMixin, AddressMixin,
 
     order_id = sa.Column(
         sautils.UUIDType,
-        sa.ForeignKey('joborders.id'),
+        sa.ForeignKey('orders.id'),
         nullable=False,
         info={
             'colanderalchemy': {

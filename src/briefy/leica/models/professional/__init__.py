@@ -104,9 +104,9 @@ class Professional(ProfessionalMixin, Base):
     # Profile information
     photo_path = sa.Column(sa.String(255), nullable=True)
 
-    # Jobs
-    jobs = orm.relationship(
-        'JobAssignment',
+    # assignments
+    assignments = orm.relationship(
+        'Assignment',
         lazy='dynamic'
     )
 
@@ -141,7 +141,7 @@ class Professional(ProfessionalMixin, Base):
     )
 
     pools = orm.relationship(
-        'JobPool',
+        'Pool',
         secondary='professionals_in_pool',
         back_populates='professionals'
     )

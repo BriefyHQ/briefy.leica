@@ -1,15 +1,15 @@
-"""Import JobPool to Leica."""
+"""Import JobPool from Knack to Leica."""
 from briefy.leica import logger
-from briefy.leica.models import JobPool
+from briefy.leica.models import Pool
 from briefy.leica.models import Professional
 from briefy.leica.sync import ModelSync
 from briefy.leica.sync.location import pycountry
 
 
-class JobPoolSync(ModelSync):
-    """Syncronize Job pools."""
+class PoolSync(ModelSync):
+    """Syncronize Pools."""
 
-    model = JobPool
+    model = Pool
     knack_model_name = 'JobPool'
 
     def get_payload(self, kobj, briefy_id=None):
@@ -27,10 +27,10 @@ class JobPoolSync(ModelSync):
         return result
 
     def add_photographers(self, obj, kobj) -> None:
-        """Add all existing Photographers in the knack JobPool to the leica db JobPool.
+        """Add all existing Photographers in the knack Pool to the leica db Pool.
 
-        :param obj: db model JobPool instance
-        :param kobj: knack model JobPool instance
+        :param obj: db model Pool instance
+        :param kobj: knack model Pool instance
         :return: None
         """
         for kuser in kobj.photographers:
@@ -39,11 +39,11 @@ class JobPoolSync(ModelSync):
             if professional:
                 obj.professionals.append(professional)
             else:
-                msg = 'Professional not found: {professional_id}. JobPool: {title}.'
+                msg = 'Professional not found: {professional_id}. Pool: {title}.'
                 logger.debug(msg.format(professional_id=professional_id, title=obj.title))
 
     def add(self, kobj, briefy_id):
-        """Add new JobPool to database."""
+        """Add new Pool to database."""
         obj = super().add(kobj, briefy_id)
         self.add_photographers(obj, kobj)
         return obj

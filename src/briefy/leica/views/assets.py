@@ -11,7 +11,7 @@ from cornice.resource import view
 from pyramid.httpexceptions import HTTPNotFound as NotFound
 from pyramid.security import Allow
 
-COLLECTION_PATH = '/jobs/{job_id}/assets'
+COLLECTION_PATH = '/assignments/{assignment_id}/assets'
 PATH = COLLECTION_PATH + '/{id}'
 
 
@@ -58,17 +58,17 @@ class AssetService(RESTService):
     def filter_allowed_fields(self):
         """List of fields allowed in filtering and sorting."""
         allowed_fields = super().filter_allowed_fields
-        # Remove job_id
-        allowed_fields.remove('job_id')
+        # Remove assignment_id
+        allowed_fields.remove('assignment_id')
         return allowed_fields
 
     @property
     def default_filters(self) -> tuple:
         """Default filters for this Service."""
-        job_id = self.request.matchdict.get('job_id')
+        assignment_id = self.request.matchdict.get('assignment_id')
         filters = list(super().default_filters)
-        if job_id:
-            filters.append((self.model.job_id == job_id))
+        if assignment_id:
+            filters.append((self.model.assignment_id == assignment_id))
         return tuple(filters)
 
 
