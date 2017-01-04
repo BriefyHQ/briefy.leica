@@ -2,14 +2,15 @@
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica import logger
 from briefy.leica.models import Comment
-from briefy.leica.models import JobAssignment
-from briefy.leica.models import JobLocation
-from briefy.leica.models import JobOrder
+from briefy.leica.models import Assignment
+from briefy.leica.models import OrderLocation
+from briefy.leica.models import Order
+from briefy.leica.models import Pool
 from briefy.leica.models import Project
 from briefy.leica.sync import PLACEHOLDERS
 from briefy.leica.sync import ModelSync
 from briefy.leica.sync.location import create_location_dict
-from briefy.leica.vocabularies import JobInputSource as ISource
+from briefy.leica.vocabularies import OrderInputSource as ISource
 
 import uuid
 
@@ -32,23 +33,22 @@ category_mapping = {item.label: item.value for item in CategoryChoices.__members
 
 
 class JobSync(ModelSync):
-    """Syncronize Jobs."""
+    """Syncronize Job: Order, OrderLocation and Assignment."""
 
-    model = JobOrder
+    model = Order
     knack_model_name = 'Job'
     knack_parent_model = 'Project'
     parent_model = Project
     bulk_insert = False
 
-    def get_slug(self, job_id: int, assignment: int = 0):
+    def get_slug(self, job_id: str, assignment: int = 0):
         """Create new slug for Order and Assignment."""
-        job_id = str(job_id)
-        while len(str(job_id)) < 4:
-            job_id = '0' + job_id
-
-        slug = '1701-PS{0}-{1}'.format(job_id[1], job_id[1:4])
+        # TODO: check jobs in knack with internal_job_id == 0
+        job_id = job_id.replace('C', '')
+        job_id = '{job_id:04d}'.format(job_id=int(job_id.replace('-', '')[-4:]))
+        slug = '1701-PS{0}-{1}'.format(job_id[0], job_id[1:4])
         if assignment:
-            slug = '{slug}_{assignment}'.format(slug=slug, assignment=assignment)
+            slug = '{slug}_{assignment:02d}'.format(slug=slug, assignment=assignment)
 
         return slug
 
@@ -56,7 +56,7 @@ class JobSync(ModelSync):
         """Create payload for customer object."""
         order_payload = super().get_payload(kobj, briefy_id)
         project, kproject = self.get_parent(kobj, 'project')
-        job_id = kobj.internal_job_id or kobj.job_id
+        job_id = str(kobj.internal_job_id or kobj.job_id)
 
         order_payload.update(
             dict(
@@ -94,7 +94,16 @@ class JobSync(ModelSync):
         )
         obj.state_history = [history]
         obj.state = state
-        self.session.add(obj)
+        further_edit = kobj.further_editing_requested_by_client
+        if state == 'in_qa':
+            if kobj.new_set:
+                obj.set_type = 'new'
+            else:
+                obj.set_type = 'returned_photographer'
+
+            if further_edit:
+                obj.set_type = 'refused_customer'
+
         model = obj.__class__.__name__
         logger.debug('{model} imported with state: {state}'.format(model=model, state=state))
 
@@ -113,7 +122,7 @@ class JobSync(ModelSync):
                 last_name=kobj.contact_person.last or PLACEHOLDERS['last_name'],
             )
             try:
-                location = JobLocation(**payload)
+                location = OrderLocation(**payload)
                 self.session.add(location)
                 obj.location = location
             except Exception as exc:
@@ -151,9 +160,16 @@ class JobSync(ModelSync):
             payable = False
 
         professional_id = self.get_user(kobj, 'responsible_photographer')
+        job_id = str(kobj.internal_job_id or kobj.job_id)
+        kpool_id = kobj.job_pool[0]['id'] if kobj.job_pool else None
+        job_pool = Pool.query().filter_by(external_id=kpool_id).one_or_none()
+        if kpool_id and not job_pool:
+            print('Knack Poll ID: {0} do not found in leica.'.format(kpool_id))
         payload = dict(
             id=uuid.uuid4(),
             order_id=obj.id,
+            pool=job_pool,
+            slug=self.get_slug(job_id, assignment=1),
             professional_id=professional_id,
             payout_value=self.parse_decimal(kobj.photographer_payout),
             payout_currency=kobj.currency_payout or 'EUR',
@@ -162,7 +178,7 @@ class JobSync(ModelSync):
             submission_path=str(kobj.photo_submission_link),
             travel_expenses=self.parse_decimal(kobj.travel_expenses),
         )
-        assignment = JobAssignment(**payload)
+        assignment = Assignment(**payload)
         self.session.add(assignment)
         logger.debug('Assignment added: {id}'.format(id=assignment.id))
 

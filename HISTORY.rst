@@ -57,6 +57,22 @@ History
      * Customized to_dict and to_liting_dict on professional model (rudaporto).
      * Change number_of_assets Order field to number_required_assets (rudaporto).
      * Update import to generate the Order slug from the knack.job_id (internal) (rdaporto).
+     * Remove the last lazy='joined' to improve listing latency (rudaporto).
+     * Added new field set_type to show and filter different types of sets in QA (rudaporto).
+     * Refactory _summarize_relationships and also insert it in the default to_dict and to_listing_dict (rudaporto).
+     * Update import Job to populate set_type and also added set_type to the JobAssignment listing (rudaporto).
+     * Fix slug generation when import form knack (rudaporto).
+     * Added new field slug in the JobAssingmnet and update db migration and import from knack (rudaporto).
+     * New function that use the insert context to create JobAssigmnet slug from the JobOrder slug (rudaporto).
+     * Added database models: Pool and ProfessionalsInPool (association model between Pool and Professional) (rudaporto).
+     * Basic workflow for a Pool model (rudaporto).
+     * Added new ForeignKey pool_id (nullable=True) in JobAssignment model to link an JobAssignment to a Pool (rudaporto).
+     * Added resource view /pools to manage JobPools (rudaporto).
+     * Update database fixtures to support composed primary keys (rudaporto).
+     * Add Pool sync/import script and classes (rudaporto).
+     * Fix Pool and Professional association relationships and update tests (rudaporto).
+     * Update initial database migration script with all model changes (rudaporto).
+     * LEICA-128: Refactor Job classes names following the changes as Assignment or Order (rudaporto).
 
 
 1.1.0 (2016-10-04)

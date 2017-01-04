@@ -1,4 +1,4 @@
-"""Views to handle Projects creation."""
+"""Views to handle Customers creation."""
 from briefy.leica.events import customer as events
 from briefy.leica.models import Customer
 from briefy.ws import CORS_POLICY
@@ -59,7 +59,7 @@ class CustomersService(RESTService):
     cors_policy=CORS_POLICY,
     factory=CustomerFactory
 )
-class CustomerWorkflow(WorkflowAwareResource):
+class CustomerWorkflowService(WorkflowAwareResource):
     """Customer workflow resource."""
 
     model = Customer

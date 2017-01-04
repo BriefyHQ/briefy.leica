@@ -13,8 +13,8 @@ class TestCommentModel(BaseModelTest):
         (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
-        (models.JobOrder, 'data/job_orders.json'),
-        (models.JobAssignment, 'data/jobs.json'),
+        (models.Order, 'data/orders.json'),
+        (models.Assignment, 'data/assignments.json'),
         (models.Image, 'data/images.json'),
     ]
     file_path = 'data/comments.json'

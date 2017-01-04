@@ -1,19 +1,19 @@
-"""Event subscribers for briefy.leica.models.job.Job."""
+"""Event subscribers for briefy.leica.models.job.Assignment."""
 from briefy.common.users import SystemUser
-from briefy.leica.events.job import JobCreatedEvent
+from briefy.leica.events.assignment import AssignmentCreatedEvent
 from briefy.leica.subscribers import safe_workflow_trigger_transitions
 from pyramid.events import subscriber
 
 
-@subscriber(JobCreatedEvent)
-def job_created_handler(event):
-    """Handle job created event."""
+@subscriber(AssignmentCreatedEvent)
+def assignment_created_handler(event):
+    """Handle Assignment created event."""
     transitions = [('submit', ''), ]
     safe_workflow_trigger_transitions(event, transitions=transitions)
 
 
-def job_submit(event):
-    """Handle job submitted event."""
+def assignment_submit(event):
+    """Handle Assignment submitted event."""
     transitions = []
     # Impersonate the System here
     event.user = SystemUser
@@ -24,13 +24,13 @@ def job_submit(event):
 
 
 def transition_handler(event):
-    """Handle job transition events."""
+    """Handle Assignment transition events."""
     event_name = event.event_name
-    if not event_name.startswith('jobassignment.workflow'):
+    if not event_name.startswith('assignment.workflow'):
         return
 
     handlers = {
-        'jobassignment.workflow.submit': job_submit
+        'assignment.workflow.submit': assignment_submit
     }
     handler = handlers.get(event_name, None)
     if handler:

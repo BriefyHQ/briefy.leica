@@ -1,4 +1,4 @@
-"""Test Jobs database model."""
+"""Test Assignments database model."""
 from briefy.leica import models
 from conftest import BaseModelTest
 
@@ -6,27 +6,27 @@ import pytest
 
 
 @pytest.mark.usefixtures('create_dependencies')
-class TestJobModel(BaseModelTest):
-    """Test Job."""
+class TestAssignmentModel(BaseModelTest):
+    """Test Assignment."""
 
     dependencies = [
         (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
-        (models.JobOrder, 'data/job_orders.json'),
+        (models.Order, 'data/orders.json'),
     ]
-    file_path = 'data/jobs.json'
-    model = models.JobAssignment
+    file_path = 'data/assignments.json'
+    model = models.Assignment
 
     def test_workflow(self, instance_obj, roles):
         """Test workflow for this model."""
         from briefy.common.workflow.exceptions import WorkflowTransitionException
 
-        job = instance_obj
-        wf = job.workflow
+        assignment = instance_obj
+        wf = assignment.workflow
 
         # Object starts as created
-        assert job.state == 'created'
+        assert assignment.state == 'created'
 
         # Customer can move it to validation
         wf.context = roles['customer']
@@ -36,74 +36,78 @@ class TestJobModel(BaseModelTest):
         assert 'submit' in wf.transitions
         # PM cannot
         wf.context = roles['pm']
-        assert 'submit' not in wf.transitions
+        assert 'submit' in wf.transitions
 
         # Customer moves it to validation
         wf.context = roles['customer']
         wf.submit()
 
         # Validation happened already
-        assert job.state == 'pending'
+        assert assignment.state == 'pending'
 
-        # Customer or PM can publish this job to job pool
+        # Customer or PM can publish this assignment to assignment pool
         wf.context = roles['pm']
         assert 'publish' in wf.transitions
 
         wf.context = roles['customer']
         assert 'publish' in wf.transitions
 
-        # Customer can also cancel the job
+        # Customer can also cancel the assignment
         assert 'cancel' in wf.transitions
 
         # Scout can assign it to a professional
         wf.context = roles['scout']
         assert 'assign' in wf.transitions
         wf.assign()
-        assert job.state == 'assigned'
+        assert assignment.state == 'assigned'
 
-        # Customer can still cancel the job
+        # Customer can still cancel the assignment
         wf.context = roles['customer']
         assert 'cancel' in wf.transitions
 
-        # Professional can schedule the job or report scheduling issues
+        # Professional can schedule the assignment or report scheduling issues
         wf.context = roles['professional']
         assert 'schedule' in wf.transitions
         wf.scheduling_issues()
-        # Job will still be assigned
-        assert job.state == 'assigned'
+        # assignment will still be assigned
+        assert assignment.state == 'assigned'
 
         wf.schedule()
-        assert job.state == 'scheduled'
+        assert assignment.state == 'scheduled'
 
-        # Customer can still cancel the job
+        # Customer can still cancel the assignment
         wf.context = roles['customer']
         assert 'cancel' in wf.transitions
 
-        # System is now able to move the job to awaiting for assets
+        # System is now able to move the assignment to awaiting for assets
         wf.context = roles['system']
         assert 'ready_for_upload' in wf.transitions
         wf.ready_for_upload()
-        assert job.state == 'awaiting_assets'
+        assert assignment.state == 'awaiting_assets'
 
-        # Customer can not cancel this job anymore
+        # Customer can cancel this assignment before first upload to in_qa
         wf.context = roles['customer']
-        assert 'cancel' not in wf.transitions
+        assert 'cancel' in wf.transitions
 
-        # Professional can re-schedule this job
+        # Professional can re-schedule this assignment or send it to qa
         wf.context = roles['professional']
-        assert 'schedule' in wf.transitions
-
-        # Professional can re-schedule this job or send it to qa
-        wf.context = roles['professional']
-        assert 'schedule' in wf.transitions
+        assert 'reschedule' in wf.transitions
         assert 'upload' in wf.transitions
         wf.upload()
 
-        # QA can reject or approve the job
+        # Customer can not cancel this assignment anymore after upload
+        wf.context = roles['customer']
+        assert 'cancel' not in wf.transitions
+
+        # QA can reject or approve the assignment
         wf.context = roles['qa']
+
+        # TODO: remove this after automatic Assignment validation
+        wf.validate_assets()
+
         assert 'approve' in wf.transitions
         assert 'reject' in wf.transitions
-        # Trying to approve a job with the wrong number of assets with raise an exception
+        # Trying to approve a assignment with the wrong number of assets with raise an exception
         with pytest.raises(WorkflowTransitionException) as excinfo:
             wf.approve()
 
@@ -113,52 +117,58 @@ class TestJobModel(BaseModelTest):
         assert 'Message is required' in str(excinfo)
         wf.reject(message='Missing 5 or 6 pictures')
 
-        assert job.state == 'awaiting_assets'
+        assert assignment.state == 'awaiting_assets'
 
         # Professional upload new assets and QA approves it
         wf.context = roles['professional']
         wf.upload()
 
-        job.order.number_required_assets = 0
+        assignment.order.number_required_assets = 0
         wf.context = roles['qa']
+
+        # TODO: remove this after automatic Assignment validation
+        wf.validate_assets()
+
         wf.approve()
-        assert job.state == 'approved'
+        assert assignment.state == 'approved'
         assert 'retract_approval' in wf.transitions
 
-        # System can execute a deliver transition
-        # This triggers an event to be picked by briefy.courier
-        wf.context = roles['system']
-        assert 'deliver' in wf.transitions
-        wf.deliver()
-        assert job.state == 'approved'
-
-        # System or PM can move job to completed
-        wf.context = roles['system']
-        assert 'complete' in wf.transitions
-
+        # System or PM can move assignment to completed
         wf.context = roles['pm']
         assert 'complete' in wf.transitions
+        wf.context = roles['system']
+        assert 'complete' in wf.transitions
 
-        # Customer can approve or reject the job
+        # Customer can approve or reject the assignment
         wf.context = roles['customer']
         assert 'complete' in wf.transitions
         assert 'refuse' in wf.transitions
         wf.refuse(message='Need a picture of the pool')
 
-        assert job.state == 'refused'
+        assert assignment.state == 'refused'
 
-        # PM could decide to move job to complete or send it back to QA
+        # PM could decide to move assignment to complete or send it back to QA
+        wf.context = roles['pm']
+        assert 'return_to_qa' in wf.transitions
+        wf.return_to_qa()
+
+        # now QA has to approve again
+        wf.context = roles['qa']
+        assert 'approve' in wf.transitions
+        wf.approve()
+
+        # now PM can complete or refuse again
         wf.context = roles['pm']
         assert 'complete' in wf.transitions
-        assert 'retract_approval' in wf.transitions
+        assert 'refuse' in wf.transitions
 
-        # Customer could also move the job to completed from here
+        # Customer could also move the assignment to completed from here
         wf.context = roles['customer']
         assert 'complete' in wf.transitions
         wf.complete()
-        assert job.state == 'completed'
+        assert assignment.state == 'completed'
 
-        # After completion, only the system can execute a transition to the job
+        # After completion, only the system can execute a transition to the assignment
         for role in ('customer', 'professional', 'pm', 'qa', 'scout'):
             wf.context = roles[role]
             assert len(wf.transitions) == 0

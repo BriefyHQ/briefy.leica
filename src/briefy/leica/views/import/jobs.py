@@ -85,7 +85,7 @@ class JobImportService:
 
     @view(permission='add')
     def post(self):
-        """Add or update one Job model from knack Job item."""
+        """Add or update one Order and Assignment models from knack Job item."""
         knack_id = self.request.matchdict.get('knack_id')
         try:
             kjob = self.job_sync.get_knack_item(knack_id)

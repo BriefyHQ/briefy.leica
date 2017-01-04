@@ -1,6 +1,6 @@
-"""Views to handle Assets creation."""
-from briefy.leica.events import asset as events
-from briefy.leica.models import Image
+"""Views to handle Pools creation."""
+from briefy.leica.events import pool as events
+from briefy.leica.models import Pool
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources import BaseResource
 from briefy.ws.resources import RESTService
@@ -11,16 +11,14 @@ from cornice.resource import view
 from pyramid.httpexceptions import HTTPNotFound as NotFound
 from pyramid.security import Allow
 
-COLLECTION_PATH = '/assignments/{assignment_id}/assets'
+COLLECTION_PATH = '/pools'
 PATH = COLLECTION_PATH + '/{id}'
 
 
-class AssetFactory(BaseFactory):
-    """Asset context factory."""
+class PoolFactory(BaseFactory):
+    """Pool context factory."""
 
-    # model = Asset
-    # For now all assets will be images
-    model = Image
+    model = Pool
 
     @property
     def __base_acl__(self) -> list:
@@ -30,7 +28,8 @@ class AssetFactory(BaseFactory):
         :rtype: list
         """
         _acls = [
-            (Allow, 'g:briefy_qa', ['add', 'delete', 'edit', 'list', 'view'])
+            (Allow, 'g:briefy_pm', ['add', 'delete', 'edit', 'list', 'view']),
+            (Allow, 'g:briefy_scout', ['add', 'delete', 'edit', 'list', 'view'])
         ]
         return _acls
 
@@ -38,64 +37,47 @@ class AssetFactory(BaseFactory):
 @resource(collection_path=COLLECTION_PATH,
           path=PATH,
           cors_policy=CORS_POLICY,
-          factory=AssetFactory)
-class AssetService(RESTService):
-    """Assets service."""
+          factory=PoolFactory)
+class PoolService(RESTService):
+    """Pool service."""
 
-    model = Image
-    friendly_name = Image.__name__
-    items_per_page = 150
-    default_order_by = 'created_at'
+    model = Pool
+    friendly_name = model.__name__
+    default_order_by = 'title'
+    filter_related_fields = []
 
     _default_notify_events = {
-        'POST': events.AssetCreatedEvent,
-        'PUT': events.AssetUpdatedEvent,
-        'GET': events.AssetLoadedEvent,
-        'DELETE': events.AssetDeletedEvent,
+        'POST': events.PoolCreatedEvent,
+        'PUT': events.PoolUpdatedEvent,
+        'GET': events.PoolLoadedEvent,
+        'DELETE': events.PoolDeletedEvent,
     }
-
-    @property
-    def filter_allowed_fields(self):
-        """List of fields allowed in filtering and sorting."""
-        allowed_fields = super().filter_allowed_fields
-        # Remove assignment_id
-        allowed_fields.remove('assignment_id')
-        return allowed_fields
-
-    @property
-    def default_filters(self) -> tuple:
-        """Default filters for this Service."""
-        assignment_id = self.request.matchdict.get('assignment_id')
-        filters = list(super().default_filters)
-        if assignment_id:
-            filters.append((self.model.assignment_id == assignment_id))
-        return tuple(filters)
 
 
 @resource(
     collection_path=PATH + '/transitions',
     path=PATH + '/transitions/{transition_id}',
     cors_policy=CORS_POLICY,
-    factory=AssetFactory
+    factory=PoolFactory
 )
-class AssetWorkflow(WorkflowAwareResource):
-    """Assets workflow resource."""
+class PoolWorkflowService(WorkflowAwareResource):
+    """Pool workflow resource."""
 
-    model = Image
-    friendly_name = Image.__name__
+    model = Pool
+    friendly_name = model.__name__
 
 
 @resource(
     collection_path=PATH + '/versions',
     path=PATH + '/versions/{version_id}',
     cors_policy=CORS_POLICY,
-    factory=AssetFactory
+    factory=PoolFactory
 )
-class AssetVersions(BaseResource):
-    """Versioning of assets."""
+class PoolVersionsService(BaseResource):
+    """Versioning of Pools."""
 
-    model = Image
-    friendly_name = Image.__name__
+    model = Pool
+    friendly_name = model.__name__
 
     @view(validators='_run_validators')
     def collection_get(self):
