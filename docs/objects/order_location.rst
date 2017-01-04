@@ -1,26 +1,26 @@
-Job Location
-------------
+Order Location
+--------------
 
 Inheritance
 +++++++++++
 
-Inheritance diagram for the Job location class:
+Inheritance diagram for the OrderLocation class:
 
-.. inheritance-diagram:: briefy.leica.models.job.location.JobLocation
+.. inheritance-diagram:: briefy.leica.models.job.location.OderLocation
 
 
 Workflow
 ++++++++
 
 .. workflow::
-   :class: briefy.leica.models.job.workflows.JobLocationWorkflow
+   :class: briefy.leica.models.job.workflows.OrderLocationWorkflow
 
 Database model
 ++++++++++++++
 
-Database diagram for the JobLocation data model:
+Database diagram for the OrderLocation data model:
 
 .. sadisplay::
     :module: briefy.leica.models.job.location
-    :alt: Job locations data model
+    :alt: Order location data model
     :render: graphviz

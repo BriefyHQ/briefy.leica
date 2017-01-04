@@ -21,7 +21,7 @@ class TestOrderView(BaseVersionedTestView):
     ]
     file_path = 'data/orders.json'
     model = models.Order
-    initial_wf_state = 'received'
+    initial_wf_state = 'created'
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {

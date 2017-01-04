@@ -1,24 +1,24 @@
-JobOrder
---------
+Order
+-----
 
 Inheritance
 +++++++++++
 
-Inheritance diagram for the JobOrder class:
+Inheritance diagram for the Order class:
 
-.. inheritance-diagram:: briefy.leica.models.job.order.JobOrder
+.. inheritance-diagram:: briefy.leica.models.job.order.Order
 
 
 Workflow
 ++++++++
 
 .. workflow::
-   :class: briefy.leica.models.job.workflows.JobOrderWorkflow
+   :class: briefy.leica.models.job.workflows.OrderWorkflow
 
 
 Database model
 ++++++++++++++
-Database diagram for the JobOrder data model:
+Database diagram for the Order data model:
 
 .. sadisplay::
     :module: briefy.leica.models.job.order

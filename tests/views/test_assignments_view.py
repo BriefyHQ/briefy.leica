@@ -96,6 +96,7 @@ class TestAssignmentView(BaseVersionedTestView):
             status=200
         )
         result = request.json
-        assert result['total'] == 2
+        assert result['total'] == 3
+        assert 'cancel' in result['transitions']
         assert 'publish' in result['transitions']
         assert 'assign' in result['transitions']

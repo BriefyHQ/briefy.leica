@@ -36,7 +36,7 @@ class TestAssignmentModel(BaseModelTest):
         assert 'submit' in wf.transitions
         # PM cannot
         wf.context = roles['pm']
-        assert 'submit' not in wf.transitions
+        assert 'submit' in wf.transitions
 
         # Customer moves it to validation
         wf.context = roles['customer']
@@ -85,22 +85,26 @@ class TestAssignmentModel(BaseModelTest):
         wf.ready_for_upload()
         assert assignment.state == 'awaiting_assets'
 
-        # Customer can not cancel this assignment anymore
+        # Customer can cancel this assignment before first upload to in_qa
         wf.context = roles['customer']
-        assert 'cancel' not in wf.transitions
-
-        # Professional can re-schedule this assignment
-        wf.context = roles['professional']
-        assert 'schedule' in wf.transitions
+        assert 'cancel' in wf.transitions
 
         # Professional can re-schedule this assignment or send it to qa
         wf.context = roles['professional']
-        assert 'schedule' in wf.transitions
+        assert 'reschedule' in wf.transitions
         assert 'upload' in wf.transitions
         wf.upload()
 
+        # Customer can not cancel this assignment anymore after upload
+        wf.context = roles['customer']
+        assert 'cancel' not in wf.transitions
+
         # QA can reject or approve the assignment
         wf.context = roles['qa']
+
+        # TODO: remove this after automatic Assignment validation
+        wf.validate_assets()
+
         assert 'approve' in wf.transitions
         assert 'reject' in wf.transitions
         # Trying to approve a assignment with the wrong number of assets with raise an exception
@@ -121,22 +125,18 @@ class TestAssignmentModel(BaseModelTest):
 
         assignment.order.number_required_assets = 0
         wf.context = roles['qa']
+
+        # TODO: remove this after automatic Assignment validation
+        wf.validate_assets()
+
         wf.approve()
         assert assignment.state == 'approved'
         assert 'retract_approval' in wf.transitions
 
-        # System can execute a deliver transition
-        # This triggers an event to be picked by briefy.courier
-        wf.context = roles['system']
-        assert 'deliver' in wf.transitions
-        wf.deliver()
-        assert assignment.state == 'approved'
-
         # System or PM can move assignment to completed
-        wf.context = roles['system']
-        assert 'complete' in wf.transitions
-
         wf.context = roles['pm']
+        assert 'complete' in wf.transitions
+        wf.context = roles['system']
         assert 'complete' in wf.transitions
 
         # Customer can approve or reject the assignment
@@ -149,8 +149,18 @@ class TestAssignmentModel(BaseModelTest):
 
         # PM could decide to move assignment to complete or send it back to QA
         wf.context = roles['pm']
+        assert 'return_to_qa' in wf.transitions
+        wf.return_to_qa()
+
+        # now QA has to approve again
+        wf.context = roles['qa']
+        assert 'approve' in wf.transitions
+        wf.approve()
+
+        # now PM can complete or refuse again
+        wf.context = roles['pm']
         assert 'complete' in wf.transitions
-        assert 'retract_approval' in wf.transitions
+        assert 'refuse' in wf.transitions
 
         # Customer could also move the assignment to completed from here
         wf.context = roles['customer']

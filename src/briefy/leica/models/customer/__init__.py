@@ -74,14 +74,14 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
     _workflow = workflows.CustomerWorkflow
 
     __summary_attributes__ = [
-        'id', 'slug', 'title', 'description', 'created_at', 'updated_at', 'state', 'external_id'
+        'id', 'slug', 'title', 'description', 'created_at', 'updated_at', 'state', 'tax_country'
     ]
     __summary_attributes_relations__ = ['billing_contact', 'business_contact', 'addresses']
     __listing_attributes__ = __summary_attributes__
 
     __colanderalchemy_config__ = {'excludes': [
         'state_history', 'state', '_account_manager', '_customer_user',
-        'billing_contact', 'business_contact'
+        'business_contact', 'billing_contact'
     ]}
 
     parent_customer_id = sa.Column(
@@ -121,6 +121,12 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
         'CustomerBillingAddress',
         backref=orm.backref('customer'),
         lazy='dynamic',
+        info={
+            'colanderalchemy': {
+                'title': 'Billing Addresses',
+                'missing': colander.drop,
+            }
+        }
     )
     """List of Billing Addresses for a Customer
 
@@ -130,7 +136,13 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
     contacts = orm.relationship(
         'CustomerContact',
         backref=orm.backref('customer'),
-        lazy='dynamic'
+        lazy='dynamic',
+        info={
+            'colanderalchemy': {
+                'title': 'Customer Contacts',
+                'missing': colander.drop,
+            }
+        }
     )
     """List of Contacts for a Customer
 
@@ -145,6 +157,13 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
         )''',
         viewonly=True,
         uselist=False,
+        info={
+            'colanderalchemy': {
+                'title': 'Business Contact',
+                'default': colander.null,
+                'missing': colander.drop,
+            }
+        }
     )
     """Customer business contact.
 
@@ -159,6 +178,13 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
         )''',
         viewonly=True,
         uselist=False,
+        info={
+            'colanderalchemy': {
+                'title': 'Billing Contact',
+                'default': colander.null,
+                'missing': colander.drop,
+            }
+        }
     )
     """Customer billing contact.
 
@@ -168,7 +194,13 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
     projects = orm.relationship(
         'Project',
         backref=orm.backref('customer'),
-        lazy='dynamic'
+        lazy='dynamic',
+        info={
+            'colanderalchemy': {
+                'title': 'Projects',
+                'missing': colander.drop,
+            }
+        }
     )
     """List of Projects of this Customer.
 
@@ -178,7 +210,13 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
     orders = orm.relationship(
         'Order',
         backref=orm.backref('customer'),
-        lazy='dynamic'
+        lazy='dynamic',
+        info={
+            'colanderalchemy': {
+                'title': 'Business Contact',
+                'missing': colander.drop,
+            }
+        }
     )
     """List of Orders of this Customer.
 
