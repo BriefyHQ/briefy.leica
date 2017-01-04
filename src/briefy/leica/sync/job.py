@@ -91,6 +91,16 @@ def add_order_history(session, obj, kobj):
         'actor': 'g:system',
         'transition': '',
         'from': '',
+        'to': 'created'
+    })
+    # last_date = kobj.input_date
+
+    history.append({
+        'date': _build_date(kobj.input_date),
+        'message': 'Automatic transition to received',
+        'actor': 'g:system',
+        'transition': 'submit',
+        'from': 'created',
         'to': 'received'
     })
     last_date = kobj.input_date
@@ -192,7 +202,11 @@ def add_order_history(session, obj, kobj):
     logger.debug('{model} imported with state: {state}'.format(model=model, state=obj.state))
 
 
+<<<<<<< Updated upstream
 def add_assignment_history(session, obj, kobj):
+=======
+def add_assignment_history(session, obj, kobj, professional=None):
+>>>>>>> Stashed changes
     """Add state_history and state information to the Assigment."""
     history = []
 
@@ -451,6 +465,7 @@ class JobSync(ModelSync):
 
     def add_assigment(self, obj, kobj):
         """Add a related assign object."""
+<<<<<<< Updated upstream
         # TODO: import comments
 
         payable = True
@@ -463,6 +478,14 @@ class JobSync(ModelSync):
         job_pool = Pool.query().filter_by(external_id=kpool_id).one_or_none()
         if kpool_id and not job_pool:
             print('Knack Poll ID: {0} do not found in leica.'.format(kpool_id))
+=======
+        # TODO: dates should be created as workflow history transitions
+        # assignment_date = kobj.assignment_date
+        # add comments
+        professional_id = self.get_user(kobj, 'responsible_photographer')
+        _, professional_name = _get_identifier(kobj, 'responsible_photographer')
+        payable = kobj.approval_status != {'Cancelled'}
+>>>>>>> Stashed changes
         payload = dict(
             id=uuid.uuid4(),
             order_id=obj.id,
@@ -497,7 +520,8 @@ class JobSync(ModelSync):
         self.update_local_roles(assignment, pm_roles_roles, 'project_manager')
 
         # update assignment state history
-        add_assignment_history(self.session, assignment, kobj)
+        add_assignment_history(self.session, assignment, kobj,
+                               professional=(professional_id, professional_name))
 
     def add(self, kobj, briefy_id):
         """Add new Job to database."""
