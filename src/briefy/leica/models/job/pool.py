@@ -1,4 +1,4 @@
-"""Briefy Leica Job Pool."""
+"""Briefy Leica Pool."""
 from briefy.common.db.mixins import Timestamp
 from briefy.leica.db import Base
 from briefy.leica.db import Session
@@ -12,7 +12,7 @@ import sqlalchemy_utils as sautils
 
 
 class ProfessionalsInPool(mixins.VersionMixin, Timestamp, Base):
-    """Relationshiop between Professional and JobPool."""
+    """Relationshiop between Professional and Pool."""
 
     __session__ = Session
     __tablename__ = 'professionals_in_pool'
@@ -21,19 +21,19 @@ class ProfessionalsInPool(mixins.VersionMixin, Timestamp, Base):
 
     pool_id = sa.Column(
         sautils.UUIDType,
-        sa.ForeignKey('jobpools.id'),
+        sa.ForeignKey('pools.id'),
         primary_key=True,
         info={
             'colanderalchemy': {
-                'title': 'Job Pool ID',
+                'title': 'Pool ID',
                 'validator': colander.uuid,
                 'typ': colander.String
             }
         }
     )
-    """Job Pool ID.
+    """Pool ID.
 
-    Foreignkey to :class:`briefy.leica.models.job.pool.JobPool`.
+    Foreignkey to :class:`briefy.leica.models.job.pool.Pool`.
     """
 
     professional_id = sa.Column(
@@ -54,11 +54,11 @@ class ProfessionalsInPool(mixins.VersionMixin, Timestamp, Base):
     """
 
     pool = orm.relationship(
-        'JobPool'
+        'Pool'
     )
-    """Job Pool.
+    """Pool.
 
-    Relationship with :class:`briefy.leica.models.job.pool.JobPool`.
+    Relationship with :class:`briefy.leica.models.job.pool.Pool`.
     """
 
     professional = orm.relationship(
@@ -70,10 +70,10 @@ class ProfessionalsInPool(mixins.VersionMixin, Timestamp, Base):
     """
 
 
-class JobPool(mixins.KLeicaVersionedMixin, Base):
-    """A Job Pool."""
+class Pool(mixins.KLeicaVersionedMixin, Base):
+    """A Pool."""
 
-    _workflow = workflows.JobPoolWorkflow
+    _workflow = workflows.PoolWorkflow
 
     __summary_attributes__ = [
         'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
@@ -92,20 +92,20 @@ class JobPool(mixins.KLeicaVersionedMixin, Base):
     )
 
     country = sa.Column(sautils.CountryType, nullable=False)
-    """Country of this JobPool.
+    """Country of this Pool.
 
     Country will be stored as a ISO 3166-2 information.
     i.e.: DE, BR, ID
     """
 
-    # Job Assignments
+    # Assignments
     assignments = orm.relationship(
-        'JobAssignment',
+        'Assignment',
         backref=orm.backref('pool')
     )
-    """Job Assignments.
+    """Assignments.
 
-    Relationship with :class:`briefy.leica.models.job.JobAssignment`.
+    Relationship with :class:`briefy.leica.models.job.Assignment`.
     """
 
     professionals = orm.relationship(

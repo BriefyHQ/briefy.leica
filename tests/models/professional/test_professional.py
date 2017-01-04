@@ -10,14 +10,14 @@ class TestProfessionalModel(BaseModelTest):
     """Test Professional."""
 
     dependencies = [
-        (models.JobPool, 'data/job_pools.json'),
+        (models.Pool, 'data/jpools.json'),
     ]
     file_path = 'data/professionals.json'
     model = models.Professional
 
     def test_add_pool_to_professional(self, instance_obj, session):
         """Add job pools to the professional."""
-        pools = models.JobPool.query().all()
+        pools = models.Pool.query().all()
         assert len(pools) == 3
         assert len(instance_obj.pools) == 0
 

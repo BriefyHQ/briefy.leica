@@ -175,14 +175,14 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
     Returns a collection of :class:`briefy.leica.models.project.Project`.
     """
 
-    jobs = orm.relationship(
-        'JobOrder',
+    orders = orm.relationship(
+        'Order',
         backref=orm.backref('customer'),
         lazy='dynamic'
     )
-    """List of Jobs of this Customer.
+    """List of Orders of this Customer.
 
-    Returns a collection of :class:`briefy.leica.models.job.order.JobOrders`.
+    Returns a collection of :class:`briefy.leica.models.job.order.Orders`.
     """
 
     @declared_attr

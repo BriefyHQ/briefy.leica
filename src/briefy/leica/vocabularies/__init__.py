@@ -14,7 +14,7 @@ options = [
 ]
 
 
-ClientJobStatusChoices = LabeledEnum('ClientJobStatusChoices', options)
+OrderStatusChoices = LabeledEnum('OrderStatusChoices', options)
 
 
 options = [
@@ -59,7 +59,7 @@ options = [
 ]
 
 
-JobInputSource = LabeledEnum('JobInputSource', options)
+OrderInputSource = LabeledEnum('OrderInputSource', options)
 
 
 options = [

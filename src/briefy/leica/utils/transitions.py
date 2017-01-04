@@ -18,18 +18,18 @@ def get_transition_date(transitions: tuple, obj, first: bool=False) -> datetime:
     return valid[order]['date'] if valid else None
 
 
-def approve_assets_in_job(job: Base, context) -> list:
-    """Approve all pending assets in a Job.
+def approve_assets_in_assignment(assignment: Base, context) -> list:
+    """Approve all pending assets in an Assignment.
 
-    :param job: Internal Briefy Job.
+    :param assignment: Internal Briefy Assignment.
     :param context: Workflow context.
-    :returns: List of approved assets in this job.
+    :returns: List of approved assets in this assignment.
     """
-    all_assets = job.assets
+    all_assets = assignment.assets
     pending = [
-        a for a in all_assets if a.state in ('pending')
+        a for a in all_assets if a.state == 'pending'
     ]
-    assets_ids = [a.id for a in all_assets if a.state in ('approved')]
+    assets_ids = [a.id for a in all_assets if a.state == 'approved']
     for asset in pending:
         asset.workflow.context = context
         # Approve asset
@@ -37,9 +37,9 @@ def approve_assets_in_job(job: Base, context) -> list:
         assets_ids.append(asset.id)
 
     logger.info(
-        'Transitioned {assets_count} assets to approved for job {id}'.format(
+        'Transitioned {assets_count} assets to approved for Assignment {id}'.format(
             assets_count=len(pending),
-            id=job.id,
+            id=assignment.id,
         )
     )
     return assets_ids

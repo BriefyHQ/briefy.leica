@@ -9,7 +9,7 @@ from briefy.common.db.types import geo
 from briefy.common.db.types.aware_datetime import AwareDateTime
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.common.vocabularies.person import GenderCategories
-from briefy.leica.vocabularies import JobInputSource
+from briefy.leica.vocabularies import OrderInputSource
 from sqlalchemy.dialects import postgresql
 from sqlalchemy_utils import types
 from sqlalchemy_utils.types.uuid import UUIDType

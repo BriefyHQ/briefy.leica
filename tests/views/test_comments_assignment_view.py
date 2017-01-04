@@ -1,4 +1,4 @@
-"""Test job comments view."""
+"""Test Assignment comments view."""
 from briefy.leica import models
 from conftest import BaseTestView
 
@@ -6,16 +6,16 @@ import pytest
 
 
 @pytest.mark.usefixtures('create_dependencies')
-class TestJobComments(BaseTestView):
-    """Test Comments for a Job."""
+class TestAssignmentComments(BaseTestView):
+    """Test Comments for an Assignment."""
 
-    base_path = '/jobs/c04dc102-7d3b-4574-a261-4bf72db571db/comments'
+    base_path = '/assignments/c04dc102-7d3b-4574-a261-4bf72db571db/comments'
     dependencies = [
         (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
-        (models.JobOrder, 'data/job_orders.json'),
-        (models.JobAssignment, 'data/jobs.json'),
+        (models.Order, 'data/orders.json'),
+        (models.Assignment, 'data/assignments.json'),
         (models.Image, 'data/images.json')
     ]
     file_path = 'data/comments.json'

@@ -45,7 +45,7 @@ class CommentService(RESTService):
     def filter_allowed_fields(self):
         """List of fields allowed in filtering and sorting."""
         allowed_fields = super().filter_allowed_fields
-        # Remove job_id and asset_id
+        # Remove assignment_id and asset_id
         allowed_fields.remove('entity_id')
         return allowed_fields
 
@@ -65,9 +65,9 @@ class CommentsWorkflowService(WorkflowAwareResource):
     friendly_name = Comment.__name__
 
 
-JOB_PATH = '/jobs/{job_id}'
+ASSIGNMENT_PATH = '/assignments/{assignment_id}'
 
-COLLECTION_PATH = '/jobs/{entity_id}/comments'
+COLLECTION_PATH = '/assignments/{entity_id}/comments'
 PATH = COLLECTION_PATH + '/{id}'
 
 
@@ -77,8 +77,8 @@ PATH = COLLECTION_PATH + '/{id}'
     cors_policy=CORS_POLICY,
     factory=CommentFactory
 )
-class JobCommentService(CommentService):
-    """Comments for a Job."""
+class AssignmentCommentService(CommentService):
+    """Comments for an Assignment."""
 
 
 @resource(
@@ -87,11 +87,11 @@ class JobCommentService(CommentService):
     cors_policy=CORS_POLICY,
     factory=CommentFactory
 )
-class JobCommentWorkflowService(CommentsWorkflowService):
-    """JobComment workflow resource."""
+class AssignmentCommentWorkflowService(CommentsWorkflowService):
+    """AssignmentComment workflow resource."""
 
 
-COLLECTION_PATH = JOB_PATH + '/assets/{entity_id}/comments'
+COLLECTION_PATH = ASSIGNMENT_PATH + '/assets/{entity_id}/comments'
 PATH = COLLECTION_PATH + '/{id}'
 
 
@@ -102,7 +102,7 @@ PATH = COLLECTION_PATH + '/{id}'
     factory=CommentFactory
 )
 class AssetCommentService(CommentService):
-    """Comments for an asset."""
+    """Comments for an Asset."""
 
 
 @resource(
@@ -125,8 +125,8 @@ PATH = COLLECTION_PATH + '/{id}'
     cors_policy=CORS_POLICY,
     factory=CommentFactory
 )
-class JobOrderCommentService(CommentService):
-    """Comments for a Job Order."""
+class OrderCommentService(CommentService):
+    """Comments for an Order."""
 
 
 @resource(
@@ -135,5 +135,5 @@ class JobOrderCommentService(CommentService):
     cors_policy=CORS_POLICY,
     factory=CommentFactory
 )
-class JobOrderCommentWorkflowService(CommentsWorkflowService):
-    """JobOrderComment workflow resource."""
+class OrderCommentWorkflowService(CommentsWorkflowService):
+    """AssignmentOrderComment workflow resource."""

@@ -1,6 +1,6 @@
 """Syncronize Assets."""
 from briefy.leica import logger
-from briefy.leica.models import JobAssignment
+from briefy.leica.models import Assignment
 from briefy.leica.models import Image
 
 import csv
@@ -14,13 +14,15 @@ SENTINEL_PROFESSIONAL_UUID = 'ca6083a9-bc94-4309-be3c-a80a0d1f2370'
 
 def import_assets(session, asset_rows):
     """Import assets."""
-    previous_job_id = None
+    previous_assignment_id = None
     created = updated = count = 0
     failed = []
-    for job_id, professional_id, s3_path, image_size, image_width, image_height in asset_rows:
-        if job_id != previous_job_id:
-            job = JobAssignment.query().get(job_id)
-            previous_job_id = job_id
+
+    for assignment_id, professional_id, s3_path, image_size, image_width, image_height \
+            in asset_rows:
+        if assignment_id != previous_assignment_id:
+            job = Assignment.query().get(assignment_id)
+            previous_assignment_id = assignment_id
 
         if not professional_id and job.professional_id:
             professional_id = job.professional_id
@@ -43,10 +45,10 @@ def import_assets(session, asset_rows):
             updated += 1
             if len(possible_duplicate) > 1:
                 logger.error('Job "{0}" has duplicate assets with the name "{1}"'.format(
-                    job_id, filename))
+                    assignment_id, filename))
                 with open('duplicate_asset_filename.csv', 'at') as file_:
                     wr = csv.writer(file_)
-                    wr.writerow((job_id, filename))
+                    wr.writerow((assignment_id, filename))
                 del wr, file_
         else:
             created += 1
@@ -55,7 +57,7 @@ def import_assets(session, asset_rows):
 
             # Main data updating:
             asset.update(dict(
-                job_id=job_id,
+                assignment_id=assignment_id,
                 title=title,
                 type='image',
                 description="",
@@ -92,7 +94,7 @@ def import_assets(session, asset_rows):
             logger.error('Could not import asset "{}". Error {}'.format(
                 s3_path, error))
             savepoint.rollback()
-            failed.append(dict(job_id=job.id, asset_name=filename))
+            failed.append(dict(assignment_id=job.id, asset_name=filename))
             continue
 
             count += 1

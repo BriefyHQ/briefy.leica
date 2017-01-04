@@ -1,4 +1,4 @@
-"""Job workflow."""
+"""Order, OrderLocation, Assignment and Pool related workflow."""
 from briefy.common.vocabularies.roles import Groups as G
 from briefy.common.vocabularies.roles import LocalRolesChoices as LR
 from briefy.common.workflow import BriefyWorkflow
@@ -12,16 +12,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class JobWorkflow(BriefyWorkflow):
-    """Workflow for a JobAssignment."""
+class AssignmentWorkflow(BriefyWorkflow):
+    """Workflow for a Assignment."""
 
-    entity = 'job'
+    entity = 'assignment'
     initial_state = 'created'
 
     # States
     created = WS(
         'created', 'Created',
-        'Job created by the customer.'
+        'Assignment created by the customer.'
     )
 
     validation = WS(
@@ -31,32 +31,32 @@ class JobWorkflow(BriefyWorkflow):
 
     edit = WS(
         'edit', 'Edit',
-        'Customer must edit job in order to be approved.'
+        'Customer must edit assignment in order to be approved.'
     )
 
     pending = WS(
         'pending', 'Pending',
-        'Awaiting professional assignment by Briefy.'
+        'Awaiting Professional assignment by Briefy.'
     )
 
     published = WS(
-        'published', 'Job Pool',
-        'Available for Professional self assignment.'
+        'published', 'Published',
+        'Available for a Professional self assign.'
     )
 
     assigned = WS(
         'assigned', 'Assigned',
-        'Job assigned, waiting for scheduling.'
+        'Assignment assigned and waiting for scheduling.'
     )
 
     scheduled = WS(
         'scheduled', 'Scheduled',
-        'Job scheduled.'
+        'Assignment scheduled.'
     )
 
     cancelled = WS(
         'cancelled', 'Cancelled',
-        'Job was cancelled by the customer.'
+        'Assignment was cancelled by the customer.'
     )
 
     awaiting_assets = WS(
@@ -66,7 +66,7 @@ class JobWorkflow(BriefyWorkflow):
 
     in_qa = WS(
         'in_qa', 'Quality assurance',
-        'Job is under quality assurance.'
+        'Assignment is under quality assurance.'
     )
 
     approved = WS(
@@ -76,55 +76,55 @@ class JobWorkflow(BriefyWorkflow):
 
     refused = WS(
         'refused', 'Customer refused',
-        'Job was rejected by the customer.'
+        'Assignment was rejected by the customer.'
     )
 
     completed = WS(
         'completed', 'Completed',
-        'Job is completed.'
+        'Assignment is completed.'
     )
 
     # Transitions
     @created.transition(validation, 'can_submit')
     @edit.transition(validation, 'can_submit')
     def submit(self):
-        """After job creation, or edition submit it to machine validation."""
+        """After Assignment creation, or edition submit it to machine validation."""
         pass
 
     @validation.transition(pending, 'can_validate')
     def validate(self):
-        """Validate a job."""
+        """Validate an Assignment."""
         pass
 
     @validation.transition(edit, 'can_validate')
     def invalidate(self):
-        """Invalidate a job, sending it to edit."""
+        """Invalidate an Assignment, sending it to edit."""
         pass
 
     @pending.transition(assigned, 'can_assign')
     def assign(self):
-        """Assign a Job to a professional."""
+        """Assign an Assignment to a professional."""
         pass
 
     @pending.transition(published, 'can_publish')
     def publish(self):
-        """Put the job to be self assigned."""
+        """Put the Assignment to be self assigned."""
         pass
 
     @published.transition(pending, 'can_retract')
     def retract(self):
-        """Remove a job from Job Poll."""
+        """Remove a Assignment from the Pool."""
         pass
 
     @published.transition(assigned, 'can_self_assign')
     def self_assign(self):
-        """Professional gets a job."""
+        """Professional gets an Assignment."""
         pass
 
     @assigned.transition(scheduled, 'can_schedule')
     @awaiting_assets.transition(scheduled, 'can_schedule')
     def schedule(self):
-        """Professional schedules the job."""
+        """Professional schedules the Assignment."""
         pass
 
     @assigned.transition(assigned, 'can_schedule')
@@ -134,7 +134,7 @@ class JobWorkflow(BriefyWorkflow):
 
     @scheduled.transition(awaiting_assets, 'can_get_ready_for_upload')
     def ready_for_upload(self):
-        """System moves job to awaiting for upload."""
+        """System moves Assignment to awaiting for upload."""
         pass
 
     @awaiting_assets.transition(in_qa, 'can_upload')
@@ -144,24 +144,24 @@ class JobWorkflow(BriefyWorkflow):
 
     @in_qa.transition(pending, 'can_unassign')
     def unassign(self):
-        """QA unassign a Job."""
+        """QA unassign an Assignment."""
         # Update state and comments on Knack
         pass
 
     @in_qa.transition(approved, 'can_approve')
     def approve(self):
-        """QA approves a Job."""
-        job = self.document
-        if not job.approvable:
+        """QA approves an Assignment."""
+        assignment = self.document
+        if not assignment.approvable:
             raise self.state.exception_transition(
                 'Incorrect number of assets.'
             )
         # Transition all pending assets to approved
-        transitions.approve_assets_in_job(job, self.context)
+        transitions.approve_assets_in_assignment(assignment, self.context)
 
     @in_qa.transition(awaiting_assets, 'can_approve', require_message=True)
     def reject(self):
-        """QA rejects a Job."""
+        """QA rejects an Assignment."""
         pass
 
     @approved.transition(in_qa, 'can_retract_approval')
@@ -173,17 +173,17 @@ class JobWorkflow(BriefyWorkflow):
     @approved.transition(completed, 'can_complete')
     @refused.transition(completed, 'can_complete_from_refused')
     def complete(self):
-        """Customer approve the job."""
+        """Customer approve the Assignment."""
         pass
 
     @approved.transition(refused, 'can_refuse', require_message=True)
     def refuse(self):
-        """Customer refuses the job."""
+        """Customer refuses the Assignment."""
         pass
 
     @approved.transition(approved, 'can_deliver')
     def deliver(self):
-        """Execute the delivery of job assets."""
+        """Execute the delivery of assets from the Assignment."""
         pass
 
     @pending.transition(cancelled, 'can_cancel')
@@ -191,68 +191,68 @@ class JobWorkflow(BriefyWorkflow):
     @assigned.transition(cancelled, 'can_cancel')
     @scheduled.transition(scheduled, 'can_cancel')
     def cancel(self):
-        """Customer or Briefy cancel the job.."""
+        """Customer or Briefy cancel the Assignment."""
         pass
 
     @Permission(groups=[G['customers'], G['bizdev'], G['system']])
     def can_submit(self):
-        """Validate if user can submit the job."""
+        """Validate if user can submit the Assignment."""
         return True
 
     @Permission(groups=[G['scout'], G['pm']])
     def can_assign(self):
-        """Validate if user can assign the job to a professional."""
+        """Validate if user can assign the Assignment to a Professional."""
         return True
 
     @Permission(groups=[G['professionals'], ])
     def can_self_assign(self):
-        """Validate if user is able to self assign this job."""
-        # TODO: Check for existing jobs in the same date.
+        """Validate if user is able to self assign this Assignment."""
+        # TODO: Check for existing Assignments in the same date.
         return True
 
     @Permission(groups=[G['system'], ])
     def can_validate(self):
-        """Validate if user is system and job."""
+        """Validate if user is system."""
         return True
 
     @Permission(groups=[G['customers'], G['pm'], G['scout'], G['system']])
     def can_publish(self):
-        """Validate if user can publish this job (job pool)."""
+        """Validate if user can publish this Assignment."""
         return True
 
     @Permission(groups=[G['customers'], G['pm'], G['scout']])
     def can_retract(self):
-        """Validate if user can retract job from job pool."""
+        """Validate if user can retract an Assignment."""
         return True
 
     @Permission(groups=[G['professionals'], G['pm']])
     def can_schedule(self):
-        """Validate if user can schedule a job."""
+        """Validate if user can schedule an Assignment."""
         return True
 
     @Permission(groups=[G['system'], ])
     def can_get_ready_for_upload(self):
-        """Validate if user can move Job to waiting for assets."""
+        """Validate if user can move an Assignment to waiting for assets."""
         return True
 
     @Permission(groups=[G['professionals'], G['qa'], ])
     def can_upload(self):
-        """Validate if user can move Job to qa."""
+        """Validate if user can move an Assignment to qa."""
         return True
 
     @Permission(groups=[LR['qa_manager'], G['qa'], G['pm'], ])
     def can_unassign(self):
-        """Validate if user can unassign a Job."""
+        """Validate if user can un assign an Assignment."""
         return True
 
     @Permission(groups=[LR['qa_manager'], G['qa'], ])
     def can_approve(self):
-        """Validate if user can approve a Job."""
+        """Validate if user can approve an Assignment."""
         return True
 
     @Permission(groups=[LR['qa_manager'], G['qa'], ])
     def can_reject(self):
-        """Validate if user can reject a Job."""
+        """Validate if user can reject an Assignment."""
         return True
 
     @Permission(groups=[LR['qa_manager'], G['qa'], ])
@@ -267,22 +267,22 @@ class JobWorkflow(BriefyWorkflow):
 
     @Permission(groups=[G['customers'], G['pm'], G['system']])
     def can_complete(self):
-        """Validate if user can move a job to completed."""
+        """Validate if user can move an Assignment to completed."""
         return True
 
     @Permission(groups=[G['customers'], G['pm']])
     def can_complete_from_refused(self):
-        """Validate if user can move a job to completed from refused state."""
+        """Validate if user can move an Assignment to completed from refused state."""
         return True
 
     @Permission(groups=[G['customers'], ])
     def can_refuse(self):
-        """Validate if user can reject a job as a customer."""
+        """Validate if user can reject an Assignment as a customer."""
         return True
 
     @Permission(groups=[G['customers'], ])
     def can_cancel(self):
-        """Validate if user can cancel a job as a customer."""
+        """Validate if user can cancel an Assignment as a customer."""
         return True
 
     @Permission(groups=[G['system'], ])
@@ -291,59 +291,59 @@ class JobWorkflow(BriefyWorkflow):
         return True
 
 
-class JobLocationWorkflow(BriefyWorkflow):
-    """Workflow for a JobLocation."""
+class OrderLocationWorkflow(BriefyWorkflow):
+    """Workflow for a OrderLocation."""
 
-    entity = 'joblocation'
+    entity = 'orderlocation'
     initial_state = 'created'
 
     # States
     created = WS(
         'created', 'Created',
-        'Job Location inserted on the database.'
+        'OrderLocation inserted on the database.'
     )
 
 
-class JobOrderWorkflow(BriefyWorkflow):
-    """Workflow for a JobOrder."""
+class OrderWorkflow(BriefyWorkflow):
+    """Workflow for a Order."""
 
-    entity = 'joborder'
+    entity = 'order'
     initial_state = 'received'
 
     # States
     received = WS(
         'received', 'Received',
-        'Job Order received to be executed.'
+        'Order received to be executed.'
     )
 
     assigned = WS(
         'assigned', 'Assigned',
-        'Job Order assigned to a Professional.'
+        'Order assigned to a Professional.'
     )
 
     scheduled = WS(
         'scheduled', 'Scheduled',
-        'Job Order scheduled to be executed.'
+        'Order scheduled to be executed.'
     )
 
     in_qa = WS(
         'in_qa', 'In QA',
-        'Job Order in the quality assurance validation.'
+        'Order in the quality assurance validation.'
     )
 
     cancelled = WS(
         'cancelled', 'Cancelled',
-        'Job Order cancelled.'
+        'Order cancelled.'
     )
 
     approved = WS(
         'approved', 'Approved',
-        'Job Order approved by quality assurance.'
+        'Order approved by quality assurance.'
     )
 
     refused = WS(
         'refused', 'Refused',
-        'Job Order refused.'
+        'Order refused.'
 
     )
 
@@ -355,7 +355,7 @@ class JobOrderWorkflow(BriefyWorkflow):
 
     @Permission(groups=[LR['project_manager'], G['pm'], G['scout'], ])
     def can_assign(self):
-        """Permission: Validate if user can assign a JobOrder.
+        """Permission: Validate if user can assign a Order.
 
         Groups: g:pm, g:scout, r:project_manager
         """
@@ -365,16 +365,16 @@ class JobOrderWorkflow(BriefyWorkflow):
     @assigned.transition(cancelled, 'can_cancel')
     @received.transition(cancelled, 'can_cancel')
     def cancel(self):
-        """Transition: Cancel the JobOrder."""
+        """Transition: Cancel the Order."""
         pass
 
     @Permission(groups=[LR['project_manager'], G['pm'], G['customers'], G['finance']])
     def can_cancel(self):
-        """Permission: Validate if user can move the JobOrder to the cancelled state.
+        """Permission: Validate if user can move the Order to the cancelled state.
 
         Groups: g:pm, g:finance, g:customers, r:project_manager
         """
-        # TODO: validate if the restrictions before cancel the JobOrder
+        # TODO: validate if the restrictions before cancel the Order
         return True
 
     @received.transition(scheduled, 'can_schedule')
@@ -385,7 +385,7 @@ class JobOrderWorkflow(BriefyWorkflow):
 
     @Permission(groups=[LR['project_manager'], G['pm'], G['scout'], ])
     def can_schedule(self):
-        """Permission: Validate if user can schedule a JobOrder.
+        """Permission: Validate if user can schedule an Order.
 
         Groups: g:pm, g:scout, r:project_manager
         """
@@ -398,7 +398,7 @@ class JobOrderWorkflow(BriefyWorkflow):
 
     @Permission(groups=[LR['project_manager'], LR['professional_user'], G['pm'], G['qa'], ])
     def can_start_qa(self):
-        """Permission: Validate if user can move JobOrder the in_qa state.
+        """Permission: Validate if user can move an Order into the in_qa state.
 
         Groups: g:pm, g:qa, r:project_manager, r:professional
         """
@@ -406,12 +406,12 @@ class JobOrderWorkflow(BriefyWorkflow):
 
     @in_qa.transition(approved, 'can_approve')
     def approve(self):
-        """Transition: Inform the approval of the JobOrder to the customer."""
+        """Transition: Inform the approval of the Order to the customer."""
         pass
 
     @Permission(groups=[LR['qa_manager'], G['qa'], ])
     def can_approve(self):
-        """Permission: Validate if user can approve the JobOrder.
+        """Permission: Validate if user can approve the Order.
 
         Groups: g:qa, r:qa_manager
         """
@@ -419,13 +419,13 @@ class JobOrderWorkflow(BriefyWorkflow):
 
     @approved.transition(refused, 'can_refuse')
     def refuse(self):
-        """Transition: Customer refuse the JobOrder."""
+        """Transition: Customer refuse the Order."""
         pass
 
     # TODO: add LR pm_customer
     @Permission(groups=[G['pm']])
     def can_refuse(self):
-        """Permission: Validate if user can refuse the JobOrder.
+        """Permission: Validate if user can refuse the Order.
 
         Groups: g:pm, r:pm_customer
         """
@@ -434,48 +434,48 @@ class JobOrderWorkflow(BriefyWorkflow):
     @in_qa.transition(assigned, 'can_reassign')
     @refused.transition(assigned, 'can_reassign')
     def reassign(self):
-        """Transition: Inform the re-assignment of the JobOrder the customer."""
+        """Transition: Inform the re-assignment of the Order the customer."""
         pass
 
     @Permission(groups=[LR['project_manager'], G['pm'], ])
     def can_reassign(self):
-        """Permission: Validate if user reassign a JobOrder.
+        """Permission: Validate if user reassign an Order.
 
         Groups: g:pm, r:project_manager
         """
         return True
 
 
-class JobPoolWorkflow(BriefyWorkflow):
-    """Workflow for a JobPool."""
+class PoolWorkflow(BriefyWorkflow):
+    """Workflow for a Pool."""
 
-    entity = 'jobpool'
+    entity = 'pool'
     initial_state = 'created'
 
     # States
     created = WS(
         'created', 'Created',
-        'JobPool created.'
+        'Pool created.'
     )
 
     active = WS(
         'active', 'Active',
-        'JobPool is active.'
+        'Pool is active.'
     )
 
     inactive = WS(
         'inactive', 'Inactive',
-        'JobPool is inactive.'
+        'Pool is inactive.'
     )
 
     @created.transition(active, 'submit')
     def submit(self):
-        """Transition: JobPool was submitted."""
+        """Transition: Pool was submitted."""
         pass
 
     @Permission(groups=[G['scout'], G['pm'], ])
     def can_submit(self):
-        """Permission: Validate if user can submit a JobPool.
+        """Permission: Validate if user can submit a Pool.
 
         Groups: g:pm, g:scout
         """
@@ -483,12 +483,12 @@ class JobPoolWorkflow(BriefyWorkflow):
 
     @active.transition(inactive, 'can_disable')
     def disable(self):
-        """Transition: JobPool was moved to inactive."""
+        """Transition: Pool was moved to inactive."""
         pass
 
     @Permission(groups=[G['scout'], G['pm'], ])
     def can_disable(self):
-        """Permission: Validate if user can inactive a JobPool.
+        """Permission: Validate if user can inactive a Pool.
 
         Groups: g:pm, g:scout
         """
@@ -496,12 +496,12 @@ class JobPoolWorkflow(BriefyWorkflow):
 
     @inactive.transition(active, 'can_reactivated')
     def reactivated(self):
-        """Transition: JobPool was moved back to active."""
+        """Transition: Pool was moved back to active."""
         pass
 
     @Permission(groups=[G['scout'], G['pm'], ])
     def can_reactivated(self):
-        """Permission: Validate if user can reactivated a JobPool.
+        """Permission: Validate if user can reactivated a Pool.
 
         Groups: g:pm, g:scout
         """

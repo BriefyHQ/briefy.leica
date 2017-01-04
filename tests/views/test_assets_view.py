@@ -10,19 +10,19 @@ import transaction
 class TestAssetView(BaseVersionedTestView):
     """Test AssetService view."""
 
-    base_path = '/jobs/c04dc102-7d3b-4574-a261-4bf72db571db/assets'
+    base_path = '/assignments/c04dc102-7d3b-4574-a261-4bf72db571db/assets'
     dependencies = [
         (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
-        (models.JobOrder, 'data/job_orders.json'),
-        (models.JobAssignment, 'data/jobs.json')
+        (models.Order, 'data/orders.json'),
+        (models.Assignment, 'data/assignments.json')
     ]
     file_path = 'data/images.json'
     model = models.Image
     initial_wf_state = 'pending'
     # TODO: author_id and uploaded_by should be validated
-    ignore_validation_fields = ['state_history', 'state', 'updated_at', 'job',
+    ignore_validation_fields = ['state_history', 'state', 'updated_at', 'assignment',
                                 'raw_metadata', 'uploaded_by', 'professional']
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
@@ -68,7 +68,7 @@ class TestAssetView(BaseVersionedTestView):
 
     def test_get_with_filters_with_wrong_id(self, app, obj_payload):
         """Test get a collection, filtering by the wrong id."""
-        # This id is from an asset in a distinct job
+        # This id is from an asset in a distinct assignment
         obj_id = '740323b0-f97f-4c5a-b99a-71663e807051'
         # Filter by object id
         params = {
@@ -84,15 +84,15 @@ class TestAssetView(BaseVersionedTestView):
 
     def test_get_with_filters_with_wrong_id_wrong_filter(self, app, obj_payload):
         """Test get a collection, filtering by the wrong id."""
-        # This id is from an asset in a distinct job
+        # This id is from an asset in a distinct assignment
         obj_id = '740323b0-f97f-4c5a-b99a-71663e807051'
 
         # Conflicting project_id
-        job_id = '67cbcef9-1354-415a-a1ff-498444647bdd'
+        assignment_id = '67cbcef9-1354-415a-a1ff-498444647bdd'
         # Filter by object id
         params = {
             'id': obj_id,
-            'job_id': job_id
+            'assignment_id': assignment_id
         }
         request = app.get('{base}'.format(base=self.base_path),
                           params,
@@ -101,20 +101,20 @@ class TestAssetView(BaseVersionedTestView):
 
         assert result['status'] == 'error'
         assert 'Unknown filter field' in result['errors'][0]['description']
-        assert 'job_id' in result['errors'][0]['name']
+        assert 'assignment_id' in result['errors'][0]['name']
 
     def test_workflow(self):
         pass
 
     def test_machine_validation_invalidating(self, session, obj_payload, app):
         """Test creation of a new asset ending on edit state."""
-        from briefy.leica.models import JobAssignment
+        from briefy.leica.models import Assignment
 
         payload = obj_payload
         payload['id'] = '560a6697-11d2-4fe9-9757-a279c126b6bf'
         with transaction.manager:
-            job = JobAssignment.get(payload['job_id'])
-            project = job.order.project
+            assignment = Assignment.get(payload['assignment_id'])
+            project = assignment.order.project
             project.tech_requirements = {
                 'dimensions': {'value': '800x600', 'operator': 'eq'},
             }

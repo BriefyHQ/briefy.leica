@@ -11,9 +11,9 @@ Objects defined in this package.
    link
    customer
    project
-   job
-   joborder
-   job_location
-   jobpool
+   assignment
+   order
+   order_location
+   pool
    asset
    comment

@@ -2,15 +2,15 @@
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica import logger
 from briefy.leica.models import Comment
-from briefy.leica.models import JobAssignment
-from briefy.leica.models import JobLocation
-from briefy.leica.models import JobOrder
-from briefy.leica.models import JobPool
+from briefy.leica.models import Assignment
+from briefy.leica.models import OrderLocation
+from briefy.leica.models import Order
+from briefy.leica.models import Pool
 from briefy.leica.models import Project
 from briefy.leica.sync import PLACEHOLDERS
 from briefy.leica.sync import ModelSync
 from briefy.leica.sync.location import create_location_dict
-from briefy.leica.vocabularies import JobInputSource as ISource
+from briefy.leica.vocabularies import OrderInputSource as ISource
 
 import uuid
 
@@ -33,9 +33,9 @@ category_mapping = {item.label: item.value for item in CategoryChoices.__members
 
 
 class JobSync(ModelSync):
-    """Syncronize Jobs."""
+    """Syncronize Job: Order, OrderLocation and Assignment."""
 
-    model = JobOrder
+    model = Order
     knack_model_name = 'Job'
     knack_parent_model = 'Project'
     parent_model = Project
@@ -122,7 +122,7 @@ class JobSync(ModelSync):
                 last_name=kobj.contact_person.last or PLACEHOLDERS['last_name'],
             )
             try:
-                location = JobLocation(**payload)
+                location = OrderLocation(**payload)
                 self.session.add(location)
                 obj.location = location
             except Exception as exc:
@@ -162,7 +162,7 @@ class JobSync(ModelSync):
         professional_id = self.get_user(kobj, 'responsible_photographer')
         job_id = str(kobj.internal_job_id or kobj.job_id)
         kpool_id = kobj.job_pool[0]['id'] if kobj.job_pool else None
-        job_pool = JobPool.query().filter_by(external_id=kpool_id).one_or_none()
+        job_pool = Pool.query().filter_by(external_id=kpool_id).one_or_none()
         if kpool_id and not job_pool:
             print('Knack Poll ID: {0} do not found in leica.'.format(kpool_id))
         payload = dict(
@@ -178,7 +178,7 @@ class JobSync(ModelSync):
             submission_path=str(kobj.photo_submission_link),
             travel_expenses=self.parse_decimal(kobj.travel_expenses),
         )
-        assignment = JobAssignment(**payload)
+        assignment = Assignment(**payload)
         self.session.add(assignment)
         logger.debug('Assignment added: {id}'.format(id=assignment.id))
 

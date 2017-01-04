@@ -1,4 +1,4 @@
-"""Test job orders view."""
+"""Test Orders view."""
 from briefy.leica import models
 from conftest import BaseVersionedTestView
 
@@ -6,8 +6,8 @@ import pytest
 
 
 @pytest.mark.usefixtures('create_dependencies')
-class TestJobOrderView(BaseVersionedTestView):
-    """Test JobOrderService view."""
+class TestOrderView(BaseVersionedTestView):
+    """Test OrderService view."""
 
     base_path = '/orders'
     dependencies = [
@@ -19,8 +19,8 @@ class TestJobOrderView(BaseVersionedTestView):
         'state_history', 'state', 'updated_at', 'customer', 'project',
         'customer_user', 'project_manager', 'scout_manager',
     ]
-    file_path = 'data/job_orders.json'
-    model = models.JobOrder
+    file_path = 'data/orders.json'
+    model = models.Order
     initial_wf_state = 'received'
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''

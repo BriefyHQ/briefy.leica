@@ -1,6 +1,6 @@
-"""Views to handle JobPools creation."""
-from briefy.leica.events import jobpool as events
-from briefy.leica.models import JobPool
+"""Views to handle Pools creation."""
+from briefy.leica.events import pool as events
+from briefy.leica.models import Pool
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources import BaseResource
 from briefy.ws.resources import RESTService
@@ -15,10 +15,10 @@ COLLECTION_PATH = '/pools'
 PATH = COLLECTION_PATH + '/{id}'
 
 
-class JobPoolFactory(BaseFactory):
-    """Job pool context factory."""
+class PoolFactory(BaseFactory):
+    """Pool context factory."""
 
-    model = JobPool
+    model = Pool
 
     @property
     def __base_acl__(self) -> list:
@@ -37,20 +37,20 @@ class JobPoolFactory(BaseFactory):
 @resource(collection_path=COLLECTION_PATH,
           path=PATH,
           cors_policy=CORS_POLICY,
-          factory=JobPoolFactory)
-class JobPoolService(RESTService):
-    """Job Pool service."""
+          factory=PoolFactory)
+class PoolService(RESTService):
+    """Pool service."""
 
-    model = JobPool
+    model = Pool
     friendly_name = model.__name__
     default_order_by = 'title'
     filter_related_fields = []
 
     _default_notify_events = {
-        'POST': events.JobPoolCreatedEvent,
-        'PUT': events.JobPoolUpdatedEvent,
-        'GET': events.JobPoolLoadedEvent,
-        'DELETE': events.JobPoolDeletedEvent,
+        'POST': events.PoolCreatedEvent,
+        'PUT': events.PoolUpdatedEvent,
+        'GET': events.PoolLoadedEvent,
+        'DELETE': events.PoolDeletedEvent,
     }
 
 
@@ -58,12 +58,12 @@ class JobPoolService(RESTService):
     collection_path=PATH + '/transitions',
     path=PATH + '/transitions/{transition_id}',
     cors_policy=CORS_POLICY,
-    factory=JobPoolFactory
+    factory=PoolFactory
 )
-class JobPoolWorkflow(WorkflowAwareResource):
-    """Job pool workflow resource."""
+class PoolWorkflowService(WorkflowAwareResource):
+    """Pool workflow resource."""
 
-    model = JobPool
+    model = Pool
     friendly_name = model.__name__
 
 
@@ -71,12 +71,12 @@ class JobPoolWorkflow(WorkflowAwareResource):
     collection_path=PATH + '/versions',
     path=PATH + '/versions/{version_id}',
     cors_policy=CORS_POLICY,
-    factory=JobPoolFactory
+    factory=PoolFactory
 )
-class JobPoolVersions(BaseResource):
-    """Versioning of Job pools."""
+class PoolVersionsService(BaseResource):
+    """Versioning of Pools."""
 
-    model = JobPool
+    model = Pool
     friendly_name = model.__name__
 
     @view(validators='_run_validators')
