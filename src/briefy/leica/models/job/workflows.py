@@ -69,7 +69,6 @@ class AssignmentWorkflow(BriefyWorkflow):
         'Assignment was rejected by the customer.'
     )
 
-    # TODO: "completed" belongs to JobOrderWorkflow
     completed = WS(
         'completed', 'Completed',
         'Assignment is completed.'
@@ -92,7 +91,7 @@ class AssignmentWorkflow(BriefyWorkflow):
 
     @property
     def already_uploaded(self):
-        """The Assignment was never uploaded by the Professional.   """
+        """The Assignment was never uploaded by the Professional."""
         for item in self.document.state_history:
             if item.get('to') == self.in_qa.name:
                 return True

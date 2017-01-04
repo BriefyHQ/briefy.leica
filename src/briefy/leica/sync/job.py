@@ -45,8 +45,7 @@ def _status_after_or_equal(status_to_check, reference_status):
 
 
 def first(seq):
-    """Return the first element of a sequence or None if it is empty.
-    """
+    """Return the first element of a sequence or None if it is empty."""
     if not seq:
         return None
     return next(iter(seq))
