@@ -2,7 +2,7 @@
 from briefy.leica.models import Asset
 from briefy.leica.models import Comment
 from briefy.leica.models import Customer
-from briefy.leica.models import JobAssignment
+from briefy.leica.models import Assignment
 from briefy.leica.models import Project
 
 
@@ -25,5 +25,5 @@ def export_all():
     export_model('assets.json', Asset)
     export_model('comments.json', Comment)
     export_model('customers.json', Customer)
-    export_model('jobs.json', JobAssignment)
+    export_model('assignments.json', Assignment)
     export_model('projects.json', Project)

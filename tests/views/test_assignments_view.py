@@ -1,4 +1,4 @@
-"""Test jobs view."""
+"""Test Assignments Service view."""
 from briefy.leica import models
 from conftest import BaseVersionedTestView
 
@@ -7,23 +7,23 @@ import transaction
 
 
 @pytest.mark.usefixtures('create_dependencies')
-class TestJobView(BaseVersionedTestView):
-    """Test JobService view."""
+class TestAssignmentView(BaseVersionedTestView):
+    """Test AssignmentService view."""
 
-    base_path = '/jobs'
+    base_path = '/assignments'
     dependencies = [
         (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
-        (models.JobOrder, 'data/job_orders.json'),
+        (models.Order, 'data/orders.json'),
     ]
     # TODO: local role attributes are not in the colander schema and so ignored on add or update
     ignore_validation_fields = [
         'state_history', 'state', 'order', 'updated_at', 'customer', 'project',
         'qa_manager', 'project_manager', 'scout_manager', 'professional'
     ]
-    file_path = 'data/jobs.json'
-    model = models.JobAssignment
+    file_path = 'data/assignments.json'
+    model = models.Assignment
     initial_wf_state = 'pending'
     check_versions_field = 'payout_currency'
     UPDATE_SUCCESS_MESSAGE = ''
@@ -45,7 +45,7 @@ class TestJobView(BaseVersionedTestView):
             'description': '',
             'updated_at': '2016-09-18T18:55:20.696061+00:00',
             'filename': '2345.jpg',
-            'source_path': 'source/files/jobs/2345.jpg',
+            'source_path': 'source/files/assignments/2345.jpg',
             'created_at': '2016-09-18T18:55:20.696043+00:00',
             'state': 'pending',
             'width': 5760,
@@ -70,7 +70,7 @@ class TestJobView(BaseVersionedTestView):
                 }
             ],
             'size': 4049867,
-            'job_id': 'c04dc102-7d3b-4574-a261-4bf72db571db',
+            'assignment_id': 'c04dc102-7d3b-4574-a261-4bf72db571db',
             'title': 'IMAGE01'
         }
         # Create the object using a new transaction
@@ -96,6 +96,7 @@ class TestJobView(BaseVersionedTestView):
             status=200
         )
         result = request.json
-        assert result['total'] == 2
+        assert result['total'] == 3
+        assert 'cancel' in result['transitions']
         assert 'publish' in result['transitions']
         assert 'assign' in result['transitions']

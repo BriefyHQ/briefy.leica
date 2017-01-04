@@ -45,8 +45,8 @@ class AssetImportService:
             asset_rows = []
             for item in data:
                 asset_rows.append(
-                    (item['job_id'], item['professional_id'], item['s3_path'], item['image_size'],
-                     item['image_width'], item['image_height'])
+                    (item['assignment_id'], item['professional_id'], item['s3_path'],
+                     item['image_size'], item['image_width'], item['image_height'])
                 )
             session = self.request.db
             try:

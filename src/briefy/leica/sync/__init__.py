@@ -167,7 +167,8 @@ class ModelSync:
             _, self.knack_parents = get_model_and_data(knack_parent_model)
         knack_parent = None
         for item in self.knack_parents:
-            value_id = getattr(kobj, field_name)[0]['id']
+            attr = getattr(kobj, field_name)
+            value_id = attr[0]['id']
             if item.id == value_id:
                 knack_parent = item
                 break
@@ -233,7 +234,7 @@ class ModelSync:
         else:
             items = self.get_items()
 
-        # items = items[0:710]
+        # items = items[:730]
         total = len(items)
         for i, kobj in enumerate(items):
             if limit and i >= limit:

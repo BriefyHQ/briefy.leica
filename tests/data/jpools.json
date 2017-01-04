@@ -1,0 +1,32 @@
+[
+  {
+    "id": "58cbcdf7-47f7-4a10-9cbb-64888dbc645a",
+    "updated_at": "2016-09-18T18:55:20.226722+00:00",
+    "created_at": "2016-09-18T18:55:20.226696+00:00",
+    "state": "created",
+    "country": "ID",
+    "title": "Agoda Bali",
+    "description": "Agoda Bali Job pool",
+    "slug": "agoda-bali-pool"
+  },
+  {
+    "id": "92cf10f4-f39d-49b5-ae1b-3565b87738d1",
+    "updated_at": "2016-09-18T18:55:20.226722+00:00",
+    "created_at": "2016-09-18T18:55:20.226696+00:00",
+    "state": "created",
+    "title": "Agoda Phuket",
+    "country": "TH",
+    "description": "Agoda Phuket Job pool",
+    "slug": "agoda-phuket-pool"
+  },
+  {
+    "id": "b8961a45-b292-4394-a3f8-681f06b05be2",
+    "updated_at": "2016-09-18T18:55:20.226722+00:00",
+    "created_at": "2016-09-18T18:55:20.226696+00:00",
+    "state": "created",
+    "title": "Agoda Bangkok",
+    "country": "TH",
+    "description": "Agoda Bangkok Job pool",
+    "slug": "agoda-bangkok-pool"
+  }
+]

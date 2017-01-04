@@ -25,7 +25,7 @@ class WorkingLocation(Address, mixins.LeicaMixin, Base):
     _workflow = workflows.LocationWorkflow
 
     __summary_attributes__ = [
-        'id', 'created_at', 'updated_at', 'state',
+        'id', 'created_at', 'updated_at', 'state', 'timezone',
         'locality', 'country', 'coordinates', 'formatted_address'
     ]
 

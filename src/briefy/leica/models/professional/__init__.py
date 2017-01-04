@@ -4,7 +4,6 @@ from briefy.common.db.mixins.optin import OptIn
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.professional.workflows import ProfessionalWorkflow
-from briefy.leica.models.professional.workflows import SkillWorkflow
 from briefy.ws.utils.user import add_user_info_to_state_history
 from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
@@ -63,6 +62,8 @@ class Professional(ProfessionalMixin, Base):
         'main_email', 'main_mobile', 'type', 'photo_path'
     ]
 
+    __summary_attributes_relations__ = ['links', 'main_location']
+
     __listing_attributes__ = __summary_attributes__
 
     __colanderalchemy_config__ = {
@@ -102,16 +103,16 @@ class Professional(ProfessionalMixin, Base):
     # Profile information
     photo_path = sa.Column(sa.String(255), nullable=True)
 
-    # Jobs
-    jobs = orm.relationship(
-        'JobAssignment',
+    # assignments
+    assignments = orm.relationship(
+        'Assignment',
         lazy='dynamic'
     )
 
     # Assets
     assets = orm.relationship(
         'Asset',
-        backref=orm.backref('professional', lazy='joined'),
+        backref=orm.backref('professional'),
         lazy='dynamic'
     )
 
@@ -126,7 +127,7 @@ class Professional(ProfessionalMixin, Base):
     locations = orm.relationship(
         'WorkingLocation',
         backref=orm.backref(
-            'professional', lazy='joined'
+            'professional'
         ),
         cascade='all, delete-orphan',
     )
@@ -136,6 +137,12 @@ class Professional(ProfessionalMixin, Base):
         uselist=False,
         viewonly=False,
         cascade='all, delete-orphan',
+    )
+
+    pools = orm.relationship(
+        'Pool',
+        secondary='professionals_in_pool',
+        back_populates='professionals'
     )
 
     type = sa.Column(sa.String(50), nullable=False)
@@ -161,45 +168,10 @@ class Professional(ProfessionalMixin, Base):
             args['polymorphic_on'] = cls.type
         return args
 
-    def _summarize_relationships(self) -> dict:
-        """Summarize relationship information.
-
-        :return: Dictionary with summarized info for relationships.
-        """
-        data = {}
-        links = self.links
-        main_location = self.main_location
-        to_summarize = [
-            ('links', links),
-        ]
-
-        if main_location:
-            to_summarize.append(
-                ('main_location', main_location)
-            )
-
-        for k, obj in to_summarize:
-            if isinstance(obj, Base):
-                serialized = obj.to_summary_dict() if obj else None
-            else:
-                serialized = [o.to_summary_dict() for o in obj]
-            data[k] = serialized
-        return data
-
-    def to_listing_dict(self) -> dict:
-        """Return a summarized version of the dict representation of this Class.
-
-        Used to serialize this object within a parent object serialization.
-        :returns: Dictionary with fields and values used by this Class
-        """
-        data = super().to_listing_dict()
-        data.update(self._summarize_relationships())
-        return data
-
     def to_dict(self):
         """Return a dict representation of this object."""
         data = super().to_dict()
-        data.update(self._summarize_relationships())
+        data['slug'] = self.slug
 
         # Workflow history
         add_user_info_to_state_history(self.state_history)
@@ -210,7 +182,7 @@ class Professional(ProfessionalMixin, Base):
 class Skill(mixins.LeicaMixin):
     """A Skill of a professional."""
 
-    _workflow = SkillWorkflow
+    _workflow = ProfessionalWorkflow
 
     @declared_attr
     def id(cls):

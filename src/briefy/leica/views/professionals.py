@@ -60,7 +60,7 @@ class ProfessionalService(RESTService):
     cors_policy=CORS_POLICY,
     factory=ProfessionalFactory
 )
-class ProfessionalWorkflow(WorkflowAwareResource):
+class ProfessionalWorkflowService(WorkflowAwareResource):
     """Professional workflow resource."""
 
     model = Professional

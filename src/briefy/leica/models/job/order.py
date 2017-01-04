@@ -3,7 +3,7 @@ from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.job import workflows
-from briefy.leica.vocabularies import JobInputSource
+from briefy.leica.vocabularies import OrderInputSource
 from briefy.ws.utils.user import add_user_info_to_state_history
 from sqlalchemy import orm
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -13,20 +13,21 @@ import sqlalchemy as sa
 import sqlalchemy_utils as sautils
 
 __summary_attributes__ = [
-    'id', 'title', 'description', 'created_at', 'updated_at', 'state',
-    'price', 'number_of_assets', 'location'
+    'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
+    'price', 'number_required_assets', 'location'
 ]
 
 __listing_attributes__ = __summary_attributes__
 
 
-class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
-               mixins.KLeicaVersionedMixin, Base):
-    """A Job Order from the customer."""
+class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
+            mixins.KLeicaVersionedMixin, Base):
+    """An Order from the customer."""
 
-    _workflow = workflows.JobOrderWorkflow
+    _workflow = workflows.OrderWorkflow
 
     __summary_attributes__ = __summary_attributes__
+    __summary_attributes_relations__ = ['project', 'comments', 'customer']
     __listing_attributes__ = __listing_attributes__
 
     __raw_acl__ = (
@@ -54,13 +55,13 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
             }
         }
     )
-    """Customer Job Order ID.
+    """Customer Order ID.
 
-    Reference for the customer to find this job. On Knack this field was refered as 'job_id'
+    Reference for the customer to find this order. On Knack this field was refered as 'job_id'
     """
 
     job_id = sa.Column(sa.String, nullable=True, index=True)
-    """Job ID was the main Briefy id for a Job.
+    """Order ID was the main Briefy id for an Order.
 
     This field was used on Knack as an auto-incremented field named 'internal_job_id'.
     """
@@ -108,46 +109,46 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         default='undefined',
         nullable=True
     )
-    """Category of this job.
+    """Category of this Order.
 
     Options come from :mod:`briefy.common.vocabularies.categories`.
     """
 
     source = sa.Column(
-        sautils.ChoiceType(JobInputSource, impl=sa.String()),
+        sautils.ChoiceType(OrderInputSource, impl=sa.String()),
         default='briefy',
         nullable=False
     )
-    """Source of this job.
+    """Source of this Order.
 
-    This field stores which part created this job, Customer or Briefy.
+    This field stores which part created this Order, Customer or Briefy.
     Options come from :mod:`briefy.leica.vocabularies`.
     """
 
-    number_of_assets = sa.Column(sa.Integer(), default=20)
-    """Number of assets of a job."""
+    number_required_assets = sa.Column(sa.Integer(), default=20)
+    """Number of required assets of an Order."""
 
     requirements = sa.Column(sa.Text, default='')
-    """Human-readable requirements for a Job."""
+    """Human-readable requirements for an Order."""
 
     location = orm.relationship(
-        'JobLocation',
+        'OrderLocation',
         uselist=False,
         backref=orm.backref('order')
     )
-    """Job Location.
+    """Order Location.
 
-    Relationship with :class:`briefy.leica.models.job.location.JobLocation`.
+    Relationship with :class:`briefy.leica.models.job.location.OrderLocation`.
     """
 
-    # Job Assignments
+    # Assignments
     assignments = orm.relationship(
-        'JobAssignment',
+        'Assignment',
         backref=orm.backref('order')
     )
-    """Job Assignments.
+    """Assignments.
 
-    Relationship with :class:`briefy.leica.models.job.JobAssignment`.
+    Relationship with :class:`briefy.leica.models.job.Assignment`.
     """
 
     _availability = sa.Column(
@@ -155,7 +156,7 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         sautils.JSONType,
         info={
             'colanderalchemy': {
-                'title': 'Availability for scheduling this job.',
+                'title': 'Availability for scheduling this Order.',
                 'missing': colander.drop,
                 'typ': colander.String
             }
@@ -170,20 +171,20 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         'Comment',
         foreign_keys='Comment.entity_id',
         order_by='asc(Comment.created_at)',
-        primaryjoin='Comment.entity_id == JobOrder.id',
+        primaryjoin='Comment.entity_id == Order.id',
         lazy='dynamic'
     )
-    """Comments connected to this job order.
+    """Comments connected to this order.
 
     Collection of :class:`briefy.leica.models.comment.Comment`.
     """
 
     @hybrid_property
     def availability(self) -> list:
-        """Return availability for a Job.
+        """Return availability for an Order.
 
         This should return a list with zero or more available dates for
-        scheduling this job.
+        scheduling this Order.
         i.e.::
 
             [
@@ -199,7 +200,7 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     @availability.setter
     def availability(self, value: dict):
-        """Set availabilities for a job."""
+        """Set availabilities for an Order."""
         self._availability = value
 
     _delivery = sa.Column(
@@ -220,7 +221,7 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     @hybrid_property
     def delivery(self) -> dict:
-        """Return delivery info for a Job.
+        """Return delivery info for an Order.
 
         This should return a dict with the delivery method and URL
         i.e.::
@@ -236,12 +237,12 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     @delivery.setter
     def delivery(self, value: dict):
-        """Set delivery information for a job."""
+        """Set delivery information for an Order."""
         self._delivery = value
 
     @property
     def assets(self):
-        """Return Assets from this JobOrder.
+        """Return Assets from this Order.
 
         Collection of :class:`briefy.leica.models.asset.Asset`.
         """
@@ -253,35 +254,12 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     @property
     def tech_requirements(self) -> dict:
-        """Tech requirements for this job.
+        """Tech requirements for this Order.
 
-        :return: A dictionary with technical requirements for a job.
+        :return: A dictionary with technical requirements for an Order.
         """
         project = self.project
         return project.tech_requirements
-
-    def _summarize_relationships(self) -> dict:
-        """Summarize relationship information.
-
-        :return: Dictionary with summarized info for relationships.
-        """
-        data = {}
-        project = self.project
-        comments = self.comments
-        to_summarize = [
-            ('project', project),
-            ('comments', comments),
-        ]
-        if project:
-            to_summarize.append(('customer', project.customer))
-
-        for k, obj in to_summarize:
-            if isinstance(obj, Base):
-                serialized = obj.to_summary_dict() if obj else None
-            else:
-                serialized = [o.to_summary_dict() for o in obj]
-            data[k] = serialized
-        return data
 
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
@@ -290,7 +268,6 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_listing_dict()
-        data.update(self._summarize_relationships())
         data = self._apply_actors_info(data)
         return data
 
@@ -302,7 +279,6 @@ class JobOrder(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data['availability'] = self.availability
         data['price'] = self.price
         data['slug'] = self.slug
-        data.update(self._summarize_relationships())
 
         # Workflow history
         add_user_info_to_state_history(self.state_history)

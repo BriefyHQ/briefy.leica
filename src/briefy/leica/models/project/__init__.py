@@ -4,7 +4,6 @@ from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.project import workflows
 from briefy.ws.utils.user import add_user_info_to_state_history
-from briefy.ws.utils.user import get_public_user_info
 from sqlalchemy import orm
 from zope.interface import Interface
 from zope.interface import implementer
@@ -15,7 +14,7 @@ import sqlalchemy_utils as sautils
 
 
 class IProject(Interface):
-    """Marker interface for Job."""
+    """Marker interface for Project."""
 
 
 class CommercialInfoMixin(mixins.ProfessionalPayoutInfo, mixins.ProjectBriefyRoles,
@@ -47,9 +46,11 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         'id', 'title', 'description', 'created_at', 'updated_at', 'state', 'external_id'
     ]
 
+    __summary_attributes_relations__ = ['customer']
+
     __listing_attributes__ = [
         'id', 'title', 'description', 'created_at', 'updated_at', 'state',
-        'external_id', 'total_jobs'
+        'external_id', 'total_orders'
     ]
 
     __raw_acl__ = (
@@ -86,48 +87,48 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
             }
         }
     )
-    """Technical requirements for jobs in this project.
+    """Technical requirements for orders in this project.
 
-    It stores a dictionary of requirements to be fullfiled by each asset of each Job.
+    It stores a dictionary of requirements to be full filed by each asset of each Assignment.
     """
 
     cancellation_window = sa.Column(sa.Integer, default=0)
-    """Period, in hours, before the shooting, a Job can be cancelled.
+    """Period, in hours, before the shooting, an Assignment can be cancelled.
 
-    i.e.: 24 would mean a Job in this project could be cancelled with at least 24 hour notice.
-    Zero means no cancellation is possible.
+    i.e.: 24 would mean an Assignment in this project could be cancelled with
+    at least 24 hour notice. Zero means no cancellation is possible.
     """
 
     availability_window = sa.Column(sa.Integer, default=0)
     """Period, in days, an availability date can be inputed.
 
-    i.e.: 10 would mean a Job would have availability dates for, at least, 10 days in the future.
+    i.e.: 10 would mean an Order would have availability dates for, at least, 10 days in the future.
     Zero means no check is done.
     """
 
     approval_window = sa.Column(sa.Integer, default=0)
-    """Period, in days, after the delivery, a Job could be approved or rejected by the customer.
+    """Period, in days, after the delivery, an Order could be approved or rejected by the customer.
 
-    i.e.: 10 would mean a Job in this project could be approved up to 10 days after its delivery.
-    Zero means a Job will be automatically approved.
+    i.e.: 10 would mean an Order in this project could be approved up to 10 days after its delivery.
+    Zero means a Order will be automatically approved.
     """
 
-    jobs = orm.relationship(
-        'JobOrder',
+    orders = orm.relationship(
+        'Order',
         backref=orm.backref('project'),
         lazy='dynamic'
     )
-    """List of Jobs of this project.
+    """List of Orders of this project.
 
-    Returns a collection of :class:`briefy.leica.models.job.order.JobOrder`.
+    Returns a collection of :class:`briefy.leica.models.job.order.Order`.
     """
 
-    @sautils.aggregated('jobs', sa.Column(sa.Integer, default=0))
-    def total_jobs(self):
-        """Total jobs in this project.
+    @sautils.aggregated('orders', sa.Column(sa.Integer, default=0))
+    def total_orders(self):
+        """Total Orders in this project.
 
         This attribute uses the Aggregated funcion of SQLAlchemy Utils, meaning the column
-        should be updated on each change on any contained Job.
+        should be updated on each change on any contained Order.
         """
         return sa.func.count('1')
 
@@ -160,23 +161,6 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     )
     """Path to release template file."""
 
-    def _apply_actors_info(self, data: dict) -> dict:
-        """Apply actors information for a given data dictionary.
-
-        :param data: Data dictionary.
-        :return: Data dictionary.
-        """
-        actors = [(k, k) for k in self.__actors__]
-        info = self._actors_info()
-        for key, attr in actors:
-            try:
-                value = info.get(attr).pop()
-            except (AttributeError, IndexError):
-                data[key] = None
-            else:
-                data[key] = get_public_user_info(value) if value else None
-        return data
-
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
 
@@ -184,17 +168,13 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_listing_dict()
-        customer = self.customer
-        data['customer'] = customer.to_summary_dict() if customer else None
         data = self._apply_actors_info(data)
         return data
 
     def to_dict(self):
         """Return a dict representation of this object."""
         data = super().to_dict()
-        customer = self.customer
         data['slug'] = self.slug
-        data['customer'] = customer.to_listing_dict() if customer else None
         data = self._apply_actors_info(data)
         add_user_info_to_state_history(self.state_history)
         # Apply actor information to data

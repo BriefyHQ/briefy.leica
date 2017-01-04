@@ -8,7 +8,7 @@ import os
 
 
 @pytest.mark.usefixtures('db_transaction', 'create_dependencies')
-class TestAssetImportView():
+class TestAssetImportView:
     """Test AssetImportService view."""
 
     base_path = '/knack/assets/import'
@@ -17,8 +17,8 @@ class TestAssetImportView():
         (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
-        (models.JobOrder, 'data/job_orders.json'),
-        (models.JobAssignment, 'data/jobs.json')
+        (models.Order, 'data/orders.json'),
+        (models.Assignment, 'data/assignments.json')
     ]
 
     @property
