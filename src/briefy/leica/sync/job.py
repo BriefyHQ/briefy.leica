@@ -163,9 +163,22 @@ def add_order_history(session, obj, kobj):
             'date': _build_date(date, last_date),
             'message': "Approved by '{}' on the Knack database".format(person),
             'actor': 'g:briefy_qa',
-            'transition': 'approve',
+            'transition': 'deliver',
             'from': history[-1]['to'],
-            'to': 'in_qa'
+            'to': 'delivered'
+        })
+        last_date = date
+
+    # check for 'accepted' status
+    if kobj.approval_status and first(kobj.approval_status) == 'Completed':
+        date = kobj.last_approval_date or last_date
+        history.append({
+            'date': _build_date(date, last_date),
+            'message': "Marked as  'completed' on the Knack database",
+            'actor': 'g:system',
+            'transition': 'accept',
+            'from': history[-1]['to'],
+            'to': 'accepted'
         })
         last_date = date
 
@@ -202,11 +215,8 @@ def add_order_history(session, obj, kobj):
     logger.debug('{model} imported with state: {state}'.format(model=model, state=obj.state))
 
 
-<<<<<<< Updated upstream
-def add_assignment_history(session, obj, kobj):
-=======
 def add_assignment_history(session, obj, kobj, professional=None):
->>>>>>> Stashed changes
+
     """Add state_history and state information to the Assigment."""
     history = []
 
@@ -308,7 +318,7 @@ def add_assignment_history(session, obj, kobj, professional=None):
         history.append({
             'date': _build_date(kobj.submission_date, last_date),
             'message': "Submited by '{}' (from data on Knack)".format(person),
-            'actor': 'g:system',
+            'actor': str(professional) if professional else 'g:system',
             'transition': 'upload',
             'from': 'awaiting_assets',
             'to': 'validation',
@@ -342,6 +352,16 @@ def add_assignment_history(session, obj, kobj, professional=None):
             'to': 'approved',
         })
         last_date = date
+
+    if kobj.approval_status and first(kobj.approval_status).lower() == 'completed':
+        history.append({
+            'date': _build_date(kobj.submission_date, last_date),
+            'message': "completed",
+            'actor': 'g:system',
+            'transition': 'complete',
+            'from': 'approved',
+            'to': 'completed',
+        })
 
     # Check for 'completed' status # ERROR: 'completed' status should be on JobOrder
     # Check for 'edit' status # This can 't be reliably retrieved from Knack fields
@@ -465,7 +485,7 @@ class JobSync(ModelSync):
 
     def add_assigment(self, obj, kobj):
         """Add a related assign object."""
-<<<<<<< Updated upstream
+
         # TODO: import comments
 
         payable = True
@@ -478,14 +498,7 @@ class JobSync(ModelSync):
         job_pool = Pool.query().filter_by(external_id=kpool_id).one_or_none()
         if kpool_id and not job_pool:
             print('Knack Poll ID: {0} do not found in leica.'.format(kpool_id))
-=======
-        # TODO: dates should be created as workflow history transitions
-        # assignment_date = kobj.assignment_date
-        # add comments
-        professional_id = self.get_user(kobj, 'responsible_photographer')
-        _, professional_name = _get_identifier(kobj, 'responsible_photographer')
-        payable = kobj.approval_status != {'Cancelled'}
->>>>>>> Stashed changes
+
         payload = dict(
             id=uuid.uuid4(),
             order_id=obj.id,
@@ -521,7 +534,7 @@ class JobSync(ModelSync):
 
         # update assignment state history
         add_assignment_history(self.session, assignment, kobj,
-                               professional=(professional_id, professional_name))
+                               professional=professional_id)
 
         # populate the set_type field
         further_edit = kobj.further_editing_requested_by_client
