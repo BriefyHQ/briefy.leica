@@ -581,7 +581,7 @@ class JobSync(ModelSync):
             assignment.set_type = 'refused_customer'
         elif not assignment.set_type:
             assignment.set_type = 'returned_photographer'
-        logger.info('Set type: {}'.format(assignment.set_type))
+        logger.debug('Set type: {}'.format(assignment.set_type))
 
     def add(self, kobj, briefy_id):
         """Add new Job to database."""
