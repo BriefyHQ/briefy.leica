@@ -14,7 +14,7 @@ import sqlalchemy_utils as sautils
 
 __summary_attributes__ = [
     'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
-    'price', 'number_required_assets', 'location'
+    'price', 'number_required_assets', 'location', 'category'
 ]
 
 __listing_attributes__ = __summary_attributes__
