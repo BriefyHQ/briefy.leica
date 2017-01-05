@@ -458,8 +458,9 @@ class JobSync(ModelSync):
         project, kproject = self.get_parent(kobj, 'project')
         job_id = str(kobj.internal_job_id or kobj.job_id)
         number_required_assets = kobj.number_of_photos or project.number_required_assets or 10
-        category = str(kobj.category)
+        category = kobj.category.pop() if kobj.category else 'undefined'
         category = 'Accommodation' if category == 'Accomodation' else category
+        category = 'Portrait' if category == 'Portraits' else category
 
         order_payload.update(
             dict(
@@ -478,6 +479,8 @@ class JobSync(ModelSync):
                 source=isource_mapping.get(str(kobj.input_source), 'briefy'),
             )
         )
+        if order_payload.get('category') == 'undefined':
+            logger.debug('Category undefined knack Job: {job_id}'.format(job_id=job_id))
         return order_payload
 
     def add_location(self, obj, kobj):
