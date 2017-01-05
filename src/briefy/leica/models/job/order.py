@@ -125,7 +125,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     Options come from :mod:`briefy.leica.vocabularies`.
     """
 
-    number_required_assets = sa.Column(sa.Integer(), default=20)
+    number_required_assets = sa.Column(sa.Integer(), default=10)
     """Number of required assets of an Order."""
 
     requirements = sa.Column(sa.Text, default='')
