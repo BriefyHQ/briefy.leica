@@ -59,7 +59,7 @@ class Professional(ProfessionalMixin, Base):
 
     __summary_attributes__ = [
         'id', 'title', 'description', 'created_at', 'updated_at', 'state',
-        'main_email', 'main_mobile', 'type', 'photo_path'
+        'main_email', 'main_mobile', 'type', 'photo_path', 'slug'
     ]
 
     __summary_attributes_relations__ = ['links', 'main_location']
