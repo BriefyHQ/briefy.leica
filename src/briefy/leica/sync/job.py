@@ -7,29 +7,429 @@ from briefy.leica.models import OrderLocation
 from briefy.leica.models import Order
 from briefy.leica.models import Pool
 from briefy.leica.models import Project
+from briefy.leica.vocabularies import OrderInputSource as ISource
 from briefy.leica.sync import PLACEHOLDERS
 from briefy.leica.sync import ModelSync
 from briefy.leica.sync.location import create_location_dict
-from briefy.leica.vocabularies import OrderInputSource as ISource
+from collections import OrderedDict
+from datetime import datetime
 
+import pytz
 import uuid
 
 
-job_status_mapping = {
-    'Pending': 'pending',
-    'Published': 'published',
-    'Scheduled': 'scheduled',
-    'Assigned': 'assigned',
-    'Cancelled ': 'cancelled',
-    'Awaiting Assets': 'awaiting_assets',
-    'Approved': 'approved',
-    'Completed': 'completed',
-    'Refused': 'refused',
-    'In QA': 'in_qa',
-}
+# Field 'approval_status' on Knack.
+# (Actually maps to several states on JobOrder and associated JobAssignments)
+job_status_list = [
+    ('Pending', 'pending'),
+    ('Published', 'published'),
+    ('Scheduled', 'scheduled'),
+    ('Assigned', 'assigned'),
+    ('Cancelled ', 'cancelled'),
+    ('Awaiting Assets', 'awaiting_assets'),
+    ('Approved', 'approved'),
+    ('Completed', 'completed'),
+    ('Refused', 'refused'),
+    ('In QA', 'in_qa'),
+]
+
+job_status_mapping = OrderedDict(job_status_list)
+
+
+def _status_after_or_equal(status_to_check, reference_status):
+    for knack_name, name in job_status_list:
+        if name == status_to_check:
+            return True
+        elif name == reference_status:
+            return False
+
+
+def first(seq):
+    """Return the first element of a sequence or None if it is empty."""
+    if not seq:
+        return None
+    return next(iter(seq))
+
 
 isource_mapping = {item.label: item.value for item in ISource.__members__.values()}
 category_mapping = {item.label: item.value for item in CategoryChoices.__members__.values()}
+
+
+def _build_date(dt, minimal=None):
+    """Return a safe str representation for a datetime.
+
+    Given a valid datetime, or None and a valid minimal datetime,
+    returns a valid str representation for it in i soformat-
+    or the empty string.
+
+    """
+    if not dt and minimal:
+        dt = minimal
+    if dt:
+        return dt.isoformat()
+    return ''
+
+
+def _get_identifier(kobj, field, default='Unknown'):
+    """Retrieve the display name of given Knack relationship field."""
+    attr = getattr(kobj, field, [])
+    if not attr:
+        return default
+    return attr[0].get('identifier', default)
+
+
+def add_order_history(session, obj, kobj):
+    """Add state_history and state information to the Order."""
+    history = []
+    # created and received status
+    person = _get_identifier(kobj, 'input_person', default='Briefy')
+    # actor should be customer_user or project_manager
+    actor_id = obj.project_manager if obj.source == 'briefy' else obj.customer_user
+    actor = str(actor_id) if actor_id else 'g:system'
+    history.append({
+        'date': _build_date(kobj.input_date),
+        'message': 'Created by {} on Knack database'.format(person),
+        'actor': actor,
+        'transition': '',
+        'from': '',
+        'to': 'created'
+    })
+
+    history.append({
+        'date': _build_date(kobj.input_date),
+        'message': 'Automatic transition to received',
+        'actor': actor,
+        'transition': 'submit',
+        'from': 'created',
+        'to': 'received'
+    })
+    last_date = kobj.input_date
+
+    # check for 'assigned' status
+    if kobj.assignment_date:
+        person = _get_identifier(kobj, 'scouting_manager', default='Unknown')
+        # actor should be assignment scout_manager if available
+        actor_id = obj.assignments[0].scout_manager
+        actor = str(actor_id) if actor_id else 'g:system'
+        history.append({
+            'date': _build_date(kobj.assignment_date, last_date),
+            'message': "Photographer assigned by '{}' on the Knack database".format(person),
+            'actor': actor,
+            'transition': 'assign',
+            'from': 'received',
+            'to': 'assigned'
+        })
+        last_date = kobj.assignment_date
+
+    # check for 'scheduled' status
+    if kobj.scheduled_shoot_date_time:
+        date = kobj.scheduled_shoot_date_time
+        if date in (kobj.availability_1, kobj.availability_2):
+            person = _get_identifier(kobj, 'responsible_photographer', default='Photographer')
+        else:
+            person = 'Briefy'
+        extra_message = ''
+        if kobj.rescheduled:
+            extra_message += (
+                '''\nThis job was re-schedulled and may have been re-assigned/shot'''
+                '''again. The old platform could not save this informaton. This transition'''
+                '''refers to the last valid scheduling'''
+            )
+
+        # actor should be professional_user
+        actor_id = obj.assignments[0].professional_user
+        actor = str(actor_id) if actor_id else 'g:system'
+        history.append({
+            'date': _build_date(date, last_date),
+            'message': "Scheduled by '{}' on the Knack database".format(person) + extra_message,
+            'actor': actor,
+            'transition': 'schedule',
+            'from': history[-1]['to'],
+            'to': 'scheduled'
+        })
+        last_date = date
+
+    # check for 'in_qa' status
+    if kobj.submission_date:
+        date = kobj.submission_date
+        person = _get_identifier(kobj, 'responsible_photographer', default='Photographer')
+        # actor should be professional_user
+        actor_id = obj.assignments[0].professional_user
+        actor = str(actor_id) if actor_id else 'g:system'
+        history.append({
+            'date': _build_date(date, last_date),
+            'message': "Submited by '{}' on the Knack database".format(person),
+            'actor': actor,
+            'transition': 'start_qa',
+            'from': history[-1]['to'],
+            'to': 'in_qa'
+        })
+        last_date = date
+
+    # check for 'delivered' status
+    if kobj.client_delivery_link.url:
+        date = kobj.last_approval_date or last_date
+        person = _get_identifier(kobj, 'qa_manager', default='g:briefy_qa')
+        # actor should be qa_manager
+        actor_id = obj.assignments[0].qa_manager
+        actor = str(actor_id) if actor_id else 'g:briefy_qa'
+        history.append({
+            'date': _build_date(date, last_date),
+            'message': "Delivered by '{}' on the Knack database".format(person),
+            'actor': actor,
+            'transition': 'deliver',
+            'from': history[-1]['to'],
+            'to': 'delivered'
+        })
+        last_date = date
+
+    # check for 'accepted' status
+    if kobj.approval_status and first(kobj.approval_status) == 'Completed':
+        date = kobj.last_approval_date or last_date
+        # actor should be customer_user or project_manager
+        actor_id = obj.customer_user or obj.project_manager
+        actor = str(actor_id) if actor_id else 'g:system'
+        history.append({
+            'date': _build_date(date, last_date),
+            'message': "Marked as  'completed' on the Knack database",
+            'actor': actor,
+            'transition': 'accept',
+            'from': history[-1]['to'],
+            'to': 'accepted'
+        })
+        last_date = date
+
+    # check for 'cancelled' status
+    if first(kobj.approval_status) == 'Cancelled':
+        date = kobj.last_approval_date or last_date
+        # actor should be customer_user or project_manager
+        actor_id = obj.customer_user or obj.project_manager
+        actor = str(actor_id) if actor_id else 'g:system'
+        history.append({
+            'date': _build_date(date, last_date),
+            'message': 'Job cancelled on the Knack database by unknown actor',
+            'actor': actor,
+            'transition': 'cancel',
+            'from': history[-1]['to'],
+            'to': 'cancelled'
+        })
+        last_date = date
+
+    # check for 'refused' status
+    if first(kobj.approval_status) == 'Refused':
+        date = kobj.delivery_date_to_client or last_date
+        # actor should be customer_user or project_manager
+        actor_id = obj.customer_user or obj.project_manager
+        actor = str(actor_id) if actor_id else 'g:system'
+        history.append({
+            'date': _build_date(date, last_date),
+            'message': 'Job refused by client',
+            'actor': actor,
+            'transition': 'refuse',
+            'from': history[-1]['to'],
+            'to': 'refused'
+        })
+        last_date = date
+
+    obj.state_history = history
+    obj.state = history[-1]['to']
+    session.add(obj)
+    model = obj.__class__.__name__
+    logger.debug('{model} imported with state: {state}'.format(model=model, state=obj.state))
+
+
+def add_assignment_history(session, obj, kobj):
+    """Add state_history and state information to the Assigment."""
+    history = []
+    order = obj.order
+
+    # Check for 'created' status
+    person = _get_identifier(kobj, 'input_person', default='Briefy')
+    # actor should be customer_user or project_manager
+    actor_id = order.project_manager if order.source == 'briefy' else order.customer_user
+    actor = str(actor_id) if actor_id else 'g:system'
+    history.append({
+        'date': _build_date(kobj.input_date),
+        'message': 'Created by {} on Knack database'.format(person),
+        'actor': actor,
+        'transition': '',
+        'from': '',
+        'to': 'created'
+    })
+    history.append({
+        'date': _build_date(kobj.input_date),
+        'message': 'Automatic transition to pending',
+        'actor': actor,
+        'transition': 'submit',
+        'from': 'created',
+        'to': 'pending'
+    })
+    last_date = kobj.input_date
+
+    # Check for 'published' status
+    if _get_identifier(kobj, 'scouting_manager').lower().strip() == 'job pool':
+        # actor should be customer_user or project_manager
+        actor_id = order.customer_user or order.project_manager
+        actor = str(actor_id) if actor_id else 'g:system'
+        history.append({
+            'date': _build_date(kobj.input_date),
+            'message': 'Job sent to job pool',
+            'actor': actor,
+            'transition': 'publish',
+            'from': 'pending',
+            'to': 'published'
+        })
+
+    # Check for 'assigned' status
+    if kobj.assignment_date:
+        person = _get_identifier(kobj, 'scouting_manager', default='Unknown')
+        # actor should be professional_user or scout_manager
+        is_job_pool = history[-1]['to'] == 'published'
+        actor_id = obj.professional_user if is_job_pool else obj.scout_manager
+        actor = str(actor_id) if actor_id else 'g:system'
+        history.append({
+            'date': _build_date(kobj.assignment_date, kobj.input_date),
+            'message': "Photographer assigned by '{}' on the Knack database".format(person),
+            'actor': actor,
+            'transition': 'assign' if not is_job_pool else 'self_assign',
+            'from': history[-1]['to'],
+            'to': 'assigned'
+        })
+        last_date = kobj.assignment_date
+
+    #  Check for 'scheduled' status
+    if kobj.scheduled_shoot_date_time:
+        date = kobj.scheduled_shoot_date_time
+        if date in (kobj.availability_1, kobj.availability_2):
+            person = _get_identifier(kobj, 'responsible_photographer', default='Photographer')
+        else:
+            person = 'Briefy'
+
+        # actor should be professional_user
+        actor_id = obj.professional_user
+        actor = str(actor_id) if actor_id else 'g:system'
+        history.append({
+            'date': _build_date(date, last_date),
+            'message': "Scheduled by '{}' on the Knack database".format(person),
+            'actor': actor,
+            'transition': 'schedule',
+            'from': history[-1]['to'],
+            'to': 'scheduled'
+        })
+        last_date = date
+
+    #  Check for 'awaiting_assets' status
+    dt = kobj.scheduled_shoot_date_time
+    if dt and datetime.now(tz=pytz.UTC) > dt:
+        history.append({
+            'date': _build_date(kobj.scheduled_shoot_date_time, last_date),
+            'message': 'Waiting for asset upload (from data on Knack)',
+            'actor': 'g:system',
+            'transition': 'ready_for_upload',
+            'from': 'scheduled',
+            'to': 'awaiting_assets',
+        })
+        last_date = kobj.scheduled_shoot_date_time
+
+    # Check for Validation status: # TODO currently broken on the knack workflow.
+    if kobj.submission_date:
+        person = _get_identifier(kobj, 'responsible_photographer', default='Photographer')
+        # actor should be professional_user
+        actor_id = obj.professional_user
+        actor = str(actor_id) if actor_id else 'g:system'
+        history.append({
+            'date': _build_date(kobj.submission_date, last_date),
+            'message': "Submited by '{}' (from data on Knack)".format(person),
+            'actor': actor,
+            'transition': 'upload',
+            'from': 'awaiting_assets',
+            'to': 'validation',
+        })
+        last_date = kobj.submission_date
+
+    # Check for 'in_qa' status
+    if kobj.submission_date:
+        date = kobj.last_approval_date or kobj.submission_date
+        history.append({
+            'date': _build_date(date, last_date),
+            'message': "Automatic validation skipped (from data on Knack)",
+            'actor': 'g:system',
+            'transition': 'validate',
+            'from': 'validation',
+            'to': 'in_qa',  # Note: can't know about intermediary non-validated sets
+        })
+        last_date = date
+
+    # TODO: check if job was returned back to awaiting assets (EDIT NEEDED)
+
+    # Check for 'approved' status
+    if kobj.approval_status and first(kobj.approval_status).lower() == 'approved':
+        person = _get_identifier(kobj, 'qa_manager', default='g:briefy_qa')
+        # actor should be qa_manager
+        actor_id = obj.qa_manager
+        actor = str(actor_id) if actor_id else 'g:briefy_qa'
+        date = kobj.last_approval_date or kobj.submission_date
+        history.append({
+            'date': _build_date(kobj.submission_date, last_date),
+            'message': "Approved by '{}'".format(person),
+            'actor': actor,
+            'transition': 'approve',
+            'from': 'in_qa',
+            'to': 'approved',
+        })
+        last_date = date
+
+    if kobj.approval_status and first(kobj.approval_status).lower() == 'completed':
+        # actor should be customer_user or project_manager
+        actor_id = order.customer_user or order.project_manager
+        actor = str(actor_id) if actor_id else 'g:system'
+        history.append({
+            'date': _build_date(kobj.submission_date, last_date),
+            'message': "completed",
+            'actor': actor,
+            'transition': 'complete',
+            'from': 'approved',
+            'to': 'completed',
+        })
+
+    # Check for 'cancelled' status
+    if kobj.approval_status and first(kobj.approval_status).lower() == 'cancelled':
+        date = kobj.last_approval_date or kobj.submission_date
+        # actor should be customer_user or project_manager
+        actor_id = order.customer_user or order.project_manager
+        actor = str(actor_id) if actor_id else 'g:system'
+        history.append({
+            # TODO: verify this date
+            'date': _build_date(kobj.submission_date, last_date),
+            'message': "Cancelled by customer",
+            'actor': actor,
+            'transition': 'cancel',
+            'from': history[-1]['to'],
+            'to': 'cancelled',
+        })
+
+    # Check for 'refused' status
+    if kobj.approval_status and kobj.approval_status.pop().lower() == 'refused':
+        date = kobj.last_approval_date or kobj.submission_date
+        project = _get_identifier(kobj, 'customer')
+        # actor should be customer_user or project_manager
+        actor_id = order.customer_user or order.project_manager
+        actor = str(actor_id) if actor_id else 'g:system'
+        history.append({
+            # TODO: verify this date
+            'date': _build_date(kobj.submission_date, last_date),
+            'message': "Set of photos refused by client from project '{}'".format(project),
+            'actor': actor,
+            'transition': 'refuse',
+            'from': 'approved',
+            'to': 'refused',
+        })
+
+    obj.state_history = history
+    obj.state = history[-1]['to']
+    session.add(obj)
+    model = obj.__class__.__name__
+    logger.debug('{model} imported with state: {state}'.format(model=model, state=obj.state))
 
 
 class JobSync(ModelSync):
@@ -77,36 +477,6 @@ class JobSync(ModelSync):
         )
         return order_payload
 
-    def add_history(self, obj, kobj):
-        """Add state_history and state information to the Order."""
-        knack_status = list(kobj.approval_status)
-        if knack_status:
-            state = job_status_mapping.get(knack_status[0])
-        else:
-            msg = 'Status was not found in the mapping. Job ID {job_id}'
-            logger.info(msg.format(job_id=obj.customer_order_id))
-            state = 'pending'
-        history = dict(
-            message='Imported in this state from Knack database',
-            actor='g:system',
-            transition='',
-            to=state
-        )
-        obj.state_history = [history]
-        obj.state = state
-        further_edit = kobj.further_editing_requested_by_client
-        if state == 'in_qa':
-            if kobj.new_set:
-                obj.set_type = 'new'
-            else:
-                obj.set_type = 'returned_photographer'
-
-            if further_edit:
-                obj.set_type = 'refused_customer'
-
-        model = obj.__class__.__name__
-        logger.debug('{model} imported with state: {state}'.format(model=model, state=state))
-
     def add_location(self, obj, kobj):
         """Add Job location to the Order."""
         payload = create_location_dict('job_location', kobj)
@@ -144,16 +514,14 @@ class JobSync(ModelSync):
         session = self.session
         session.add(Comment(**payload))
 
-    def add_assigment_comments(self, obj, kobj):
+    def add_assignment_comments(self, obj, kobj):
         """Import assigment comments."""
         # TODO: internal comment, photographer comment, quality assurance feedback
         pass
 
-    def add_assigment(self, obj, kobj):
+    def add_assignment(self, obj, kobj):
         """Add a related assign object."""
-        # TODO: dates should be created as workflow history transitions
-        # assignment_date = kobj.assignment_date
-        # add comments
+        # TODO: import comments
 
         payable = True
         if kobj.approval_status == {'Cancelled'}:
@@ -165,6 +533,7 @@ class JobSync(ModelSync):
         job_pool = Pool.query().filter_by(external_id=kpool_id).one_or_none()
         if kpool_id and not job_pool:
             print('Knack Poll ID: {0} do not found in leica.'.format(kpool_id))
+
         payload = dict(
             id=uuid.uuid4(),
             order_id=obj.id,
@@ -180,6 +549,7 @@ class JobSync(ModelSync):
         )
         assignment = Assignment(**payload)
         self.session.add(assignment)
+        self.session.flush()
         logger.debug('Assignment added: {id}'.format(id=assignment.id))
 
         if professional_id:
@@ -199,7 +569,18 @@ class JobSync(ModelSync):
         self.update_local_roles(assignment, pm_roles_roles, 'project_manager')
 
         # update assignment state history
-        self.add_history(assignment, kobj)
+        add_assignment_history(self.session, assignment, kobj)
+
+        # populate the set_type field
+        further_edit = kobj.further_editing_requested_by_client
+        state = obj.state
+        if state == 'in_qa':
+            if kobj.new_set:
+                obj.set_type = 'new'
+            else:
+                obj.set_type = 'returned_photographer'
+            if further_edit:
+                obj.set_type = 'refused_customer'
 
     def add(self, kobj, briefy_id):
         """Add new Job to database."""
@@ -220,9 +601,11 @@ class JobSync(ModelSync):
                           if role.role_name.value == 'project_manager']
         self.update_local_roles(obj, pm_roles_roles, 'project_manager')
 
-        self.add_history(obj, kobj)
         self.add_location(obj, kobj)
         self.add_comment(obj, kobj)
-        self.add_assigment(obj, kobj)
+        self.add_assignment(obj, kobj)
+
+        # this sould be after import the assignment
+        add_order_history(self.session, obj, kobj)
         logger.debug('Additional data imported for this order: History, Location, Comment.')
         return obj

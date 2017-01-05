@@ -5,12 +5,16 @@ from briefy.leica.sync.professional import PhotographerSync
 from briefy.leica.tools import logger # noqa
 
 
-def main(session, transaction):
+def main(session, transaction, limit=None):
     """Import Project script."""
-    PhotographerSync(session, transaction)()
+    PhotographerSync(session, transaction)(limit=limit)
 
 
 if __name__ == '__main__':
-    session = configure(Session)
     import transaction
-    main(session, transaction)
+    import sys
+
+    session = configure(Session)
+
+    limit = int(sys.argv[1]) if len(sys.argv) >= 2 else None
+    main(session, transaction, limit)
