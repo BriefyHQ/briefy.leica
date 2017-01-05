@@ -76,7 +76,7 @@ class Pool(mixins.KLeicaVersionedMixin, Base):
     _workflow = workflows.PoolWorkflow
 
     __summary_attributes__ = [
-        'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
+        'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state', 'country'
     ]
     __listing_attributes__ = __summary_attributes__
 
