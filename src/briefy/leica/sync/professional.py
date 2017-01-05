@@ -29,7 +29,6 @@ class PhotographerSync(ModelSync):
             return
 
         try:
-            location_dict.pop('formatted_address', None)
             location = location_model(**location_dict)
             self.session.add(location)
             self.session.flush()

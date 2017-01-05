@@ -216,7 +216,6 @@ def add_order_history(session, obj, kobj):
 
 
 def add_assignment_history(session, obj, kobj, professional=None):
-
     """Add state_history and state information to the Assigment."""
     history = []
 
@@ -485,7 +484,6 @@ class JobSync(ModelSync):
 
     def add_assigment(self, obj, kobj):
         """Add a related assign object."""
-
         # TODO: import comments
 
         payable = True
