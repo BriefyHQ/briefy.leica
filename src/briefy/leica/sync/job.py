@@ -131,8 +131,8 @@ def add_order_history(session, obj, kobj):
         extra_message = ''
         if kobj.rescheduled:
             extra_message += (
-                '''\nThis job was re-schedulled and may have been re-assigned/shot'''
-                '''again. The old platform could not save this informaton. This transition'''
+                '''\nThis job was re-scheduled and may have been re-assigned/shot'''
+                '''again. The old platform could not save this information. This transition'''
                 '''refers to the last valid scheduling'''
             )
 
@@ -457,12 +457,16 @@ class JobSync(ModelSync):
         order_payload = super().get_payload(kobj, briefy_id)
         project, kproject = self.get_parent(kobj, 'project')
         job_id = str(kobj.internal_job_id or kobj.job_id)
+        number_required_assets = kobj.number_of_photos or project.number_required_assets or 10
+        category = kobj.category.pop() if kobj.category else 'undefined'
+        category = 'Accommodation' if category == 'Accomodation' else category
+        category = 'Portrait' if category == 'Portraits' else category
 
         order_payload.update(
             dict(
                 title=kobj.job_name,
                 description='',
-                category=category_mapping.get(str(kobj.category), 'undefined'),
+                category=category_mapping.get(category, 'undefined'),
                 project_id=project.id,
                 customer_id=project.customer.id,
                 price=self.parse_decimal(kobj.set_price),
@@ -471,10 +475,12 @@ class JobSync(ModelSync):
                 job_id=job_id,
                 external_id=kobj.id,
                 requirements=kobj.client_specific_requirement,
-                number_required_assets=kobj.number_of_photos,
+                number_required_assets=number_required_assets,
                 source=isource_mapping.get(str(kobj.input_source), 'briefy'),
             )
         )
+        if order_payload.get('category') == 'undefined':
+            logger.debug('Category undefined knack Job: {job_id}'.format(job_id=job_id))
         return order_payload
 
     def add_location(self, obj, kobj):
@@ -533,12 +539,13 @@ class JobSync(ModelSync):
         job_pool = Pool.query().filter_by(external_id=kpool_id).one_or_none()
         if kpool_id and not job_pool:
             print('Knack Poll ID: {0} do not found in leica.'.format(kpool_id))
-
+        set_type = 'new' if kobj.new_set else None
         payload = dict(
             id=uuid.uuid4(),
             order_id=obj.id,
             pool=job_pool,
             slug=self.get_slug(job_id, assignment=1),
+            set_type=set_type,
             professional_id=professional_id,
             payout_value=self.parse_decimal(kobj.photographer_payout),
             payout_currency=kobj.currency_payout or 'EUR',
@@ -573,14 +580,11 @@ class JobSync(ModelSync):
 
         # populate the set_type field
         further_edit = kobj.further_editing_requested_by_client
-        state = obj.state
-        if state == 'in_qa':
-            if kobj.new_set:
-                obj.set_type = 'new'
-            else:
-                obj.set_type = 'returned_photographer'
-            if further_edit:
-                obj.set_type = 'refused_customer'
+        if further_edit:
+            assignment.set_type = 'refused_customer'
+        elif not assignment.set_type:
+            assignment.set_type = 'returned_photographer'
+        logger.debug('Set type: {}'.format(assignment.set_type))
 
     def add(self, kobj, briefy_id):
         """Add new Job to database."""

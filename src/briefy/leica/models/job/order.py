@@ -14,7 +14,7 @@ import sqlalchemy_utils as sautils
 
 __summary_attributes__ = [
     'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
-    'price', 'number_required_assets', 'location'
+    'price', 'number_required_assets', 'location', 'category'
 ]
 
 __listing_attributes__ = __summary_attributes__
@@ -125,7 +125,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     Options come from :mod:`briefy.leica.vocabularies`.
     """
 
-    number_required_assets = sa.Column(sa.Integer(), default=20)
+    number_required_assets = sa.Column(sa.Integer(), default=10)
     """Number of required assets of an Order."""
 
     requirements = sa.Column(sa.Text, default='')

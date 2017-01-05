@@ -77,6 +77,9 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     Builds the relation with :class:`briefy.leica.models.customer.Customer`.
     """
 
+    number_required_assets = sa.Column(sa.Integer(), default=10)
+    """Number of required assets of a Project to be used in the Order as default value."""
+
     tech_requirements = sa.Column(
         sautils.JSONType,
         info={
