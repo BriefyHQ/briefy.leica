@@ -8,6 +8,7 @@ from briefy.leica.models import GDrive
 from briefy.leica.models import Linkedin
 from briefy.leica.models import MainWorkingLocation
 from briefy.leica.models import Photographer
+from briefy.leica.models import Pool
 from briefy.leica.models import Portfolio
 from briefy.leica.sync import cleanse_phone_number
 from briefy.leica.sync import ModelSync
@@ -78,6 +79,24 @@ class PhotographerSync(ModelSync):
                                  location_model=model,
                                  field_name=location)
 
+    def add_professional_pool(self, obj, kobj) -> None:
+        """Migrate JobPool for each Professional if exists.
+
+        :param obj: db model Professional instance
+        :param kobj: knack model Photographer instance
+        :return: None
+        """
+        for kpool in kobj.job_pool:
+            kpool_id = kpool['id']
+            db_pool = Pool.query().filter_by(external_id=kpool_id).one_or_none()
+            if db_pool:
+                obj.pools.append(db_pool)
+            else:
+                print('Knack Poll ID: {0} do not found in leica.'.format(kpool_id))
+                msg = 'Knack Pool not found in Leica: {kpool_id}. ' \
+                      'Professional name: {title} id: {professional_id}'
+                logger.debug(msg.format(professional_id=obj.id, kpool_id=kpool_id, title=obj.title))
+
     def add_links(self, kobj, obj):
         """Add all professional links."""
         url = kobj.portfolio_web_site.url or ''
@@ -126,4 +145,5 @@ class PhotographerSync(ModelSync):
         obj = super().add(kobj, briefy_id)
         self.add_locations(kobj, obj)
         self.add_links(kobj, obj)
+        self.add_professional_pool(obj, kobj)
         return obj

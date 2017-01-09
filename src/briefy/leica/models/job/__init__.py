@@ -97,7 +97,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
 
     __summary_attributes__ = __summary_attributes__
     __summary_attributes_relations__ = [
-        'project', 'comments', 'location', 'professional' 'customer'
+        'project', 'comments', 'location', 'professional' 'customer', 'pool'
     ]
     __listing_attributes__ = __listing_attributes__
 
