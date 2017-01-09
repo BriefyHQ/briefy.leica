@@ -221,6 +221,7 @@ CONSTRAINTS = {
     'Agoda Bangkok': _agoda_constraints[1],
     'Agoda Pattaya': _agoda_constraints[1],
     'Agoda Phuket': _agoda_constraints[1],
+    'Agoda Re-shoot / New shoot': _agoda_constraints[1],
     'Aladinia Spa Project (Pilot)': _default_constraints[1],
     'Aladinia': _aladina_constraints[1],
     'Auctionata': _auctionata_constraints[1],

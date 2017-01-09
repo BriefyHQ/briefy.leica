@@ -8,8 +8,14 @@ QA steps and so on.
 A comprehensive documentation is available at the `Developer Documentation`_ server.
 
 
+TODO
+====
+
+* Create a versions endpoint generic service in briefy.ws and refactor / add to all views for models with versions.
+
+
 Code Health
-============
+===========
 This service codebase is tested using Travis CI
 
 ============ ======================================================================================================================== 

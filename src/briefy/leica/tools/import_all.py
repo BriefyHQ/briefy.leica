@@ -15,8 +15,8 @@ def main(session, transaction):
     update_users()
     CustomerSync(session, transaction)()
     ProjectSync(session, transaction)()
-    PhotographerSync(session, transaction)()
     PoolSync(session, transaction)()
+    PhotographerSync(session, transaction)()
     JobSync(session, transaction)()
 
 

@@ -74,7 +74,8 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
     _workflow = workflows.CustomerWorkflow
 
     __summary_attributes__ = [
-        'id', 'slug', 'title', 'description', 'created_at', 'updated_at', 'state', 'tax_country'
+        'id', 'slug', 'title', 'description', 'created_at', 'updated_at', 'state',
+        'tax_country', 'legal_name'
     ]
     __summary_attributes_relations__ = ['billing_contact', 'business_contact', 'addresses']
     __listing_attributes__ = __summary_attributes__

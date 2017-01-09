@@ -2,9 +2,14 @@
 from briefy.common.db.mixins import Timestamp
 from briefy.leica.db import Base
 from briefy.leica.db import Session
+from briefy.leica.models import Assignment
 from briefy.leica.models import mixins
 from briefy.leica.models.job import workflows
+from sqlalchemy import func
 from sqlalchemy import orm
+from sqlalchemy import select
+from sqlalchemy.sql import and_, not_
+from sqlalchemy.ext.declarative import declared_attr
 
 import colander
 import sqlalchemy as sa
@@ -76,9 +81,12 @@ class Pool(mixins.KLeicaVersionedMixin, Base):
     _workflow = workflows.PoolWorkflow
 
     __summary_attributes__ = [
-        'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state', 'country'
+        'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
+        'country',
     ]
-    __listing_attributes__ = __summary_attributes__
+    __listing_attributes__ = __summary_attributes__ + [
+        'total_assignments', 'total_professionals', 'live_assignments'
+    ]
 
     __colanderalchemy_config__ = {'excludes': [
         'state_history', 'state'
@@ -113,6 +121,34 @@ class Pool(mixins.KLeicaVersionedMixin, Base):
         secondary='professionals_in_pool',
         back_populates='pools'
     )
+
+    @declared_attr
+    def total_assignments(cls) -> str:
+        """Return the total number of Assignments in the Pool."""
+        stmt = select([func.count(Assignment.id)]).where(
+            Assignment.pool_id == cls.id
+        ).as_scalar()
+        return orm.column_property(stmt)
+
+    @declared_attr
+    def live_assignments(cls) -> str:
+        """Return the number of 'active' Assignments in the Pool."""
+        end_states = ('cancelled', 'approved', 'completed', 'perm_rejected')
+        stmt = select([func.count(Assignment.id)]).where(
+            and_(
+                Assignment.pool_id == cls.id,
+                not_(Assignment.state.in_(end_states))
+            )
+        ).as_scalar()
+        return orm.column_property(stmt)
+
+    @declared_attr
+    def total_professionals(cls) -> str:
+        """Return the total number of Professionals in the Pool."""
+        stmt = select([func.count(ProfessionalsInPool.professional_id)]).where(
+            ProfessionalsInPool.pool_id == cls.id
+        ).correlate('professionals').as_scalar()
+        return orm.column_property(stmt)
 
     def to_dict(self):
         """Return a dict representation of this object."""
