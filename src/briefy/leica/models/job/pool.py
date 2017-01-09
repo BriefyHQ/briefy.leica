@@ -147,7 +147,7 @@ class Pool(mixins.KLeicaVersionedMixin, Base):
         """Return the total number of Professionals in the Pool."""
         stmt = select([func.count(ProfessionalsInPool.professional_id)]).where(
             ProfessionalsInPool.pool_id == cls.id
-        ).as_scalar()
+        ).correlate('professionals').as_scalar()
         return orm.column_property(stmt)
 
     def to_dict(self):
