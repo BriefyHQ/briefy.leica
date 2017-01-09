@@ -5,10 +5,10 @@ from briefy.leica.db import Session
 from briefy.leica.models import Assignment
 from briefy.leica.models import mixins
 from briefy.leica.models.job import workflows
+from briefy.leica.models.professional import Professional
 from sqlalchemy import func
 from sqlalchemy import orm
 from sqlalchemy import select
-from sqlalchemy import table
 from sqlalchemy.sql import and_, not_
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -124,7 +124,7 @@ class Pool(mixins.KLeicaVersionedMixin, Base):
     )
 
     @declared_attr
-    def total_assignments(cls) -> str:
+    def total_assignments(cls) -> int:
         """Return the total number of Assignments in the Pool."""
         stmt = select([func.count(Assignment.id)]).where(
             Assignment.pool_id == cls.id
@@ -132,7 +132,7 @@ class Pool(mixins.KLeicaVersionedMixin, Base):
         return orm.column_property(stmt)
 
     @declared_attr
-    def live_assignments(cls) -> str:
+    def live_assignments(cls) -> int:
         """Return the number of 'active' Assignments in the Pool."""
         end_states = ('cancelled', 'approved', 'completed', 'perm_rejected')
         stmt = select([func.count(Assignment.id)]).where(
@@ -144,11 +144,14 @@ class Pool(mixins.KLeicaVersionedMixin, Base):
         return orm.column_property(stmt)
 
     @declared_attr
-    def total_professionals(cls) -> str:
+    def total_professionals(cls) -> int:
         """Return the total number of Professionals in the Pool."""
-        stmt = select([func.count(ProfessionalsInPool.professional_id)]).where(
-            ProfessionalsInPool.pool_id == cls.id
-        ).correlate(table('professionals')).as_scalar()
+        stmt = select([func.count(Professional.id)]).where(
+            and_(
+                ProfessionalsInPool.professional_id == Professional.id,
+                ProfessionalsInPool.pool_id == cls.id
+            )
+        ).as_scalar()
         return orm.column_property(stmt)
 
     def to_dict(self):
