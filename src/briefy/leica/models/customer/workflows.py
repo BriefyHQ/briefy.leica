@@ -60,12 +60,12 @@ class CustomerWorkflow(BriefyWorkflow):
         """Validate if user can submit a profile."""
         return True
 
-    @Permission(groups=[LR['owner'], G['bizdev'], G['finance'] ])
+    @Permission(groups=[LR['owner'], G['bizdev'], G['finance']])
     def can_activate(self):
         """Validate if user can activate this working location."""
         return True
 
-    @Permission(groups=[LR['owner'], G['bizdev'], G['finance'] ])
+    @Permission(groups=[LR['owner'], G['bizdev'], G['finance']])
     def can_inactivate(self):
         """Validate if user can inactivate this working location."""
         return True
