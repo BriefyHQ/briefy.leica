@@ -43,7 +43,8 @@ class ProfessionalService(RESTService):
     default_order_by = 'title'
     filter_related_fields = [
         'title', 'customer_user', 'project_manager', 'customer.title',
-        'main_location.formatted_address', 'main_location.country', 'main_location.locality'
+        'main_location.formatted_address', 'main_location.country',
+        'main_location.locality', 'pools.title', 'pools.country'
     ]
 
     _default_notify_events = {
