@@ -44,7 +44,7 @@ class ProfessionalService(RESTService):
     filter_related_fields = [
         'title', 'customer_user', 'project_manager', 'customer.title',
         'main_location.formatted_address', 'main_location.country',
-        'main_location.locality', 'pools.title', 'pools.country'
+        'main_location.locality', 'pools.id', 'pools.title', 'pools.country'
     ]
 
     _default_notify_events = {
