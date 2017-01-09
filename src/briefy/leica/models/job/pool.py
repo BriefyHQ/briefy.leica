@@ -8,6 +8,7 @@ from briefy.leica.models.job import workflows
 from sqlalchemy import func
 from sqlalchemy import orm
 from sqlalchemy import select
+from sqlalchemy import table
 from sqlalchemy.sql import and_, not_
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -147,7 +148,7 @@ class Pool(mixins.KLeicaVersionedMixin, Base):
         """Return the total number of Professionals in the Pool."""
         stmt = select([func.count(ProfessionalsInPool.professional_id)]).where(
             ProfessionalsInPool.pool_id == cls.id
-        ).correlate('professionals').as_scalar()
+        ).correlate(table('professionals')).as_scalar()
         return orm.column_property(stmt)
 
     def to_dict(self):
