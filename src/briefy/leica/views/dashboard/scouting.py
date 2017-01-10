@@ -1,11 +1,12 @@
 """Views to handle Scouting Dashboards creation."""
 from briefy.leica.models.dashboard.scouting import DashboardScoutingCountry
+from briefy.leica.models.dashboard.scouting import DashboardScoutingProject
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources import RESTService
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
-from pyramid.security import Allow
 from cornice.resource import view
+from pyramid.security import Allow
 
 
 COLLECTION_PATH = '/dashboards/scouting/country'
@@ -35,7 +36,7 @@ class DashboardScoutingFactory(BaseFactory):
           cors_policy=CORS_POLICY,
           factory=DashboardScoutingFactory)
 class DashboardScoutingCountryService(RESTService):
-    """Projects Service."""
+    """Dashboard Scouting: Country Service."""
 
     model = DashboardScoutingCountry
     friendly_name = model.__name__
@@ -49,6 +50,49 @@ class DashboardScoutingCountryService(RESTService):
         ('assigned', {'label': 'Assigned Jobs', 'type': 'integer', 'url': '', 'filter': ''}),
         ('professionals',
          {'label': 'Photographers in Country', 'type': 'integer', 'url': '', 'filter': ''}
+         ),
+    )
+
+    @view(validators='_run_validators', permission='list')
+    def collection_get(self):
+        """Return a list of objects.
+
+        :returns: Payload with total records and list of objects
+        """
+        headers = self.request.response.headers
+        pagination = self.get_records()
+        total = pagination['total']
+        headers['Total-Records'] = '{total}'.format(total=total)
+        # Force in here to use the listing serialization.
+        pagination['data'] = [o.to_listing_dict() for o in pagination['data']]
+        if self.column_map:
+            pagination['columns'] = [{key: value} for key, value in self.column_map]
+        return pagination
+
+
+COLLECTION_PATH = '/dashboards/scouting/project'
+PATH = COLLECTION_PATH + '/{id}'
+
+
+@resource(collection_path=COLLECTION_PATH,
+          path=PATH,
+          cors_policy=CORS_POLICY,
+          factory=DashboardScoutingFactory)
+class DashboardScoutingProjectService(RESTService):
+    """Dashboard Scouting: Project Service."""
+
+    model = DashboardScoutingProject
+    friendly_name = model.__name__
+    default_order_by = 'title'
+
+    column_map = (
+        ('project', {'label': 'Project', 'type': 'text', 'url': '', 'filter': ''}),
+        ('total', {'label': 'Total', 'type': 'integer', 'url': '', 'filter': ''}),
+        ('unassigned', {'label': 'Unassigned Jobs', 'type': 'integer', 'url': '', 'filter': ''}),
+        ('job_pool', {'label': 'In Job Pool', 'type': 'integer', 'url': '', 'filter': ''}),
+        ('assigned', {'label': 'Assigned Jobs', 'type': 'integer', 'url': '', 'filter': ''}),
+        ('professionals',
+         {'label': 'Active Photographers in Project', 'type': 'integer', 'url': '', 'filter': ''}
          ),
     )
 
