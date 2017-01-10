@@ -74,6 +74,8 @@ History
      * Update initial database migration script with all model changes (rudaporto).
      * LEICA-128: Refactor Job classes names following the changes as Assignment or Order (rudaporto).
      * LEICA-132: Add new fields to Pool and fix Professionls in Pool import. Add pool attribute to Assignment list and filter (rudaporto).
+     * LEICA-133: Added Scouting Dashboard endpoints (rudaporto).
+     * LEICA-134: Added QA Dashboard endpoints (rudaporto).
 
 
 1.1.0 (2016-10-04)

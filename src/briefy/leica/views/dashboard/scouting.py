@@ -1,4 +1,4 @@
-"""Views to handle Scouting Dashboards creation."""
+"""Views to handle Scouting Dashboards."""
 from briefy.leica.models import Pool
 from briefy.leica.models.dashboard.scouting import DashboardScoutingCountry
 from briefy.leica.models.dashboard.scouting import DashboardScoutingProject
@@ -10,7 +10,7 @@ from pyramid.security import Allow
 
 
 class DashboardScoutingFactory(BaseFactory):
-    """DashboardScoutingCountry context factory."""
+    """Dashboard Scouting context factory."""
 
     model = DashboardScoutingCountry
 
