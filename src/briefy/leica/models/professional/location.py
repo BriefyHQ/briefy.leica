@@ -26,7 +26,7 @@ class WorkingLocation(Address, mixins.LeicaMixin, Base):
 
     __summary_attributes__ = [
         'id', 'created_at', 'updated_at', 'state', 'timezone',
-        'locality', 'country', 'coordinates', 'formatted_address'
+        'locality', 'country', 'coordinates', 'formatted_address', 'info'
     ]
 
     __listing_attributes__ = __summary_attributes__

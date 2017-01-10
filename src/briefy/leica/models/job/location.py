@@ -31,7 +31,7 @@ class OrderLocation(LocationContactInfoMixin, AddressMixin,
 
     __summary_attributes__ = [
         'id', 'country', 'locality', 'coordinates', 'email', 'mobile',
-        'additional_phone', 'fullname', 'formatted_address', 'timezone',
+        'additional_phone', 'fullname', 'formatted_address', 'timezone', 'info'
     ]
 
     __listing_attributes__ = __summary_attributes__
