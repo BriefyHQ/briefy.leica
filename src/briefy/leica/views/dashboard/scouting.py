@@ -47,7 +47,9 @@ class DashboardScoutingCountryService(RESTService):
         ('unassigned', {'label': 'Unassigned Jobs', 'type': 'integer', 'url': '', 'filter': ''}),
         ('job_pool', {'label': 'In Job Pool', 'type': 'integer', 'url': '', 'filter': ''}),
         ('assigned', {'label': 'Assigned Jobs', 'type': 'integer', 'url': '', 'filter': ''}),
-        ('professionals', {'label': 'Photographers in Country', 'type': 'integer', 'url': '', 'filter': ''}),
+        ('professionals',
+         {'label': 'Photographers in Country', 'type': 'integer', 'url': '', 'filter': ''}
+         ),
     )
 
     @view(validators='_run_validators', permission='list')
