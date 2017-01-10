@@ -76,6 +76,7 @@ History
      * LEICA-132: Add new fields to Pool and fix Professionls in Pool import. Add pool attribute to Assignment list and filter (rudaporto).
      * LEICA-133: Added Scouting Dashboard endpoints (rudaporto).
      * LEICA-134: Added QA Dashboard endpoints (rudaporto).
+     * LEICA-135: Added Professional and Customer Dashboard endpoints (rudaporto).
 
 
 1.1.0 (2016-10-04)
