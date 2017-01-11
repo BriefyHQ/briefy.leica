@@ -172,7 +172,9 @@ def create_location_dict(address_field: str, kobj: KnackEntity, country: str='')
             postcode,
             country
         ]
-        formatted_address = ', '.join(parts)
+        formatted_address = ', '.join(
+            [p for p in parts if p.strip()]
+        )
         info = dict(
             formatted_address=formatted_address,
             province=klocation.state,
