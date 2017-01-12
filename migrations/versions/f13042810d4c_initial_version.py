@@ -384,6 +384,7 @@ def upgrade():
         sa.Column('description', sa.Text(), nullable=True),
         sa.Column('gender', types.ChoiceType(choices=GenderCategories, impl=sa.String()),
                   nullable=True),
+        sa.Column('accept_travel', sa.Boolean(), default=False),
         sa.Column('birth_date', sa.Date(), nullable=True),
         sa.Column('created_at', AwareDateTime(), nullable=True),
         sa.Column('updated_at', AwareDateTime(), nullable=True),
@@ -400,6 +401,9 @@ def upgrade():
         sa.UniqueConstraint('id')
     )
     op.create_index(op.f('ix_professionals_slug'), 'professionals', ['slug'], unique=False)
+    op.create_index(
+        op.f('ix_professionals_accept_travel'),
+        'professionals', ['accept_travel'], unique=False)
 
     op.create_table(
         'professionals_in_pool_version',
@@ -431,6 +435,7 @@ def upgrade():
         sa.Column('description', sa.Text(), autoincrement=False, nullable=True),
         sa.Column('gender', types.ChoiceType(choices=GenderCategories, impl=sa.String()),
                   autoincrement=False, nullable=True),
+        sa.Column('accept_travel', sa.Boolean(), default=False),
         sa.Column('birth_date', sa.Date(), autoincrement=False, nullable=True),
         sa.Column('created_at', AwareDateTime(), autoincrement=False, nullable=True),
         sa.Column('updated_at', AwareDateTime(), autoincrement=False, nullable=True),
@@ -457,6 +462,9 @@ def upgrade():
     op.create_index(
         op.f('ix_professionals_version_slug'),
         'professionals_version', ['slug'], unique=False)
+    op.create_index(
+        op.f('ix_professionals_version_accept_travel'),
+        'professionals_version', ['accept_travel'], unique=False)
     op.create_index(
         op.f('ix_professionals_version_transaction_id'),
         'professionals_version', ['transaction_id'], unique=False)
