@@ -79,6 +79,7 @@ History
      * LEICA-135: Added Professional and Customer Dashboard endpoints (rudaporto).
      * Add new field for Professional: accept_travel (boolean) (rudaporto).
      * Remove all binary=false from UUID fields (rudaporto).
+     * Adjust users sync to update Knack Profile.briefy_id if not equal to same user.briefy_id in Rolleiflex (rudaporto).
 
 1.1.0 (2016-10-04)
 ------------------
