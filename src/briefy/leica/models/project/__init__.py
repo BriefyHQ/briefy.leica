@@ -77,6 +77,24 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     Builds the relation with :class:`briefy.leica.models.customer.Customer`.
     """
 
+    abstract = sa.Column(
+        'abstract',
+        sa.Text,
+        nullable=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Abstract',
+                'missing': colander.drop,
+                'typ': colander.String
+            }
+        }
+    )
+    """Abstract for a project.
+
+    Text field allowing a small, but meaningful description for an object.
+    Used to store Bizdev comments.
+    """
+
     number_required_assets = sa.Column(sa.Integer(), default=10)
     """Number of required assets of a Project to be used in the Order as default value."""
 

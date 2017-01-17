@@ -28,7 +28,8 @@ class ProjectSync(ModelSync):
             dict(
                 title=title,
                 slug=slug,
-                description=kobj.project_abstract,
+                description='',
+                abstract=kobj.project_abstract,
                 customer_id=customer.id,
                 briefing=kobj.briefing,
                 approval_window=kobj.set_refusal_window or 0,
