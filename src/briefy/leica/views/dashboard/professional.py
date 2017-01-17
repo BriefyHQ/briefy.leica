@@ -1,4 +1,5 @@
 """Views to handle Professional Dashboards."""
+from briefy.leica.models import Assignment
 from briefy.leica.models.dashboard.professional import DashboardProfessionalAssignment
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources import RESTService
@@ -66,3 +67,16 @@ class DashboardProfessionalAssignmentService(RESTService):
             'type': 'integer', 'url': '', 'filter': ''
         }
     )
+
+    @property
+    def default_filters(self) -> tuple:
+        """Default filters to be applied to every query.
+
+        This is supposed to be specialized by resource classes.
+        :returns: A tuple of default filters to be applied to queries.
+        """
+        user = self.request.user
+        filters = (
+            Assignment.professional_id == user.id,
+        )
+        return filters

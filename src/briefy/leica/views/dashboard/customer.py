@@ -74,3 +74,14 @@ class DashboardCustomerOrderService(RESTService):
             'type': 'integer', 'url': '', 'filter': ''
         }
     )
+
+    @property
+    def default_filters(self) -> tuple:
+        """Default filters to be applied to every query.
+
+        This is supposed to be specialized by resource classes.
+        :returns: A tuple of default filters to be applied to queries.
+        """
+        # user = self.request.user
+        filters = tuple()
+        return filters
