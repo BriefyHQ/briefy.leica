@@ -466,6 +466,7 @@ class JobSync(ModelSync):
             dict(
                 title=kobj.job_name,
                 description='',
+                created_at=_build_date(kobj.input_date),
                 category=category_mapping.get(category, 'undefined'),
                 project_id=project.id,
                 customer_id=project.customer.id,
