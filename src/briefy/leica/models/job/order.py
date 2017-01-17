@@ -269,7 +269,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
         Information will be extracted from state history field.
         """
-        transitions = ('accept', 'refuse' )
+        transitions = ('accept', 'refuse')
         return get_transition_date(transitions, self, first=True)
 
     def to_listing_dict(self) -> dict:
