@@ -558,6 +558,7 @@ class JobSync(ModelSync):
         payload = dict(
             id=uuid.uuid4(),
             order_id=obj.id,
+            created_at=_build_date(kobj.input_date),
             pool=job_pool,
             slug=self.get_slug(job_id, assignment=1),
             set_type=set_type,
