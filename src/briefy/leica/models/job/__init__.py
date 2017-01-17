@@ -22,11 +22,12 @@ import sqlalchemy_utils as sautils
 
 __summary_attributes__ = [
     'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
-    'approvable', 'total_assets', 'total_approvable_assets'
+    'number_required_assets', 'approvable', 'total_assets', 'total_approvable_assets'
 ]
 
 __listing_attributes__ = __summary_attributes__ + [
-    'assignment_date', 'last_approval_date', 'submission_date', 'set_type'
+    'assignment_date', 'last_approval_date', 'submission_date', 'last_submission_date',
+    'set_type', 'number_required_assets',
 ]
 
 
@@ -79,12 +80,21 @@ class AssignmentDates:
 
     @hybrid_property
     def submission_date(self) -> datetime:
-        """Return last submission date date for this Assignment.
+        """Return first submission date date for this Assignment.
 
         Information will be extracted from state history field.
         """
         transitions = ('ready_for_upload', )
         return get_transition_date(transitions, self, first=True)
+
+    @hybrid_property
+    def last_submission_date(self) -> datetime:
+        """Return last submission date date for this Assignment.
+
+        Information will be extracted from state history field.
+        """
+        transitions = ('ready_for_upload', )
+        return get_transition_date(transitions, self)
 
 
 @implementer(IAssignment)
@@ -375,10 +385,10 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         )
 
     @declared_attr
-    def job_id(cls) -> str:
-        """Return the job_id of an Order."""
+    def order_slug(cls) -> str:
+        """Return the order_id (slug) of an Order."""
         return orm.column_property(
-            select([Order.job_id]).where(
+            select([Order.slug]).where(
                 Order.id == cls.order_id
             ),
         )
@@ -391,6 +401,11 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
                 Order.id == cls.order_id
             ),
         )
+
+    @hybrid_property
+    def customer_approval_date(self) -> datetime:
+        """Return last accept/refusal date for the parent order."""
+        return self.order.customer_approval_date
 
     @property
     def briefing(self) -> str:
