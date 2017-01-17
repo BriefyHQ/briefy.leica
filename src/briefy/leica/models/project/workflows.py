@@ -26,6 +26,11 @@ class ProjectWorkflow(BriefyWorkflow):
         'On Going.'
     )
 
+    paused = WS(
+        'paused', 'Paused',
+        'Paused.'
+    )
+
     completed = WS(
         'completed', 'Completed',
         'Completed.'
@@ -34,6 +39,7 @@ class ProjectWorkflow(BriefyWorkflow):
     # Transitions:
     @created.transition(ongoing, 'can_start')
     @completed.transition(ongoing, 'can_start')
+    @paused.transition(ongoing, 'can_start')
     def start(self):
         """Start a project, moving it to On Going."""
         pass
@@ -43,9 +49,19 @@ class ProjectWorkflow(BriefyWorkflow):
         """Close a project, moving it to Completed."""
         pass
 
+    @ongoing.transition(paused, 'can_pause')
+    def pause(self):
+        """Pause a project, no new activity should happen here."""
+        pass
+
     @Permission(groups=[G['bizdev'], G['system']])
     def can_start(self):
         """Validate if user can start this project."""
+        return True
+
+    @Permission(groups=[G['bizdev'], G['system']])
+    def can_pause(self):
+        """Validate if user can pause this project."""
         return True
 
     @Permission(groups=[G['bizdev'], G['system']])
