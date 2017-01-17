@@ -489,13 +489,27 @@ class JobSync(ModelSync):
         if payload:
             country = payload['country']
             payload['order_id'] = obj.id
+            contact = kobj.contact_person
+            first_name = contact.first.strip() if isinstance(contact.first, str) else ''
+            last_name = contact.last.strip() if isinstance(contact.last, str) else ''
+
+            if first_name and not last_name:
+                pieces = first_name.split(' ')
+                last_name = pieces[-1] if len(pieces) > 1 else PLACEHOLDERS['last_name']
+                first_name = ' '.join(pieces[:-1]) if len(pieces) > 1 else first_name
+
+            if not first_name:
+                first_name = PLACEHOLDERS['first_name']
+            if not last_name:
+                last_name = PLACEHOLDERS['last_name']
+
             payload.update(
                 id=uuid.uuid4(),
                 mobile=self.parse_phonenumber(kobj, 'contact_number_1', country),
                 additional_phone=self.parse_phonenumber(kobj, 'contact_number_2', country),
                 email=kobj.contact_email.email or PLACEHOLDERS['email'],
-                first_name=kobj.contact_person.first or PLACEHOLDERS['first_name'],
-                last_name=kobj.contact_person.last or PLACEHOLDERS['last_name'],
+                first_name=first_name,
+                last_name=last_name,
             )
             try:
                 location = OrderLocation(**payload)
