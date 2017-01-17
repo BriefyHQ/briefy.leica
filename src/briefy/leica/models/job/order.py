@@ -2,8 +2,10 @@
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
+from briefy.leica.models.descriptors import UnaryRelationshipWrapper
 from briefy.leica.models.job import workflows
 from briefy.leica.utils.transitions import get_transition_date
+from briefy.leica.models.job.location import OrderLocation
 from briefy.leica.vocabularies import OrderInputSource
 from briefy.ws.utils.user import add_user_info_to_state_history
 from datetime import datetime
@@ -133,15 +135,24 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     requirements = sa.Column(sa.Text, default='')
     """Human-readable requirements for an Order."""
 
-    location = orm.relationship(
+    _location = orm.relationship(
         'OrderLocation',
         uselist=False,
-        backref=orm.backref('order')
+        backref=orm.backref('order'),
+        info={
+            'colanderalchemy': {
+                'title': 'Location',
+                'missing': colander.drop
+            }
+        }
     )
     """Order Location.
 
     Relationship with :class:`briefy.leica.models.job.location.OrderLocation`.
     """
+
+    location = UnaryRelationshipWrapper('_location', OrderLocation, 'order_id')
+    """Descriptor to handle location get, set and delete."""
 
     # Assignments
     assignments = orm.relationship(
