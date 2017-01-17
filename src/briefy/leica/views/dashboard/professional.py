@@ -41,22 +41,28 @@ class DashboardProfessionalAssignmentService(RESTService):
     default_order_by = 'total'
 
     _columns_map = (
-        ('total',
-         {'label': 'Total number of Jobs', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
-        ('assigned',
-         {'label': 'Jobs to be scheduled', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
-        ('scheduled',
-         {'label': 'Jobs scheduled', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
-        ('in_qa',
-         {'label': 'Jobs in QA process', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
-        ('rejected',
-         {'label': 'Jobs rejected by QA', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
-        ('completed',
-         {'label': 'Jobs completed', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
+        {
+            'field': 'total', 'label': 'Total number of Jobs',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'assigned', 'label': 'Jobs to be scheduled',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'scheduled', 'label': 'Jobs scheduled',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'in_qa', 'label': 'Jobs in QA process',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'rejected', 'label': 'Jobs rejected by QA',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'completed', 'label': 'Jobs completed',
+            'type': 'integer', 'url': '', 'filter': ''
+        }
     )

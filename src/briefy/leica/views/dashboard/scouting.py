@@ -43,14 +43,30 @@ class DashboardScoutingCountryService(RESTService):
     default_order_by = 'country'
 
     _columns_map = (
-        ('country', {'label': 'Country', 'type': 'country', 'url': '', 'filter': ''}),
-        ('total', {'label': 'Total', 'type': 'integer', 'url': '', 'filter': ''}),
-        ('unassigned', {'label': 'Unassigned Jobs', 'type': 'integer', 'url': '', 'filter': ''}),
-        ('job_pool', {'label': 'In Job Pool', 'type': 'integer', 'url': '', 'filter': ''}),
-        ('assigned', {'label': 'Assigned Jobs', 'type': 'integer', 'url': '', 'filter': ''}),
-        ('professionals',
-         {'label': 'Photographers in Country', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
+        {
+            'field': 'country', 'label': 'Country',
+            'type': 'country', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'total', 'label': 'Total',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'unassigned', 'label': 'Unassigned Jobs',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'job_pool', 'label': 'In Job Pool',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'assigned', 'label': 'Assigned Jobs',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'professionals', 'label': 'Photographers in Country',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
     )
 
 
@@ -70,14 +86,30 @@ class DashboardScoutingProjectService(RESTService):
     default_order_by = 'title'
 
     _columns_map = (
-        ('project', {'label': 'Project', 'type': 'text', 'url': '', 'filter': ''}),
-        ('total', {'label': 'Total', 'type': 'integer', 'url': '', 'filter': ''}),
-        ('unassigned', {'label': 'Unassigned Jobs', 'type': 'integer', 'url': '', 'filter': ''}),
-        ('job_pool', {'label': 'In Job Pool', 'type': 'integer', 'url': '', 'filter': ''}),
-        ('assigned', {'label': 'Assigned Jobs', 'type': 'integer', 'url': '', 'filter': ''}),
-        ('professionals',
-         {'label': 'Active Photographers in Project', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
+        {
+            'field': 'project', 'label': 'Project',
+            'type': 'text', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'total', 'label': 'Total',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'unassigned', 'label': 'Unassigned Jobs',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'job_pool', 'label': 'In Job Pool',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'assigned', 'label': 'Assigned Jobs',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'professionals', 'label': 'Active Photographers in Project',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
     )
 
 
@@ -97,15 +129,24 @@ class DashboardScoutingPoolService(RESTService):
     default_order_by = 'title'
 
     _columns_map = (
-        ('pool', {'label': 'Pool', 'type': 'text', 'url': '', 'filter': ''}),
-        ('country', {'label': 'Country', 'type': 'country', 'url': '', 'filter': ''}),
-        ('total_assignments',
-         {'label': 'Total Assignments', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
-        ('live_assignments',
-         {'label': 'Live Assignments', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
-        ('total_professionals',
-         {'label': 'Number of Photographers', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
+        {
+            'field': 'pool', 'label': 'Pool',
+            'type': 'text', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'country', 'label': 'Country',
+            'type': 'country', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'total_assignments', 'label': 'Total Assignments',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'live_assignments', 'label': 'Live Assignments',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'total_professionals', 'label': 'Number of Photographers',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
     )

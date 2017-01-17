@@ -41,28 +41,36 @@ class DashboardCustomerOrderService(RESTService):
     default_order_by = 'total'
 
     _columns_map = (
-        ('title',
-         {'label': 'Project', 'type': 'text', 'url': '', 'filter': ''}
-         ),
-        ('total',
-         {'label': 'Total Jobs', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
-        ('received',
-         {'label': 'New Jobs', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
-        ('assigned',
-         {'label': 'Jobs Assigned', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
-        ('scheduled',
-         {'label': 'Jobs Scheduled', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
-        ('in_qa',
-         {'label': 'Jobs in QA process', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
-        ('cancelled',
-         {'label': 'Jobs Cancelled', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
-        ('completed',
-         {'label': 'Jobs Completed', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
+        {
+            'field': 'title', 'label': 'Project',
+            'type': 'text', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'total', 'label': 'Total Jobs',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'received', 'label': 'New Jobs',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'assigned', 'label': 'Jobs Assigned',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'scheduled', 'label': 'Jobs Scheduled',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'in_qa', 'label': 'Jobs in QA process',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'cancelled', 'label': 'Jobs Cancelled',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'completed', 'label': 'Jobs Completed',
+            'type': 'integer', 'url': '', 'filter': ''
+        }
     )

@@ -42,18 +42,22 @@ class DashboardQaTypeService(RESTService):
     default_order_by = 'total'
 
     _columns_map = (
-        ('total',
-         {'label': 'Sets awaiting approval in Total', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
-        ('refused_customer',
-         {'label': 'Sets Refused By Client', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
-        ('returned_photographer',
-         {'label': 'Sets Returned from Photographer', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
-        ('new',
-         {'label': 'New Sets', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
+        {
+            'field': 'total', 'label': 'Sets awaiting approval',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'new', 'label': 'New Sets',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'refused_customer', 'label': 'Sets Refused By Client',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'returned_photographer', 'label': 'Sets Returned from Photographer',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
     )
 
 
@@ -73,19 +77,24 @@ class DashboardQaProjectService(RESTService):
     default_order_by = 'title'
 
     _columns_map = (
-        ('title',
-         {'label': 'Project Name', 'type': 'text', 'url': '', 'filter': ''}
-         ),
-        ('refused_customer',
-         {'label': 'Sets Refused', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
-        ('returned_photographer',
-         {'label': 'Sets Returned', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
-        ('job_pool',
-         {'new': 'New Sets', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
-        ('total',
-         {'label': 'In Total', 'type': 'integer', 'url': '', 'filter': ''}
-         ),
+        {
+            'field': 'title', 'label': 'Project Name',
+            'type': 'text', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'refused_customer', 'label': 'Sets Refused',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'returned_photographer', 'label': 'Sets Returned',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'new', 'label': 'New Sets',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
+        {
+            'field': 'total', 'label': 'In Total',
+            'type': 'integer', 'url': '', 'filter': ''
+        },
     )
