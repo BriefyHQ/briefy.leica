@@ -3,8 +3,10 @@ from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.job import workflows
+from briefy.leica.utils.transitions import get_transition_date
 from briefy.leica.vocabularies import OrderInputSource
 from briefy.ws.utils.user import add_user_info_to_state_history
+from datetime import datetime
 from sqlalchemy import orm
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -260,6 +262,15 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         """
         project = self.project
         return project.tech_requirements
+
+    @hybrid_property
+    def customer_approval_date(self) -> datetime:
+        """Return first submission date date for this Assignment.
+
+        Information will be extracted from state history field.
+        """
+        transitions = ('accept', 'refuse' )
+        return get_transition_date(transitions, self, first=True)
 
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
