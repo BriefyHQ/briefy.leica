@@ -50,7 +50,7 @@ class ProjectService(RESTService):
     }
 
     filter_related_fields = [
-        'customer_user', 'project_manager', 'customer.title',
+        'customer_user', 'customer.id', 'project_manager', 'customer.title',
     ]
 
 

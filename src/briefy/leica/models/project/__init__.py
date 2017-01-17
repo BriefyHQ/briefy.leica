@@ -43,14 +43,14 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     _workflow = workflows.ProjectWorkflow
 
     __summary_attributes__ = [
-        'id', 'title', 'description', 'created_at', 'updated_at', 'state', 'external_id'
+        'id', 'title', 'description', 'created_at', 'updated_at', 'state', 'slug'
     ]
 
     __summary_attributes_relations__ = ['customer']
 
     __listing_attributes__ = [
         'id', 'title', 'description', 'created_at', 'updated_at', 'state',
-        'external_id', 'total_orders'
+        'external_id', 'total_orders', 'slug',
     ]
 
     __raw_acl__ = (

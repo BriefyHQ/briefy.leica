@@ -77,7 +77,9 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
         'id', 'slug', 'title', 'description', 'created_at', 'updated_at', 'state',
         'tax_country', 'legal_name'
     ]
-    __summary_attributes_relations__ = ['billing_contact', 'business_contact', 'addresses']
+    __summary_attributes_relations__ = [
+        'billing_contact', 'business_contact', 'addresses', 'projects'
+    ]
     __listing_attributes__ = __summary_attributes__
 
     __colanderalchemy_config__ = {'excludes': [
@@ -243,6 +245,7 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
         """Return a dict representation of this object."""
         data = super().to_dict()
         data['slug'] = self.slug
+        data['projects'] = [p.to_summary_dict() for p in self.projects]
         add_user_info_to_state_history(self.state_history)
         # Apply actor information to data
         data = self._apply_actors_info(data)

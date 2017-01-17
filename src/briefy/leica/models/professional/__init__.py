@@ -62,7 +62,7 @@ class Professional(ProfessionalMixin, Base):
         'main_email', 'main_mobile', 'type', 'photo_path', 'slug'
     ]
 
-    __summary_attributes_relations__ = ['links', 'main_location', 'pools']
+    __summary_attributes_relations__ = ['links', 'main_location', 'locations', 'pools']
 
     __listing_attributes__ = __summary_attributes__
 
@@ -172,6 +172,7 @@ class Professional(ProfessionalMixin, Base):
         """Return a dict representation of this object."""
         data = super().to_dict()
         data['slug'] = self.slug
+        data['locations'] = self.locations
 
         # Workflow history
         add_user_info_to_state_history(self.state_history)
