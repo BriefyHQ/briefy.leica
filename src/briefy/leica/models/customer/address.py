@@ -23,7 +23,7 @@ class CustomerBillingAddress(Address, mixins.LeicaMixin, Base):
     __listing_attributes__ = __summary_attributes__
 
     customer_id = sa.Column(
-        UUIDType(binary=False),
+        UUIDType(),
         sa.ForeignKey('customers.id'), unique=False,
         info={'colanderalchemy': {
             'title': 'Customer id',

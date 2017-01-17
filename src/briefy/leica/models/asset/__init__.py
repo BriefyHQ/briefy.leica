@@ -229,7 +229,7 @@ class Image(asset.ImageMixin, Asset):
     def id(cls):
         """Id for this Image."""
         return sa.Column(
-            UUIDType(binary=False),
+            UUIDType(),
             sa.ForeignKey('assets.id'),
             primary_key=True,
             info={'colanderalchemy': {
@@ -262,7 +262,7 @@ class ThreeSixtyImage(asset.ThreeSixtyImageMixin, Asset):
     def id(cls):
         """Id for this Image."""
         return sa.Column(
-            UUIDType(binary=False),
+            UUIDType(),
             sa.ForeignKey('assets.id'),
             primary_key=True,
             info={'colanderalchemy': {
@@ -291,7 +291,7 @@ class Video(asset.VideoMixin, Asset):
     def id(cls):
         """Id for this Image."""
         return sa.Column(
-            UUIDType(binary=False),
+            UUIDType(),
             sa.ForeignKey('assets.id'),
             primary_key=True,
             info={'colanderalchemy': {

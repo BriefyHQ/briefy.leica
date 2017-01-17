@@ -17,7 +17,7 @@ class Link(mixins.LeicaMixin, Base):
     _workflow = workflows.LinkWorkflow
 
     professional_id = sa.Column(
-        UUIDType(binary=False), sa.ForeignKey('professionals.id'), unique=False,
+        UUIDType(), sa.ForeignKey('professionals.id'), unique=False,
         info={'colanderalchemy': {
             'title': 'Professional id',
             'validator': colander.uuid,

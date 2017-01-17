@@ -54,8 +54,10 @@ class PhotographerSync(ModelSync):
         if main_mobile:
             main_mobile = cleanse_phone_number(main_mobile, country)
 
+        state = 'inactive' if kobj.blacklist else 'active'
         result.update(
             dict(
+                state=state,
                 main_email=kobj.email.email or PLACEHOLDERS['email'],
                 first_name=first_name.strip(),
                 last_name=last_name.strip(),

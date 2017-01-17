@@ -73,7 +73,7 @@ class Professional(ProfessionalMixin, Base):
     }
 
     id = sa.Column(
-        UUIDType(binary=False),
+        UUIDType(),
         unique=True,
         primary_key=True,
         info={'colanderalchemy': {
@@ -82,6 +82,9 @@ class Professional(ProfessionalMixin, Base):
               'missing': colander.drop,
               'typ': colander.String}}
     )
+
+    accept_travel = sa.Column(sa.Boolean(), default=False, index=True)
+    """Accept travel to other locations to work."""
 
     @declared_attr
     def title(cls):
@@ -189,7 +192,7 @@ class Skill(mixins.LeicaMixin):
     def id(cls):
         """Id for this skill."""
         return sa.Column(
-            UUIDType(binary=False),
+            UUIDType(),
             sa.ForeignKey('professionals.id'),
             primary_key=True,
             info={'colanderalchemy': {

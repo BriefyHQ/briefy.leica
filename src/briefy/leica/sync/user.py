@@ -72,13 +72,16 @@ def update_user_briefy_id(profile='User'):
     with ThreadPoolExecutor(max_workers=10) as executor:
         print('Total of {0} users: {1}'.format(profile, len(all_users)))
         for user in all_users:
-            if user.briefy_id:
-                continue
             briefy_id = rosetta.get(user.id)
-            if briefy_id:
+            if user.briefy_id and user.briefy_id == briefy_id:
+                continue
+            elif briefy_id:
                 user.briefy_id = briefy_id
                 future = executor.submit(knack.commit_knack_object, user)
                 future.add_done_callback(print_update_user)
+            else:
+                msg = 'User with email: {email} did not have briefy_id. Run Rolleifley import.'
+                print(msg.format(email=user.email))
 
 
 def update_users():
