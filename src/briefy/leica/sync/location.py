@@ -183,14 +183,16 @@ def create_location_dict(address_field: str, kobj: KnackEntity, country: str='')
             country=country_id,
             postal_code=klocation.zip
         )
-
-        return dict(
+        data = dict(
             country=country_id,
             formatted_address=formatted_address,
             info=info,
             locality=city.strip(' '),
             **extra_location_info
         )
+        if extra_location_info.get('coordinates'):
+            data['coordinates'] = extra_location_info['coordinates']
+        return data
 
     else:
         msg = 'Country not found: {country}, {city}, {street}. Field: {field}'.format(
