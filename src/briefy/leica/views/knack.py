@@ -19,7 +19,7 @@ class KnackLoggerFactory(BaseFactory):
         :return List of acl for the current logged user plus defaults.
         """
         return [
-            (Allow, Everyone, ['add']),
+            (Allow, Everyone, ['create']),
         ]
 
 
@@ -34,7 +34,7 @@ class KnackLoggerService:
         self.context = context
         self.request = request
 
-    @view(permission='add')
+    @view(permission='create')
     def post(self) -> dict:
         """Get payload from knack, add user and referrer and sent to logger.info."""
         referrer = self.request.referrer

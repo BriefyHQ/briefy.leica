@@ -33,11 +33,17 @@ class UnaryRelationshipWrapper:
         :return: None
         """
         if isinstance(value, dict):
-            child = self._model(**value)
-            session = obj.__session__
-            session.add(child)
-            # TODO: call obj.some_hook to change something else, like workflow
-            # this should be another optional parameter in the init
+            if not value.get('id', None):
+                location = self._model(**value)
+                session = obj.__session__
+                session.add(location)
+                # TODO: call obj.some_hook to change something else, like workflow
+                # this should be another optional parameter in the init
+            else:
+                location = self.__get__(obj)
+                if location:
+                    for k, v in value.items():
+                        setattr(location, k, v)
         elif isinstance(value, self._model):
             setattr(obj, self._field_name, value)
         elif not value:

@@ -85,10 +85,22 @@ class ProjectSync(ModelSync):
 
         # briefy project manager context roles
         pm_briefy_roles = self.get_local_roles(kobj, 'project_manager')
-        self.update_local_roles(obj, pm_briefy_roles, 'project_manager')
+        permissions = ['view', 'edit']
+        self.update_local_roles(
+            obj,
+            pm_briefy_roles,
+            'project_manager',
+            permissions
+        )
 
         # customer pm user context roles
         customer_roles = self.get_local_roles(kobj, 'clients_project_manager')
-        self.update_local_roles(obj, customer_roles, 'customer_user')
+        customer_permissions = ['view']
+        self.update_local_roles(
+            obj,
+            customer_roles,
+            'customer_user',
+            customer_permissions
+        )
 
         return obj

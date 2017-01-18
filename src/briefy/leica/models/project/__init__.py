@@ -54,14 +54,15 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     ]
 
     __raw_acl__ = (
-        ('list', ('g:briefy_qa', 'g:briefy_pm', 'g:system')),
-        ('view', ()),
-        ('edit', ()),
-        ('delete', ()),
+        ('create', ('g:briefy_pm', 'g:briefy_finance', 'g:system')),
+        ('list', ('g:briefy', 'g:system')),
+        ('view', ('g:briefy', 'g:system')),
+        ('edit', ('g:briefy_pm', 'g:briefy_finance', 'g:system')),
+        ('delete', ('g:briefy_finance', 'g:system')),
     )
 
     __colanderalchemy_config__ = {'excludes': [
-        'state_history', 'state', 'customer', '_customer_user', '_project_manager'
+        'state_history', 'state', 'customer', '_customer_user', '_project_manager', 'external_id'
     ]}
 
     customer_id = sa.Column(sautils.UUIDType,

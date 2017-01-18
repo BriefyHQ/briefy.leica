@@ -23,6 +23,14 @@ class Comment(mixins.LeicaMixin, Base):
 
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'entity_type', 'type']}
 
+    __raw_acl__ = (
+        ('list', ('g:briefy', 'g:system')),
+        ('create', ('g:briefy', 'g:system')),
+        ('view', ('g:briefy', 'g:system')),
+        ('edit', ('g:system',)),
+        ('delete', ('g:system',)),
+    )
+
     content = sa.Column(sa.Text, nullable=False)
     """Content.
 

@@ -574,20 +574,42 @@ class JobSync(ModelSync):
         logger.debug('Assignment added: {id}'.format(id=assignment.id))
 
         if professional_id:
-            self.update_local_roles(assignment, [professional_id], 'professional_user')
+            professional_permissions = ['view', 'edit']
+            self.update_local_roles(
+                assignment,
+                [professional_id],
+                'professional_user',
+                professional_permissions
+            )
 
         # qa manager context roles
         qa_manager_roles = self.get_local_roles(kobj, 'qa_manager')
-        self.update_local_roles(assignment, qa_manager_roles, 'qa_manager')
+        permissions = ['view', 'edit']
+        self.update_local_roles(
+            assignment,
+            qa_manager_roles,
+            'qa_manager',
+            permissions
+        )
 
         # scout manager context roles
         scout_manager_roles = self.get_local_roles(kobj, 'scouting_manager')
-        self.update_local_roles(assignment, scout_manager_roles, 'scout_manager')
+        self.update_local_roles(
+            assignment,
+            scout_manager_roles,
+            'scout_manager',
+            permissions
+        )
 
         # project manager context roles
         pm_roles_roles = [role.user_id for role in obj.project.local_roles
                           if role.role_name.value == 'project_manager']
-        self.update_local_roles(assignment, pm_roles_roles, 'project_manager')
+        self.update_local_roles(
+            assignment,
+            pm_roles_roles,
+            'project_manager',
+            permissions
+        )
 
         # update assignment state history
         add_assignment_history(self.session, assignment, kobj)
@@ -610,16 +632,32 @@ class JobSync(ModelSync):
         # customer context roles
         customer_roles = [role.user_id for role in project.local_roles
                           if role.role_name.value == 'customer_user']
-        self.update_local_roles(obj, customer_roles, 'customer_user')
+        permissions = ['view', 'edit']
+        self.update_local_roles(
+            obj,
+            customer_roles,
+            'customer_user',
+            permissions
+        )
 
         # scout manager context roles
         scout_manager_roles = self.get_local_roles(kobj, 'scouting_manager')
-        self.update_local_roles(obj, scout_manager_roles, 'scout_manager')
+        self.update_local_roles(
+            obj,
+            scout_manager_roles,
+            'scout_manager',
+            permissions
+        )
 
         # project manager context roles
         pm_roles_roles = [role.user_id for role in project.local_roles
                           if role.role_name.value == 'project_manager']
-        self.update_local_roles(obj, pm_roles_roles, 'project_manager')
+        self.update_local_roles(
+            obj,
+            pm_roles_roles,
+            'project_manager',
+            permissions
+        )
 
         self.add_location(obj, kobj)
         self.add_comment(obj, kobj)

@@ -84,8 +84,16 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
 
     __colanderalchemy_config__ = {'excludes': [
         'state_history', 'state', '_account_manager', '_customer_user',
-        'business_contact', 'billing_contact'
+        'business_contact', 'billing_contact', 'external_id'
     ]}
+
+    __raw_acl__ = (
+        ('list', ('g:briefy', 'g:system')),
+        ('create', ('g:briefy_bizdev', 'g:briefy_finance', 'g:system')),
+        ('view', ('g:briefy', 'g:system')),
+        ('edit', ('g:briefy_bizdev', 'g:briefy_finance', 'g:system')),
+        ('delete', ('g:briefy_finance', 'g:system')),
+    )
 
     parent_customer_id = sa.Column(
         sautils.UUIDType,

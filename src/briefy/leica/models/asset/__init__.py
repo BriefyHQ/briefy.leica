@@ -35,10 +35,11 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
     __listing_attributes__ = __listing_attributes__
 
     __raw_acl__ = (
-        ('list', ('g:briefy_qa', 'g:briefy_pm', 'g:system')),
-        ('view', ()),
-        ('edit', ()),
-        ('delete', ()),
+        ('list', ('g:briefy', 'g:system')),
+        ('create', ('g:briefy_qa', 'g:system')),
+        ('view', ('g:briefy', 'g:system')),
+        ('edit', ('g:briefy_qa', 'g:system')),
+        ('delete', ('g:briefy_qa', 'g:system')),
     )
 
     __actors__ = (
@@ -46,9 +47,10 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
         'uploaded_by'
     )
 
-    __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'history',
-                                               'raw_metadata', 'professional',
-                                               'comments', 'assignment']}
+    __colanderalchemy_config__ = {'excludes': [
+        'state_history', 'state', 'history', 'raw_metadata', 'professional',
+        'comments', 'assignment'
+    ]}
 
     type = sa.Column(
         sa.String(50), nullable=False,
