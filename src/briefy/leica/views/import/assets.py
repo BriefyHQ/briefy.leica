@@ -1,16 +1,18 @@
 """Service to import batch add assets to briefy.leica."""
 from briefy.leica import logger
+from briefy.leica.models import Asset
 from briefy.leica.sync.asset import import_assets
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
 from cornice.resource import view
-from pyramid.authentication import Everyone
 from pyramid.authorization import Allow
 
 
 class AssetImportFactory(BaseFactory):
     """Internal context factory for import assets service."""
+
+    model = Asset
 
     @property
     def __base_acl__(self):
@@ -20,7 +22,7 @@ class AssetImportFactory(BaseFactory):
         :rtype list
         """
         return [
-            (Allow, Everyone, ['view', 'list', 'add']),
+            (Allow, "g:briefy", ['view', 'list', 'create']),
         ]
 
 
@@ -35,7 +37,7 @@ class AssetImportService:
         self.context = context
         self.request = request
 
-    @view(permission='add')
+    @view(permission='create')
     def post(self):
         """Add all assets from the data list received as a json map."""
         data = self.request.json.get('data')

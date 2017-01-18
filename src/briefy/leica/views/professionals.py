@@ -26,7 +26,8 @@ class ProfessionalFactory(BaseFactory):
         """
         _acls = [
             (Allow, 'g:briefy_scout', ['add', 'delete', 'edit', 'list', 'view']),
-            (Allow, 'g:briefy_qa', ['list', 'view'])
+            (Allow, 'g:briefy_finance', ['add', 'delete', 'edit', 'list', 'view']),
+            (Allow, 'g:briefy_qa', ['list', 'view']),
         ]
         return _acls
 

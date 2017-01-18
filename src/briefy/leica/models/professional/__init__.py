@@ -68,9 +68,18 @@ class Professional(ProfessionalMixin, Base):
 
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', 'profiles', 'links', 'locations', 'type', 'main_location'
+            'state_history', 'state', 'profiles', 'links', 'locations', 'type',
+            'main_location', 'external_id'
         ]
     }
+
+    __raw_acl__ = (
+        ('create', ('g:briefy_scout', 'g:briefy_finance', 'g:system')),
+        ('list', ('g:briefy', 'g:system')),
+        ('view', ('g:briefy', 'g:system')),
+        ('edit', ('g:briefy_scout', 'g:briefy_finance', 'g:system')),
+        ('delete', ('g:briefy_finance', 'g:system')),
+    )
 
     id = sa.Column(
         UUIDType(),

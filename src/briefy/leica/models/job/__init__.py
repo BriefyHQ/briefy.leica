@@ -108,15 +108,16 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
 
     __summary_attributes__ = __summary_attributes__
     __summary_attributes_relations__ = [
-        'project', 'comments', 'location', 'professional', 'customer', 'pool'
+        'project', 'comments', 'location', 'professional', 'customer', 'pool', 'external_id'
     ]
     __listing_attributes__ = __listing_attributes__
 
     __raw_acl__ = (
-        ('list', ('g:briefy_qa', 'g:briefy_pm', 'g:system')),
-        ('view', ()),
-        ('edit', ()),
-        ('delete', ()),
+        ('create', ('g:briefy_pm', 'g:briefy_finance', 'g:briefy_scout', 'g:system')),
+        ('list', ('g:briefy', 'g:system')),
+        ('view', ('g:briefy', 'g:system')),
+        ('edit', ('g:briefy_pm', 'g:briefy_finance', 'g:briefy_scout', 'g:system')),
+        ('delete', ('g:briefy_finance', 'g:system')),
     )
 
     __colanderalchemy_config__ = {

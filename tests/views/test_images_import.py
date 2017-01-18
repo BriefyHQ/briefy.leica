@@ -7,7 +7,7 @@ import pytest
 import os
 
 
-@pytest.mark.usefixtures('db_transaction', 'create_dependencies')
+@pytest.mark.usefixtures('db_transaction', 'create_dependencies', 'login')
 class TestAssetImportView:
     """Test AssetImportService view."""
 
@@ -23,7 +23,8 @@ class TestAssetImportView:
 
     @property
     def headers(self):
-        return {'X-Locale': 'en_GB'}
+        return {'X-Locale': 'en_GB',
+                'Authorization': 'JWT {token}'.format(token=self.token)}
 
     def test_post_import_assets(self, app):
         """Test post to the internal import assets."""

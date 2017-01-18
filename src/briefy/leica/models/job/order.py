@@ -35,16 +35,17 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     __listing_attributes__ = __listing_attributes__
 
     __raw_acl__ = (
-        ('list', ('l:customer', 'g:briefy_qa', 'g:briefy_bizdev', 'g:briefy_pm', 'g:system')),
-        ('view', ()),
-        ('edit', ()),
-        ('delete', ()),
+        ('create', ('g:briefy_pm', 'g:briefy_finance', 'g:system')),
+        ('list', ('g:briefy', 'g:system')),
+        ('view', ('g:briefy', 'g:system')),
+        ('edit', ('g:briefy_pm', 'g:briefy_finance', 'g:system')),
+        ('delete', ('g:briefy_finance', 'g:system')),
     )
 
     __colanderalchemy_config__ = {
         'excludes': [
             'state_history', 'state', 'project', 'comments', 'customer',
-            '_project_manager', '_scout_manager', '_customer_user'
+            '_project_manager', '_scout_manager', '_customer_user', 'external_id'
         ]
     }
 

@@ -90,14 +90,15 @@ class Pool(mixins.KLeicaVersionedMixin, Base):
     ]
 
     __colanderalchemy_config__ = {'excludes': [
-        'state_history', 'state'
+        'state_history', 'state', 'external_id'
     ]}
 
     __raw_acl__ = (
-        ('list', ('g:briefy_qa', 'g:briefy_bizdev', 'g:briefy_pm', 'g:system')),
-        ('view', ()),
-        ('edit', ()),
-        ('delete', ()),
+        ('create', ('g:briefy_pm', 'g:briefy_finance', 'g:system')),
+        ('list', ('g:briefy', 'g:system')),
+        ('view', ('g:briefy', 'g:system')),
+        ('edit', ('g:briefy_pm', 'g:briefy_finance', 'g:system')),
+        ('delete', ('g:briefy_finance', 'g:system')),
     )
 
     country = sa.Column(sautils.CountryType, nullable=False)
