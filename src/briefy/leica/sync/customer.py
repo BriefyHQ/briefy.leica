@@ -1,5 +1,8 @@
 """Import and sync Knack Company to Leica Customer."""
+from briefy.common.db import datetime_utcnow
 from briefy.common.utils.data import generate_slug
+from briefy.common.utils.transformers import to_serializable
+from briefy.common.users import SystemUser
 from briefy.leica import logger
 from briefy.leica.sync import cleanse_phone_number
 from briefy.leica.sync import ModelSync
@@ -8,6 +11,9 @@ from briefy.leica.models import CustomerContact
 from briefy.leica.models import CustomerBillingAddress
 from briefy.leica.sync.location import COUNTRY_MAPPING
 from briefy.leica.sync.location import create_location_dict
+
+NOW = to_serializable(datetime_utcnow())
+ACTOR = SystemUser.id
 
 
 class CustomerSync(ModelSync):
@@ -68,16 +74,41 @@ class CustomerSync(ModelSync):
         )
         self._add_contact(kobj, obj, contact_dict, 'billing_contact_person')
 
+    def _state_history(self, state: str='active'):
+        """Create state history structure."""
+        return [
+            {
+                'date': NOW,
+                'message': 'Imported customer from Knack database',
+                'actor': ACTOR,
+                'transition': '',
+                'from': '',
+                'to': 'created'
+            },
+            {
+                'date': NOW,
+                'message': 'Automatic transition',
+                'actor': ACTOR,
+                'transition': 'activate' if state == 'active' else 'inactivate',
+                'from': 'created',
+                'to': state
+            },
+        ]
+
     def get_payload(self, kobj, briefy_id=None):
         """Create payload for customer object."""
         result = super().get_payload(kobj, briefy_id)
         location_dict = create_location_dict('company_address', kobj)
         title = kobj.company_name
         slug = generate_slug(title)
+        state = 'active'
+        state_history = self._state_history(state)
         result.update(
             dict(
                 external_id=kobj.id,
                 slug=slug,
+                state=state,
+                state_history=state_history,
                 title=title,
                 legal_name=kobj.legal_name,
                 tax_id=kobj.tax_id,

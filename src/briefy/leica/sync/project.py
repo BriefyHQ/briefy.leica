@@ -1,9 +1,15 @@
 """Import Projects to Leica."""
+from briefy.common.db import datetime_utcnow
+from briefy.common.users import SystemUser
 from briefy.common.utils.data import generate_slug
+from briefy.common.utils.transformers import to_serializable
 from briefy.leica.models import Customer
 from briefy.leica.models import Project
 from briefy.leica.sync import ModelSync
 from briefy.leica.sync.project_constraints import CONSTRAINTS
+
+NOW = to_serializable(datetime_utcnow())
+ACTOR = SystemUser.id
 
 
 class ProjectSync(ModelSync):
@@ -13,6 +19,27 @@ class ProjectSync(ModelSync):
     knack_model_name = 'Project'
     knack_parent_model = 'Company'
     parent_model = Customer
+
+    def _state_history(self, state: str='ongoing'):
+        """Create state history structure."""
+        return [
+            {
+                'date': NOW,
+                'message': 'Imported project from Knack database',
+                'actor': ACTOR,
+                'transition': '',
+                'from': '',
+                'to': 'created'
+            },
+            {
+                'date': NOW,
+                'message': 'Automatic transition',
+                'actor': ACTOR,
+                'transition': 'start' if state == 'ongoing' else 'pause',
+                'from': 'created',
+                'to': state
+            },
+        ]
 
     def get_payload(self, kobj, briefy_id=None):
         """Create payload for project object."""
@@ -24,10 +51,14 @@ class ProjectSync(ModelSync):
         title = kobj.project_name.strip()
         slug = generate_slug(title)
         tech_requirements = CONSTRAINTS[title]
+        state = 'ongoing'
+        state_history = self._state_history(state)
         result.update(
             dict(
                 title=title,
                 slug=slug,
+                state=state,
+                state_history=state_history,
                 description='',
                 abstract=kobj.project_abstract,
                 customer_id=customer.id,
