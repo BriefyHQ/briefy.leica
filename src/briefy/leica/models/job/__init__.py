@@ -22,12 +22,13 @@ import sqlalchemy_utils as sautils
 
 __summary_attributes__ = [
     'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
-    'number_required_assets', 'approvable', 'total_assets', 'total_approvable_assets'
+    'number_required_assets', 'approvable', 'total_assets', 'total_approvable_assets',
+    'category'
 ]
 
 __listing_attributes__ = __summary_attributes__ + [
     'assignment_date', 'last_approval_date', 'submission_date', 'last_submission_date',
-    'set_type', 'number_required_assets',
+    'set_type', 'number_required_assets', 'category'
 ]
 
 
@@ -107,7 +108,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
 
     __summary_attributes__ = __summary_attributes__
     __summary_attributes_relations__ = [
-        'project', 'comments', 'location', 'professional' 'customer', 'pool'
+        'project', 'comments', 'location', 'professional', 'customer', 'pool'
     ]
     __listing_attributes__ = __listing_attributes__
 
@@ -394,6 +395,15 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         )
 
     @declared_attr
+    def category(cls) -> str:
+        """Return the category of an Order."""
+        return orm.column_property(
+            select([Order.category]).where(
+                Order.id == cls.order_id
+            ),
+        )
+
+    @declared_attr
     def number_required_assets(cls) -> str:
         """Return the number_required_assets of an Order."""
         return orm.column_property(
@@ -435,6 +445,9 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         data['briefing'] = self.briefing
         data['assignment_date'] = self.assignment_date
         data['slug'] = self.slug
+        data['tech_requirements'] = self.project.tech_requirements
+        data['requirements'] = self.order.requirements
+        data['category'] = self.category
 
         # Workflow history
         add_user_info_to_state_history(self.state_history)

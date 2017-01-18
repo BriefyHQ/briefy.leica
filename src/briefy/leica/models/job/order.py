@@ -302,6 +302,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data['price'] = self.price
         data['slug'] = self.slug
         data['location'] = self.location
+        data['tech_requirements'] = self.tech_requirements
 
         # Workflow history
         add_user_info_to_state_history(self.state_history)
