@@ -82,6 +82,7 @@ History
      * Adjust users sync to update Knack Profile.briefy_id if not equal to same user.briefy_id in Rolleiflex (rudaporto).
      * New descriptor to help set and get from unary relationships like Order.location (rudaporto).
      * Review __raw_acl__ attribute on all models (rudaporto).
+     * Improve import to set permissions for each local role imported (rudaporto).
 
 1.1.0 (2016-10-04)
 ------------------

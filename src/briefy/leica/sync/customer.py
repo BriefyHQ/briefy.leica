@@ -141,11 +141,23 @@ class CustomerSync(ModelSync):
 
         # customer context roles
         customer_roles = self.get_local_roles(kobj, 'company_user')
-        self.update_local_roles(obj, customer_roles, 'customer_user')
+        customer_permissions = ['view']
+        self.update_local_roles(
+            obj,
+            customer_roles,
+            'customer_user',
+            customer_permissions
+        )
 
         # account manager context roles
         account_roles = self.get_local_roles(kobj, 'account_manager')
-        self.update_local_roles(obj, account_roles, 'account_manager')
+        permissions = ['view', 'edit']
+        self.update_local_roles(
+            obj,
+            account_roles,
+            'account_manager',
+            permissions,
+        )
 
         self.add_address(kobj, obj)
         self.add_business_contact(kobj, obj)

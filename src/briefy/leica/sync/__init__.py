@@ -125,12 +125,12 @@ class ModelSync:
                 result.append(briefy_user)
         return result
 
-    def update_local_roles(self, obj, new_users, attr):
+    def update_local_roles(self, obj, new_users, attr, permissions):
         """Update local roles for DB objects using a list of roles."""
         actual_users = [role.user_id for role in obj.local_roles if role.role_name == attr]
         for user_id in new_users:
             if user_id not in actual_users:
-                obj._add_local_role_user_id(user_id, attr)
+                obj._add_local_role_user_id(user_id, attr, permissions)
 
     def update(self, kobj, item):
         """Update database item from knack obj."""
