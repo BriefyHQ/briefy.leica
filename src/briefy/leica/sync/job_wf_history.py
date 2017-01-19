@@ -31,7 +31,7 @@ order_status = [
     ('Cancelled', 'cancelled'),
     ('Awaiting Assets', 'in_qa'),
     ('Approved', 'delivered'),
-    ('Completed', 'accepted'),
+    ('Completed', 'completed'),
     ('Refused', 'refused'),
     ('In QA', 'in_qa'),
 ]
