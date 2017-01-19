@@ -78,6 +78,24 @@
     "state": "created",
     "main_mobile": "+4917637754722",
     "description": "A genius.",
-    "main_email": "steve@professional.briefy.co"
+    "main_email": "steve@professional.briefy.co",
+    "main_location": {
+      "coordinates": [52.3758916, 9.732010400000036],
+      "country": "DE",
+      "formatted_address": "Hanover, Germany",
+      "id": "1c5b32d8-eb28-407a-9d92-abe59ddbb99b",
+      "info": {
+        "coordinates": [52.3758916, 9.732010400000036],
+               "country": "DE",
+               "formatted_address": "Hanover, Germany",
+               "locality": "Hanover",
+               "place_id": "ChIJhU9JTVELsEcRIEeslG2sJQQ",
+               "postal_code": "",
+               "province": "Lower Saxony",
+               "route": "",
+               "street_number": ""
+      },
+      "locality": "Hanover"
+    }
   }
 ]

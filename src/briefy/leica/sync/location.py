@@ -30,7 +30,7 @@ CITY_MAPPING = (
     ('Glasgow', 'Glasgow', 'United Kingdom'),
     ('GLOUCESTERSHIRE', 'GLOUCESTERSHIRE', 'United Kingdom'),
     ('Goslar', 'Goslar', 'Germany'),
-    ('Hannover', 'Hannover', 'Germany'),
+    ('Hannover', 'Hanover', 'Germany'),
     ('Hong Kong', 'Hong Kong', 'Hong Kong'),
     ('india', 'EMPTY_CITY', 'India'),
     ('Jakarta', 'Jakarta', 'Indonesia'),

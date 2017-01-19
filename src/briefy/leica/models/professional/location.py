@@ -31,6 +31,12 @@ class WorkingLocation(Address, mixins.LeicaMixin, Base):
 
     __listing_attributes__ = __summary_attributes__
 
+    __colanderalchemy_config__ = {
+        'excludes': [
+            'state_history', 'state', 'type'
+        ]
+    }
+
     professional_id = sa.Column(
         UUIDType(), sa.ForeignKey('professionals.id'), unique=False,
         info={'colanderalchemy': {
@@ -39,7 +45,10 @@ class WorkingLocation(Address, mixins.LeicaMixin, Base):
             'missing': colander.drop,
             'typ': colander.String}}
     )
-    type = sa.Column(sa.String(50), nullable=False)
+    type = sa.Column(
+        sa.String(50),
+        nullable=False
+    )
 
     # Range from the main address
     range = sa.Column(sa.Integer(), default=10)
@@ -54,6 +63,13 @@ class WorkingLocation(Address, mixins.LeicaMixin, Base):
     def __tablename__(self):
         """Define tablename."""
         return 'workinglocations'
+
+    def to_dict(self):
+        """Return a dict representation of this object."""
+        data = super().to_dict()
+        data['coordinates'] = self.coordinates
+        data['latlng'] = self.latlng
+        return data
 
 
 class MainWorkingLocation(WorkingLocation):
