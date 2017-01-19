@@ -3,7 +3,9 @@ from briefy.common.db.mixins import PersonalInfoMixin
 from briefy.common.db.mixins.optin import OptIn
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
+from briefy.leica.models.descriptors import UnaryRelationshipWrapper
 from briefy.leica.models.professional.workflows import ProfessionalWorkflow
+from briefy.leica.models.professional.location import MainWorkingLocation
 from briefy.ws.utils.user import add_user_info_to_state_history
 from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
@@ -69,7 +71,7 @@ class Professional(ProfessionalMixin, Base):
     __colanderalchemy_config__ = {
         'excludes': [
             'state_history', 'state', 'profiles', 'links', 'locations', 'type',
-            'main_location', 'external_id'
+            'external_id'
         ]
     }
 
@@ -77,7 +79,7 @@ class Professional(ProfessionalMixin, Base):
         ('create', ('g:briefy_scout', 'g:briefy_finance', 'g:system')),
         ('list', ('g:briefy', 'g:system')),
         ('view', ('g:briefy', 'g:system')),
-        ('edit', ('g:briefy_scout', 'g:briefy_finance', 'g:system')),
+        ('edit', ('g:briefy_scout', 'g:briefy_finance', 'g:briefy_pm', 'g:system')),
         ('delete', ('g:briefy_finance', 'g:system')),
     )
 
@@ -144,12 +146,27 @@ class Professional(ProfessionalMixin, Base):
         cascade='all, delete-orphan',
     )
 
-    main_location = orm.relationship(
+    _main_location = orm.relationship(
         'MainWorkingLocation',
         uselist=False,
         viewonly=False,
         cascade='all, delete-orphan',
+        info={
+            'colanderalchemy': {
+                'title': 'Main Location',
+                'missing': colander.drop
+            }
+        }
     )
+    """Order Location.
+
+    Relationship with :class:`briefy.leica.models.job.location.OrderLocation`.
+    """
+
+    main_location = UnaryRelationshipWrapper(
+        '_main_location', MainWorkingLocation, 'professional_id'
+    )
+    """Descriptor to handle main location get, set and delete."""
 
     pools = orm.relationship(
         'Pool',

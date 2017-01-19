@@ -22,6 +22,7 @@ CITY_MAPPING = (
     ('Birmingham', 'Birmingham', 'United Kingdom'),
     ('Braunschweig', 'Braunschweig', 'Germany'),
     ('Brühl', 'Brühl', 'Germany'),
+    ('Copenhagen', 'Copenhagen', 'Denmark'),
     ('Denpasar', 'Denpasar', 'Indonesia'),
     ('Düsseldorf', 'Düsseldorf', 'Germany'),
     ('Edenkoben', 'Edenkoben', 'Germany'),
@@ -29,14 +30,17 @@ CITY_MAPPING = (
     ('Glasgow', 'Glasgow', 'United Kingdom'),
     ('GLOUCESTERSHIRE', 'GLOUCESTERSHIRE', 'United Kingdom'),
     ('Goslar', 'Goslar', 'Germany'),
-    ('Hannover', 'Hannover', 'Germany'),
+    ('Hannover', 'Hanover', 'Germany'),
     ('Hong Kong', 'Hong Kong', 'Hong Kong'),
     ('india', 'EMPTY_CITY', 'India'),
+    ('Jakarta', 'Jakarta', 'Indonesia'),
     ('Kassel', 'Kassel', 'Germany'),
     ('Köln (Porz)', 'Köln', 'Germany'),
+    ('Laufen', 'Laufen', 'Germany'),
     ('Leeds', 'Leeds', 'United Kingdom'),
     ('Leipzig', 'Leipzig', 'Germany'),
     ('Leverkusen', 'Leverkusen', 'Germany'),
+    ('Lisbon', 'Lisbon', 'Portugal'),
     ('Lombok', 'Lombok', 'Indonesia'),
     ('Manchester', 'Manchester', 'United Kingdom'),
     ('Melbourne', 'Melbourne', 'Australia'),
@@ -45,6 +49,7 @@ CITY_MAPPING = (
     ('Newcastle upon Tyne', 'Newcastle upon Tyne', 'United Kingdom'),
     ('Osnabrück', 'Osnabrück', 'Germany'),
     ('Pattaya', 'Pattaya', 'Thailand'),
+    ('Philadelphia', 'Philadelphia', 'United States'),
     ('Phuket', 'Phuket', 'Thailand'),
     ('Ravensburg', 'Ravensburg', 'Germany'),
     ('Regensburg', 'Regensburg', 'Germany'),
@@ -122,7 +127,7 @@ def create_location_dict(address_field: str, kobj: KnackEntity, country: str='')
     if hasattr(klocation, 'latitude') and hasattr(klocation, 'longitude'):
         extra_location_info['coordinates'] = {
             'type': 'Point',
-            'coordinates': [klocation.latitude, klocation.longitude]
+            'coordinates': [klocation.longitude, klocation.latitude]
         }
     kcountry = klocation.country.strip() if klocation.country else ''
     street = klocation.street

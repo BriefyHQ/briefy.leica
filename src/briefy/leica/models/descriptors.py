@@ -34,16 +34,18 @@ class UnaryRelationshipWrapper:
         """
         if isinstance(value, dict):
             if not value.get('id', None):
-                location = self._model(**value)
+                fk_id = obj.id
+                value[self._fk_attr] = fk_id
+                sub_object = self._model(**value)
                 session = obj.__session__
-                session.add(location)
+                session.add(sub_object)
                 # TODO: call obj.some_hook to change something else, like workflow
                 # this should be another optional parameter in the init
             else:
-                location = self.__get__(obj)
-                if location:
+                sub_object = self.__get__(obj)
+                if sub_object:
                     for k, v in value.items():
-                        setattr(location, k, v)
+                        setattr(sub_object, k, v)
         elif isinstance(value, self._model):
             setattr(obj, self._field_name, value)
         elif not value:
@@ -54,4 +56,5 @@ class UnaryRelationshipWrapper:
 
     def __delete__(self, obj):
         """Remove the related object with soft delete."""
-        # TODO: implement a way to delete the working location
+        # TODO: implement a way to delete sub_object
+        pass
