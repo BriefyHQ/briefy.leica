@@ -20,7 +20,7 @@ class DashboardCustomerFactory(BaseFactory):
         :rtype: list
         """
         _acls = [
-            (Allow, 'g:customers', ['list']),
+            (Allow, 'g:customers', ['list', 'view']),
         ]
         return _acls
 

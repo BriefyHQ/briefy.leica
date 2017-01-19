@@ -2,6 +2,7 @@
 from briefy import leica
 from briefy.common.types import BaseUser
 from briefy.common.utils.transformers import to_serializable
+from briefy.leica import models
 from briefy.leica.db import Base
 from briefy.leica.db import create_engine
 from briefy.leica.db import Session as DBSession
@@ -477,6 +478,43 @@ class BaseVersionedTestView(BaseTestView):
 
         assert result['versions'][1]['id'] > result['versions'][0]['id']
         assert result['versions'][1]['updated_at'] > result['versions'][0]['updated_at']
+
+
+@pytest.mark.usefixtures('db_transaction', 'create_dependencies', 'login')
+class BaseDashboardTestView:
+    """Test dashboards view base class."""
+
+    # tuple of dashboards endpoints
+    base_paths = ()
+
+    dependencies = [
+        (models.Professional, 'data/professionals.json'),
+        (models.Customer, 'data/customers.json'),
+        (models.Project, 'data/projects.json'),
+        (models.Order, 'data/orders.json'),
+        (models.Assignment, 'data/assignments.json')
+    ]
+
+    @property
+    def headers(self):
+        return {'X-Locale': 'en_GB',
+                'Authorization': 'JWT {token}'.format(token=self.token)}
+
+    def test_get_dashboards(self, app):
+        """Test get all dashboards defined in the base_paths tuple."""
+        headers = self.headers
+        for path in self.base_paths:
+            request = app.get(
+                path,
+                headers=headers,
+                status=200
+            )
+
+            result = request.json
+            assert 'data' in result
+            assert 'columns' in result
+            assert 'columns' in result
+        # TODO: implement more checks about dashboard structure
 
 
 @pytest.fixture(scope='session')

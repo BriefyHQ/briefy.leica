@@ -21,7 +21,7 @@ class DashboardQaFactory(BaseFactory):
         :rtype: list
         """
         _acls = [
-            (Allow, 'g:briefy_qa', ['list']),
+            (Allow, 'g:briefy_qa', ['list', 'view']),
         ]
         return _acls
 

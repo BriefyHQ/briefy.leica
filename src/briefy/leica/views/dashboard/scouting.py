@@ -22,7 +22,7 @@ class DashboardScoutingFactory(BaseFactory):
         :rtype: list
         """
         _acls = [
-            (Allow, 'g:briefy_scout', ['list']),
+            (Allow, 'g:briefy_scout', ['list', 'view']),
         ]
         return _acls
 

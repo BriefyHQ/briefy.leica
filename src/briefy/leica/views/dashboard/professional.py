@@ -21,7 +21,7 @@ class DashboardProfessionalFactory(BaseFactory):
         :rtype: list
         """
         _acls = [
-            (Allow, 'g:professionals', ['list']),
+            (Allow, 'g:professionals', ['list', 'view']),
         ]
         return _acls
 
