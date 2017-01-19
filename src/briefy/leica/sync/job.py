@@ -273,7 +273,7 @@ def add_assignment_history(session, obj, kobj):
         actor = str(actor_id) if actor_id else 'g:system'
         history.append({
             'date': _build_date(kobj.input_date),
-            'message': 'Job sent to job pool',
+            'message': 'Assignment sent to job pool',
             'actor': actor,
             'transition': 'publish',
             'from': 'pending',
@@ -310,7 +310,7 @@ def add_assignment_history(session, obj, kobj):
         actor = str(actor_id) if actor_id else 'g:system'
         history.append({
             'date': _build_date(date, last_date),
-            'message': "Scheduled by '{}' on the Knack database".format(person),
+            'message': "Scheduled by '{0}' on the Knack database".format(person),
             'actor': actor,
             'transition': 'schedule',
             'from': history[-1]['to'],
@@ -554,14 +554,12 @@ class JobSync(ModelSync):
         job_pool = Pool.query().filter_by(external_id=kpool_id).one_or_none()
         if kpool_id and not job_pool:
             print('Knack Poll ID: {0} do not found in leica.'.format(kpool_id))
-        set_type = 'new' if kobj.new_set else None
         payload = dict(
             id=uuid.uuid4(),
             order_id=obj.id,
             created_at=_build_date(kobj.input_date),
             pool=job_pool,
             slug=self.get_slug(job_id, assignment=1),
-            set_type=set_type,
             professional_id=professional_id,
             payout_value=self.parse_decimal(kobj.photographer_payout),
             payout_currency=kobj.currency_payout or 'EUR',
@@ -622,7 +620,9 @@ class JobSync(ModelSync):
             assignment.set_type = 'refused_customer'
         elif not assignment.set_type:
             assignment.set_type = 'returned_photographer'
-        logger.debug('Set type: {}'.format(assignment.set_type))
+        else:
+            assignment.set_type = 'new'
+        logger.debug('Set type: {0}'.format(assignment.set_type))
 
     def add(self, kobj, briefy_id):
         """Add new Job to database."""

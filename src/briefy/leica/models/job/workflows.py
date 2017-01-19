@@ -222,13 +222,14 @@ class AssignmentWorkflow(BriefyWorkflow):
     @in_qa.transition(approved, 'can_approve')
     def approve(self):
         """QA approves the Assignment Set."""
-        assignment = self.document
-        if not assignment.approvable:
-            raise self.state.exception_transition(
-                'Incorrect number of assets.'
-            )
-        # Transition all pending assets to approved
-        transitions.approve_assets_in_assignment(assignment, self.context)
+        # assignment = self.document
+        # if not assignment.approvable:
+        #     raise self.state.exception_transition(
+        #         'Incorrect number of assets.'
+        #     )
+        # # Transition all pending assets to approved
+        # transitions.approve_assets_in_assignment(assignment, self.context)
+        pass
 
     @in_qa.transition(awaiting_assets, 'can_approve', require_message=True)
     def reject(self):
