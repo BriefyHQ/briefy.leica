@@ -49,13 +49,11 @@ class CommentService(RESTService):
         allowed_fields.remove('entity_id')
         return allowed_fields
 
-    @property
-    def default_filters(self) -> tuple:
+    def default_filters(self, query) -> object:
         """Default filters for this Service."""
         entity_id = self.request.matchdict.get('entity_id', '')
-        filters = list(super().default_filters)
-        filters.append((self.model.entity_id == entity_id))
-        return tuple(filters)
+        query.filter(self.model.entity_id == entity_id)
+        return query
 
 
 class CommentsWorkflowService(WorkflowAwareResource):

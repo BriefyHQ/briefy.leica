@@ -35,8 +35,11 @@ total_assignments_professional = select([
         case([(Assignment.state.in_(('approved', 'completed')), 1)], else_=0)
     ).label('completed'),
 ]).where(
-    Assignment.state.in_(
-        ('assigned', 'scheduled', 'in_qa', 'approved', 'completed')
+    and_(
+        Assignment.state.in_(
+            ('assigned', 'scheduled', 'in_qa', 'approved', 'completed')
+        ),
+        Assignment.professional_id == ':professional_id '
     )
 ).alias('total_assignments_professional')
 

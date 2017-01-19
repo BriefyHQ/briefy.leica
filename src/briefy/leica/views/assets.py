@@ -62,14 +62,12 @@ class AssetService(RESTService):
         allowed_fields.remove('assignment_id')
         return allowed_fields
 
-    @property
-    def default_filters(self) -> tuple:
+    def default_filters(self, query) -> object:
         """Default filters for this Service."""
         assignment_id = self.request.matchdict.get('assignment_id')
-        filters = list(super().default_filters)
         if assignment_id:
-            filters.append((self.model.assignment_id == assignment_id))
-        return tuple(filters)
+            query.filter(self.model.assignment_id == assignment_id)
+        return query
 
 
 @resource(

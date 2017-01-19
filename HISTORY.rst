@@ -84,6 +84,7 @@ History
      * Review __raw_acl__ attribute on all models (rudaporto).
      * Improve import to set permissions for each local role imported (rudaporto).
      * New base class to test dashboard views and test cases for all implemented dashboards: QA, Scout, Professional, Customer (rudaporto).
+     * Change customer and professional dashboard queries and implement default_filter (view) to add parameters to the query (rudaporto).
 
 1.1.0 (2016-10-04)
 ------------------

@@ -10,7 +10,7 @@ from sqlalchemy import func
 from sqlalchemy import select
 
 
-total_assignments_customer = select([
+total_order_customer = select([
     Project.title,
     func.count(distinct(Order.id)).label('total'),
     func.sum(
@@ -37,15 +37,16 @@ total_assignments_customer = select([
             ('received', 'assigned', 'scheduled', 'cancelled', 'delivered', 'accepted')
         ),
         Project.id == Order.project_id,
+        Project.local_roles.any(role_name='customer_user', user_id=':user_id')
     )
-).alias('total_assignments_professional')
+).alias('total_order_customer')
 
 
 class DashboardCustomerOrder(Base):
     """Dashboard Customer: Total of Order by workflow state."""
 
-    __table__ = total_assignments_customer
+    __table__ = total_order_customer
     __mapper_args__ = {
-        'primary_key': [total_assignments_customer.c.total]
+        'primary_key': [total_order_customer.c.total]
     }
     __session__ = Session
