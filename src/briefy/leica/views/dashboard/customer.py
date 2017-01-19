@@ -46,31 +46,31 @@ class DashboardCustomerOrderService(RESTService):
             'type': 'text', 'url': '', 'filter': ''
         },
         {
-            'field': 'total', 'label': 'Total Jobs',
+            'field': 'total', 'label': 'All Orders',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'received', 'label': 'New Jobs',
+            'field': 'received', 'label': 'New Orders',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'assigned', 'label': 'Jobs Assigned',
+            'field': 'assigned', 'label': 'Orders Assigned',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'scheduled', 'label': 'Jobs Scheduled',
+            'field': 'scheduled', 'label': 'Orders Scheduled',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'in_qa', 'label': 'Jobs in QA process',
+            'field': 'in_qa', 'label': 'Orders in QA process',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'cancelled', 'label': 'Jobs Cancelled',
+            'field': 'cancelled', 'label': 'Cancelled Orders',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'completed', 'label': 'Jobs Completed',
+            'field': 'completed', 'label': 'Completed Orders',
             'type': 'integer', 'url': '', 'filter': ''
         }
     )

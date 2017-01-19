@@ -21,7 +21,9 @@ __summary_attributes__ = [
     'price', 'number_required_assets', 'location', 'category'
 ]
 
-__listing_attributes__ = __summary_attributes__
+__listing_attributes__ = __summary_attributes__ + [
+    'customer_order_id', 'deliver_date', 'accept_date'
+]
 
 
 class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
@@ -276,8 +278,17 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         return project.tech_requirements
 
     @hybrid_property
-    def customer_approval_date(self) -> datetime:
-        """Return first submission date date for this Assignment.
+    def deliver_date(self) -> datetime:
+        """Return last deliver date for this Orders.
+
+        Information will be extracted from state history field.
+        """
+        transitions = ('deliver',)
+        return get_transition_date(transitions, self, first=False)
+
+    @hybrid_property
+    def accept_date(self) -> datetime:
+        """Return first accepted or refused date for this Order.
 
         Information will be extracted from state history field.
         """

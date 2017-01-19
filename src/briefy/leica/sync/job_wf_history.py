@@ -29,9 +29,9 @@ order_status = [
     ('Scheduled', 'scheduled'),
     ('Assigned', 'assigned'),
     ('Cancelled', 'cancelled'),
-    ('Awaiting Assets', 'in_qa'),
+    ('Awaiting Assets', 'scheduled'),
     ('Approved', 'delivered'),
-    ('Completed', 'completed'),
+    ('Completed', 'accepted'),
     ('Refused', 'refused'),
     ('In QA', 'in_qa'),
 ]

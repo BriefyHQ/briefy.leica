@@ -28,7 +28,7 @@ class OrderFactory(BaseFactory):
         :rtype: list
         """
         _acls = [
-            (Allow, 'g:customers', ['add', 'list', 'view'])
+            (Allow, 'g:customers', ['create', 'list', 'view'])
         ]
         return _acls
 
