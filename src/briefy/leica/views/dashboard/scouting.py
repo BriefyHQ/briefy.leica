@@ -9,22 +9,14 @@ from cornice.resource import resource
 from pyramid.security import Allow
 
 
-class DashboardScoutingFactory(BaseFactory):
-    """Dashboard Scouting context factory."""
+class DashboardScoutingCountryFactory(BaseFactory):
+    """Dashboard Scouting Country context factory."""
 
     model = DashboardScoutingCountry
 
-    @property
-    def __base_acl__(self) -> list:
-        """Hook to be use by subclasses to define default ACLs in context.
-
-        :return: list of ACLs
-        :rtype: list
-        """
-        _acls = [
-            (Allow, 'g:briefy_scout', ['list', 'view']),
-        ]
-        return _acls
+    __base_acl__ = [
+        (Allow, 'g:briefy_scout', ['list', 'view']),
+    ]
 
 
 COLLECTION_PATH = '/dashboards/scouting/country'
@@ -34,7 +26,7 @@ PATH = COLLECTION_PATH + '/{id}'
 @resource(collection_path=COLLECTION_PATH,
           path=PATH,
           cors_policy=CORS_POLICY,
-          factory=DashboardScoutingFactory)
+          factory=DashboardScoutingCountryFactory)
 class DashboardScoutingCountryService(RESTService):
     """Dashboard Scouting: Country Service."""
 
@@ -70,6 +62,16 @@ class DashboardScoutingCountryService(RESTService):
     )
 
 
+class DashboardScoutingProjectFactory(BaseFactory):
+    """Dashboard Scouting Project context factory."""
+
+    model = DashboardScoutingProject
+
+    __base_acl__ = [
+        (Allow, 'g:briefy_scout', ['list', 'view']),
+    ]
+
+
 COLLECTION_PATH = '/dashboards/scouting/project'
 PATH = COLLECTION_PATH + '/{id}'
 
@@ -77,7 +79,7 @@ PATH = COLLECTION_PATH + '/{id}'
 @resource(collection_path=COLLECTION_PATH,
           path=PATH,
           cors_policy=CORS_POLICY,
-          factory=DashboardScoutingFactory)
+          factory=DashboardScoutingProjectFactory)
 class DashboardScoutingProjectService(RESTService):
     """Dashboard Scouting: Project Service."""
 
