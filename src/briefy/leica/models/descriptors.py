@@ -34,17 +34,13 @@ class UnaryRelationshipWrapper:
         :return: None
         """
         if isinstance(value, dict):
-            if not value.get('id', None):
-                self.create_sub_object(obj, value)
-            else:
-                self.update_sub_object(obj, value)
+            self.create_or_update_sub_object(obj, value)
         elif isinstance(value, self._model):
             setattr(obj, self._field_name, value)
         elif not value:
             pass
         else:
-            msg = 'Value must be a map to create a new instance or an instance of {model_name}.'
-            raise ValueError(msg.format(self._model.__name__))
+            self.raise_value_error()
 
     def __delete__(self, obj):
         """Remove the related object with soft delete."""
@@ -57,6 +53,18 @@ class UnaryRelationshipWrapper:
         if not obj.id:
             obj.id = uuid4()
         return obj.id
+
+    def raise_value_error(self):
+        """Raise ValueError when value is not dict or model instance."""
+        msg = 'Value must be a map to create a new instance or an instance of {model_name}.'
+        raise ValueError(msg.format(self._model.__name__))
+
+    def create_or_update_sub_object(self, obj, value):
+        """"Create a new sub object o update an existing instance."""
+        if not value.get('id', None):
+            self.create_sub_object(obj, value)
+        else:
+            self.update_sub_object(obj, value)
 
     def create_sub_object(self, obj, value):
         """Create a new sub object instance."""
@@ -90,16 +98,12 @@ class MultipleRelationshipWrapper(UnaryRelationshipWrapper):
         sub_model_instances = []
         for value in values:
             if isinstance(value, dict):
-                if not value.get('id', None):
-                    self.create_sub_object(obj, value)
-                else:
-                    self.update_sub_object(obj, value)
+                self.create_or_update_sub_object(obj, value)
             elif isinstance(value, self._model):
                 sub_model_instances.append(value)
             elif not value:
                 pass
             else:
-                msg = 'Value must be a map to create a new instance or an instance of {model_name}.'
-                raise ValueError(msg.format(self._model.__name__))
+                self.raise_value_error()
         if sub_model_instances:
             setattr(obj, self._field_name, sub_model_instances)
