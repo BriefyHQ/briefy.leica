@@ -89,7 +89,7 @@ class DashboardScoutingProjectService(RESTService):
 
     _columns_map = (
         {
-            'field': 'title ', 'label': 'Project',
+            'field': 'title', 'label': 'Project',
             'type': 'text', 'url': '', 'filter': ''
         },
         {
