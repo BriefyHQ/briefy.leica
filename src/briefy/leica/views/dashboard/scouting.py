@@ -44,15 +44,15 @@ class DashboardScoutingCountryService(RESTService):
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'unassigned', 'label': 'Unassigned Jobs',
+            'field': 'unassigned', 'label': 'Manually Assign',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'job_pool', 'label': 'In Job Pool',
+            'field': 'job_pool', 'label': 'In Pool',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'assigned', 'label': 'Assigned Jobs',
+            'field': 'assigned', 'label': 'Assigned',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
@@ -97,15 +97,15 @@ class DashboardScoutingProjectService(RESTService):
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'unassigned', 'label': 'Unassigned Jobs',
+            'field': 'unassigned', 'label': 'Manually Assign',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'job_pool', 'label': 'In Job Pool',
+            'field': 'pool', 'label': 'In Pool',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'assigned', 'label': 'Assigned Jobs',
+            'field': 'assigned', 'label': 'Assigned',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {

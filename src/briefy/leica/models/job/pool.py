@@ -128,18 +128,21 @@ class Pool(mixins.KLeicaVersionedMixin, Base):
     def total_assignments(cls) -> int:
         """Return the total number of Assignments in the Pool."""
         stmt = select([func.count(Assignment.id)]).where(
-            Assignment.pool_id == cls.id
+            and_(
+                Assignment.pool_id == cls.id,
+                Assignment.professional_id is not None,
+            )
         ).as_scalar()
         return orm.column_property(stmt)
 
     @declared_attr
     def live_assignments(cls) -> int:
         """Return the number of 'active' Assignments in the Pool."""
-        end_states = ('cancelled', 'approved', 'completed', 'perm_rejected')
         stmt = select([func.count(Assignment.id)]).where(
             and_(
                 Assignment.pool_id == cls.id,
-                not_(Assignment.state.in_(end_states))
+                Assignment.professional_id is None,
+                Assignment.state == 'published'
             )
         ).as_scalar()
         return orm.column_property(stmt)

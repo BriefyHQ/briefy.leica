@@ -34,27 +34,27 @@ class DashboardProfessionalAssignmentService(RESTService):
 
     _columns_map = (
         {
-            'field': 'total', 'label': 'Total number of Jobs',
+            'field': 'total', 'label': 'All your Assignments',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'assigned', 'label': 'Jobs to be scheduled',
+            'field': 'assigned', 'label': 'To be Scheduled',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'scheduled', 'label': 'Jobs scheduled',
+            'field': 'scheduled', 'label': 'Scheduled',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'in_qa', 'label': 'Jobs in QA process',
+            'field': 'awaiting_submission_resubmission', 'label': 'Waiting Submission / Resubmission',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'rejected', 'label': 'Jobs rejected by QA',
+            'field': 'in_qa', 'label': 'In QA Review',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'completed', 'label': 'Jobs completed',
+            'field': 'completed_inactive', 'label': 'Completed / Inactive',
             'type': 'integer', 'url': '', 'filter': ''
         }
     )

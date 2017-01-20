@@ -27,11 +27,15 @@ total_assignments_per_country = select([
     OrderLocation.country.label('country'),
     func.count(distinct(Assignment.id)).label('total'),
     func.sum(
-        case([(Assignment.state.in_(('pending', 'published')), 1)], else_=0)
+        case([(Assignment.state == 'pending', 1)], else_=0)
     ).label('unassigned'),
     func.sum(
-        case([(Assignment.pool_id.isnot(None), 1)], else_=0)
-    ).label('job_pool'),
+        case([(
+            and_(
+                Assignment.pool_id.isnot(None),
+                Assignment.state == 'published'
+            ), 1)], else_=0)
+    ).label('pool'),
     func.sum(
         case([(Assignment.state.in_(('assigned', 'scheduled')), 1)], else_=0)
     ).label('assigned'),
@@ -67,11 +71,15 @@ total_assignments_per_project = select([
     Project.title,
     func.count(distinct(Assignment.id)).label('total'),
     func.sum(
-        case([(Assignment.state.in_(('pending', 'published')), 1)], else_=0)
+        case([(Assignment.state == 'pending', 1)], else_=0)
     ).label('unassigned'),
     func.sum(
-        case([(Assignment.pool_id.isnot(None), 1)], else_=0)
-    ).label('job_pool'),
+        case([(
+            and_(
+                Assignment.pool_id.isnot(None),
+                Assignment.state == 'published'
+            ), 1)], else_=0)
+    ).label('pool'),
     func.sum(
         case([(Assignment.state.in_(('assigned', 'scheduled')), 1)], else_=0)
     ).label('assigned'),
