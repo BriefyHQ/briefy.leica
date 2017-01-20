@@ -48,7 +48,7 @@ class AssignmentService(RESTService):
         'project.id', 'description', '_location.locality', '_location.country',
         'location.formatted_address', 'location.fullname', 'location.email',
         'professional_user', 'project_manager', 'scout_manager', 'qa_manager',
-        'customer.title', 'pool.id', 'pool.title', 'pool.country'
+        'customer.title', 'pool.id', 'pool.title', 'pool.country', 'availability'
     ]
 
     _default_notify_events = {

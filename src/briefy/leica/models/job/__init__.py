@@ -28,7 +28,8 @@ __summary_attributes__ = [
 
 __listing_attributes__ = __summary_attributes__ + [
     'assignment_date', 'last_approval_date', 'submission_date', 'last_submission_date',
-    'set_type', 'number_required_assets', 'category', 'scheduled_datetime'
+    'set_type', 'number_required_assets', 'category', 'scheduled_datetime', 'payout_value',
+    'availability'
 ]
 
 
@@ -413,6 +414,15 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
             ),
         )
 
+    @declared_attr
+    def availability(cls) -> list:
+        """Return the availability dates of an Order."""
+        return orm.column_property(
+            select([Order._availability]).where(
+                Order.id == cls.order_id
+            ),
+        )
+
     @hybrid_property
     def customer_approval_date(self) -> datetime:
         """Return last accept/refusal date for the parent order."""
@@ -448,6 +458,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         data['slug'] = self.slug
         data['tech_requirements'] = self.project.tech_requirements
         data['requirements'] = self.order.requirements
+        data['availability'] = self.availability
         data['category'] = self.category
 
         # Workflow history

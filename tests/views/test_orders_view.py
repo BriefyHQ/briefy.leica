@@ -27,5 +27,7 @@ class TestOrderView(BaseVersionedTestView):
     update_map = {
         'title': 'New Order Title changed!',
         'price': 10000,
-        'price_currency': 'USD'
+        'price_currency': 'USD',
+        'availability': ["2017-01-18T18:55:25.930638+00:00",
+                         "2017-01-19T18:55:25.930638+00:00"]
     }

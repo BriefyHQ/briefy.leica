@@ -50,7 +50,14 @@ class JobSync(ModelSync):
         category = kobj.category.pop() if kobj.category else 'undefined'
         category = 'Accommodation' if category == 'Accomodation' else category
         category = 'Portrait' if category == 'Portraits' else category
-
+        if kobj.availability_1 and kobj.availability_2:
+            availability = [
+                kobj.availability_1.isoformat(),
+                kobj.availability_2.isoformat()
+            ]
+            print(availability, kobj.approval_status, kobj.briefy_id)
+        else:
+            availability = None
         order_payload.update(
             dict(
                 title=kobj.job_name,
@@ -63,6 +70,7 @@ class JobSync(ModelSync):
                 customer_order_id=kobj.job_id,
                 slug=self.get_slug(job_id),
                 job_id=job_id,
+                availability=availability,
                 external_id=kobj.id,
                 requirements=kobj.client_specific_requirement,
                 number_required_assets=number_required_assets,

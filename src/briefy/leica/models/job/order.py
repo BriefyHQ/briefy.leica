@@ -22,7 +22,7 @@ __summary_attributes__ = [
 ]
 
 __listing_attributes__ = __summary_attributes__ + [
-    'customer_order_id', 'deliver_date', 'accept_date'
+    'customer_order_id', 'deliver_date', 'accept_date', 'availability'
 ]
 
 
@@ -174,7 +174,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
             'colanderalchemy': {
                 'title': 'Availability for scheduling this Order.',
                 'missing': colander.drop,
-                'typ': colander.String
+                'typ': colander.List
             }
         }
     )
@@ -210,12 +210,10 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
         """
         availability = self._availability
-        if isinstance(availability, dict):
-            availability = [availability, ]
         return availability
 
     @availability.setter
-    def availability(self, value: dict):
+    def availability(self, value: list):
         """Set availabilities for an Order."""
         self._availability = value
 
