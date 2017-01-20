@@ -87,7 +87,7 @@ class DashboardScoutingProjectService(RESTService):
 
     _columns_map = (
         {
-            'field': 'project', 'label': 'Project',
+            'field': 'title ', 'label': 'Project',
             'type': 'text', 'url': '', 'filter': ''
         },
         {
@@ -113,6 +113,12 @@ class DashboardScoutingProjectService(RESTService):
     )
 
 
+class DashboardScoutingPoolFactory(BaseFactory):
+    """Dashboard Scouting context factory."""
+
+    model = Pool
+
+
 COLLECTION_PATH = '/dashboards/scouting/pool'
 PATH = COLLECTION_PATH + '/{id}'
 
@@ -120,7 +126,7 @@ PATH = COLLECTION_PATH + '/{id}'
 @resource(collection_path=COLLECTION_PATH,
           path=PATH,
           cors_policy=CORS_POLICY,
-          factory=DashboardScoutingFactory)
+          factory=DashboardScoutingPoolFactory)
 class DashboardScoutingPoolService(RESTService):
     """Dashboard Scouting: Pool Service."""
 
@@ -130,7 +136,7 @@ class DashboardScoutingPoolService(RESTService):
 
     _columns_map = (
         {
-            'field': 'pool', 'label': 'Pool',
+            'field': 'title', 'label': 'Pool',
             'type': 'text', 'url': '', 'filter': ''
         },
         {
