@@ -55,7 +55,6 @@ class JobSync(ModelSync):
                 kobj.availability_1.isoformat(),
                 kobj.availability_2.isoformat()
             ]
-            print(availability, kobj.approval_status, kobj.briefy_id)
         else:
             availability = None
         order_payload.update(
