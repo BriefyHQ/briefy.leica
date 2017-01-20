@@ -48,7 +48,7 @@ class DashboardScoutingCountryService(RESTService):
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'job_pool', 'label': 'In Pool',
+            'field': 'pool', 'label': 'In Pool',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
