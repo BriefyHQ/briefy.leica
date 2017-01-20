@@ -16,6 +16,10 @@ class Link(mixins.LeicaMixin, Base):
 
     _workflow = workflows.LinkWorkflow
 
+    __colanderalchemy_config__ = {
+        'excludes': ['state_history', 'state']
+    }
+
     professional_id = sa.Column(
         UUIDType(), sa.ForeignKey('professionals.id'), unique=False,
         info={'colanderalchemy': {

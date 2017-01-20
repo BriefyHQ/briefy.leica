@@ -3,8 +3,11 @@ from briefy.common.db.mixins import PersonalInfoMixin
 from briefy.common.db.mixins.optin import OptIn
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
+from briefy.leica.models.descriptors import MultipleRelationshipWrapper
 from briefy.leica.models.descriptors import UnaryRelationshipWrapper
 from briefy.leica.models.professional.workflows import ProfessionalWorkflow
+from briefy.leica.models.professional.link import Link
+from briefy.leica.models.professional.location import WorkingLocation
 from briefy.leica.models.professional.location import MainWorkingLocation
 from briefy.ws.utils.user import add_user_info_to_state_history
 from sqlalchemy import orm
@@ -70,13 +73,12 @@ class Professional(ProfessionalMixin, Base):
 
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', 'profiles', 'links', 'locations', 'type',
-            'external_id'
+            'state_history', 'state', 'profiles', 'type', 'external_id'
         ]
     }
 
     __raw_acl__ = (
-        ('create', ('g:briefy_scout', 'g:briefy_finance', 'g:system')),
+        ('create', ('g:briefy_scout', 'g:briefy_finance', 'g:briefy_qa', 'g:system')),
         ('list', ('g:briefy', 'g:system')),
         ('view', ('g:briefy', 'g:system')),
         ('edit', ('g:briefy_scout', 'g:briefy_finance', 'g:briefy_pm', 'g:system')),
@@ -115,7 +117,15 @@ class Professional(ProfessionalMixin, Base):
         return self.main_mobile
 
     # Profile information
-    photo_path = sa.Column(sa.String(255), nullable=True)
+    photo_path = sa.Column(
+        sa.String(255),
+        nullable=True,
+        info={'colanderalchemy': {
+              'title': 'Photo Path',
+              'validator': colander.url,
+              'missing': colander.drop,
+              'typ': colander.String}}
+    )
 
     # assignments
     assignments = orm.relationship(
@@ -131,20 +141,42 @@ class Professional(ProfessionalMixin, Base):
     )
 
     # Links
-    links = orm.relationship(
+    _links = orm.relationship(
         'Link',
         backref='professional',
         cascade='all, delete-orphan',
+        info={
+            'colanderalchemy': {
+                'title': 'Links',
+                'missing': colander.drop
+            }
+        }
     )
 
+    links = MultipleRelationshipWrapper(
+        '_links', Link, 'professional_id'
+    )
+    """Descriptor to handle multiple links get, set and delete."""
+
     # Locations
-    locations = orm.relationship(
+    _locations = orm.relationship(
         'WorkingLocation',
         backref=orm.backref(
             'professional'
         ),
         cascade='all, delete-orphan',
+        info={
+            'colanderalchemy': {
+                'title': 'Locations',
+                'missing': colander.drop
+            }
+        }
     )
+
+    locations = MultipleRelationshipWrapper(
+        '_locations', WorkingLocation, 'professional_id'
+    )
+    """Descriptor to handle multiple location get, set and delete."""
 
     _main_location = orm.relationship(
         'MainWorkingLocation',
@@ -202,6 +234,7 @@ class Professional(ProfessionalMixin, Base):
         data = super().to_dict()
         data['slug'] = self.slug
         data['locations'] = self.locations
+        data['links'] = self.links
 
         # Workflow history
         add_user_info_to_state_history(self.state_history)
