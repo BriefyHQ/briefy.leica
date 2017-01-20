@@ -150,6 +150,7 @@ class JobSync(ModelSync):
             pool=job_pool,
             slug=self.get_slug(job_id, assignment=1),
             professional_id=professional_id,
+            scheduled_datetime=kobj.scheduled_shoot_date_time,
             payout_value=self.parse_decimal(kobj.photographer_payout),
             payout_currency=kobj.currency_payout or 'EUR',
             additional_compensation=self.parse_decimal(kobj.additional_compensation),
