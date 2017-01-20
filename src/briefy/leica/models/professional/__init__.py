@@ -122,7 +122,6 @@ class Professional(ProfessionalMixin, Base):
         nullable=True,
         info={'colanderalchemy': {
               'title': 'Photo Path',
-              'validator': colander.url,
               'missing': colander.drop,
               'typ': colander.String}}
     )
