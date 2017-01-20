@@ -17,6 +17,7 @@ class DashboardQaTypeFactory(BaseFactory):
         (Allow, 'g:briefy_qa', ['list', 'view']),
     ]
 
+
 COLLECTION_PATH = '/dashboards/qa/type'
 PATH = COLLECTION_PATH + '/{id}'
 

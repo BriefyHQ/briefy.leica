@@ -21,7 +21,7 @@ total_assignments_professional = select([
         case([(Assignment.state == 'awaiting_assets', 1)], else_=0)
     ).label('awaiting_submission_resubmission'),
     func.sum(
-        case([(Assignment.state.in_(('in_qa', 'asset_validation')   ), 1)], else_=0)
+        case([(Assignment.state.in_(('in_qa', 'asset_validation')), 1)], else_=0)
     ).label('in_qa'),
     func.sum(
         case([(Assignment.state.in_(

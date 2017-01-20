@@ -46,7 +46,8 @@ class DashboardProfessionalAssignmentService(RESTService):
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'awaiting_submission_resubmission', 'label': 'Waiting Submission / Resubmission',
+            'field': 'awaiting_submission_resubmission',
+            'label': 'Waiting Submission / Resubmission',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
