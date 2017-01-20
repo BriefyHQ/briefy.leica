@@ -44,8 +44,9 @@ class OrderService(RESTService):
     friendly_name = model.__name__
     default_order_by = 'created_at'
     filter_related_fields = [
-        'project.title', 'project.id', 'project.status', 'location.locality', 'location.country',
-        'location.fullname', 'location.formatted_address', 'customer.title',
+        'project.title', 'project.id', 'project.status', '_location.locality',
+        '_location.country', '_location.fullname', '_location.formatted_address',
+        'customer.title',
     ]
 
     _default_notify_events = {
