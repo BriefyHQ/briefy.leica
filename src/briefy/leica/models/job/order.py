@@ -48,7 +48,8 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         'excludes': [
             'state_history', 'state', 'project', 'comments', 'customer',
             '_project_manager', '_scout_manager', '_customer_user', 'external_id'
-        ]
+        ],
+        'overrides': mixins.OrderBriefyRoles.__colanderalchemy_config__['overrides']
     }
 
     customer_order_id = sa.Column(
