@@ -218,7 +218,11 @@ class AssignmentWorkflow(BriefyWorkflow):
         """QA retract rejection or manually move to QA."""
         pass
 
-    @in_qa.transition(approved, 'can_approve')
+    @in_qa.transition(
+        approved,
+        'can_approve',
+        required_fields=('qa_manager', )
+    )
     def approve(self):
         """QA approves the Assignment Set."""
         # assignment = self.document
@@ -230,7 +234,11 @@ class AssignmentWorkflow(BriefyWorkflow):
         # transitions.approve_assets_in_assignment(assignment, self.context)
         pass
 
-    @in_qa.transition(awaiting_assets, 'can_approve', require_message=True)
+    @in_qa.transition(
+        awaiting_assets, 'can_approve',
+        require_message=True,
+        required_fields=('qa_manager', )
+    )
     def reject(self):
         """QA rejects Assignment Set."""
         pass
