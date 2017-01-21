@@ -1,6 +1,8 @@
 """Test Assignments database model."""
 from briefy.leica import models
 from conftest import BaseModelTest
+from datetime import datetime
+from datetime import timedelta
 
 import pytest
 
@@ -21,6 +23,8 @@ class TestAssignmentModel(BaseModelTest):
     def test_workflow(self, instance_obj, roles):
         """Test workflow for this model."""
         from briefy.common.workflow.exceptions import WorkflowTransitionException
+
+        now = datetime.utcnow()
 
         assignment = instance_obj
         wf = assignment.workflow
@@ -58,7 +62,9 @@ class TestAssignmentModel(BaseModelTest):
         # Scout can assign it to a professional
         wf.context = roles['scout']
         assert 'assign' in wf.transitions
-        wf.assign()
+        wf.assign(
+            fields={'professional_id': '23d94a43-3947-42fc-958c-09245ecca5f2'}
+        )
         assert assignment.state == 'assigned'
 
         # Customer can still cancel the assignment
@@ -72,7 +78,9 @@ class TestAssignmentModel(BaseModelTest):
         # assignment will still be assigned
         assert assignment.state == 'assigned'
 
-        wf.schedule()
+        wf.schedule(
+            fields={'scheduled_datetime': now + timedelta(10)}
+        )
         assert assignment.state == 'scheduled'
 
         # Customer can still cancel the assignment
@@ -93,7 +101,12 @@ class TestAssignmentModel(BaseModelTest):
         wf.context = roles['professional']
         assert 'reschedule' in wf.transitions
         assert 'upload' in wf.transitions
-        wf.upload()
+        wf.upload(
+            fields={
+                'submission_path':
+                'https://drive.google.com/drive/folders/0BwrdIL719n7waUlleFJfZ1RGak0'
+            }
+        )
 
         # Customer can not cancel this assignment anymore after upload
         wf.context = roles['customer']
@@ -115,14 +128,28 @@ class TestAssignmentModel(BaseModelTest):
 
         with pytest.raises(WorkflowTransitionException) as excinfo:
             wf.reject()
+        assert 'Field qa_manager is required for this transition' in str(excinfo)
+
+        with pytest.raises(WorkflowTransitionException) as excinfo:
+            wf.reject(
+                fields={'qa_manager': '44f57cff-3db4-4b10-b9dc-8cd8761a6c7e'}
+            )
         assert 'Message is required' in str(excinfo)
-        wf.reject(message='Missing 5 or 6 pictures')
+        wf.reject(
+            message='Missing 5 or 6 pictures',
+            fields={'qa_manager': '44f57cff-3db4-4b10-b9dc-8cd8761a6c7e'}
+        )
 
         assert assignment.state == 'awaiting_assets'
 
         # Professional upload new assets and QA approves it
         wf.context = roles['professional']
-        wf.upload()
+        wf.upload(
+            fields={
+                'submission_path':
+                    'https://drive.google.com/drive/folders/0BwrdIL719n7waUlleFJfZ1RGak0'
+            }
+        )
 
         assignment.order.number_required_assets = 0
         wf.context = roles['qa']
@@ -130,7 +157,9 @@ class TestAssignmentModel(BaseModelTest):
         # TODO: remove this after automatic Assignment validation
         wf.validate_assets()
 
-        wf.approve()
+        wf.approve(
+            fields={'qa_manager': '44f57cff-3db4-4b10-b9dc-8cd8761a6c7e'}
+        )
         assert assignment.state == 'approved'
         assert 'retract_approval' in wf.transitions
 
@@ -156,7 +185,9 @@ class TestAssignmentModel(BaseModelTest):
         # now QA has to approve again
         wf.context = roles['qa']
         assert 'approve' in wf.transitions
-        wf.approve()
+        wf.approve(
+            fields={'qa_manager': '44f57cff-3db4-4b10-b9dc-8cd8761a6c7e'}
+        )
 
         # now PM can complete or refuse again
         wf.context = roles['pm']

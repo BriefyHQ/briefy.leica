@@ -107,7 +107,11 @@ class AssignmentWorkflow(BriefyWorkflow):
         """Validate if user can submit an Assignment."""
         return True
 
-    @pending.transition(assigned, 'can_assign')
+    @pending.transition(
+        assigned,
+        'can_assign',
+        required_fields=('professional_id',)
+    )
     def assign(self):
         """Define a Professional to the Assignment."""
         pass
@@ -137,7 +141,11 @@ class AssignmentWorkflow(BriefyWorkflow):
         """Validate if user can retract the Assignment from Pool."""
         return True
 
-    @published.transition(assigned, 'can_self_assign')
+    @published.transition(
+        assigned,
+        'can_self_assign',
+        required_fields=('scheduled_datetime', 'professional_id')
+    )
     def self_assign(self):
         """Professional choose the Assignment from the Pool."""
         pass
@@ -148,7 +156,11 @@ class AssignmentWorkflow(BriefyWorkflow):
         # TODO: Check for existing Assignment already schedule to the same date.
         return True
 
-    @assigned.transition(scheduled, 'can_schedule')
+    @assigned.transition(
+        scheduled,
+        'can_schedule',
+        required_fields=('scheduled_datetime', )
+    )
     def schedule(self):
         """Professional, Scout or PM schedule the Assignment."""
         pass
@@ -258,7 +270,11 @@ class AssignmentWorkflow(BriefyWorkflow):
         """Validate if user can approve or reject an Assignment Set."""
         return True
 
-    @awaiting_assets.transition(asset_validation, 'can_upload')
+    @awaiting_assets.transition(
+        asset_validation,
+        'can_upload',
+        required_fields=('submission_path', )
+    )
     def upload(self):
         """Professional submits all assets for QA."""
         pass
