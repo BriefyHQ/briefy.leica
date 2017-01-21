@@ -23,12 +23,12 @@ import sqlalchemy_utils as sautils
 __summary_attributes__ = [
     'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
     'number_required_assets', 'approvable', 'total_assets', 'total_approvable_assets',
-    'category'
+    'category', 'scheduled_datetime'
 ]
 
 __listing_attributes__ = __summary_attributes__ + [
     'assignment_date', 'last_approval_date', 'submission_date', 'last_submission_date',
-    'set_type', 'number_required_assets', 'category', 'scheduled_datetime', 'payout_value',
+    'set_type', 'number_required_assets', 'category', 'payout_value',
     'availability'
 ]
 

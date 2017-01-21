@@ -329,6 +329,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data['price'] = self.price
         data['slug'] = self.slug
         data['location'] = self.location
+        data['assignment'] = self.assignment.to_summary_dict()
         data['tech_requirements'] = self.tech_requirements
 
         # Workflow history
