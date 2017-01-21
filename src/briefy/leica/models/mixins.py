@@ -38,13 +38,13 @@ def get_public_user_info(user_id: str) -> dict:
     }
     from briefy.leica.models import UserProfile
     try:
-        user_id = uuid.UUID(user_id)
-    except ValueError as exc:
+        _ = uuid.UUID(user_id)  # noqa
+    except (ValueError, AttributeError) as exc:
         return data
     else:
         raw_data = UserProfile.get(user_id)
         if raw_data:
-            data['id'] = raw_data.id
+            data['id'] = str(raw_data.id)
             data['first_name'] = raw_data.first_name
             data['last_name'] = raw_data.last_name
             data['fullname'] = raw_data.title
