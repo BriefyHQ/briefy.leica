@@ -47,7 +47,8 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     __colanderalchemy_config__ = {
         'excludes': [
             'state_history', 'state', 'project', 'comments', 'customer',
-            '_project_manager', '_scout_manager', '_customer_user', 'external_id'
+            '_project_manager', '_scout_manager', '_customer_user', 'external_id',
+            'assignment'
         ],
         'overrides': mixins.OrderBriefyRoles.__colanderalchemy_config__['overrides']
     }
@@ -166,6 +167,21 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     """Assignments.
 
     Relationship with :class:`briefy.leica.models.job.Assignment`.
+    """
+
+    assignment = orm.relationship(
+        'Assignment',
+        uselist=False,
+        viewonly=True,
+        order_by='asc(Assignment.created_at)',
+        primaryjoin='''and_(
+            Order.id == Assignment.order_id,
+            not_(Assignment.state.in_(('cancelled', 'perm_reject')))
+        )''',
+    )
+    """Current Assignment connect to this order.
+
+    Collection of :class:`briefy.leica.models.job.Assignment`.
     """
 
     _availability = sa.Column(

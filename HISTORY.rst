@@ -91,6 +91,7 @@ History
      * Implement user profile basic information import from knack (rudaporto).
      * Update JobSync to import all comments using the new Comment format (rudaporto).
      * Create new functions to add user info to state_history and to get user info now from UserProfile model (rudaporto).
+     * Added Order.assignment relationshit to return the last active Assignment of one Order (rudaporto).
 
 1.1.0 (2016-10-04)
 ------------------
