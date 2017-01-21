@@ -82,10 +82,13 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
     ]
     __listing_attributes__ = __summary_attributes__
 
-    __colanderalchemy_config__ = {'excludes': [
-        'state_history', 'state', '_account_manager', '_customer_user',
-        'business_contact', 'billing_contact', 'external_id'
-    ]}
+    __colanderalchemy_config__ = {
+        'excludes': [
+            'state_history', 'state', '_account_manager', '_customer_user',
+            'business_contact', 'billing_contact', 'external_id'
+        ],
+        'overrides': mixins.CustomerBriefyRoles.__colanderalchemy_config__['overrides']
+    }
 
     __raw_acl__ = (
         ('list', ('g:briefy', 'g:system')),

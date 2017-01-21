@@ -127,7 +127,8 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
             'professional', 'assets', 'project', 'location',
             '_scout_manager', '_project_manager', '_qa_manager',
             '_professional_user', 'pool'
-        ]
+        ],
+        'overrides': mixins.AssignmentBriefyRoles.__colanderalchemy_config__['overrides']
     }
 
     _slug = sa.Column('slug',

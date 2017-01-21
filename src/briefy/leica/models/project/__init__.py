@@ -61,9 +61,12 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         ('delete', ('g:briefy_finance', 'g:system')),
     )
 
-    __colanderalchemy_config__ = {'excludes': [
-        'state_history', 'state', 'customer', '_customer_user', '_project_manager', 'external_id'
-    ]}
+    __colanderalchemy_config__ = {
+        'excludes': [
+            'state_history', 'state', 'customer', '_customer_user', '_project_manager', 'external_id'
+        ],
+        'overrides': mixins.ProjectBriefyRoles.__colanderalchemy_config__['overrides']
+    }
 
     customer_id = sa.Column(sautils.UUIDType,
                             sa.ForeignKey('customers.id'),

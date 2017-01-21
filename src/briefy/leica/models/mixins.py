@@ -19,6 +19,14 @@ import sqlalchemy as sa
 import sqlalchemy_utils as sautils
 
 
+_ID_COLANDER = {
+    'title': 'ID',
+    'validator': colander.uuid,
+    'missing': colander.drop,
+    'typ': colander.String()
+}
+
+
 class LeicaBriefyRoles(BaseBriefyRoles):
     """Base class for leica local roles."""
 
@@ -66,7 +74,8 @@ class LeicaBriefyRoles(BaseBriefyRoles):
             entity_id=cls.id,
             user_id=user_id,
             entity_type=cls.__name__,
-            role_name=getattr(LocalRolesChoices, role_name)
+            role_name=getattr(LocalRolesChoices, role_name),
+            can_view=True,
         )
 
     def _apply_actors_info(self, data: dict) -> dict:
@@ -94,6 +103,13 @@ class CustomerBriefyRoles(LeicaBriefyRoles):
         'customer_user',
         'account_manager',
     )
+
+    __colanderalchemy_config__ = {
+        'overrides': {
+            'customer_user': _ID_COLANDER,
+            'account_manager': _ID_COLANDER,
+        }
+    }
 
     @declared_attr
     def _customer_user(cls):
@@ -136,6 +152,13 @@ class ProjectBriefyRoles(LeicaBriefyRoles):
         'project_manager',
     )
 
+    __colanderalchemy_config__ = {
+        'overrides': {
+            'customer_user': _ID_COLANDER,
+            'project_manager': _ID_COLANDER,
+        }
+    }
+
     @declared_attr
     def _customer_user(cls):
         """Relationship: return a list of LocalRoles.
@@ -177,6 +200,14 @@ class OrderBriefyRoles(LeicaBriefyRoles):
         'project_manager',
         'scout_manager',
     )
+
+    __colanderalchemy_config__ = {
+        'overrides': {
+            'customer_user': _ID_COLANDER,
+            'project_manager': _ID_COLANDER,
+            'scout_manager': _ID_COLANDER,
+        }
+    }
 
     @declared_attr
     def _customer_user(cls):
@@ -236,6 +267,15 @@ class AssignmentBriefyRoles(LeicaBriefyRoles):
         'scout_manager',
         'qa_manager',
     )
+
+    __colanderalchemy_config__ = {
+        'overrides': {
+            'professional_user': _ID_COLANDER,
+            'project_manager': _ID_COLANDER,
+            'scout_manager': _ID_COLANDER,
+            'qa_manager': _ID_COLANDER,
+        }
+    }
 
     @declared_attr
     def _professional_user(cls):
