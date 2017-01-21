@@ -80,7 +80,7 @@ def update_user_briefy_id(profile='User'):
                 future = executor.submit(knack.commit_knack_object, user)
                 future.add_done_callback(print_update_user)
             else:
-                msg = 'User with email: {email} did not have briefy_id. Run Rolleifley import.'
+                msg = 'User with email: {email} did not have briefy_id. Run Rolleiflex import.'
                 print(msg.format(email=user.email))
 
 
@@ -93,6 +93,7 @@ def update_users():
         'ProjectManager',
         'Qa',
         'ScoutingManager',
+        'FinanceManager',
         'Supervisor',
         'AccountManager'
     )

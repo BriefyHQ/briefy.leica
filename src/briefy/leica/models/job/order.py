@@ -7,7 +7,7 @@ from briefy.leica.models.job import workflows
 from briefy.leica.utils.transitions import get_transition_date
 from briefy.leica.models.job.location import OrderLocation
 from briefy.leica.vocabularies import OrderInputSource
-from briefy.ws.utils.user import add_user_info_to_state_history
+from briefy.leica.utils.user import add_user_info_to_state_history
 from datetime import datetime
 from sqlalchemy import orm
 from sqlalchemy.ext.hybrid import hybrid_property

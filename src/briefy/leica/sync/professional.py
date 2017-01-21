@@ -45,25 +45,25 @@ class PhotographerSync(ModelSync):
 
         first_name = kobj.display_name.first or PLACEHOLDERS['first_name']
         last_name = kobj.display_name.last or PLACEHOLDERS['last_name']
-        main_mobile = kobj.phone.get('number') if kobj.phone else None
+        mobile = kobj.phone.get('number') if kobj.phone else None
         country = kobj.country if kobj.country else ''
         location = create_location_dict('working_location_1', kobj, country)
         if location and not country:
             country = location.get('country')
 
-        if main_mobile:
-            main_mobile = cleanse_phone_number(main_mobile, country)
+        if mobile:
+            mobile = cleanse_phone_number(mobile, country)
 
         state = 'inactive' if kobj.blacklist else 'active'
         result.update(
             dict(
                 state=state,
-                main_email=kobj.email.email or PLACEHOLDERS['email'],
+                email=kobj.email.email or PLACEHOLDERS['email'],
                 first_name=first_name.strip(),
                 last_name=last_name.strip(),
                 # TODO: this will be removed when update DB (title is now a computed value)
                 title='{0} {1}'.format(first_name, last_name),
-                main_mobile=main_mobile
+                mobile=mobile
             )
         )
         return result

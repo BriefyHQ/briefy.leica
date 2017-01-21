@@ -3,7 +3,7 @@ from briefy.common.db.mixins import BriefyRoles
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.project import workflows
-from briefy.ws.utils.user import add_user_info_to_state_history
+from briefy.leica.utils.user import add_user_info_to_state_history
 from sqlalchemy import orm
 from zope.interface import Interface
 from zope.interface import implementer

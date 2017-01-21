@@ -13,7 +13,9 @@ def get_transition_date(transitions: tuple, obj, first: bool=False) -> datetime:
     :param first: Return the first occurence of this transition.
     """
     order = 0 if first else -1
-    history = obj.state_history if hasattr(obj, 'state_history') else []
+    history_attr = getattr(obj, 'state_history', None)
+    valid_history_attr = history_attr and isinstance(history_attr, list)
+    history = obj.state_history if valid_history_attr else []
     valid = [t for t in history if t['transition'] in transitions]
     return valid[order]['date'] if valid else None
 

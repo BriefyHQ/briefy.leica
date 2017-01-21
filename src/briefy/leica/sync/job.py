@@ -120,21 +120,66 @@ class JobSync(ModelSync):
 
     def add_comment(self, obj, kobj):
         """Add Project Manager comment to the Order."""
-        project_manager = obj.project.project_manager if obj.project.project_manager else None
-        payload = dict(
-            id=uuid.uuid4(),
-            entity_id=obj.id,
-            entity_type=obj.__tablename__,
-            author_id=project_manager,
-            content=kobj.project_manager_comment
-        )
-        session = self.session
-        session.add(Comment(**payload))
+        if kobj.project_manager_comment:
+            project_manager = obj.project.project_manager if obj.project.project_manager else None
+            payload = dict(
+                id=uuid.uuid4(),
+                entity_id=obj.id,
+                entity_type=obj.__tablename__,
+                author_id=project_manager,
+                content=kobj.project_manager_comment,
+                author_role='project_manager',
+                to_role='customer_user',
+                internal=False,
+            )
+            session = self.session
+            session.add(Comment(**payload))
+
+        if kobj.client_feedback:
+            customer_user = obj.project.customer_user or obj.project.project_manager
+            payload = dict(
+                id=uuid.uuid4(),
+                entity_id=obj.id,
+                entity_type=obj.__tablename__,
+                author_id=customer_user,
+                content=kobj.client_feedback,
+                author_role='customer_user',
+                to_role='project_manager',
+                internal=False,
+            )
+            session = self.session
+            session.add(Comment(**payload))
 
     def add_assignment_comments(self, obj, kobj):
-        """Import assigment comments."""
-        # TODO: internal comment, photographer comment, quality assurance feedback
-        pass
+        """Import Assignment comments."""
+        if kobj.photographers_comment and obj.professional_id:
+            payload = dict(
+                id=uuid.uuid4(),
+                entity_id=obj.id,
+                entity_type=obj.__tablename__,
+                author_id=obj.professional_id,
+                content=kobj.photographers_comment,
+                author_role='professional_user',
+                to_role='qa_manager',
+                internal=False,
+            )
+            session = self.session
+            session.add(Comment(**payload))
+
+        if kobj.quality_assurance_feedback:
+            qa_manager = obj.qa_manager or obj.project.project_manager
+            payload = dict(
+                id=uuid.uuid4(),
+                entity_id=obj.id,
+                entity_type=obj.__tablename__,
+                author_id=qa_manager,
+                content=kobj.quality_assurance_feedback,
+                author_role='qa_manager',
+                to_role='professional_user',
+                internal=False,
+            )
+            session = self.session
+            session.add(Comment(**payload))
 
     def add_assignment(self, obj, kobj):
         """Add a related assign object."""
@@ -210,6 +255,9 @@ class JobSync(ModelSync):
 
         # update assignment state history
         add_assignment_history(self.session, assignment, kobj)
+
+        # add assignment comments
+        self.add_assignment_comments(assignment, kobj)
 
         # populate the set_type field
         further_edit = kobj.further_editing_requested_by_client

@@ -2,7 +2,7 @@
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.comment import workflows
-from briefy.ws.utils.user import add_user_info_to_state_history
+from briefy.leica.utils.user import add_user_info_to_state_history
 from zope.interface import implementer
 from zope.interface import Interface
 
@@ -52,6 +52,22 @@ class Comment(mixins.LeicaMixin, Base):
                           )
     """Author ID."""
 
+    author_role = sa.Column(sa.String,
+                            nullable=False,
+                            info={'colanderalchemy': {
+                                  'title': 'Author Role',
+                                  'typ': colander.String}}
+                            )
+    """Primary role of the author."""
+
+    to_role = sa.Column(sa.String,
+                        nullable=False,
+                        info={'colanderalchemy': {
+                              'title': 'Destination Role',
+                              'typ': colander.String}}
+                        )
+    """Destination role that should see the comment."""
+
     in_reply_to = sa.Column(sautils.UUIDType,
                             sa.ForeignKey('comments.id'),
                             nullable=True,
@@ -63,7 +79,14 @@ class Comment(mixins.LeicaMixin, Base):
                             )
     """In Reply To.
 
-    Comment which this one replies. Used for stablishing comment threads.
+    Comment which this one replies. Used for establishing comment threads.
+    """
+
+    internal = sa.Column(sa.Boolean, default=True)
+    """Internal comment flag.
+
+    Mark if the comment should only be visible internal.
+
     """
 
     entity_type = sa.Column(sa.String(255))

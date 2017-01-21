@@ -6,7 +6,7 @@ from briefy.leica.models.job import workflows
 from briefy.leica.models.job.order import Order
 from briefy.leica.utils.transitions import get_transition_date
 from briefy.leica.vocabularies import TypesOfSetChoices
-from briefy.ws.utils.user import add_user_info_to_state_history
+from briefy.leica.utils.user import add_user_info_to_state_history
 from datetime import datetime
 from sqlalchemy import orm
 from sqlalchemy import select
@@ -426,7 +426,8 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     @hybrid_property
     def customer_approval_date(self) -> datetime:
         """Return last accept/refusal date for the parent order."""
-        return self.order.customer_approval_date
+        transitions = ('accept', 'refuse')
+        return get_transition_date(transitions, self.order, first=True)
 
     @property
     def briefing(self) -> str:

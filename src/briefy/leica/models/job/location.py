@@ -1,6 +1,6 @@
 """Briefy Leica OrderLocation model."""
 from briefy.common.db.mixins import Address as AddressMixin
-from briefy.common.db.mixins import NameMixin
+from briefy.common.db.mixins import ContactInfoMixin
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.job import workflows
@@ -10,53 +10,7 @@ import sqlalchemy as sa
 import sqlalchemy_utils as sautils
 
 
-class LocationContactInfoMixin(NameMixin):
-    """A mixin to manage contact information for the order location."""
-
-    email = sa.Column(
-        sautils.types.EmailType(),
-        nullable=True,
-        unique=False,
-        info={
-            'colanderalchemy': {
-                'title': 'Email',
-                'missing': colander.drop,
-            }
-        }
-    )
-    """Email of the contact person."""
-
-    mobile = sa.Column(
-        sautils.types.PhoneNumberType(),
-        nullable=True,
-        unique=False,
-        info={
-            'colanderalchemy': {
-                'title': 'Mobile Phone',
-                'typ': colander.String,
-                'missing': colander.drop,
-            }
-        }
-
-    )
-    """Mobile phone number of the contact person."""
-
-    additional_phone = sa.Column(
-        sautils.types.PhoneNumberType(),
-        nullable=True,
-        unique=False,
-        info={
-            'colanderalchemy': {
-                'title': 'Additional Phone',
-                'typ': colander.String,
-                'missing': colander.drop,
-            }
-        }
-    )
-    """Additional phone number of the contact person."""
-
-
-class OrderLocation(LocationContactInfoMixin, AddressMixin,
+class OrderLocation(ContactInfoMixin, AddressMixin,
                     mixins.LeicaMixin, mixins.VersionMixin, Base):
     """Order location model."""
 

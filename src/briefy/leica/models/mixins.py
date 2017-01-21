@@ -1,13 +1,16 @@
 """Briefy Leica mixins."""
-from briefy.common.db.mixins import BaseMetadata
-from briefy.common.db.mixins import KnackMixin
 from briefy.common.db.mixins import BaseBriefyRoles
+from briefy.common.db.mixins import BaseMetadata
+from briefy.common.db.mixins import ContactInfoMixin
+from briefy.common.db.mixins import KnackMixin
 from briefy.common.db.mixins import LocalRolesMixin
 from briefy.common.db.mixins import Mixin
+from briefy.common.db.mixins import OptIn
+from briefy.common.db.mixins import PersonalInfoMixin
 from briefy.common.db.models.roles import LocalRole
 from briefy.common.vocabularies.roles import LocalRolesChoices
+from briefy.common.utils.cache import timeout_cache
 from briefy.leica.db import Session
-from briefy.ws.utils.user import get_public_user_info
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -17,6 +20,35 @@ from sqlalchemy_continuum.utils import count_versions
 import colander
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils
+import uuid
+
+
+@timeout_cache(600, renew=False)
+def get_public_user_info(user_id: str) -> dict:
+    """Retrieve user information from briefy.rolleiflex.
+
+    :param user_id: Id for the user we want to query.
+    :return: Dictionary with public user information.
+    """
+    data = {
+        'id': user_id,
+        'first_name': '',
+        'last_name': '',
+        'fullname': '',
+    }
+    from briefy.leica.models import UserProfile
+    try:
+        user_id = uuid.UUID(user_id)
+    except ValueError as exc:
+        return data
+    else:
+        raw_data = UserProfile.get(user_id)
+        if raw_data:
+            data['id'] = raw_data.id
+            data['first_name'] = raw_data.first_name
+            data['last_name'] = raw_data.last_name
+            data['fullname'] = raw_data.title
+        return data
 
 
 class LeicaBriefyRoles(BaseBriefyRoles):
@@ -518,5 +550,11 @@ class KLeicaVersionedMixin(KnackMixin, LeicaVersionedMixin):
 
 class PolaroidMixin:
     """Mixin to handle Polaroid integration."""
+
+    pass
+
+
+class UserProfileMixin(ContactInfoMixin, PersonalInfoMixin, OptIn, KLeicaVersionedMixin):
+    """A user profile on our system."""
 
     pass
