@@ -204,6 +204,7 @@ class JobSync(ModelSync):
                 kobj.briefy_id,
                 release.split('/')[-1]
             )
+        payout_value=self.parse_decimal(kobj.photographer_payout)
         payload = dict(
             id=uuid.uuid4(),
             order_id=obj.id,
@@ -213,7 +214,7 @@ class JobSync(ModelSync):
             professional_id=professional_id,
             scheduled_datetime=kobj.scheduled_shoot_date_time,
             release_contract=release,
-            payout_value=self.parse_decimal(kobj.photographer_payout),
+            payout_value=payout_value,
             payout_currency=kobj.currency_payout or 'EUR',
             additional_compensation=self.parse_decimal(kobj.additional_compensation),
             payable=payable,
@@ -265,7 +266,8 @@ class JobSync(ModelSync):
 
         # update assignment state history
         add_assignment_history(self.session, assignment, kobj)
-
+        if assignment.state == 'cancelled':
+            assignment.payout_value = 0
         # add assignment comments
         self.add_assignment_comments(assignment, kobj)
 
