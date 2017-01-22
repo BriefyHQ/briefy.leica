@@ -26,6 +26,7 @@ STATUS_MAPPING = {
     'Briefy': 'active',
     'Classic Driver': 'inactive',
     'Deliveroo Germany GmbH': 'active',
+    'Deliveroo Germany': 'active',
     'DoorDash': 'inactive',
     'eH Visio': 'active',
     'Erento': 'inactive',
