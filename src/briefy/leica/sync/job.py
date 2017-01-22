@@ -272,10 +272,12 @@ class JobSync(ModelSync):
         self.add_assignment_comments(assignment, kobj)
 
         # populate the set_type field
+        new_set = kobj.new_set
         further_edit = kobj.further_editing_requested_by_client
+
         if further_edit:
             assignment.set_type = 'refused_customer'
-        elif not assignment.set_type:
+        elif not new_set:
             assignment.set_type = 'returned_photographer'
         else:
             assignment.set_type = 'new'
