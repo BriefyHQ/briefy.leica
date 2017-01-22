@@ -113,6 +113,7 @@ import_clean_db: clean_dockers create_dockers
 	echo "Waiting Posgtres to start"
 	sleep 40
 	alembic upgrade head
+	python src/briefy/leica/tools/user_import.py
 	python src/briefy/leica/tools/customer_import.py
 	python src/briefy/leica/tools/project_import.py
 	python src/briefy/leica/tools/pool_import.py

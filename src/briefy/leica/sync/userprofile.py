@@ -18,12 +18,16 @@ class UserProfileSync(ModelSync):
         first_name = kobj.name.first or PLACEHOLDERS['first_name']
         last_name = kobj.name.last or PLACEHOLDERS['last_name']
         state = 'active' if kobj.user_status == {'active'} else 'inactive'
+        company_name = ''
+        if hasattr(kobj, 'company') and kobj.company:
+            company_name = kobj.company[0]['identifier'].strip()
         result.update(
             dict(
                 state=state,
                 email=kobj.email.email or PLACEHOLDERS['email'],
                 first_name=first_name.strip(),
                 last_name=last_name.strip(),
+                company_name=company_name,
             )
         )
         return result
@@ -54,10 +58,6 @@ class CustomerUserProfileSync(UserProfileSync):
     def get_payload(self, kobj, briefy_id=None):
         """Create payload for a UserProfile object."""
         payload = super().get_payload(kobj, briefy_id)
-        # TODO: update other fields
-        # payload.update(
-        #    dict(company='Briefy')
-        # )
         return payload
 
 
