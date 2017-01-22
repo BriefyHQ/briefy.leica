@@ -34,7 +34,16 @@ total_order_customer = select([
 ]).group_by(Project.title).where(
     and_(
         Order.state.in_(
-            ('received', 'assigned', 'scheduled', 'cancelled', 'delivered', 'accepted', 'in_qa')
+            (
+                'received',
+                'assigned',
+                'scheduled',
+                'cancelled',
+                'delivered',
+                'accepted',
+                'in_qa',
+                'refused'
+            )
         ),
         Project.id == Order.project_id,
         Project.local_roles.any(role_name='customer_user', user_id=':user_id')

@@ -30,7 +30,7 @@ class DashboardCustomerOrderService(RESTService):
 
     model = DashboardCustomerOrder
     friendly_name = model.__name__
-    default_order_by = 'total'
+    default_order_by = 'title'
 
     _columns_map = (
         {
