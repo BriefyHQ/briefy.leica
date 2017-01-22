@@ -1,6 +1,7 @@
 """Import and sync Knack Job to Leica Job."""
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica import logger
+from briefy.leica.config import FILES_BASE
 from briefy.leica.models import Comment
 from briefy.leica.models import Assignment
 from briefy.leica.models import OrderLocation
@@ -195,6 +196,14 @@ class JobSync(ModelSync):
         job_pool = Pool.query().filter_by(external_id=kpool_id).one_or_none()
         if kpool_id and not job_pool:
             print('Knack Poll ID: {0} do not found in leica.'.format(kpool_id))
+
+        release = kobj.signed_releases_contract
+        if release:
+            release = '{0}/files/order/{1}/release/{2}'.format(
+                FILES_BASE,
+                kobj.briefy_id,
+                release.split('/')[-1]
+            )
         payload = dict(
             id=uuid.uuid4(),
             order_id=obj.id,
@@ -203,6 +212,7 @@ class JobSync(ModelSync):
             slug=self.get_slug(job_id, assignment=1),
             professional_id=professional_id,
             scheduled_datetime=kobj.scheduled_shoot_date_time,
+            release_contract=release,
             payout_value=self.parse_decimal(kobj.photographer_payout),
             payout_currency=kobj.currency_payout or 'EUR',
             additional_compensation=self.parse_decimal(kobj.additional_compensation),

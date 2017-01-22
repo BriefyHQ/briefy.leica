@@ -158,7 +158,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         """
         return sa.func.count('1')
 
-    # Formerly know as brief
+    # Formerly known as brief
     briefing = sa.Column(
         sautils.URLType,
         nullable=True,

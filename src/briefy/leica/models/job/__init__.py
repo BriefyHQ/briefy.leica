@@ -335,6 +335,19 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     Instance of :class:`briefy.leica.models.job.location.OrderLocation`.
     """
 
+    release_contract = sa.Column(
+        sautils.URLType,
+        nullable=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Release Contract',
+                'validator': colander.url,
+                'missing': colander.drop,
+                'typ': colander.String
+            }
+        }
+    )
+
     @sautils.aggregated('assets', sa.Column(sa.Integer, default=0))
     def total_assets(self):
         """Total number of assets.

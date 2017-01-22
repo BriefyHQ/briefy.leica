@@ -34,3 +34,5 @@ API_PASSWORD = config('API_PASSWORD', default='testtest')
 API_BASE = config('API_BASE', default='https://api.stg.briefy.co')
 LOGIN_ENDPOINT = config('LOGIN_ENDPOINT', default=API_BASE + '/login/email')
 ROSETTA_ENDPOINT = config('ROSETTA_ENDPOINT', default=API_BASE + '/internal/rosetta')
+
+FILES_BASE = 'https://files.briefy.co' if _queue_suffix == 'live' else 'https://files.stg.briefy.co'
