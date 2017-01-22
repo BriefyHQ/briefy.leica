@@ -23,7 +23,7 @@ total_order_customer = select([
         case([(Order.state == 'scheduled', 1)], else_=0)
     ).label('scheduled'),
     func.sum(
-        case([(Order.state == 'in_qa', 1)], else_=0)
+        case([(Order.state.in_(('in_qa', 'refused')), 1)], else_=0)
     ).label('in_qa'),
     func.sum(
         case([(Order.state == 'cancelled', 1)], else_=0)
