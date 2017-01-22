@@ -52,7 +52,7 @@ class CommentService(RESTService):
     def default_filters(self, query) -> object:
         """Default filters for this Service."""
         entity_id = self.request.matchdict.get('entity_id', '')
-        query.filter(self.model.entity_id == entity_id)
+        query = query.filter(self.model.entity_id == entity_id)
         return query
 
 

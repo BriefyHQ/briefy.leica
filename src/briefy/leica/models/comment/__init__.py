@@ -23,6 +23,12 @@ class Comment(mixins.LeicaMixin, Base):
 
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'entity_type', 'type']}
 
+    __summary_attributes__ = [
+        'id', 'content', 'internal', 'created_at', 'updated_at', 'author', 'author_role', 'to_role'
+    ]
+
+    __listing_attributes__ = __summary_attributes__
+
     __raw_acl__ = (
         ('list', ('g:briefy', 'g:system')),
         ('create', ('g:briefy', 'g:system')),
@@ -106,10 +112,16 @@ class Comment(mixins.LeicaMixin, Base):
     Entity this comment is attached to.
     """
 
+    @property
+    def author(self):
+        """Author information."""
+        return mixins.get_public_user_info(str(self.author_id))
+
     entity = sautils.generic_relationship(entity_type, entity_id)
 
     def to_dict(self):
         """Return a dict representation of this object."""
         data = super().to_dict()
         add_user_info_to_state_history(self.state_history)
+        data['author'] = self.author
         return data
