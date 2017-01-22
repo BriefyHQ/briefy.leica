@@ -204,7 +204,7 @@ class JobSync(ModelSync):
                 kobj.briefy_id,
                 release.split('/')[-1]
             )
-        payout_value=self.parse_decimal(kobj.photographer_payout)
+        payout_value = self.parse_decimal(kobj.photographer_payout)
         payload = dict(
             id=uuid.uuid4(),
             order_id=obj.id,

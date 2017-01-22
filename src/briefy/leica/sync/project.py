@@ -42,7 +42,6 @@ STATUS_MAPPING = {
 }
 
 
-
 class ProjectSync(ModelSync):
     """Syncronize Projects."""
 
