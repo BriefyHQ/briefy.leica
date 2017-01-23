@@ -35,6 +35,7 @@ def get_public_user_info(user_id: str) -> dict:
         'first_name': '',
         'last_name': '',
         'fullname': '',
+        'email': '',
     }
     from briefy.leica.models import UserProfile
     try:
@@ -48,6 +49,7 @@ def get_public_user_info(user_id: str) -> dict:
             data['first_name'] = raw_data.first_name
             data['last_name'] = raw_data.last_name
             data['fullname'] = raw_data.title
+            data['email'] = raw_data.email
         return data
 
 
