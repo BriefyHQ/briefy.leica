@@ -66,6 +66,8 @@ class JobSync(ModelSync):
         elif delivery_link_str:
             delivery['gdrive'] = delivery_link_str
 
+        requirements = kobj.client_specific_requirement or None
+
         order_payload.update(
             dict(
                 title=kobj.job_name,
@@ -81,7 +83,7 @@ class JobSync(ModelSync):
                 job_id=job_id,
                 availability=availability,
                 external_id=kobj.id,
-                requirements=self.choice_to_str(kobj.client_specific_requirement),
+                requirements=requirements,
                 number_required_assets=number_required_assets,
                 source=isource_mapping.get(str(kobj.input_source), 'briefy'),
             )

@@ -22,7 +22,8 @@ __summary_attributes__ = [
 ]
 
 __listing_attributes__ = __summary_attributes__ + [
-    'customer_order_id', 'deliver_date', 'accept_date', 'availability', 'assignment'
+    'customer_order_id', 'deliver_date', 'accept_date', 'availability', 'assignment',
+    'requirements', 'delivery',
 ]
 
 
