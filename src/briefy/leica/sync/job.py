@@ -58,6 +58,14 @@ class JobSync(ModelSync):
             ]
         else:
             availability = None
+
+        delivery_link_str = kobj.client_delivery_link.url
+        delivery = dict()
+        if delivery_link_str and delivery_link_str[:4] == 'sftp':
+            delivery['sftp'] = delivery_link_str
+        elif delivery_link_str:
+            delivery['gdrive'] = delivery_link_str
+
         order_payload.update(
             dict(
                 title=kobj.job_name,
@@ -69,10 +77,11 @@ class JobSync(ModelSync):
                 price=self.parse_decimal(kobj.set_price),
                 customer_order_id=kobj.job_id,
                 slug=self.get_slug(job_id),
+                delivery=delivery,
                 job_id=job_id,
                 availability=availability,
                 external_id=kobj.id,
-                requirements=kobj.client_specific_requirement,
+                requirements=self.choice_to_str(kobj.client_specific_requirement),
                 number_required_assets=number_required_assets,
                 source=isource_mapping.get(str(kobj.input_source), 'briefy'),
             )
@@ -205,17 +214,21 @@ class JobSync(ModelSync):
                 release.split('/')[-1]
             )
         payout_value = self.parse_decimal(kobj.photographer_payout)
+        knack_payout_currency = self.choice_to_str(kobj.currency_payout)
+        payout_currency = str(knack_payout_currency) if knack_payout_currency else 'EUR'
+        reason_compensation = self.choice_to_str(kobj.reason_for_additional_compensation)
         payload = dict(
             id=uuid.uuid4(),
             order_id=obj.id,
             created_at=_build_date(kobj.input_date),
             pool=job_pool,
+            reason_additional_compensation=reason_compensation,
             slug=self.get_slug(job_id, assignment=1),
             professional_id=professional_id,
             scheduled_datetime=kobj.scheduled_shoot_date_time,
             release_contract=release,
             payout_value=payout_value,
-            payout_currency=kobj.currency_payout or 'EUR',
+            payout_currency=payout_currency,
             additional_compensation=self.parse_decimal(kobj.additional_compensation),
             payable=payable,
             submission_path=str(kobj.photo_submission_link),

@@ -446,6 +446,24 @@ class AssignmentFinancialInfo(ProfessionalPayoutInfo):
     This value is expressed in cents.
     """
 
+    reason_additional_compensation = sa.Column(
+        sa.Text(),
+        nullable=True,
+        default='',
+        info={
+            'colanderalchemy': {
+                'title': 'Type of Set',
+                'default': '',
+                'missing': colander.drop,
+                'typ': colander.String
+            }
+        }
+    )
+    """Reason for Additional Compensation.
+
+    Text explaining why we give an additional compensation to the Professional.
+    """
+
     payable = sa.Column(
         sa.Boolean,
         nullable=False,

@@ -22,7 +22,7 @@ __summary_attributes__ = [
 ]
 
 __listing_attributes__ = __summary_attributes__ + [
-    'customer_order_id', 'deliver_date', 'accept_date', 'availability'
+    'customer_order_id', 'deliver_date', 'accept_date', 'availability', 'assignment'
 ]
 
 
@@ -328,6 +328,8 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data['availability'] = self.availability
         data['price'] = self.price
         data['slug'] = self.slug
+        data['deliver_date'] = self.deliver_date
+        data['delivery'] = self.delivery
         data['location'] = self.location
         data['assignment'] = self.assignment.to_summary_dict() if self.assignment else None
         data['tech_requirements'] = self.tech_requirements

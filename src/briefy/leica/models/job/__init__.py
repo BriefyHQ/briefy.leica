@@ -29,7 +29,8 @@ __summary_attributes__ = [
 __listing_attributes__ = __summary_attributes__ + [
     'assignment_date', 'last_approval_date', 'submission_date', 'last_submission_date',
     'set_type', 'number_required_assets', 'category', 'payout_value',
-    'availability'
+    'availability', 'payout_currency', 'travel_expenses', 'additional_compensation',
+    'reason_additional_compensation', 'qa_manager', 'submission_path', 'state_history',
 ]
 
 

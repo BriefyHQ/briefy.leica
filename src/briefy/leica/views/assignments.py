@@ -45,7 +45,7 @@ class AssignmentService(RESTService):
     default_order_by = 'updated_at'
     filter_related_fields = [
         'project.title', 'title', 'professional.title', 'professional.email',
-        'project.id', 'description', '_location.locality', '_location.country',
+        'project.id', 'description', 'location.locality', 'location.country',
         'location.formatted_address', 'location.fullname', 'location.email',
         'professional_user', 'project_manager', 'scout_manager', 'qa_manager',
         'customer.title', 'pool.id', 'pool.title', 'pool.country', 'availability'

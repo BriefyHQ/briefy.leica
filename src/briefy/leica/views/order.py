@@ -46,7 +46,7 @@ class OrderService(RESTService):
     filter_related_fields = [
         'project.title', 'project.id', 'project.status', '_location.locality',
         '_location.country', '_location.fullname', '_location.formatted_address',
-        'customer.title',
+        'customer.title', 'assignment.id'
     ]
 
     _default_notify_events = {

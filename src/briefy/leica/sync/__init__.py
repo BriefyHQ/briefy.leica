@@ -143,16 +143,21 @@ class ModelSync:
 
     def parse_decimal(self, value):
         """Parse decimal money values to integer."""
-        return value * 100 if value else 0
+        return value * 100 if value else None
 
     def parse_phonenumber(self, kobj, attr, country=''):
         """Parse phone number from knack before input in the database."""
-        number_attr = getattr(kobj, attr, None)
-        if number_attr:
-            number = cleanse_phone_number(number_attr, country)
+        number_attr_value = getattr(kobj, attr, None)
+        if number_attr_value:
+            number = cleanse_phone_number(number_attr_value, country)
         else:
+            if number_attr_value:
+                msg = 'Phone parse fail. Phone: {number}. Type: {type} ID: {briefy_id}'
+                print(msg.format(number=number_attr_value,
+                                 type=self.model.__name__,
+                                 briefy_id=kobj.briefy_id,
+                                 ))
             number = None
-
         return number
 
     def get_parent(self, kobj: KnackEntity, field_name: str ='',
@@ -175,6 +180,12 @@ class ModelSync:
 
         db_parent = parent_model.query().filter_by(external_id=knack_parent.id).one()
         return db_parent, knack_parent
+
+    @staticmethod
+    def choice_to_str(value):
+        """Convert a choice value to a str."""
+        value = [s for s in value]
+        return value[0] if value else ''
 
     def add(self, kobj, briefy_id):
         """Add new database item from knack obj."""
