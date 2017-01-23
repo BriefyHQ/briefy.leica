@@ -149,14 +149,8 @@ class ModelSync:
         """Parse phone number from knack before input in the database."""
         number_attr_value = getattr(kobj, attr, None)
         if number_attr_value:
-            number = cleanse_phone_number(number_attr_value, country)
+            number = cleanse_phone_number(number_attr_value['number'], country)
         else:
-            if number_attr_value:
-                msg = 'Phone parse fail. Phone: {number}. Type: {type} ID: {briefy_id}'
-                print(msg.format(number=number_attr_value,
-                                 type=self.model.__name__,
-                                 briefy_id=kobj.briefy_id,
-                                 ))
             number = None
         return number
 
