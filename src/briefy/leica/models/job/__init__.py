@@ -31,6 +31,7 @@ __listing_attributes__ = __summary_attributes__ + [
     'set_type', 'number_required_assets', 'category', 'payout_value',
     'availability', 'payout_currency', 'travel_expenses', 'additional_compensation',
     'reason_additional_compensation', 'qa_manager', 'submission_path', 'state_history',
+    'requirements'
 ]
 
 
@@ -421,6 +422,15 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         )
 
     @declared_attr
+    def requirements(cls) -> str:
+        """Return the requirements of an Order."""
+        return orm.column_property(
+            select([Order.requirements]).where(
+                Order.id == cls.order_id
+            ),
+        )
+
+    @declared_attr
     def category(cls) -> str:
         """Return the category of an Order."""
         return orm.column_property(
@@ -482,7 +492,6 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         data['assignment_date'] = self.assignment_date
         data['slug'] = self.slug
         data['tech_requirements'] = self.project.tech_requirements
-        data['requirements'] = self.order.requirements
         data['availability'] = self.availability
         data['category'] = self.category
 
