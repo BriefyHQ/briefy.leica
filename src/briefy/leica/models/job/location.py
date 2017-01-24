@@ -16,10 +16,22 @@ class OrderLocation(ContactInfoMixin, AddressMixin,
 
     _workflow = workflows.OrderLocationWorkflow
 
+    __versioned__ = {
+        'exclude': ['state_history', '_state_history', 'timezone', ]
+    }
+
     __summary_attributes__ = [
         'id', 'country', 'locality', 'coordinates', 'email', 'mobile',
-        'additional_phone', 'fullname', 'formatted_address', 'timezone', 'info'
+        'additional_phone', 'fullname', 'formatted_address', 'info'
     ]
+
+    __colanderalchemy_config__ = {
+        'excludes': [
+            'state_history', 'state', 'timezone', 'versions',
+            'can_create_roles', 'can_view_roles', 'can_edit_roles', 'can_delete_roles',
+            'can_list_roles', 'local_roles'
+        ],
+    }
 
     __listing_attributes__ = __summary_attributes__
 
