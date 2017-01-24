@@ -1,5 +1,4 @@
 """Utils to query user info."""
-from briefy.common.utils.cache import timeout_cache
 from briefy.leica.models.mixins import get_public_user_info
 
 
