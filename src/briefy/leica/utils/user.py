@@ -3,7 +3,6 @@ from briefy.common.utils.cache import timeout_cache
 from briefy.leica.models.mixins import get_public_user_info
 
 
-@timeout_cache(600, renew=False)
 def add_user_info_to_state_history(state_history):
     """Receive object state history and add user information.
 

@@ -385,6 +385,15 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         )
 
     @declared_attr
+    def delivery(cls) -> str:
+        """Return the delivery of an Order."""
+        return orm.column_property(
+            select([Order._delivery]).where(
+                Order.id == cls.order_id
+            ),
+        )
+
+    @declared_attr
     def description(cls) -> str:
         """Return the description of an Order."""
         return orm.column_property(
