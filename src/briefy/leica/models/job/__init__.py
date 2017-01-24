@@ -45,7 +45,7 @@ class IAssignment(Interface):
 
 
 class AssignmentDates:
-    """Mixin providing date-related information of a Assignment."""
+    """Mixin providing date-related information of an Assignment."""
 
     scheduled_datetime = sa.Column(
         AwareDateTime(),

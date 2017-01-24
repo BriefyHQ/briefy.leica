@@ -390,12 +390,12 @@ class OrderWorkflow(BriefyWorkflow):
 
     @received.transition(assigned, 'can_assign')
     def assign(self):
-        """Transition: Assign a Professional to an bOrder."""
+        """Transition: Assign a Professional to an Assignment."""
         pass
 
     @Permission(groups=[LR['project_manager'], G['pm'], G['scout'], ])
     def can_assign(self):
-        """Permission: Validate if user can assign a Order.
+        """Permission: Validate if user can assign an Assignment.
 
         Groups: g:pm, g:scout, r:project_manager
         """
