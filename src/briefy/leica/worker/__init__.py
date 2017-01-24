@@ -28,7 +28,7 @@ with the following keys:
 
 
 class Worker(QueueWorker):
-    """Ms.laure queue worker."""
+    """Briefy.leica queue worker."""
 
     name = 'briefy.leica.worker'
     """Worker name."""
