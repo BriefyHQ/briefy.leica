@@ -484,9 +484,10 @@ class OrderWorkflow(BriefyWorkflow):
         # should be only used by the Assignment workflow
         return True
 
+
     @Permission(groups=[LR['project_manager'], G['pm'], G['scout'], ])
     def can_assign(self):
-        """Permission: Validate if user can assign a Order.
+        """Permission: Validate if user can assign an Assignment.
 
         Groups: g:pm, g:scout, r:project_manager
         """

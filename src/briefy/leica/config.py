@@ -14,6 +14,9 @@ UPLOAD_BUCKET = config(
     default='upload-{env}-briefy'.format(env=_queue_suffix)
 )
 
+# Queue
+LEICA_QUEUE = config('LEICA_QUEUE', default='leica-{}'.format(_queue_suffix))
+
 IMAGE_BUCKET = config(
     'IMAGE_BUCKET',
     default='images-{env}-briefy'.format(env=_queue_suffix)

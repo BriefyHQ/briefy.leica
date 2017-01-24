@@ -1,0 +1,6 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+    <!-- Mail queue -->
+    <utility name="leica.queue" component=".MailQueue" provides="briefy.common.queue.IQueue" />
+
+</configure>
