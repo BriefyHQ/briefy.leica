@@ -143,7 +143,7 @@ class ModelSync:
 
     def parse_decimal(self, value):
         """Parse decimal money values to integer."""
-        return value * 100 if value else None
+        return value * 100 if value else 0
 
     def parse_phonenumber(self, kobj, attr, country=''):
         """Parse phone number from knack before input in the database."""

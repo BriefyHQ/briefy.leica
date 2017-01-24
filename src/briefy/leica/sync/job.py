@@ -231,10 +231,10 @@ class JobSync(ModelSync):
             release_contract=release,
             payout_value=payout_value,
             payout_currency=payout_currency,
-            additional_compensation=self.parse_decimal(kobj.additional_compensation),
+            additional_compensation=self.parse_decimal(kobj.additional_compensation) or None,
             payable=payable,
             submission_path=str(kobj.photo_submission_link),
-            travel_expenses=self.parse_decimal(kobj.travel_expenses),
+            travel_expenses=self.parse_decimal(kobj.travel_expenses) or None,
         )
         assignment = Assignment(**payload)
         self.session.add(assignment)
