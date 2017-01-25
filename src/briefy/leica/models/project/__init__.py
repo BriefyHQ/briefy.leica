@@ -1,5 +1,6 @@
 """Briefy Leica Project model."""
 from briefy.common.db.mixins import BriefyRoles
+from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.project import workflows
@@ -102,6 +103,16 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
 
     number_required_assets = sa.Column(sa.Integer(), default=10)
     """Number of required assets of a Project to be used in the Order as default value."""
+
+    category = sa.Column(
+        sautils.ChoiceType(CategoryChoices, impl=sa.String()),
+        default='undefined',
+        nullable=False
+    )
+    """Category of this Order.
+
+    Options come from :mod:`briefy.common.vocabularies.categories`.
+    """
 
     tech_requirements = sa.Column(
         sautils.JSONType,

@@ -1,4 +1,5 @@
 """Knack to Leica syncronization code."""
+from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.knack.base import KnackEntity
 from briefy.leica import logger
 from briefy.leica.sync.user import get_rosetta
@@ -20,6 +21,9 @@ PLACEHOLDERS = {
 }
 
 VALID_PHONE_CHARS = digits + '+'
+
+
+category_mapping = {item.label: item.value for item in CategoryChoices.__members__.values()}
 
 
 def cleanse_phone_number(value: str, country: str, kobj: object) -> Union[PhoneNumber, None]:
