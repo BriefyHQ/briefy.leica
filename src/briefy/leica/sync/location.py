@@ -180,9 +180,11 @@ def create_location_dict(address_field: str, kobj: KnackEntity, country: str='')
         formatted_address = ', '.join(
             [p for p in parts if p.strip()]
         )
+        city = city.strip(' ')
         info = dict(
             formatted_address=formatted_address,
             province=klocation.state,
+            locality=city,
             route=street,
             street_number='',
             country=country_id,
@@ -192,7 +194,7 @@ def create_location_dict(address_field: str, kobj: KnackEntity, country: str='')
             country=country_id,
             formatted_address=formatted_address,
             info=info,
-            locality=city.strip(' '),
+            locality=city,
             **extra_location_info
         )
         if extra_location_info.get('coordinates'):
