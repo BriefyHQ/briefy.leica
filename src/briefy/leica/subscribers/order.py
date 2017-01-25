@@ -33,6 +33,11 @@ def order_submit(event):
 def order_cancel_or_perm_refuse(event):
     """Handle Assignment cancel and perm_reject workflow event."""
     order = event.obj
+
+    # TODO: workaround for double event trigger
+    if order.state == 'cancelled':
+        return
+
     request = event.request
     # cancel all existing assignments
     for assignment in order.assignments:
@@ -76,11 +81,10 @@ def order_new_shoot_or_reshoot(event):
 
 
 def transition_handler(event):
-    """Handle Assignment transition events."""
+    """Handle Cancel transition events."""
     event_name = event.event_name
     if not event_name.startswith('order.workflow'):
         return
-
     handlers = {
         'order.workflow.submit': order_submit,
         'order.workflow.cancel': order_cancel_or_perm_refuse,

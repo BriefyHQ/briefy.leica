@@ -8,7 +8,10 @@ from sqlalchemy.orm.session import object_session
 def create_comment_from_wf_transition(obj, request, author_role, to_role, internal=False):
     """Create a new Comment instance from the last workflow transition."""
     session = object_session(obj)
-    user = request.user
+    if request:
+        user = request.user
+    else:
+        user = obj.workflow.context
     message = obj.state_history[-1]['message']
     if message:
         payload = dict(

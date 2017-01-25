@@ -27,19 +27,20 @@ def assignment_submit(event):
     # safe_workflow_trigger_transitions(event, transitions=transitions, state='validation')
 
 
-def assignment_cancel_or_perm_reject(event):
-    """Handle Assignment cancel and perm_reject workflow event."""
+def assignment_perm_reject(event):
+    """Handle Assignment perm_reject workflow event."""
     request = event.request
     assignment = event.obj
+
+    # TODO: test if this cause circular failure
     order = assignment.order
     # just create a new Assignment if there is no active assignment
     if not order.assignment and order.state not in ('cancelled', 'perm_refused'):
         create_new_assignment_from_order(order, request)
 
-    if assignment.state == 'perm_rejected':
-        to_role = 'professional_user'
-        author_role = 'qa_manager'
-        create_comment_from_wf_transition(assignment, request, author_role, to_role)
+    to_role = 'professional_user'
+    author_role = 'qa_manager'
+    create_comment_from_wf_transition(assignment, request, author_role, to_role)
 
 
 def assignment_remove_schedule(event):
@@ -146,8 +147,7 @@ def transition_handler(event):
 
     handlers = {
         'assignment.workflow.submit': assignment_submit,
-        'assignment.workflow.cancel': assignment_cancel_or_perm_reject,
-        'assignment.workflow.perm_reject': assignment_cancel_or_perm_reject,
+        'assignment.workflow.perm_reject': assignment_perm_reject,
         'assignment.workflow.self_assign': assignment_self_assign,
         'assignment.workflow.scheduling_issues': assignment_scheduling_issues,
         'assignment.workflow.reject': assignment_reject,

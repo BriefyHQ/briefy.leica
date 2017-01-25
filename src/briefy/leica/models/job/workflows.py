@@ -1,10 +1,10 @@
 """Order, OrderLocation, Assignment and Pool related workflow."""
+from briefy.common.db import datetime_utcnow
 from briefy.common.vocabularies.roles import Groups as G
 from briefy.common.vocabularies.roles import LocalRolesChoices as LR
 from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import Permission
 from briefy.common.workflow import WorkflowState as WS
-from datetime import datetime
 
 import logging
 
@@ -220,7 +220,7 @@ class AssignmentWorkflow(BriefyWorkflow):
     @awaiting_assets.transition(cancelled, 'can_cancel')
     def cancel(self):
         """Customer or PM cancel the Assignment."""
-        now = datetime.now()
+        now = datetime_utcnow()
         assignment = self.document
         scheduled_datetime = assignment.scheduled_datetime
         if self.state == self.scheduled:
@@ -230,7 +230,7 @@ class AssignmentWorkflow(BriefyWorkflow):
             else:
                 return False
 
-        if self.state == self.awaiting_assets:
+        elif self.state == self.awaiting_assets:
             submission_path = assignment.submission_path
             date_diff = now - scheduled_datetime
             # let cancel if the there is no upload after 4 days
@@ -238,6 +238,8 @@ class AssignmentWorkflow(BriefyWorkflow):
                 return True
             else:
                 return False
+        else:
+            return True
 
     @Permission(groups=[G['customers'], G['pm'], G['qa'], ])
     def can_cancel(self):
@@ -247,7 +249,7 @@ class AssignmentWorkflow(BriefyWorkflow):
     @scheduled.transition(awaiting_assets, 'can_get_ready_for_upload')
     def ready_for_upload(self):
         """System moves Assignment to awaiting assets (upload)."""
-        now = datetime.now()
+        now = datetime_utcnow()
         assignment = self.document
         scheduled_datetime = assignment.scheduled_datetime
         date_diff = scheduled_datetime - now
