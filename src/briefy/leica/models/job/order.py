@@ -228,7 +228,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     comments = orm.relationship(
         'Comment',
         foreign_keys='Comment.entity_id',
-        order_by='asc(Comment.created_at)',
+        order_by='desc(Comment.created_at)',
         primaryjoin='Comment.entity_id == Order.id',
         lazy='dynamic'
     )

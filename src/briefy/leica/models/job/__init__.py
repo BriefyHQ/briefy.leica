@@ -283,7 +283,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     comments = orm.relationship(
         'Comment',
         foreign_keys='Comment.entity_id',
-        order_by='asc(Comment.created_at)',
+        order_by='desc(Comment.created_at)',
         primaryjoin='Comment.entity_id == Assignment.id',
         lazy='dynamic'
     )

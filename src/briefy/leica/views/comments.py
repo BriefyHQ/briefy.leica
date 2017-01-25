@@ -22,7 +22,10 @@ class CommentFactory(BaseFactory):
         :rtype: list
         """
         _acls = [
-            (Allow, 'g:briefy_pm', ['add', 'delete', 'edit', 'list', 'view'])
+            (Allow, 'g:briefy', ['create', 'list', 'view']),
+            (Allow, 'g:briefy_qa', ['create', 'list', 'view']),
+            (Allow, 'g:professionals', ['create', 'list', 'view']),
+            (Allow, 'g:customers', ['create', 'list', 'view']),
         ]
         return _acls
 
@@ -57,13 +60,6 @@ class CommentService(RESTService):
         return query
 
 
-class CommentsWorkflowService(WorkflowAwareResource):
-    """Comments workflow service."""
-
-    model = Comment
-    friendly_name = Comment.__name__
-
-
 ASSIGNMENT_PATH = '/assignments/{assignment_id}'
 
 COLLECTION_PATH = '/assignments/{entity_id}/comments'
@@ -80,16 +76,6 @@ class AssignmentCommentService(CommentService):
     """Comments for an Assignment."""
 
 
-@resource(
-    collection_path=PATH + '/transitions',
-    path=PATH + '/transitions/{transition_id}',
-    cors_policy=CORS_POLICY,
-    factory=CommentFactory
-)
-class AssignmentCommentWorkflowService(CommentsWorkflowService):
-    """AssignmentComment workflow resource."""
-
-
 COLLECTION_PATH = ASSIGNMENT_PATH + '/assets/{entity_id}/comments'
 PATH = COLLECTION_PATH + '/{id}'
 
@@ -104,17 +90,7 @@ class AssetCommentService(CommentService):
     """Comments for an Asset."""
 
 
-@resource(
-    collection_path=PATH + '/transitions',
-    path=PATH + '/transitions/{transition_id}',
-    cors_policy=CORS_POLICY,
-    factory=CommentFactory
-)
-class AssetCommentWorkflowService(CommentsWorkflowService):
-    """AssetComment workflow resource."""
-
-
-COLLECTION_PATH = '/orders/{entity_id}/comments'
+COLLECTION_PATH = ASSIGNMENT_PATH + '/orders/{entity_id}/comments'
 PATH = COLLECTION_PATH + '/{id}'
 
 
@@ -126,13 +102,3 @@ PATH = COLLECTION_PATH + '/{id}'
 )
 class OrderCommentService(CommentService):
     """Comments for an Order."""
-
-
-@resource(
-    collection_path=PATH + '/transitions',
-    path=PATH + '/transitions/{transition_id}',
-    cors_policy=CORS_POLICY,
-    factory=CommentFactory
-)
-class OrderCommentWorkflowService(CommentsWorkflowService):
-    """AssignmentOrderComment workflow resource."""
