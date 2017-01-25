@@ -16,6 +16,39 @@ NOW = to_serializable(datetime_utcnow())
 ACTOR = SystemUser.id
 
 
+STATUS_MAPPING = {
+    '@Leisure': 'active',
+    'Agoda': 'active',
+    'Aladinia': 'inactive',
+    'Auctionata': 'inactive',
+    'Beauty Spotter': 'active',
+    'Booking.com': 'inactive',
+    'Briefy': 'active',
+    'Classic Driver': 'inactive',
+    'Deliveroo Germany GmbH': 'active',
+    'Deliveroo Germany': 'active',
+    'DoorDash': 'inactive',
+    'eH Visio': 'active',
+    'Erento': 'inactive',
+    'Everphone': 'inactive',
+    'ezCater': 'active',
+    'Foodora': 'inactive',
+    'Holiday Lettings': 'inactive',
+    'Homeday': 'active',
+    'Hostelworld.com': 'inactive',
+    'Just Eat': 'inactive',
+    'Locadi': 'inactive',
+    'Love Home Swap': 'inactive',
+    'M Cube Incubator': 'inactive',
+    'OpenTable': 'inactive',
+    'OYO Rooms': 'inactive',
+    'Stayz Pty': 'inactive',
+    'Traveloka': 'inactive',
+    'WeTravel': 'inactive',
+    'Wine in Black': 'inactive',
+}
+
+
 class CustomerSync(ModelSync):
     """Syncronize Customers."""
 
@@ -76,7 +109,7 @@ class CustomerSync(ModelSync):
 
     def _state_history(self, state: str='active'):
         """Create state history structure."""
-        return [
+        history = [
             {
                 'date': NOW,
                 'message': 'Imported customer from Knack database',
@@ -89,11 +122,23 @@ class CustomerSync(ModelSync):
                 'date': NOW,
                 'message': 'Automatic transition',
                 'actor': ACTOR,
-                'transition': 'activate' if state == 'active' else 'inactivate',
+                'transition': 'activate',
                 'from': 'created',
                 'to': state
             },
         ]
+        if state == 'inactive':
+            history.append(
+                {
+                    'date': NOW,
+                    'message': 'Automatic transition',
+                    'actor': ACTOR,
+                    'transition': 'inactivate',
+                    'from': 'active',
+                    'to': state
+                },
+            )
+        return history
 
     def get_payload(self, kobj, briefy_id=None):
         """Create payload for customer object."""
@@ -101,7 +146,7 @@ class CustomerSync(ModelSync):
         location_dict = create_location_dict('company_address', kobj)
         title = kobj.company_name
         slug = generate_slug(title)
-        state = 'active'
+        state = STATUS_MAPPING[title]
         state_history = self._state_history(state)
         result.update(
             dict(

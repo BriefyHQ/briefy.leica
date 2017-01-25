@@ -1,6 +1,6 @@
 """Briefy Leica OrderLocation model."""
 from briefy.common.db.mixins import Address as AddressMixin
-from briefy.common.db.mixins import NameMixin
+from briefy.common.db.mixins import ContactInfoMixin
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.job import workflows
@@ -10,62 +10,28 @@ import sqlalchemy as sa
 import sqlalchemy_utils as sautils
 
 
-class LocationContactInfoMixin(NameMixin):
-    """A mixin to manage contact information for the order location."""
-
-    email = sa.Column(
-        sautils.types.EmailType(),
-        nullable=True,
-        unique=False,
-        info={
-            'colanderalchemy': {
-                'title': 'Email',
-                'missing': colander.drop,
-            }
-        }
-    )
-    """Email of the contact person."""
-
-    mobile = sa.Column(
-        sautils.types.PhoneNumberType(),
-        nullable=True,
-        unique=False,
-        info={
-            'colanderalchemy': {
-                'title': 'Mobile Phone',
-                'typ': colander.String,
-                'missing': colander.drop,
-            }
-        }
-
-    )
-    """Mobile phone number of the contact person."""
-
-    additional_phone = sa.Column(
-        sautils.types.PhoneNumberType(),
-        nullable=True,
-        unique=False,
-        info={
-            'colanderalchemy': {
-                'title': 'Additional Phone',
-                'typ': colander.String,
-                'missing': colander.drop,
-            }
-        }
-    )
-    """Additional phone number of the contact person."""
-
-
-class OrderLocation(LocationContactInfoMixin, AddressMixin,
+class OrderLocation(ContactInfoMixin, AddressMixin,
                     mixins.LeicaMixin, mixins.VersionMixin, Base):
     """Order location model."""
 
     _workflow = workflows.OrderLocationWorkflow
 
+    __versioned__ = {
+        'exclude': ['state_history', '_state_history', 'timezone', ]
+    }
+
     __summary_attributes__ = [
         'id', 'country', 'locality', 'coordinates', 'email', 'mobile',
-        'additional_phone', 'fullname', 'formatted_address', 'timezone', 'info'
+        'additional_phone', 'fullname', 'formatted_address', 'info'
     ]
+
+    __colanderalchemy_config__ = {
+        'excludes': [
+            'state_history', 'state', 'timezone', 'versions',
+            'can_create_roles', 'can_view_roles', 'can_edit_roles', 'can_delete_roles',
+            'can_list_roles', 'local_roles'
+        ],
+    }
 
     __listing_attributes__ = __summary_attributes__
 

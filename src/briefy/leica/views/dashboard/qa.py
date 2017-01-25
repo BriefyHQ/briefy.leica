@@ -8,22 +8,14 @@ from cornice.resource import resource
 from pyramid.security import Allow
 
 
-class DashboardQaFactory(BaseFactory):
-    """Dashboard QA context factory."""
+class DashboardQaTypeFactory(BaseFactory):
+    """Dashboard QA Type context factory."""
 
     model = DashboardQaType
 
-    @property
-    def __base_acl__(self) -> list:
-        """Hook to be use by subclasses to define default ACLs in context.
-
-        :return: list of ACLs
-        :rtype: list
-        """
-        _acls = [
-            (Allow, 'g:briefy_qa', ['list', 'view']),
-        ]
-        return _acls
+    __base_acl__ = [
+        (Allow, 'g:briefy_qa', ['list', 'view']),
+    ]
 
 
 COLLECTION_PATH = '/dashboards/qa/type'
@@ -33,7 +25,7 @@ PATH = COLLECTION_PATH + '/{id}'
 @resource(collection_path=COLLECTION_PATH,
           path=PATH,
           cors_policy=CORS_POLICY,
-          factory=DashboardQaFactory)
+          factory=DashboardQaTypeFactory)
 class DashboardQaTypeService(RESTService):
     """Dashboard Qa: Type Service."""
 
@@ -61,6 +53,16 @@ class DashboardQaTypeService(RESTService):
     )
 
 
+class DashboardQaProjectFactory(BaseFactory):
+    """Dashboard QA Project context factory."""
+
+    model = DashboardQaProject
+
+    __base_acl__ = [
+        (Allow, 'g:briefy_qa', ['list', 'view']),
+    ]
+
+
 COLLECTION_PATH = '/dashboards/qa/project'
 PATH = COLLECTION_PATH + '/{id}'
 
@@ -68,7 +70,7 @@ PATH = COLLECTION_PATH + '/{id}'
 @resource(collection_path=COLLECTION_PATH,
           path=PATH,
           cors_policy=CORS_POLICY,
-          factory=DashboardQaFactory)
+          factory=DashboardQaProjectFactory)
 class DashboardQaProjectService(RESTService):
     """Dashboard Qa: Project Service."""
 

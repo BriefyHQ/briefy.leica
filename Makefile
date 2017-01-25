@@ -70,7 +70,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr htmlcov/
 
 lint: ## check style with flake8
-	flake8 src/briefy/leica setup.py migrations
+	flake8 src/briefy/leica setup.py
 	flake8 --ignore=D102,D103,D205,D101,D400,D210,D401,D100 tests
 
 test: lint ## run tests quickly with the default Python
@@ -113,6 +113,7 @@ import_clean_db: clean_dockers create_dockers
 	echo "Waiting Posgtres to start"
 	sleep 40
 	alembic upgrade head
+	python src/briefy/leica/tools/user_import.py
 	python src/briefy/leica/tools/customer_import.py
 	python src/briefy/leica/tools/project_import.py
 	python src/briefy/leica/tools/pool_import.py

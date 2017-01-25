@@ -4,8 +4,8 @@ from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.asset import workflows
 from briefy.leica.utils import imaging
-from briefy.ws.utils.user import add_user_info_to_state_history
-from briefy.ws.utils.user import get_public_user_info
+from briefy.leica.utils.user import add_user_info_to_state_history
+from briefy.leica.models.mixins import get_public_user_info
 from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy_utils import UUIDType

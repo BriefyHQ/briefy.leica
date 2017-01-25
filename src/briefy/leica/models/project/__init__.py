@@ -3,7 +3,7 @@ from briefy.common.db.mixins import BriefyRoles
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.project import workflows
-from briefy.ws.utils.user import add_user_info_to_state_history
+from briefy.leica.utils.user import add_user_info_to_state_history
 from sqlalchemy import orm
 from zope.interface import Interface
 from zope.interface import implementer
@@ -61,9 +61,13 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         ('delete', ('g:briefy_finance', 'g:system')),
     )
 
-    __colanderalchemy_config__ = {'excludes': [
-        'state_history', 'state', 'customer', '_customer_user', '_project_manager', 'external_id'
-    ]}
+    __colanderalchemy_config__ = {
+        'excludes': [
+            'state_history', 'state', 'customer', '_customer_user',
+            '_project_manager', 'external_id'
+        ],
+        'overrides': mixins.ProjectBriefyRoles.__colanderalchemy_config__['overrides']
+    }
 
     customer_id = sa.Column(sautils.UUIDType,
                             sa.ForeignKey('customers.id'),
@@ -154,7 +158,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         """
         return sa.func.count('1')
 
-    # Formerly know as brief
+    # Formerly known as brief
     briefing = sa.Column(
         sautils.URLType,
         nullable=True,

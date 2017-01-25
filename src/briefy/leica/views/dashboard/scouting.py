@@ -9,22 +9,14 @@ from cornice.resource import resource
 from pyramid.security import Allow
 
 
-class DashboardScoutingFactory(BaseFactory):
-    """Dashboard Scouting context factory."""
+class DashboardScoutingCountryFactory(BaseFactory):
+    """Dashboard Scouting Country context factory."""
 
     model = DashboardScoutingCountry
 
-    @property
-    def __base_acl__(self) -> list:
-        """Hook to be use by subclasses to define default ACLs in context.
-
-        :return: list of ACLs
-        :rtype: list
-        """
-        _acls = [
-            (Allow, 'g:briefy_scout', ['list', 'view']),
-        ]
-        return _acls
+    __base_acl__ = [
+        (Allow, 'g:briefy_scout', ['list', 'view']),
+    ]
 
 
 COLLECTION_PATH = '/dashboards/scouting/country'
@@ -34,7 +26,7 @@ PATH = COLLECTION_PATH + '/{id}'
 @resource(collection_path=COLLECTION_PATH,
           path=PATH,
           cors_policy=CORS_POLICY,
-          factory=DashboardScoutingFactory)
+          factory=DashboardScoutingCountryFactory)
 class DashboardScoutingCountryService(RESTService):
     """Dashboard Scouting: Country Service."""
 
@@ -52,15 +44,15 @@ class DashboardScoutingCountryService(RESTService):
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'unassigned', 'label': 'Unassigned Jobs',
+            'field': 'unassigned', 'label': 'Manually Assign',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'job_pool', 'label': 'In Job Pool',
+            'field': 'pool', 'label': 'In Pool',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'assigned', 'label': 'Assigned Jobs',
+            'field': 'assigned', 'label': 'Assigned',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
@@ -70,6 +62,16 @@ class DashboardScoutingCountryService(RESTService):
     )
 
 
+class DashboardScoutingProjectFactory(BaseFactory):
+    """Dashboard Scouting Project context factory."""
+
+    model = DashboardScoutingProject
+
+    __base_acl__ = [
+        (Allow, 'g:briefy_scout', ['list', 'view']),
+    ]
+
+
 COLLECTION_PATH = '/dashboards/scouting/project'
 PATH = COLLECTION_PATH + '/{id}'
 
@@ -77,7 +79,7 @@ PATH = COLLECTION_PATH + '/{id}'
 @resource(collection_path=COLLECTION_PATH,
           path=PATH,
           cors_policy=CORS_POLICY,
-          factory=DashboardScoutingFactory)
+          factory=DashboardScoutingProjectFactory)
 class DashboardScoutingProjectService(RESTService):
     """Dashboard Scouting: Project Service."""
 
@@ -87,7 +89,7 @@ class DashboardScoutingProjectService(RESTService):
 
     _columns_map = (
         {
-            'field': 'project', 'label': 'Project',
+            'field': 'title', 'label': 'Project',
             'type': 'text', 'url': '', 'filter': ''
         },
         {
@@ -95,15 +97,15 @@ class DashboardScoutingProjectService(RESTService):
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'unassigned', 'label': 'Unassigned Jobs',
+            'field': 'unassigned', 'label': 'Manually Assign',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'job_pool', 'label': 'In Job Pool',
+            'field': 'pool', 'label': 'In Pool',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'assigned', 'label': 'Assigned Jobs',
+            'field': 'assigned', 'label': 'Assigned',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
@@ -113,6 +115,12 @@ class DashboardScoutingProjectService(RESTService):
     )
 
 
+class DashboardScoutingPoolFactory(BaseFactory):
+    """Dashboard Scouting context factory."""
+
+    model = Pool
+
+
 COLLECTION_PATH = '/dashboards/scouting/pool'
 PATH = COLLECTION_PATH + '/{id}'
 
@@ -120,7 +128,7 @@ PATH = COLLECTION_PATH + '/{id}'
 @resource(collection_path=COLLECTION_PATH,
           path=PATH,
           cors_policy=CORS_POLICY,
-          factory=DashboardScoutingFactory)
+          factory=DashboardScoutingPoolFactory)
 class DashboardScoutingPoolService(RESTService):
     """Dashboard Scouting: Pool Service."""
 
@@ -130,7 +138,7 @@ class DashboardScoutingPoolService(RESTService):
 
     _columns_map = (
         {
-            'field': 'pool', 'label': 'Pool',
+            'field': 'title', 'label': 'Pool',
             'type': 'text', 'url': '', 'filter': ''
         },
         {

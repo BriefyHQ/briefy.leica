@@ -6,7 +6,7 @@ Inheritance
 
 Inheritance diagram for the OrderLocation class:
 
-.. inheritance-diagram:: briefy.leica.models.job.location.OderLocation
+.. inheritance-diagram:: briefy.leica.models.job.location.OrderLocation
 
 
 Workflow

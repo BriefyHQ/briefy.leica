@@ -18,26 +18,21 @@ total_assignments_professional = select([
         case([(Assignment.state == 'scheduled', 1)], else_=0)
     ).label('scheduled'),
     func.sum(
-        case([(
-            and_(
-                Assignment.state == 'in_qa',
-                Assignment.set_type == 'new'
-            ), 1)], else_=0)
+        case([(Assignment.state == 'awaiting_assets', 1)], else_=0)
+    ).label('awaiting_submission_resubmission'),
+    func.sum(
+        case([(Assignment.state.in_(('in_qa', 'asset_validation')), 1)], else_=0)
     ).label('in_qa'),
     func.sum(
-        case([(
-            and_(
-                Assignment.state == 'awaiting_assets',
-                Assignment.set_type == 'refused_customer'
-            ), 1)], else_=0)
-    ).label('rejected'),
-    func.sum(
-        case([(Assignment.state.in_(('approved', 'completed')), 1)], else_=0)
-    ).label('completed'),
+        case([(Assignment.state.in_(
+            ('approved', 'completed', 'perm_rejected', 'cancelled', 'refused')
+        ), 1)], else_=0)
+    ).label('completed_inactive'),
 ]).where(
     and_(
         Assignment.state.in_(
-            ('assigned', 'scheduled', 'in_qa', 'approved', 'completed')
+            ('assigned', 'scheduled', 'in_qa', 'approved', 'completed',
+             'perm_rejected', 'refused', 'cancelled', 'awaiting_assets', 'asset_validation')
         ),
         Assignment.professional_id == ':professional_id '
     )

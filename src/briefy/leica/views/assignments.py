@@ -44,11 +44,12 @@ class AssignmentService(RESTService):
     friendly_name = model.__name__
     default_order_by = 'updated_at'
     filter_related_fields = [
-        'project.title', 'title', 'professional.title', 'professional.main_email',
+        'project.title', 'title', 'professional.title', 'professional.email',
         'project.id', 'description', 'location.locality', 'location.country',
         'location.formatted_address', 'location.fullname', 'location.email',
         'professional_user', 'project_manager', 'scout_manager', 'qa_manager',
-        'customer.title', 'pool.id', 'pool.title', 'pool.country'
+        'customer.title', 'pool.id', 'pool.title', 'pool.country', 'availability',
+        'last_approval_date', 'submission_date',
     ]
 
     _default_notify_events = {

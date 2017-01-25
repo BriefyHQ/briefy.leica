@@ -6,7 +6,7 @@ from briefy.leica.models.job import workflows
 from briefy.leica.models.job.order import Order
 from briefy.leica.utils.transitions import get_transition_date
 from briefy.leica.vocabularies import TypesOfSetChoices
-from briefy.ws.utils.user import add_user_info_to_state_history
+from briefy.leica.utils.user import add_user_info_to_state_history
 from datetime import datetime
 from sqlalchemy import orm
 from sqlalchemy import select
@@ -23,12 +23,15 @@ import sqlalchemy_utils as sautils
 __summary_attributes__ = [
     'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
     'number_required_assets', 'approvable', 'total_assets', 'total_approvable_assets',
-    'category'
+    'category', 'scheduled_datetime', 'professional'
 ]
 
 __listing_attributes__ = __summary_attributes__ + [
     'assignment_date', 'last_approval_date', 'submission_date', 'last_submission_date',
-    'set_type', 'number_required_assets', 'category'
+    'set_type', 'number_required_assets', 'category', 'payout_value',
+    'availability', 'payout_currency', 'travel_expenses', 'additional_compensation',
+    'reason_additional_compensation', 'qa_manager', 'submission_path', 'state_history',
+    'requirements'
 ]
 
 
@@ -126,7 +129,8 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
             'professional', 'assets', 'project', 'location',
             '_scout_manager', '_project_manager', '_qa_manager',
             '_professional_user', 'pool'
-        ]
+        ],
+        'overrides': mixins.AssignmentBriefyRoles.__colanderalchemy_config__['overrides']
     }
 
     _slug = sa.Column('slug',
@@ -279,7 +283,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     comments = orm.relationship(
         'Comment',
         foreign_keys='Comment.entity_id',
-        order_by='asc(Comment.created_at)',
+        order_by='desc(Comment.created_at)',
         primaryjoin='Comment.entity_id == Assignment.id',
         lazy='dynamic'
     )
@@ -333,6 +337,19 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     Instance of :class:`briefy.leica.models.job.location.OrderLocation`.
     """
 
+    release_contract = sa.Column(
+        sautils.URLType,
+        nullable=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Release Contract',
+                'validator': colander.url,
+                'missing': colander.drop,
+                'typ': colander.String
+            }
+        }
+    )
+
     @sautils.aggregated('assets', sa.Column(sa.Integer, default=0))
     def total_assets(self):
         """Total number of assets.
@@ -369,6 +386,15 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         )
 
     @declared_attr
+    def delivery(cls) -> str:
+        """Return the delivery of an Order."""
+        return orm.column_property(
+            select([Order._delivery]).where(
+                Order.id == cls.order_id
+            ),
+        )
+
+    @declared_attr
     def description(cls) -> str:
         """Return the description of an Order."""
         return orm.column_property(
@@ -396,6 +422,15 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         )
 
     @declared_attr
+    def requirements(cls) -> str:
+        """Return the requirements of an Order."""
+        return orm.column_property(
+            select([Order.requirements]).where(
+                Order.id == cls.order_id
+            ),
+        )
+
+    @declared_attr
     def category(cls) -> str:
         """Return the category of an Order."""
         return orm.column_property(
@@ -413,10 +448,20 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
             ),
         )
 
+    @declared_attr
+    def availability(cls) -> list:
+        """Return the availability dates of an Order."""
+        return orm.column_property(
+            select([Order._availability]).where(
+                Order.id == cls.order_id
+            ),
+        )
+
     @hybrid_property
     def customer_approval_date(self) -> datetime:
         """Return last accept/refusal date for the parent order."""
-        return self.order.customer_approval_date
+        transitions = ('accept', 'refuse')
+        return get_transition_date(transitions, self.order, first=True)
 
     @property
     def briefing(self) -> str:
@@ -447,7 +492,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         data['assignment_date'] = self.assignment_date
         data['slug'] = self.slug
         data['tech_requirements'] = self.project.tech_requirements
-        data['requirements'] = self.order.requirements
+        data['availability'] = self.availability
         data['category'] = self.category
 
         # Workflow history

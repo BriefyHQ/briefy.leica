@@ -34,37 +34,55 @@ class UnaryRelationshipWrapper:
         :return: None
         """
         if isinstance(value, dict):
-            if not value.get('id', None):
-                fk_id = self.get_or_create_obj_id(obj)
-                value[self._fk_attr] = fk_id
-                sub_object = self._model(**value)
-                session = obj.__session__
-                session.add(sub_object)
-                # TODO: call obj.some_hook to change something else, like workflow
-                # this should be another optional parameter in the init
-            else:
-                sub_object = self.__get__(obj)
-                if sub_object:
-                    for k, v in value.items():
-                        setattr(sub_object, k, v)
+            self.create_or_update_sub_object(obj, value)
         elif isinstance(value, self._model):
             setattr(obj, self._field_name, value)
         elif not value:
             pass
         else:
-            msg = 'Value must be a map to create a new instance or an instance of {model_name}.'
-            raise ValueError(msg.format(self._model.__name__))
+            self.raise_value_error()
 
     def __delete__(self, obj):
         """Remove the related object with soft delete."""
         # TODO: implement a way to delete sub_object
         pass
 
-    def get_or_create_obj_id(self, obj):
+    @staticmethod
+    def get_or_create_obj_id(obj):
+        """Return the obj ID or create a new one."""
         if not obj.id:
             obj.id = uuid4()
-
         return obj.id
+
+    def raise_value_error(self):
+        """Raise ValueError when value is not dict or model instance."""
+        msg = 'Value must be a map to create a new instance or an instance of {model_name}.'
+        raise ValueError(msg.format(self._model.__name__))
+
+    def create_or_update_sub_object(self, obj, value):
+        """"Create a new sub object o update an existing instance."""
+        if not value.get('id', None):
+            self.create_sub_object(obj, value)
+        else:
+            self.update_sub_object(obj, value)
+
+    def create_sub_object(self, obj, value):
+        """Create a new sub object instance."""
+        session = obj.__session__
+        fk_id = self.get_or_create_obj_id(obj)
+        value[self._fk_attr] = fk_id
+        sub_object = self._model(**value)
+        session.add(sub_object)
+        # TODO:
+        # call obj.some_hook to change something else, like workflow
+        # this could be another optional parameter in the init
+
+    def update_sub_object(self, obj, value):
+        """Update an existing sub object instance."""
+        sub_object = self.__get__(obj)
+        if sub_object:
+            for k, v in value.items():
+                setattr(sub_object, k, v)
 
 
 class MultipleRelationshipWrapper(UnaryRelationshipWrapper):
@@ -77,28 +95,15 @@ class MultipleRelationshipWrapper(UnaryRelationshipWrapper):
         :param values: List of items to be created
         :return: None
         """
-        sub_objects = []
-        session = obj.__session__
+        sub_model_instances = []
         for value in values:
             if isinstance(value, dict):
-                if not value.get('id', None):
-                    fk_id = self.get_or_create_obj_id(obj)
-                    value[self._fk_attr] = fk_id
-                    sub_object = self._model(**value)
-                    session.add(sub_object)
-                    # TODO: call obj.some_hook to change something else, like workflow
-                    # this should be another optional parameter in the init
-                else:
-                    sub_object = self.__get__(obj)
-                    if sub_object:
-                        for k, v in value.items():
-                            setattr(sub_object, k, v)
+                self.create_or_update_sub_object(obj, value)
             elif isinstance(value, self._model):
-                sub_objects.append(value)
+                sub_model_instances.append(value)
             elif not value:
                 pass
             else:
-                msg = 'Value must be a map to create a new instance or an instance of {model_name}.'
-                raise ValueError(msg.format(self._model.__name__))
-        if sub_objects:
-            setattr(obj, self._field_name, sub_objects)
+                self.raise_value_error()
+        if sub_model_instances:
+            setattr(obj, self._field_name, sub_model_instances)

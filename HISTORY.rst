@@ -85,6 +85,15 @@ History
      * Improve import to set permissions for each local role imported (rudaporto).
      * New base class to test dashboard views and test cases for all implemented dashboards: QA, Scout, Professional, Customer (rudaporto).
      * Change customer and professional dashboard queries and implement default_filter (view) to add parameters to the query (rudaporto).
+     * Update Comments model to accept author_role, to_role and internal attributes (rudaporto).
+     * Create new model UserProfile and change Professional model to use it as base class (rudaporto).
+     * Refactor classes that uses ContactInfoMixin to use version from briefy.common (rudaporto).
+     * Implement user profile basic information import from knack (rudaporto).
+     * Update JobSync to import all comments using the new Comment format (rudaporto).
+     * Create new functions to add user info to state_history and to get user info now from UserProfile model (rudaporto).
+     * Added Order.assignment relationshit to return the last active Assignment of one Order (rudaporto).
+     * Pin pyramid to version 1.7.3 (rudaporto).
+
 
 1.1.0 (2016-10-04)
 ------------------

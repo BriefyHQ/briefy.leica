@@ -147,12 +147,11 @@ class ModelSync:
 
     def parse_phonenumber(self, kobj, attr, country=''):
         """Parse phone number from knack before input in the database."""
-        number_attr = getattr(kobj, attr, None)
-        if number_attr:
-            number = cleanse_phone_number(number_attr, country)
+        number_attr_value = getattr(kobj, attr, None)
+        if number_attr_value:
+            number = cleanse_phone_number(number_attr_value['number'], country)
         else:
             number = None
-
         return number
 
     def get_parent(self, kobj: KnackEntity, field_name: str ='',
@@ -175,6 +174,12 @@ class ModelSync:
 
         db_parent = parent_model.query().filter_by(external_id=knack_parent.id).one()
         return db_parent, knack_parent
+
+    @staticmethod
+    def choice_to_str(value):
+        """Convert a choice value to a str."""
+        value = [s for s in value]
+        return value[0] if value else ''
 
     def add(self, kobj, briefy_id):
         """Add new database item from knack obj."""

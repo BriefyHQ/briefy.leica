@@ -1,13 +1,16 @@
 """Briefy Leica mixins."""
-from briefy.common.db.mixins import BaseMetadata
-from briefy.common.db.mixins import KnackMixin
 from briefy.common.db.mixins import BaseBriefyRoles
+from briefy.common.db.mixins import BaseMetadata
+from briefy.common.db.mixins import ContactInfoMixin
+from briefy.common.db.mixins import KnackMixin
 from briefy.common.db.mixins import LocalRolesMixin
 from briefy.common.db.mixins import Mixin
+from briefy.common.db.mixins import OptIn
+from briefy.common.db.mixins import PersonalInfoMixin
 from briefy.common.db.models.roles import LocalRole
 from briefy.common.vocabularies.roles import LocalRolesChoices
+from briefy.common.utils.cache import timeout_cache
 from briefy.leica.db import Session
-from briefy.ws.utils.user import get_public_user_info
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -17,6 +20,45 @@ from sqlalchemy_continuum.utils import count_versions
 import colander
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils
+import uuid
+
+
+@timeout_cache(600, renew=False)
+def get_public_user_info(user_id: str) -> dict:
+    """Retrieve user information from briefy.rolleiflex.
+
+    :param user_id: Id for the user we want to query.
+    :return: Dictionary with public user information.
+    """
+    data = {
+        'id': user_id,
+        'first_name': '',
+        'last_name': '',
+        'fullname': '',
+        'email': '',
+    }
+    from briefy.leica.models import UserProfile
+    try:
+        _ = uuid.UUID(user_id)  # noqa
+    except (ValueError, AttributeError) as exc:
+        return data
+    else:
+        raw_data = UserProfile.get(user_id)
+        if raw_data:
+            data['id'] = str(raw_data.id)
+            data['first_name'] = raw_data.first_name
+            data['last_name'] = raw_data.last_name
+            data['fullname'] = raw_data.title
+            data['email'] = raw_data.email
+        return data
+
+
+_ID_COLANDER = {
+    'title': 'ID',
+    'validator': colander.uuid,
+    'missing': colander.drop,
+    'typ': colander.String()
+}
 
 
 class LeicaBriefyRoles(BaseBriefyRoles):
@@ -66,7 +108,8 @@ class LeicaBriefyRoles(BaseBriefyRoles):
             entity_id=cls.id,
             user_id=user_id,
             entity_type=cls.__name__,
-            role_name=getattr(LocalRolesChoices, role_name)
+            role_name=getattr(LocalRolesChoices, role_name),
+            can_view=True,
         )
 
     def _apply_actors_info(self, data: dict) -> dict:
@@ -94,6 +137,13 @@ class CustomerBriefyRoles(LeicaBriefyRoles):
         'customer_user',
         'account_manager',
     )
+
+    __colanderalchemy_config__ = {
+        'overrides': {
+            'customer_user': _ID_COLANDER,
+            'account_manager': _ID_COLANDER,
+        }
+    }
 
     @declared_attr
     def _customer_user(cls):
@@ -136,6 +186,13 @@ class ProjectBriefyRoles(LeicaBriefyRoles):
         'project_manager',
     )
 
+    __colanderalchemy_config__ = {
+        'overrides': {
+            'customer_user': _ID_COLANDER,
+            'project_manager': _ID_COLANDER,
+        }
+    }
+
     @declared_attr
     def _customer_user(cls):
         """Relationship: return a list of LocalRoles.
@@ -177,6 +234,14 @@ class OrderBriefyRoles(LeicaBriefyRoles):
         'project_manager',
         'scout_manager',
     )
+
+    __colanderalchemy_config__ = {
+        'overrides': {
+            'customer_user': _ID_COLANDER,
+            'project_manager': _ID_COLANDER,
+            'scout_manager': _ID_COLANDER,
+        }
+    }
 
     @declared_attr
     def _customer_user(cls):
@@ -236,6 +301,15 @@ class AssignmentBriefyRoles(LeicaBriefyRoles):
         'scout_manager',
         'qa_manager',
     )
+
+    __colanderalchemy_config__ = {
+        'overrides': {
+            'professional_user': _ID_COLANDER,
+            'project_manager': _ID_COLANDER,
+            'scout_manager': _ID_COLANDER,
+            'qa_manager': _ID_COLANDER,
+        }
+    }
 
     @declared_attr
     def _professional_user(cls):
@@ -372,6 +446,24 @@ class AssignmentFinancialInfo(ProfessionalPayoutInfo):
 
     Amount to be paid to the professional as additional compensation.
     This value is expressed in cents.
+    """
+
+    reason_additional_compensation = sa.Column(
+        sa.Text(),
+        nullable=True,
+        default='',
+        info={
+            'colanderalchemy': {
+                'title': 'Type of Set',
+                'default': '',
+                'missing': colander.drop,
+                'typ': colander.String
+            }
+        }
+    )
+    """Reason for Additional Compensation.
+
+    Text explaining why we give an additional compensation to the Professional.
     """
 
     payable = sa.Column(
@@ -518,5 +610,11 @@ class KLeicaVersionedMixin(KnackMixin, LeicaVersionedMixin):
 
 class PolaroidMixin:
     """Mixin to handle Polaroid integration."""
+
+    pass
+
+
+class UserProfileMixin(ContactInfoMixin, PersonalInfoMixin, OptIn, KLeicaVersionedMixin):
+    """A user profile on our system."""
 
     pass

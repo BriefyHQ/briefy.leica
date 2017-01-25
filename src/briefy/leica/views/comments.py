@@ -3,7 +3,6 @@ from briefy.leica.events import comment as events
 from briefy.leica.models import Comment
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources import RESTService
-from briefy.ws.resources import WorkflowAwareResource
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
 from pyramid.security import Allow
@@ -22,7 +21,10 @@ class CommentFactory(BaseFactory):
         :rtype: list
         """
         _acls = [
-            (Allow, 'g:briefy_pm', ['add', 'delete', 'edit', 'list', 'view'])
+            (Allow, 'g:briefy', ['create', 'list', 'view']),
+            (Allow, 'g:briefy_qa', ['create', 'list', 'view']),
+            (Allow, 'g:professionals', ['create', 'list', 'view']),
+            (Allow, 'g:customers', ['create', 'list', 'view']),
         ]
         return _acls
 
@@ -33,6 +35,7 @@ class CommentService(RESTService):
     model = Comment
     friendly_name = model.__name__
     default_order_by = 'created_at'
+    default_order_direction = -1
 
     _default_notify_events = {
         'POST': events.CommentCreatedEvent,
@@ -52,15 +55,8 @@ class CommentService(RESTService):
     def default_filters(self, query) -> object:
         """Default filters for this Service."""
         entity_id = self.request.matchdict.get('entity_id', '')
-        query.filter(self.model.entity_id == entity_id)
+        query = query.filter(self.model.entity_id == entity_id)
         return query
-
-
-class CommentsWorkflowService(WorkflowAwareResource):
-    """Comments workflow service."""
-
-    model = Comment
-    friendly_name = Comment.__name__
 
 
 ASSIGNMENT_PATH = '/assignments/{assignment_id}'
@@ -79,16 +75,6 @@ class AssignmentCommentService(CommentService):
     """Comments for an Assignment."""
 
 
-@resource(
-    collection_path=PATH + '/transitions',
-    path=PATH + '/transitions/{transition_id}',
-    cors_policy=CORS_POLICY,
-    factory=CommentFactory
-)
-class AssignmentCommentWorkflowService(CommentsWorkflowService):
-    """AssignmentComment workflow resource."""
-
-
 COLLECTION_PATH = ASSIGNMENT_PATH + '/assets/{entity_id}/comments'
 PATH = COLLECTION_PATH + '/{id}'
 
@@ -103,16 +89,6 @@ class AssetCommentService(CommentService):
     """Comments for an Asset."""
 
 
-@resource(
-    collection_path=PATH + '/transitions',
-    path=PATH + '/transitions/{transition_id}',
-    cors_policy=CORS_POLICY,
-    factory=CommentFactory
-)
-class AssetCommentWorkflowService(CommentsWorkflowService):
-    """AssetComment workflow resource."""
-
-
 COLLECTION_PATH = '/orders/{entity_id}/comments'
 PATH = COLLECTION_PATH + '/{id}'
 
@@ -125,13 +101,3 @@ PATH = COLLECTION_PATH + '/{id}'
 )
 class OrderCommentService(CommentService):
     """Comments for an Order."""
-
-
-@resource(
-    collection_path=PATH + '/transitions',
-    path=PATH + '/transitions/{transition_id}',
-    cors_policy=CORS_POLICY,
-    factory=CommentFactory
-)
-class OrderCommentWorkflowService(CommentsWorkflowService):
-    """AssignmentOrderComment workflow resource."""

@@ -3,6 +3,7 @@ from briefy.common.db import datetime_utcnow
 from briefy.common.users import SystemUser
 from briefy.common.utils.data import generate_slug
 from briefy.common.utils.transformers import to_serializable
+from briefy.leica.config import FILES_BASE
 from briefy.leica.models import Customer
 from briefy.leica.models import Project
 from briefy.leica.sync import ModelSync
@@ -10,6 +11,35 @@ from briefy.leica.sync.project_constraints import CONSTRAINTS
 
 NOW = to_serializable(datetime_utcnow())
 ACTOR = SystemUser.id
+
+
+STATUS_MAPPING = {
+    'Leisure Group Belvilla DE': 'paused',
+    'Leisure Group Belvilla ES': 'paused',
+    'Leisure Group Belvilla FR': 'paused',
+    'Leisure Group Belvilla IT': 'paused',
+    'Agoda Bali': 'ongoing',
+    'Agoda Bangkok': 'ongoing',
+    'Agoda Pattaya': 'ongoing',
+    'Agoda Phuket': 'ongoing',
+    'Aladinia Spa Project (Pilot)': 'completed',
+    'Auctionata': 'completed',
+    'Beauty Spotter Clinics': 'ongoing',
+    'Agoda Re-shoot / New shoot': 'ongoing',
+    'Classic Driver Pilot': 'completed',
+    'Deliveroo Behind the Scene': 'ongoing',
+    'eH Visio Clinics': 'ongoing',
+    'Erento': 'completed',
+    'Everphone Business Portrait': 'completed',
+    'ezCater USA': 'ongoing',
+    'Foodora Wien': 'completed',
+    'Homeday Properties': 'created',
+    'Homeday Portraits': 'ongoing',
+    'Just Eat finalists UK': 'completed',
+    'Love Home Swap': 'completed',
+    'Stayz Australia': 'completed',
+    'WeTravel Yoga': 'completed',
+}
 
 
 class ProjectSync(ModelSync):
@@ -22,7 +52,7 @@ class ProjectSync(ModelSync):
 
     def _state_history(self, state: str='ongoing'):
         """Create state history structure."""
-        return [
+        history = [
             {
                 'date': NOW,
                 'message': 'Imported project from Knack database',
@@ -31,15 +61,41 @@ class ProjectSync(ModelSync):
                 'from': '',
                 'to': 'created'
             },
-            {
-                'date': NOW,
-                'message': 'Automatic transition',
-                'actor': ACTOR,
-                'transition': 'start' if state == 'ongoing' else 'pause',
-                'from': 'created',
-                'to': state
-            },
         ]
+        if state in ('ongoing', 'paused', 'completed'):
+            history.append(
+                    {
+                        'date': NOW,
+                        'message': 'Automatic transition',
+                        'actor': ACTOR,
+                        'transition': 'start',
+                        'from': 'created',
+                        'to': 'ongoing',
+                    },
+            )
+            if state == 'paused':
+                history.append(
+                    {
+                        'date': NOW,
+                        'message': 'Automatic transition',
+                        'actor': ACTOR,
+                        'transition': 'pause',
+                        'from': 'ongoing',
+                        'to': 'paused',
+                    },
+                )
+            if state == 'completed':
+                history.append(
+                    {
+                        'date': NOW,
+                        'message': 'Automatic transition',
+                        'actor': ACTOR,
+                        'transition': 'close',
+                        'from': 'ongoing',
+                        'to': 'completed',
+                    },
+                )
+        return history
 
     def get_payload(self, kobj, briefy_id=None):
         """Create payload for project object."""
@@ -51,8 +107,22 @@ class ProjectSync(ModelSync):
         title = kobj.project_name.strip()
         slug = generate_slug(title)
         tech_requirements = CONSTRAINTS[title]
-        state = 'ongoing'
+        state = STATUS_MAPPING[title]
         state_history = self._state_history(state)
+        briefing = kobj.briefing
+        if briefing:
+            briefing = '{0}/files/projects/{1}/briefing/{2}'.format(
+                FILES_BASE,
+                kobj.briefy_id,
+                briefing.split('/')[-1]
+            )
+        release_template = kobj.release_template
+        if release_template:
+            release_template = '{0}/files/projects/{1}/release_template/{2}'.format(
+                FILES_BASE,
+                kobj.briefy_id,
+                release_template.split('/')[-1]
+            )
         result.update(
             dict(
                 title=title,
@@ -62,7 +132,7 @@ class ProjectSync(ModelSync):
                 description='',
                 abstract=kobj.project_abstract,
                 customer_id=customer.id,
-                briefing=kobj.briefing,
+                briefing=briefing,
                 approval_window=kobj.set_refusal_window or 0,
                 number_required_assets=kobj.number_required_assets,
                 availability_window=kobj.availability_window or 0,
@@ -73,7 +143,7 @@ class ProjectSync(ModelSync):
                 price=self.parse_decimal(kobj.project_set_price),
                 price_currency=kobj.currency_set_price or 'EUR',
                 external_id=kobj.id,
-                release_template=kobj.release_template,
+                release_template=release_template,
                 tech_requirements=tech_requirements
             )
         )

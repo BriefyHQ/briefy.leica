@@ -12,17 +12,9 @@ class DashboardProfessionalFactory(BaseFactory):
 
     model = DashboardProfessionalAssignment
 
-    @property
-    def __base_acl__(self) -> list:
-        """Hook to be use by subclasses to define default ACLs in context.
-
-        :return: list of ACLs
-        :rtype: list
-        """
-        _acls = [
-            (Allow, 'g:professionals', ['list', 'view']),
-        ]
-        return _acls
+    __base_acl__ = [
+        (Allow, 'g:professionals', ['list', 'view']),
+    ]
 
 
 COLLECTION_PATH = '/dashboards/professional/assignment'
@@ -42,27 +34,28 @@ class DashboardProfessionalAssignmentService(RESTService):
 
     _columns_map = (
         {
-            'field': 'total', 'label': 'Total number of Jobs',
+            'field': 'total', 'label': 'All your Assignments',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'assigned', 'label': 'Jobs to be scheduled',
+            'field': 'assigned', 'label': 'To be Scheduled',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'scheduled', 'label': 'Jobs scheduled',
+            'field': 'scheduled', 'label': 'Scheduled',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'in_qa', 'label': 'Jobs in QA process',
+            'field': 'awaiting_submission_resubmission',
+            'label': 'Waiting Submission / Resubmission',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'rejected', 'label': 'Jobs rejected by QA',
+            'field': 'in_qa', 'label': 'In QA Review',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'completed', 'label': 'Jobs completed',
+            'field': 'completed_inactive', 'label': 'Completed / Inactive',
             'type': 'integer', 'url': '', 'filter': ''
         }
     )

@@ -36,6 +36,9 @@ from briefy.leica.models.professional.location import AdditionalWorkingLocation
 from briefy.leica.models.professional.location import MainWorkingLocation
 from briefy.leica.models.professional.location import WorkingLocation  # noQA
 from briefy.leica.models.project import Project
+from briefy.leica.models.user import UserProfile
+from briefy.leica.models.user import CustomerUserProfile
+from briefy.leica.models.user import BriefyUserProfile
 
 LocalRole.__session__ = Session
 
@@ -43,8 +46,10 @@ ALL_MODELS = [
     AdditionalWorkingLocation,
     Asset,
     Assignment,
+    BriefyUserProfile,
     Comment,
     Customer,
+    CustomerUserProfile,
     CustomerBillingAddress,
     CustomerContact,
     Image,
@@ -68,6 +73,7 @@ ALL_MODELS = [
     ThreeSixtyImage,
     Tumblr,
     Twitter,
+    UserProfile,
     Video,
     Videographer,
     Youtube,

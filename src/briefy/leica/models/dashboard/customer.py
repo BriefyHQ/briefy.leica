@@ -23,7 +23,7 @@ total_order_customer = select([
         case([(Order.state == 'scheduled', 1)], else_=0)
     ).label('scheduled'),
     func.sum(
-        case([(Order.state == 'in_qa', 1)], else_=0)
+        case([(Order.state.in_(('in_qa', 'refused')), 1)], else_=0)
     ).label('in_qa'),
     func.sum(
         case([(Order.state == 'cancelled', 1)], else_=0)
@@ -34,7 +34,16 @@ total_order_customer = select([
 ]).group_by(Project.title).where(
     and_(
         Order.state.in_(
-            ('received', 'assigned', 'scheduled', 'cancelled', 'delivered', 'accepted', 'in_qa')
+            (
+                'received',
+                'assigned',
+                'scheduled',
+                'cancelled',
+                'delivered',
+                'accepted',
+                'in_qa',
+                'refused'
+            )
         ),
         Project.id == Order.project_id,
         Project.local_roles.any(role_name='customer_user', user_id=':user_id')

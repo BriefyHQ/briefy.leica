@@ -12,17 +12,9 @@ class DashboardCustomerFactory(BaseFactory):
 
     model = DashboardCustomerOrder
 
-    @property
-    def __base_acl__(self) -> list:
-        """Hook to be use by subclasses to define default ACLs in context.
-
-        :return: list of ACLs
-        :rtype: list
-        """
-        _acls = [
-            (Allow, 'g:customers', ['list', 'view']),
-        ]
-        return _acls
+    __base_acl__ = [
+        (Allow, 'g:customers', ['list', 'view']),
+    ]
 
 
 COLLECTION_PATH = '/dashboards/customer/order'
@@ -38,7 +30,7 @@ class DashboardCustomerOrderService(RESTService):
 
     model = DashboardCustomerOrder
     friendly_name = model.__name__
-    default_order_by = 'total'
+    default_order_by = 'title'
 
     _columns_map = (
         {

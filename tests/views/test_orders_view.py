@@ -17,15 +17,18 @@ class TestOrderView(BaseVersionedTestView):
     ]
     ignore_validation_fields = [
         'state_history', 'state', 'updated_at', 'customer', 'project',
-        'customer_user', 'project_manager', 'scout_manager', 'location', 'external_id'
+        'customer_user', 'project_manager', 'scout_manager', 'location',
+        'external_id', 'assignment'
     ]
     file_path = 'data/orders.json'
     model = models.Order
-    initial_wf_state = 'created'
+    initial_wf_state = 'received'
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {
         'title': 'New Order Title changed!',
         'price': 10000,
-        'price_currency': 'USD'
+        'price_currency': 'USD',
+        'availability': ["2017-01-18T18:55:25.930638+00:00",
+                         "2017-01-19T18:55:25.930638+00:00"]
     }

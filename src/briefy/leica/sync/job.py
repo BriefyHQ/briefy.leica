@@ -1,6 +1,7 @@
 """Import and sync Knack Job to Leica Job."""
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica import logger
+from briefy.leica.config import FILES_BASE
 from briefy.leica.models import Comment
 from briefy.leica.models import Assignment
 from briefy.leica.models import OrderLocation
@@ -50,6 +51,22 @@ class JobSync(ModelSync):
         category = kobj.category.pop() if kobj.category else 'undefined'
         category = 'Accommodation' if category == 'Accomodation' else category
         category = 'Portrait' if category == 'Portraits' else category
+        if kobj.availability_1 and kobj.availability_2:
+            availability = [
+                kobj.availability_1.isoformat(),
+                kobj.availability_2.isoformat()
+            ]
+        else:
+            availability = None
+
+        delivery_link_str = kobj.client_delivery_link.url
+        delivery = dict()
+        if delivery_link_str and delivery_link_str[:4] == 'sftp':
+            delivery['sftp'] = delivery_link_str
+        elif delivery_link_str:
+            delivery['gdrive'] = delivery_link_str
+
+        requirements = kobj.client_specific_requirement or None
 
         order_payload.update(
             dict(
@@ -62,9 +79,11 @@ class JobSync(ModelSync):
                 price=self.parse_decimal(kobj.set_price),
                 customer_order_id=kobj.job_id,
                 slug=self.get_slug(job_id),
+                delivery=delivery,
                 job_id=job_id,
+                availability=availability,
                 external_id=kobj.id,
-                requirements=kobj.client_specific_requirement,
+                requirements=requirements,
                 number_required_assets=number_required_assets,
                 source=isource_mapping.get(str(kobj.input_source), 'briefy'),
             )
@@ -113,21 +132,66 @@ class JobSync(ModelSync):
 
     def add_comment(self, obj, kobj):
         """Add Project Manager comment to the Order."""
-        project_manager = obj.project.project_manager if obj.project.project_manager else None
-        payload = dict(
-            id=uuid.uuid4(),
-            entity_id=obj.id,
-            entity_type=obj.__tablename__,
-            author_id=project_manager,
-            content=kobj.project_manager_comment
-        )
-        session = self.session
-        session.add(Comment(**payload))
+        if kobj.project_manager_comment:
+            project_manager = obj.project.project_manager if obj.project.project_manager else None
+            payload = dict(
+                id=uuid.uuid4(),
+                entity_id=obj.id,
+                entity_type=obj.__tablename__,
+                author_id=project_manager,
+                content=kobj.project_manager_comment,
+                author_role='project_manager',
+                to_role='customer_user',
+                internal=False,
+            )
+            session = self.session
+            session.add(Comment(**payload))
+
+        if kobj.client_feedback:
+            customer_user = obj.project.customer_user or obj.project.project_manager
+            payload = dict(
+                id=uuid.uuid4(),
+                entity_id=obj.id,
+                entity_type=obj.__tablename__,
+                author_id=customer_user,
+                content=kobj.client_feedback,
+                author_role='customer_user',
+                to_role='project_manager',
+                internal=False,
+            )
+            session = self.session
+            session.add(Comment(**payload))
 
     def add_assignment_comments(self, obj, kobj):
-        """Import assigment comments."""
-        # TODO: internal comment, photographer comment, quality assurance feedback
-        pass
+        """Import Assignment comments."""
+        if kobj.photographers_comment and obj.professional_id:
+            payload = dict(
+                id=uuid.uuid4(),
+                entity_id=obj.id,
+                entity_type=obj.__tablename__,
+                author_id=obj.professional_id,
+                content=kobj.photographers_comment,
+                author_role='professional_user',
+                to_role='qa_manager',
+                internal=False,
+            )
+            session = self.session
+            session.add(Comment(**payload))
+
+        if kobj.quality_assurance_feedback:
+            qa_manager = obj.qa_manager or obj.project.project_manager
+            payload = dict(
+                id=uuid.uuid4(),
+                entity_id=obj.id,
+                entity_type=obj.__tablename__,
+                author_id=qa_manager,
+                content=kobj.quality_assurance_feedback,
+                author_role='qa_manager',
+                to_role='professional_user',
+                internal=False,
+            )
+            session = self.session
+            session.add(Comment(**payload))
 
     def add_assignment(self, obj, kobj):
         """Add a related assign object."""
@@ -143,19 +207,34 @@ class JobSync(ModelSync):
         job_pool = Pool.query().filter_by(external_id=kpool_id).one_or_none()
         if kpool_id and not job_pool:
             print('Knack Poll ID: {0} do not found in leica.'.format(kpool_id))
+
+        release = kobj.signed_releases_contract
+        if release:
+            release = '{0}/files/order/{1}/release/{2}'.format(
+                FILES_BASE,
+                kobj.briefy_id,
+                release.split('/')[-1]
+            )
+        payout_value = self.parse_decimal(kobj.photographer_payout)
+        knack_payout_currency = self.choice_to_str(kobj.currency_payout)
+        payout_currency = str(knack_payout_currency) if knack_payout_currency else 'EUR'
+        reason_compensation = self.choice_to_str(kobj.reason_for_additional_compensation)
         payload = dict(
             id=uuid.uuid4(),
             order_id=obj.id,
             created_at=_build_date(kobj.input_date),
             pool=job_pool,
+            reason_additional_compensation=reason_compensation,
             slug=self.get_slug(job_id, assignment=1),
             professional_id=professional_id,
-            payout_value=self.parse_decimal(kobj.photographer_payout),
-            payout_currency=kobj.currency_payout or 'EUR',
-            additional_compensation=self.parse_decimal(kobj.additional_compensation),
+            scheduled_datetime=kobj.scheduled_shoot_date_time,
+            release_contract=release,
+            payout_value=payout_value,
+            payout_currency=payout_currency,
+            additional_compensation=self.parse_decimal(kobj.additional_compensation) or None,
             payable=payable,
             submission_path=str(kobj.photo_submission_link),
-            travel_expenses=self.parse_decimal(kobj.travel_expenses),
+            travel_expenses=self.parse_decimal(kobj.travel_expenses) or None,
         )
         assignment = Assignment(**payload)
         self.session.add(assignment)
@@ -202,12 +281,18 @@ class JobSync(ModelSync):
 
         # update assignment state history
         add_assignment_history(self.session, assignment, kobj)
+        if assignment.state == 'cancelled':
+            assignment.payout_value = 0
+        # add assignment comments
+        self.add_assignment_comments(assignment, kobj)
 
         # populate the set_type field
+        new_set = kobj.new_set
         further_edit = kobj.further_editing_requested_by_client
+
         if further_edit:
             assignment.set_type = 'refused_customer'
-        elif not assignment.set_type:
+        elif not new_set:
             assignment.set_type = 'returned_photographer'
         else:
             assignment.set_type = 'new'
