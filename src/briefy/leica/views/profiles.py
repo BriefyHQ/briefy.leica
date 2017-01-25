@@ -24,8 +24,11 @@ class ProfessionalFactory(BaseFactory):
         :rtype: list
         """
         _acls = [
+            (Allow, 'g:briefy', ['edit', 'view']),
+            (Allow, 'g:professionals', ['edit', 'view']),
+            (Allow, 'g:customers', ['edit', 'view']),
             (Allow, 'g:briefy_finance', ['list', 'view']),
-            (Allow, 'g:briefy_tech', ['add', 'delete', 'edit', 'list', 'view']),
+            (Allow, 'g:briefy_tech', ['create', 'delete', 'edit', 'list', 'view']),
         ]
         return _acls
 
