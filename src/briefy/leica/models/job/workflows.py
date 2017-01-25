@@ -222,24 +222,19 @@ class AssignmentWorkflow(BriefyWorkflow):
         """Customer or PM cancel the Assignment."""
         now = datetime_utcnow()
         assignment = self.document
+        allowed = False
         scheduled_datetime = assignment.scheduled_datetime
         if self.state == self.scheduled:
             date_diff = scheduled_datetime - now
             if date_diff.days >= 1:
-                return True
-            else:
-                return False
-
+                allowed = True
         elif self.state == self.awaiting_assets:
             submission_path = assignment.submission_path
             date_diff = now - scheduled_datetime
             # let cancel if the there is no upload after 4 days
             if not submission_path and date_diff.days >= 4:
-                return True
-            else:
-                return False
-        else:
-            return True
+                allowed = True
+        return allowed
 
     @Permission(groups=[G['customers'], G['pm'], G['qa'], ])
     def can_cancel(self):
@@ -567,9 +562,14 @@ class OrderWorkflow(BriefyWorkflow):
     @scheduled.transition(cancelled, 'can_cancel', message_required=True)
     @assigned.transition(cancelled, 'can_cancel', message_required=True)
     @received.transition(cancelled, 'can_cancel', message_required=True)
-    def cancel(self):
+    def cancel(self, **kwargs):
         """Transition: Cancel the Order."""
-        pass
+        order = self.document
+        assignment = order.assignment
+        wkf = assignment.workflow
+        wkf.context = self.context
+        assignment.workflow.cancel()
+
 
     @Permission(groups=[LR['project_manager'], LR['customer_user'], G['pm'], G['customers'], ])
     def can_cancel(self):

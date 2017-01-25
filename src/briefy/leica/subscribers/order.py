@@ -33,19 +33,9 @@ def order_submit(event):
 def order_cancel_or_perm_refuse(event):
     """Handle Assignment cancel and perm_reject workflow event."""
     order = event.obj
-
-    # TODO: workaround for double event trigger
-    if order.state == 'cancelled':
-        return
-
-    request = event.request
-    # cancel all existing assignments
-    for assignment in order.assignments:
-        assignment.workflow.cancel()
-
     author_role = 'customer_user'
     to_role = 'project_manager'
-    create_comment_from_wf_transition(order, request, author_role, to_role)
+    create_comment_from_wf_transition(order, author_role, to_role)
 
 
 def order_remove_schedule(event):
@@ -60,10 +50,9 @@ def order_remove_schedule(event):
 def order_refuse(event):
     """Handle Order refuse workflow event."""
     order = event.obj
-    request = event.request
     author_role = 'customer_user'
     to_role = 'project_manager'
-    create_comment_from_wf_transition(order, request, author_role, to_role)
+    create_comment_from_wf_transition(order, author_role, to_role)
 
 
 def order_new_shoot_or_reshoot(event):
