@@ -3,16 +3,41 @@ from briefy.common.queue import IQueue
 from briefy.common.queue.message import SQSMessage
 from briefy.common.utils.data import Objectify
 from briefy.common.worker.queue import QueueWorker
-from briefy.leica import logger
 from briefy.leica.config import NEW_RELIC_LICENSE_KEY
-# from briefy.leica import events
+from briefy.leica import logger
+from briefy.leica.worker import actions
 from zope.component import getUtility
 
 import newrelic.agent
 
-MESSAGE_DISPATCH = {
 
+MESSAGE_DISPATCH = {
+    'laure.assignment.validated': {
+        'name': 'resolving validated assignment',
+        'action': actions.validate_assignment,
+        'success_notification': None,
+        'failure_notification': None,
+    },
+    'laure.asignemnt.rejected': {
+        'name': 'resolving invalidated assigment',
+        'action': actions.invalidate_assignment,
+        'success_notification': None,
+        'failure_notification': None,
+    },
+    'laure.assigment.copied': {
+        'name': 'resolving copied assets',
+        'action': actions.approve_assignment,
+        'success_notification': None,
+        'failure_notification': None,
+    },
+    'laure.assigment.copy_failure': {
+        'name': 'handling asset copy failure',
+        'action': actions.asset_copy_malfunction,
+        'success_notification': None,
+        'failure_notification': None,
+    }
 }
+
 """
 Dictionary for event dispatching. Expected format:
 each key is the event name itself - each value being another dictionary
@@ -70,11 +95,13 @@ class Worker(QueueWorker):
                 assignment.dct,
                 error))
             raise  # Let newrelic deal with it.
-        if status:
+        event = None
+        if status and dispatch.success_notification:
             event = dispatch.success_notification(payload)
-        else:
+        elif not status and dispatch.failure_notification:
             event = dispatch.failure_notification(payload)
-        event()
+        if event:
+            event()
         return status
 
 

@@ -286,6 +286,10 @@ class AssignmentWorkflow(BriefyWorkflow):
         # transitions.approve_assets_in_assignment(assignment, self.context)
 
         # This will not trigger the Order just the event to start ms.laure.
+
+        # TODO: Copying assets to destination delivery and archive locations
+        # is not instant.  Maybe we could have a transitory state
+        # somewhat along "delivering_process" before "approved"
         pass
 
     @in_qa.transition(
