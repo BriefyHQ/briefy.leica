@@ -4,6 +4,7 @@ from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.descriptors import UnaryRelationshipWrapper
 from briefy.leica.models.job import workflows
+from briefy.leica.models.project import Project
 from briefy.leica.utils.transitions import get_transition_date
 from briefy.leica.models.job.location import OrderLocation
 from briefy.leica.vocabularies import OrderInputSource
@@ -25,6 +26,13 @@ __listing_attributes__ = __summary_attributes__ + [
     'customer_order_id', 'deliver_date', 'accept_date', 'availability', 'assignment',
     'requirements', 'delivery',
 ]
+
+
+def get_customer_id_from_project(context):
+    """Get customer_id for Order from the Project.customer_id."""
+    project_id = context.current_parameters.get('project_id')
+    project = Project.get(project_id)
+    return project.customer_id
 
 
 class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
@@ -49,7 +57,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         'excludes': [
             'state_history', 'state', 'project', 'comments', 'customer',
             '_project_manager', '_scout_manager', '_customer_user', 'external_id',
-            'assignment'
+            'assignment', 'assignments'
         ],
         'overrides': mixins.OrderBriefyRoles.__colanderalchemy_config__['overrides']
     }
@@ -70,7 +78,18 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     Reference for the customer to find this order. On Knack this field was refered as 'job_id'
     """
 
-    job_id = sa.Column(sa.String, nullable=True, index=True)
+    job_id = sa.Column(
+        sa.String,
+        nullable=True,
+        index=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Internal Job ID (deprecated)',
+                'missing': colander.drop,
+                'typ': colander.String
+            }
+        }
+    )
     """Order ID was the main Briefy id for an Order.
 
     This field was used on Knack as an auto-incremented field named 'internal_job_id'.
@@ -80,7 +99,8 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     customer_id = sa.Column(
         sautils.UUIDType,
         sa.ForeignKey('customers.id'),
-        nullable=True,
+        default=get_customer_id_from_project,
+        nullable=False,
         info={
             'colanderalchemy': {
                 'title': 'Customer ID',
@@ -117,7 +137,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     category = sa.Column(
         sautils.ChoiceType(CategoryChoices, impl=sa.String()),
         default='undefined',
-        nullable=True
+        nullable=False
     )
     """Category of this Order.
 
@@ -135,7 +155,10 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     Options come from :mod:`briefy.leica.vocabularies`.
     """
 
-    number_required_assets = sa.Column(sa.Integer(), default=10)
+    number_required_assets = sa.Column(
+        sa.Integer(),
+        default=10
+    )
     """Number of required assets of an Order."""
 
     requirements = sa.Column(sa.Text, default='')
@@ -163,6 +186,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     # Assignments
     assignments = orm.relationship(
         'Assignment',
+        order_by='asc(Assignment.created_at)',
         backref=orm.backref('order')
     )
     """Assignments.
@@ -174,7 +198,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         'Assignment',
         uselist=False,
         viewonly=True,
-        order_by='asc(Assignment.created_at)',
+        order_by='desc(Assignment.created_at)',
         primaryjoin='''and_(
             Order.id == Assignment.order_id,
             not_(Assignment.state.in_(('cancelled', 'perm_reject')))
@@ -334,7 +358,6 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data['location'] = self.location
         data['assignment'] = self.assignment.to_summary_dict() if self.assignment else None
         data['tech_requirements'] = self.tech_requirements
-
         # Workflow history
         add_user_info_to_state_history(self.state_history)
 
