@@ -7,6 +7,7 @@ from briefy.leica.config import FILES_BASE
 from briefy.leica.models import Customer
 from briefy.leica.models import Project
 from briefy.leica.sync import ModelSync
+from briefy.leica.sync import category_mapping
 from briefy.leica.sync.project_constraints import CONSTRAINTS
 
 NOW = to_serializable(datetime_utcnow())
@@ -124,6 +125,10 @@ class ProjectSync(ModelSync):
                 release_template.split('/')[-1]
             )
 
+        category = kobj.category.pop() if kobj.category else 'undefined'
+        category = 'Accommodation' if category == 'Accomodation' else category
+        category = 'Portrait' if category == 'Portraits' else category
+
         knack_price_currency = self.choice_to_str(kobj.currency_set_price)
         price_currency = str(knack_price_currency) if knack_price_currency else 'EUR'
         result.update(
@@ -131,6 +136,7 @@ class ProjectSync(ModelSync):
                 title=title,
                 slug=slug,
                 state=state,
+                category=category,
                 state_history=state_history,
                 description='',
                 abstract=kobj.project_abstract,

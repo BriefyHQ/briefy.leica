@@ -1,5 +1,4 @@
 """Import and sync Knack Job to Leica Job."""
-from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica import logger
 from briefy.leica.config import FILES_BASE
 from briefy.leica.models import Comment
@@ -11,6 +10,7 @@ from briefy.leica.models import Project
 from briefy.leica.vocabularies import OrderInputSource as ISource
 from briefy.leica.sync import PLACEHOLDERS
 from briefy.leica.sync import ModelSync
+from briefy.leica.sync import category_mapping
 from briefy.leica.sync.job_wf_history import _build_date
 from briefy.leica.sync.job_wf_history import add_assignment_history
 from briefy.leica.sync.job_wf_history import add_order_history
@@ -19,7 +19,6 @@ from briefy.leica.sync.location import create_location_dict
 import uuid
 
 isource_mapping = {item.label: item.value for item in ISource.__members__.values()}
-category_mapping = {item.label: item.value for item in CategoryChoices.__members__.values()}
 
 
 class JobSync(ModelSync):

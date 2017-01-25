@@ -350,6 +350,8 @@ def upgrade():
     sa.Column('payout_currency', types.CurrencyType(length=3), autoincrement=False, nullable=True),
     sa.Column('payout_value', sa.Integer(), autoincrement=False, nullable=True),
     sa.Column('price_currency', types.CurrencyType(length=3), autoincrement=False, nullable=True),
+    sa.Column('category', types.ChoiceType(
+        choices=CategoryChoices, impl=sa.String()), nullable=True),
     sa.Column('price', sa.Integer(), autoincrement=False, nullable=True),
     sa.Column('contract', types.URLType(), autoincrement=False, nullable=True),
     sa.Column('customer_id', types.UUIDType(), autoincrement=False, nullable=True),
@@ -536,6 +538,8 @@ def upgrade():
     sa.Column('payout_currency', types.CurrencyType(length=3), nullable=True),
     sa.Column('payout_value', sa.Integer(), nullable=False),
     sa.Column('price_currency', types.CurrencyType(length=3), nullable=True),
+    sa.Column('category', types.ChoiceType(
+        choices=CategoryChoices, impl=sa.String()), nullable=False),
     sa.Column('price', sa.Integer(), nullable=True),
     sa.Column('contract', types.URLType(), nullable=True),
     sa.Column('customer_id', types.UUIDType(), nullable=False),

@@ -46,6 +46,13 @@ def get_customer_id_from_project(context):
     return project.customer_id
 
 
+def get_category_from_project(context):
+    """Get category for Order from the Project.category."""
+    project_id = context.current_parameters.get('project_id')
+    project = Project.get(project_id)
+    return project.category
+
+
 class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
             mixins.KLeicaVersionedMixin, Base):
     """An Order from the customer."""
@@ -182,7 +189,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     category = sa.Column(
         sautils.ChoiceType(CategoryChoices, impl=sa.String()),
-        default='undefined',
+        default=get_category_from_project,
         nullable=False
     )
     """Category of this Order.
