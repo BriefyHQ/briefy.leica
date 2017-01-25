@@ -31,6 +31,23 @@ class JobSync(ModelSync):
     parent_model = Project
     bulk_insert = False
 
+    def updated_at(self, kobj):
+        """Return updated_at value."""
+        input_date = _build_date(kobj.input_date),
+        updated_at = _build_date(kobj.updated_at)
+        assignment_date = _build_date(kobj.assignment_date)
+        submission_date = _build_date(kobj.submission_date)
+        last_approval_date = _build_date(kobj.last_approval_date)
+        last_photographer_update = _build_date(kobj.last_photographer_update)
+        delivery_date_to_client = _build_date(kobj.delivery_date_to_client)
+
+        updated_at = (
+            updated_at or delivery_date_to_client or
+            last_approval_date or last_photographer_update or
+            submission_date or assignment_date or input_date
+        )
+        return updated_at
+
     def get_slug(self, job_id: str, assignment: int = 0):
         """Create new slug for Order and Assignment."""
         # TODO: check jobs in knack with internal_job_id == 0
@@ -67,12 +84,14 @@ class JobSync(ModelSync):
             delivery['gdrive'] = delivery_link_str
 
         requirements = kobj.client_specific_requirement or None
+        knack_input_source = self.choice_to_str(kobj.input_source)
 
         order_payload.update(
             dict(
                 title=kobj.job_name,
                 description='',
                 created_at=_build_date(kobj.input_date),
+                updated_at=self.updated_at(kobj),
                 category=category_mapping.get(category, 'undefined'),
                 project_id=project.id,
                 customer_id=project.customer.id,
@@ -86,7 +105,7 @@ class JobSync(ModelSync):
                 price_currency=project.price_currency,
                 requirements=requirements,
                 number_required_assets=number_required_assets,
-                source=isource_mapping.get(str(kobj.input_source), 'briefy'),
+                source=isource_mapping.get(knack_input_source, 'briefy'),
             )
         )
         if order_payload.get('category') == 'undefined':
@@ -224,6 +243,7 @@ class JobSync(ModelSync):
             id=uuid.uuid4(),
             order_id=obj.id,
             created_at=_build_date(kobj.input_date),
+            updated_at=self.updated_at(kobj),
             pool=job_pool,
             reason_additional_compensation=reason_compensation or None,
             slug=self.get_slug(job_id, assignment=1),

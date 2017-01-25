@@ -52,7 +52,7 @@ class PhotographerSync(ModelSync):
             country = location.get('country')
 
         if mobile:
-            mobile = cleanse_phone_number(mobile, country)
+            mobile = cleanse_phone_number(mobile, country, kobj)
 
         state = 'inactive' if kobj.blacklist else 'active'
         result.update(

@@ -22,7 +22,7 @@ PLACEHOLDERS = {
 VALID_PHONE_CHARS = digits + '+'
 
 
-def cleanse_phone_number(value: str, country: str) -> Union[PhoneNumber, None]:
+def cleanse_phone_number(value: str, country: str, kobj: object) -> Union[PhoneNumber, None]:
     """Cleanse a phone number and return a PhoneNumber if valid."""
     value = ''.join([v for v in value if v in VALID_PHONE_CHARS])
     if len(value) < 10:
@@ -38,7 +38,8 @@ def cleanse_phone_number(value: str, country: str) -> Union[PhoneNumber, None]:
         parsed = phonenumbers.parse(value, country)
         value = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.INTERNATIONAL)
     except phonenumbers.NumberParseException:
-        logger.info('Error parsing {value}, {country}'.format(value=value, country=country))
+        msg = 'Error parsing {value}, Country: {country}. Briefy ID: {briefy_id}'
+        logger.info(msg.format(value=value, country=country, briefy_id=kobj.briefy_id))
         return None
     return PhoneNumber(value)
 
@@ -149,7 +150,7 @@ class ModelSync:
         """Parse phone number from knack before input in the database."""
         number_attr_value = getattr(kobj, attr, None)
         if number_attr_value:
-            number = cleanse_phone_number(number_attr_value['number'], country)
+            number = cleanse_phone_number(number_attr_value['number'], country, kobj)
         else:
             number = None
         return number

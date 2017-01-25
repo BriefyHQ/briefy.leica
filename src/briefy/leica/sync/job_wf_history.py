@@ -1,5 +1,6 @@
 """Import Job workflow history for Order and Assignment."""
 from briefy.leica import logger
+from briefy.leica.models import UserProfile
 from collections import OrderedDict
 from datetime import datetime
 
@@ -87,8 +88,20 @@ def add_order_history(session, obj, kobj):
 
     # created and received status
     person = _get_identifier(kobj, 'input_person', default='Briefy')
-    # actor should be customer_user or project_manager
-    actor_id = obj.project_manager if obj.source == 'briefy' else obj.customer_user
+    try:
+        first_name, last_name = person.split(' ')
+    except Exception as exc:
+        user_profile = None
+    else:
+        user_profile = UserProfile.query().filter_by(
+            first_name=first_name,
+            last_name=last_name
+        ).one_or_none()
+    # actor should be: user_profile or customer_user or project_manager
+    if user_profile:
+        actor_id = user_profile.id
+    else:
+        actor_id = obj.project_manager if obj.source == 'briefy' else obj.customer_user
     actor = str(actor_id) if actor_id else 'g:system'
     history.append({
         'date': _build_date(kobj.input_date),
@@ -254,8 +267,21 @@ def add_assignment_history(session, obj, kobj):
 
     # Check for 'created' status
     person = _get_identifier(kobj, 'input_person', default='Briefy')
-    # actor should be customer_user or project_manager
-    actor_id = order.project_manager if order.source == 'briefy' else order.customer_user
+    try:
+        first_name, last_name = person.split(' ')
+    except Exception as exc:
+        user_profile = None
+    else:
+        user_profile = UserProfile.query().filter_by(
+            first_name=first_name,
+            last_name=last_name
+        ).one_or_none()
+    # actor should be: user_profile or customer_user or project_manager
+    if user_profile:
+        actor_id = user_profile.id
+    else:
+        actor_id = obj.order.project_manager if \
+            obj.order.source == 'briefy' else obj.order.customer_user
     actor = str(actor_id) if actor_id else 'g:system'
     history.append({
         'date': _build_date(kobj.input_date),

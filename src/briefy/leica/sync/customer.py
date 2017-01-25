@@ -88,7 +88,8 @@ class CustomerSync(ModelSync):
         )[1] if kobj.company_address.country else 'DE'
         mobile = cleanse_phone_number(
             kobj.contact_phone.get('number'),
-            country
+            country,
+            kobj
         ) if kobj.contact_phone else ''
         contact_dict = dict(
             customer_id=obj.id,
