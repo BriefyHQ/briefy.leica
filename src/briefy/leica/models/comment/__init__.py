@@ -21,7 +21,7 @@ class Comment(mixins.LeicaMixin, Base):
 
     _workflow = workflows.CommentWorkflow
 
-    __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'entity_type', 'type']}
+    __colanderalchemy_config__ = {'excludes': ['state_history', 'state', 'type']}
 
     __summary_attributes__ = [
         'id', 'content', 'internal', 'created_at', 'updated_at', 'author', 'author_role', 'to_role'
@@ -97,7 +97,14 @@ class Comment(mixins.LeicaMixin, Base):
 
     """
 
-    entity_type = sa.Column(sa.String(255))
+    entity_type = sa.Column(
+        sa.String(255),
+        nullable=False,
+        info={'colanderalchemy': {
+            'title': 'entity',
+            'typ': colander.String}
+        }
+    )
     """Entity Type.
 
     To which object type (model) this comment is attached to.
