@@ -8,9 +8,12 @@ from sqlalchemy import case
 from sqlalchemy import distinct
 from sqlalchemy import func
 from sqlalchemy import select
+from sqlalchemy import types
+from sqlalchemy.sql import expression
 
 
 total_order_customer = select([
+    func.CONCAT('/projects/', expression.cast(Project.id, types.Unicode)).label('absolute_url'),
     Project.title,
     func.count(distinct(Order.id)).label('total'),
     func.sum(
@@ -31,7 +34,7 @@ total_order_customer = select([
     func.sum(
         case([(Order.state.in_(('delivered', 'accepted')), 1)], else_=0)
     ).label('completed'),
-]).group_by(Project.title).where(
+]).group_by(Project.title, Project.id).where(
     and_(
         Order.state.in_(
             (
