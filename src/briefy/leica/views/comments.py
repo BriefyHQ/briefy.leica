@@ -89,7 +89,7 @@ class AssetCommentService(CommentService):
     """Comments for an Asset."""
 
 
-COLLECTION_PATH = ASSIGNMENT_PATH + '/orders/{entity_id}/comments'
+COLLECTION_PATH = '/orders/{entity_id}/comments'
 PATH = COLLECTION_PATH + '/{id}'
 
 
