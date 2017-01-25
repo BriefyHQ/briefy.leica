@@ -123,6 +123,9 @@ class ProjectSync(ModelSync):
                 kobj.briefy_id,
                 release_template.split('/')[-1]
             )
+
+        knack_price_currency = self.choice_to_str(kobj.currency_set_price)
+        price_currency = str(knack_price_currency) if knack_price_currency else 'EUR'
         result.update(
             dict(
                 title=title,
@@ -136,12 +139,12 @@ class ProjectSync(ModelSync):
                 approval_window=kobj.set_refusal_window or 0,
                 number_required_assets=kobj.number_required_assets,
                 availability_window=kobj.availability_window or 0,
-                payout_currency=kobj.currency_set_price or 'EUR',
+                payout_currency=price_currency,
                 payout_value=self.parse_decimal(kobj.project_payout_set_price),
                 cancellation_window=kobj.cancellation_window or 0,
                 contract=company.link_to_contract.url,
                 price=self.parse_decimal(kobj.project_set_price),
-                price_currency=kobj.currency_set_price or 'EUR',
+                price_currency=price_currency,
                 external_id=kobj.id,
                 release_template=release_template,
                 tech_requirements=tech_requirements

@@ -28,7 +28,7 @@ class AssignmentFactory(BaseFactory):
         :rtype: list
         """
         _acls = [
-            (Allow, 'g:professionals', ['list', 'view']),
+            (Allow, 'g:professionals', ['list', 'view', 'edit']),
         ]
         return _acls
 

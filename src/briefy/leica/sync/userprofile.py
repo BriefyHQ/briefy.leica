@@ -21,6 +21,12 @@ class UserProfileSync(ModelSync):
         company_name = ''
         if hasattr(kobj, 'company') and kobj.company:
             company_name = kobj.company[0]['identifier'].strip()
+
+        email = kobj.email.email or PLACEHOLDERS['email']
+        if email == 'jobpool@picsastock.com':
+            first_name = 'Self'
+            last_name = 'Assigned'
+
         result.update(
             dict(
                 state=state,

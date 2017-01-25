@@ -13,20 +13,11 @@ class CommentFactory(BaseFactory):
 
     model = Comment
 
-    @property
-    def __base_acl__(self) -> list:
-        """Hook to be use by subclasses to define default ACLs in context.
-
-        :return: list of ACLs
-        :rtype: list
-        """
-        _acls = [
-            (Allow, 'g:briefy', ['create', 'list', 'view']),
-            (Allow, 'g:briefy_qa', ['create', 'list', 'view']),
-            (Allow, 'g:professionals', ['create', 'list', 'view']),
-            (Allow, 'g:customers', ['create', 'list', 'view']),
-        ]
-        return _acls
+    __base_acl__ = [
+        (Allow, 'g:briefy', ['create', 'list', 'view']),
+        (Allow, 'g:professionals', ['create', 'list', 'view']),
+        (Allow, 'g:customers', ['create', 'list', 'view']),
+    ]
 
 
 class CommentService(RESTService):

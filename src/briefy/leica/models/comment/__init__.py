@@ -31,9 +31,9 @@ class Comment(mixins.LeicaMixin, Base):
 
     __raw_acl__ = (
         ('list', ('g:briefy', 'g:system')),
-        ('create', ('g:briefy', 'g:system')),
-        ('view', ('g:briefy', 'g:system')),
-        ('edit', ('g:system',)),
+        ('create', ('g:briefy', 'g:professionals', 'g:customers', 'g:system')),
+        ('view', ('g:briefy', 'g:professionals', 'g:customers', 'g:system')),
+        ('edit', ('g:briefy', 'g:system',)),
         ('delete', ('g:system',)),
     )
 
