@@ -27,6 +27,8 @@ class Comment(mixins.LeicaMixin, Base):
         'id', 'content', 'internal', 'created_at', 'updated_at', 'author', 'author_role', 'to_role'
     ]
 
+    __summary_attributes_relations__ = ['entity']
+
     __listing_attributes__ = __summary_attributes__
 
     __raw_acl__ = (
@@ -124,4 +126,5 @@ class Comment(mixins.LeicaMixin, Base):
         data = super().to_dict()
         add_user_info_to_state_history(self.state_history)
         data['author'] = self.author
+        data['entity'] = self.entity
         return data

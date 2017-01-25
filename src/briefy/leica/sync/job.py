@@ -157,7 +157,7 @@ class JobSync(ModelSync):
             payload = dict(
                 id=uuid.uuid4(),
                 entity_id=obj.id,
-                entity_type=obj.__tablename__,
+                entity_type=obj.__class__.__name__,
                 author_id=project_manager,
                 content=kobj.project_manager_comment,
                 author_role='project_manager',
@@ -172,7 +172,7 @@ class JobSync(ModelSync):
             payload = dict(
                 id=uuid.uuid4(),
                 entity_id=obj.id,
-                entity_type=obj.__tablename__,
+                entity_type=obj.__class__.__name__,
                 author_id=customer_user,
                 content=kobj.client_feedback,
                 author_role='customer_user',
@@ -188,7 +188,7 @@ class JobSync(ModelSync):
             payload = dict(
                 id=uuid.uuid4(),
                 entity_id=obj.id,
-                entity_type=obj.__tablename__,
+                entity_type=obj.__class__.__name__,
                 author_id=obj.professional_id,
                 content=kobj.photographers_comment,
                 author_role='professional_user',
@@ -203,7 +203,7 @@ class JobSync(ModelSync):
             payload = dict(
                 id=uuid.uuid4(),
                 entity_id=obj.id,
-                entity_type=obj.__tablename__,
+                entity_type=obj.__class__.__name__,
                 author_id=qa_manager,
                 content=kobj.quality_assurance_feedback,
                 author_role='qa_manager',

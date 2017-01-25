@@ -13,7 +13,7 @@ def create_comment_from_wf_transition(obj, request, author_role, to_role, intern
     if message:
         payload = dict(
             entity_id=obj.id,
-            entity_type=obj.__tablename__,
+            entity_type=obj.__class__.__name__,
             author_id=user.id,
             content=message,
             author_role=author_role,
