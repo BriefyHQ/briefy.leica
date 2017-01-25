@@ -1,6 +1,5 @@
 """Import Job workflow history for Order and Assignment."""
 from briefy.leica import logger
-from briefy.leica.models import UserProfile
 from collections import OrderedDict
 from datetime import datetime
 
@@ -255,7 +254,7 @@ def add_assignment_history(session, obj, kobj):
     # Check for 'created' status
     person = _get_identifier(kobj, 'input_person', default='Briefy')
     actor_id = obj.order.project_manager if \
-            obj.order.source == 'briefy' else obj.order.customer_user
+        obj.order.source == 'briefy' else obj.order.customer_user
     actor = str(actor_id) if actor_id else 'g:system'
     history.append({
         'date': _build_date(kobj.input_date),
