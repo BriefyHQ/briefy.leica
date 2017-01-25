@@ -136,7 +136,7 @@ class ProjectSync(ModelSync):
                 title=title,
                 slug=slug,
                 state=state,
-                category=category,
+                category=category_mapping.get(category, 'undefined'),
                 state_history=state_history,
                 description='',
                 abstract=kobj.project_abstract,
