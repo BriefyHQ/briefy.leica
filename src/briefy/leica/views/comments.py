@@ -33,6 +33,7 @@ class CommentService(RESTService):
     model = Comment
     friendly_name = model.__name__
     default_order_by = 'created_at'
+    default_order_direction = -1
 
     _default_notify_events = {
         'POST': events.CommentCreatedEvent,
