@@ -83,16 +83,19 @@ class LeicaBriefyRoles(BaseBriefyRoles):
         )
 
     @classmethod
-    def get_association_proxy(cls, role_name, remote_attr):
+    def get_association_proxy(cls, role_name, remote_attr, permissions=None):
         """Get a new association proxy instance."""
         def creator(user_id):
-            return cls.create_local_role(user_id, role_name)
-
+            if isinstance(permissions, dict):
+                return cls.create_local_role(user_id, role_name, **permissions)
+            else:
+                return cls.create_local_role(user_id, role_name)
         local_attr = '_{role_name}'.format(role_name=role_name)
         return association_proxy(local_attr, remote_attr, creator=creator)
 
     @classmethod
-    def create_local_role(cls, user_id, role_name):
+    def create_local_role(cls, user_id, role_name, can_view=True, can_delete=False,
+                          can_create=False, can_edit=False, can_list=False):
         """Create local LocalRole instance for role and user_id."""
         # TODO: find a way to do this validation here..
         # query = LocalRole.query().filter_by(entity_id=cls.id,
@@ -109,7 +112,11 @@ class LeicaBriefyRoles(BaseBriefyRoles):
             user_id=user_id,
             entity_type=cls.__name__,
             role_name=getattr(LocalRolesChoices, role_name),
-            can_view=True,
+            can_view=can_view,
+            can_edit=can_edit,
+            can_list=can_list,
+            can_delete=can_delete,
+            can_create=can_create,
         )
 
     def _apply_actors_info(self, data: dict) -> dict:
@@ -325,7 +332,14 @@ class AssignmentBriefyRoles(LeicaBriefyRoles):
 
         :return: IDs of the professional users.
         """
-        return cls.get_association_proxy('professional_user', 'user_id')
+        permissions = dict(
+            can_view=True,
+            can_edit=True,
+            can_list=True,
+            can_delete=False,
+            can_create=False,
+        )
+        return cls.get_association_proxy('professional_user', 'user_id', permissions)
 
     @declared_attr
     def _project_manager(cls):

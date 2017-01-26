@@ -2,6 +2,7 @@
 from briefy.common.db import datetime_utcnow
 from briefy.common.vocabularies.roles import Groups as G
 from briefy.common.vocabularies.roles import LocalRolesChoices as LR
+from briefy.common.users import SystemUser
 from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import Permission
 from briefy.common.workflow import WorkflowState as WS
@@ -103,16 +104,25 @@ class AssignmentWorkflow(BriefyWorkflow):
     )
     def assign(self):
         """Define a Professional to the Assignment."""
-        order = self.document.order
+        assignment = self.document
+        order = assignment.order
         if order.state == 'received':
             order.workflow.assign()
+        # set local role
+        # TODO: validate if the professional_id is available
+        professional_id = assignment.professional_id
+        if professional_id:
+            assignment.professional_user = professional_id
 
     @Permission(groups=[G['scout'], G['pm'], ])
     def can_assign(self):
         """Validate if user can set the Professional in the Assignment."""
         return True
 
-    @pending.transition(published, 'can_publish')
+    @pending.transition(
+        published, 'can_publish',
+        required_fields=('pool_id', ),
+    )
     def publish(self):
         """Inform availability dates and move the enable Assignment to be self assigned."""
         order = self.document.order
@@ -145,11 +155,16 @@ class AssignmentWorkflow(BriefyWorkflow):
     def self_assign(self):
         """Professional choose the Assignment from the Pool."""
         # workflow event subscriber will move to schedule after
-        order = self.document.order
+        assignment = self.document
+        order = assignment.order
         if order.state == 'received':
+            order.workflow.context = SystemUser
             order.workflow.assign()
+        # set local role
+        professional_id = self.context.id
+        assignment.professional_user = professional_id
 
-    @Permission(groups=[G['professionals'], G['pm'], G['scout'], ])
+    @Permission(groups=[G['professionals'], G['pm'], G['scout'], G['system']])
     def can_self_assign(self):
         """Validate if user is able to self assign this Assignment."""
         # TODO: Check for existing Assignment already schedule to the same date.
@@ -165,9 +180,10 @@ class AssignmentWorkflow(BriefyWorkflow):
         # TODO: validate the scheduled_datetime is in future
         order = self.document.order
         if order.state == 'assigned':
+            order.workflow.context = SystemUser
             order.workflow.schedule()
 
-    @Permission(groups=[G['professionals'], G['pm'], G['scout'], ])
+    @Permission(groups=[G['professionals'], G['pm'], G['scout'], G['system']])
     def can_schedule(self):
         """Validate if user can schedule an Assignment."""
         return True
@@ -481,7 +497,7 @@ class OrderWorkflow(BriefyWorkflow):
         # should be only used by the Assignment workflow
         return True
 
-    @Permission(groups=[LR['project_manager'], G['pm'], G['scout'], ])
+    @Permission(groups=[LR['project_manager'], G['pm'], G['scout'], G['system'], ])
     def can_assign(self):
         """Permission: Validate if user can assign a Order.
 
@@ -570,7 +586,6 @@ class OrderWorkflow(BriefyWorkflow):
         wkf.context = self.context
         assignment.workflow.cancel()
 
-
     @Permission(groups=[LR['project_manager'], LR['customer_user'], G['pm'], G['customers'], ])
     def can_cancel(self):
         """Permission: Validate if user can move the Order to the cancelled state.
@@ -587,7 +602,8 @@ class OrderWorkflow(BriefyWorkflow):
         # this should be executed from the assignment
         pass
 
-    @Permission(groups=[LR['project_manager'], LR['professional_user'], G['pm'], G['scout']])
+    @Permission(groups=[LR['project_manager'], LR['professional_user'],
+                        G['pm'], G['scout'], G['system'], ])
     def can_schedule(self):
         """Permission: Validate if user can schedule an Order.
 

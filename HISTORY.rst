@@ -94,6 +94,11 @@ History
      * Added Order.assignment relationshit to return the last active Assignment of one Order (rudaporto).
      * Pin pyramid to version 1.7.3 (rudaporto).
      * Integrate briefy.common change on Timestamp.update_at (rudaporto).
+     * Implement default filter for the Assignment that uses _custom_filter parameter to show Assignments avaiable in the Professional Pool.
+     * Set AssignmentWorkflowService.enble_secutiry = False. Apply filter avoid Professional do self_assign one Assignment (rudaporto).
+     * Improve Assingment workflow to set professional_user local role when self_assign or assign (rudaporto).
+     * Improve LeicaBriefyRoles mixin: association proxy factory now can receive the list of permission to create the local role. (rudaporto).
+
 
 
 1.1.0 (2016-10-04)

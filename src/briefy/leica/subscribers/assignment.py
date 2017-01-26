@@ -55,8 +55,10 @@ def assignment_remove_schedule(event):
 def assignment_self_assign(event):
     """Handle Assignment self_assign workflow event."""
     assignment = event.obj
-    fields = dict(scheduled_datetime=assignment.scheduled_datetime)
-    assignment.workflow.schedule(fields=fields)
+    # make sure it will only try to schedule assigned assignment
+    if assignment.state == 'assigned':
+        fields = dict(scheduled_datetime=assignment.scheduled_datetime)
+        assignment.workflow.schedule(fields=fields)
 
 
 def assignment_scheduling_issues(event):
