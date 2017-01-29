@@ -1,5 +1,5 @@
-"""Views to handle BizDev Dashboards."""
-from briefy.leica.models.dashboard.bizdev import DashboardBizDevOrder
+"""Views to handle Finance Dashboards."""
+from briefy.leica.models.dashboard.finance import DashboardFinanceOrder
 from briefy.leica.views.dashboard import ORDER_PROJECT_COLS
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources import RESTService
@@ -8,28 +8,28 @@ from cornice.resource import resource
 from pyramid.security import Allow
 
 
-class DashboardBizDevFactory(BaseFactory):
-    """Dashboard BizDev context factory."""
+class DashboardFinanceFactory(BaseFactory):
+    """Dashboard Finance context factory."""
 
-    model = DashboardBizDevOrder
+    model = DashboardFinanceOrder
 
     __base_acl__ = [
-        (Allow, 'g:briefy_bizdev', ['list', 'view']),
+        (Allow, 'g:briefy_finance', ['list', 'view']),
     ]
 
 
-COLLECTION_PATH = '/dashboards/bizdev/order'
+COLLECTION_PATH = '/dashboards/finance/order'
 PATH = COLLECTION_PATH + '/{id}'
 
 
 @resource(collection_path=COLLECTION_PATH,
           path=PATH,
           cors_policy=CORS_POLICY,
-          factory=DashboardBizDevFactory)
-class DashboardBizDevOrderService(RESTService):
-    """Dashboard BizDev: Order Service."""
+          factory=DashboardFinanceFactory)
+class DashboardFinanceOrderService(RESTService):
+    """Dashboard Finance: Order Service."""
 
-    model = DashboardBizDevOrder
+    model = DashboardFinanceOrder
     friendly_name = model.__name__
     default_order_by = 'title'
 

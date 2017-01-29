@@ -1,11 +1,11 @@
-"""BizDev Dashboard models."""
+"""PM Dashboard models."""
 from briefy.leica.db import Base
 from briefy.leica.db import Session
 from briefy.leica.models.dashboard.base import total_order_project
 
 
-class DashboardBizDevOrder(Base):
-    """Dashboard BizDev: Total of Order by workflow state."""
+class DashboardPMOrder(Base):
+    """Dashboard PM: Total of Order by workflow state."""
 
     __table__ = total_order_project
     __mapper_args__ = {
