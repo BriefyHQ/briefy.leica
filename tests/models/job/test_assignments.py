@@ -1,7 +1,7 @@
 """Test Assignments database model."""
+from briefy.common.db import datetime_utcnow
 from briefy.leica import models
 from conftest import BaseModelTest
-from datetime import datetime
 from datetime import timedelta
 from pyramid.testing import DummyRequest
 
@@ -25,7 +25,7 @@ class TestAssignmentModel(BaseModelTest):
         """Test workflow for this model."""
         from briefy.common.workflow.exceptions import WorkflowTransitionException
 
-        now = datetime.utcnow()
+        now = datetime_utcnow()
         request = DummyRequest()
         assignment = instance_obj
         assignment.request = request
