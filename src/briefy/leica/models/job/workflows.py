@@ -221,7 +221,6 @@ class AssignmentWorkflow(BriefyWorkflow):
     @scheduled.transition(assigned, 'can_remove_schedule')
     def remove_schedule(self):
         """Customer, Professional or PM removes the Assignment scheduled shoot datetime."""
-        # subscriber handle this transition from Assignment to Order
         pass
 
     @Permission(groups=[G['professionals'], G['customers'], G['pm']])
@@ -563,7 +562,6 @@ class OrderWorkflow(BriefyWorkflow):
     @scheduled.transition(assigned, 'can_remove_schedule')
     def remove_schedule(self):
         """Transition: Inform the removal of the schedule shoot datetime to the customer."""
-        # subscriber handle this transition from Order to Assignment
         pass
 
     @Permission(groups=[LR['project_manager'], G['pm'], G['professionals'], G['customers'], ])

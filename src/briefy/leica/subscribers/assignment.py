@@ -1,5 +1,6 @@
 """Event subscribers for briefy.leica.models.job.Assignment."""
 from briefy.common.users import SystemUser
+from briefy.common.vocabularies.roles import Groups as G
 from briefy.leica.events.assignment import AssignmentCreatedEvent
 from briefy.leica.models import Professional
 from briefy.leica.subscribers import safe_workflow_trigger_transitions
@@ -51,9 +52,26 @@ def assignment_remove_schedule(event):
     """Handle Assignment remove_schedule workflow event."""
     assignment = event.obj
     assignment.scheduled_datetime = None
+    user = assignment.workflow.context
     order = assignment.order
+    message = assignment.state_history[-1]['message']
     if order.state == 'scheduled':
-        order.workflow.remove_schedule()
+        order.workflow.remove_schedule(message=message)
+
+    if G['customers'] in user.groups:
+        # this should not create a comment on the assignment only on the order
+        return
+    elif G['pm'] in user.groups:
+        to_role = 'professional_user'
+        author_role = 'project_manager'
+    elif G['professionals'] in user.groups:
+        to_role = 'project_manager'
+        author_role = 'professional_user'
+    else:
+        to_role = 'professional_user'
+        author_role = 'project_manager'
+
+    create_comment_from_wf_transition(assignment, author_role, to_role)
 
 
 def assignment_self_assign(event):

@@ -10,7 +10,8 @@ def create_comment_from_wf_transition(obj, author_role, to_role, internal=False)
     session = object_session(obj)
     last_transition = obj.state_history[-1]
     message = last_transition['message']
-    user_id = last_transition['actor']
+    actor = last_transition['actor']
+    user_id = actor['id'] if isinstance(actor, dict) else actor
     # HACK: It is ugly, but worked
     comments = obj.comments.filter(
         Comment.author_id == user_id,

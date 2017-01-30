@@ -1,5 +1,6 @@
 """Event subscribers for briefy.leica.models.job.Order."""
 from briefy.common.users import SystemUser
+from briefy.common.vocabularies.roles import Groups as G
 from briefy.leica.events.order import OrderCreatedEvent
 from briefy.leica.subscribers.utils import create_new_assignment_from_order
 from briefy.leica.subscribers.utils import create_comment_from_wf_transition
@@ -41,10 +42,27 @@ def order_cancel_or_perm_refuse(event):
 def order_remove_schedule(event):
     """Handle Order remove_schedule workflow event."""
     order = event.obj
+    user = order.workflow.context
     assignment = order.assignment
     assignment.scheduled_datetime = None
+    message = order.state_history[-1]['message']
     if assignment.state == 'scheduled':
-        order.workflow.remove_schedule()
+        assignment.workflow.remove_schedule(message=message)
+
+    if G['customers'] in user.groups:
+        to_role = 'project_manager'
+        author_role = 'customer_user'
+    elif G['pm'] in user.groups:
+        to_role = 'customer_user'
+        author_role = 'project_manager'
+    elif G['professionals'] in user.groups:
+        # this should not create a comment on the order only on the assignment
+        return
+    else:
+        to_role = 'customer_user'
+        author_role = 'project_manager'
+
+    create_comment_from_wf_transition(order, author_role, to_role)
 
 
 def order_refuse(event):
