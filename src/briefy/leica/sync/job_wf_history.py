@@ -351,7 +351,7 @@ def add_assignment_history(session, obj, kobj):
             'actor': actor,
             'transition': 'upload',
             'from': 'awaiting_assets',
-            'to': 'validation',
+            'to': 'asset_validation',
         })
         last_date = kobj.submission_date
 
@@ -362,8 +362,8 @@ def add_assignment_history(session, obj, kobj):
             'date': _build_date(date, last_date),
             'message': "Automatic validation skipped (from data on Knack)",
             'actor': 'g:system',
-            'transition': 'validate',
-            'from': 'validation',
+            'transition': 'validate_assets',
+            'from': 'asset_validation',
             'to': 'in_qa',  # Note: can't know about intermediary non-validated sets
         })
         last_date = date
