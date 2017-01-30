@@ -220,19 +220,19 @@ def add_order_history(session, obj, kobj):
 
     # check for 'refused' status
     if knack_state.lower() == 'refused':
-        date = kobj.delivery_date_to_client or last_date
+        refuse_date = date.updated_at or kobj.delivery_date_to_client or last_date
         # actor should be customer_user or project_manager
         actor_id = obj.customer_user or obj.project_manager
         actor = str(actor_id) if actor_id else 'g:system'
         history.append({
-            'date': _build_date(date, last_date),
+            'date': _build_date(refuse_date, last_date),
             'message': 'Job refused by client',
             'actor': actor,
             'transition': 'refuse',
             'from': history[-1]['to'],
             'to': order_state
         })
-        last_date = date
+        last_date = refuse_date
 
     obj.state_history = history
     # TODO: stick with knack actual status, last status history is not always accurate
@@ -418,20 +418,20 @@ def add_assignment_history(session, obj, kobj):
 
     # Check for 'refused' status
     if knack_state.lower() == 'refused':
-        date = kobj.last_approval_date or kobj.submission_date
-        project = _get_identifier(kobj, 'customer')
+        refuse_date = kobj.updated_at or kobj.last_approval_date or kobj.submission_date
+        project = obj.order.project.title
         # actor should be customer_user or project_manager
         actor_id = order.customer_user or order.project_manager
         actor = str(actor_id) if actor_id else 'g:system'
         history.append({
-            # TODO: verify this date
-            'date': _build_date(kobj.submission_date, last_date),
+            'date': _build_date(refuse_date, last_date),
             'message': "Set of photos refused by client from project '{}'".format(project),
             'actor': actor,
             'transition': 'refuse',
             'from': 'approved',
             'to': assignment_state,
         })
+        last_date = date
 
     obj.state_history = history
     # TODO: stick with knack actual status, last status history is not always accurate
