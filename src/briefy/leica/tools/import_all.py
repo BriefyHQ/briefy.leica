@@ -18,7 +18,7 @@ from briefy.leica.tools import logger # noqa
 
 
 def main(session, transaction):
-    """Import Project script."""
+    """Import all data from knack script."""
     update_users()
     CustomerSync(session, transaction)()
     ProjectSync(session, transaction)()
