@@ -103,7 +103,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         'can_assign',
         required_fields=('professional_id',)
     )
-    def assign(self):
+    def assign(self, **kwargs):
         """Define a Professional to the Assignment."""
         assignment = self.document
         order = assignment.order
@@ -124,7 +124,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         published, 'can_publish',
         required_fields=('pool_id', ),
     )
-    def publish(self):
+    def publish(self, **kwargs):
         """Inform availability dates and move the enable Assignment to be self assigned."""
         order = self.document.order
         if not order.availability:
@@ -153,7 +153,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         'can_self_assign',
         required_fields=('scheduled_datetime', 'professional_id')
     )
-    def self_assign(self):
+    def self_assign(self, **kwargs):
         """Professional choose the Assignment from the Pool."""
         # workflow event subscriber will move to schedule after
         assignment = self.document
@@ -176,7 +176,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         'can_schedule',
         required_fields=('scheduled_datetime', )
     )
-    def schedule(self):
+    def schedule(self, **kwargs):
         """Professional, Scout or PM schedule the Assignment."""
         # TODO: validate the scheduled_datetime is in future
         order = self.document.order
@@ -206,7 +206,8 @@ class AssignmentWorkflow(BriefyWorkflow):
         date_diff = fields.get('scheduled_datetime') - now
         # TODO: review this condition
         if date_diff.days < 1:
-            raise WorkflowTransitionException('Shoot Datetime should be at least one day after now.')
+            msg = 'Shoot Datetime should be at least one day after now.'
+            raise WorkflowTransitionException(msg)
 
     @assigned.transition(
         assigned,
@@ -291,7 +292,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         'can_approve',
         required_fields=('qa_manager', )
     )
-    def approve(self):
+    def approve(self, **kwargs):
         """QA approves the Assignment Set."""
         # TODO: return this validation when Mr.C is back
         # assignment = self.document
@@ -310,7 +311,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         require_message=True,
         required_fields=('qa_manager', )
     )
-    def reject(self):
+    def reject(self, **kwargs):
         """QA rejects Assignment Set."""
         assignment = self.document
         assignment.set_type = 'returned_photographer'
@@ -339,7 +340,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         'can_upload',
         required_fields=('submission_path', )
     )
-    def upload(self):
+    def upload(self, **kwargs):
         """Professional submits all assets for QA."""
         pass
 
@@ -552,7 +553,7 @@ class OrderWorkflow(BriefyWorkflow):
         assigned, 'can_reassign',
         required_fields=('professional_id', )
     )
-    def reassign(self):
+    def reassign(self, **kwargs):
         """Transition: Inform the reassignment to the customer."""
         pass
 
@@ -631,7 +632,7 @@ class OrderWorkflow(BriefyWorkflow):
         delivered, 'can_deliver',
         required_fields=('delivery', )
     )
-    def deliver(self):
+    def deliver(self, **kwargs):
         """Transition: Inform the deliver of the Order to the customer."""
         pass
 
