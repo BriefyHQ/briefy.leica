@@ -6,6 +6,7 @@ from briefy.common.users import SystemUser
 from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import Permission
 from briefy.common.workflow import WorkflowState as WS
+from briefy.common.workflow import WorkflowTransitionException
 
 import logging
 
@@ -198,10 +199,14 @@ class AssignmentWorkflow(BriefyWorkflow):
         'can_reschedule',
         required_fields=('scheduled_datetime', )
     )
-    def reschedule(self):
+    def reschedule(self, **kwargs):
         """Professional or PM reschedule an Assignment."""
-        # TODO: validate the scheduled_datetime is in future
-        pass
+        fields = kwargs.get('fields')
+        now = datetime_utcnow()
+        date_diff = fields.get('scheduled_datetime') - now
+        # TODO: review this condition
+        if date_diff.days < 1:
+            raise WorkflowTransitionException('Shoot Datetime should be at least one day after now.')
 
     @assigned.transition(
         assigned,
