@@ -376,7 +376,6 @@ class AssignmentWorkflow(BriefyWorkflow):
         assignment.set_type = 'refused_customer'
         order = assignment.order
         if order.state == 'refused':
-            order = assignment.order
             order.workflow.require_revision()
         return True
 
@@ -735,6 +734,7 @@ class OrderWorkflow(BriefyWorkflow):
     @Permission(groups=[G['pm'], ])
     def can_require_revision(self):
         """Permission: Validate if user can require revision of an Order."""
+        return True
 
 
 class PoolWorkflow(BriefyWorkflow):

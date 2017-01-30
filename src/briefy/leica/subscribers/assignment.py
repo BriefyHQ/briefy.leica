@@ -40,7 +40,11 @@ def assignment_perm_reject(event):
 
     to_role = 'professional_user'
     author_role = 'qa_manager'
-    create_comment_from_wf_transition(assignment, request, author_role, to_role)
+    create_comment_from_wf_transition(
+        assignment,
+        author_role,
+        to_role
+    )
 
 
 def assignment_remove_schedule(event):
@@ -64,81 +68,76 @@ def assignment_self_assign(event):
 def assignment_scheduling_issues(event):
     """Handle Assignment scheduling_issues workflow event."""
     assignment = event.obj
-    request = event.request
-    if request:
-        user = request.user
-        to_role = 'project_manager'
-        professional = Professional.get(user.id)
-        if professional:
-            author_role = 'professional_user'
-        else:
-            author_role = 'project_manager'
-        create_comment_from_wf_transition(assignment, request, author_role, to_role)
+    user = assignment.workflow.context
+    to_role = 'project_manager'
+    professional = Professional.get(user.id)
+    if professional:
+        author_role = 'professional_user'
+    else:
+        author_role = 'project_manager'
+    create_comment_from_wf_transition(
+        assignment,
+        author_role,
+        to_role
+    )
 
 
 def assignment_reject(event):
     """Handle Assignment reject workflow event."""
     assignment = event.obj
-    request = event.request
-    if request:
-        author_role = 'qa_manager'
-        to_role = 'professional_user'
-        create_comment_from_wf_transition(assignment, request, author_role, to_role)
+    author_role = 'qa_manager'
+    to_role = 'professional_user'
+    create_comment_from_wf_transition(
+        assignment,
+        author_role,
+        to_role
+    )
 
 
 def assignment_upload(event):
     """Handle Assignment upload workflow event."""
     assignment = event.obj
-    request = event.request
-    if request:
-        user = request.user
-        to_role = 'qa_manager'
-        professional = Professional.get(user.id)
-        if professional:
-            author_role = 'professional_user'
-            internal = False
-        else:
-            author_role = 'project_manager'
-            internal = True
-        create_comment_from_wf_transition(
-            assignment,
-            request,
-            author_role,
-            to_role,
-            internal=internal
-        )
+    user = assignment.workflow.context
+    to_role = 'qa_manager'
+    professional = Professional.get(user.id)
+    if professional:
+        author_role = 'professional_user'
+        internal = False
+    else:
+        author_role = 'project_manager'
+        internal = True
+    create_comment_from_wf_transition(
+        assignment,
+        author_role,
+        to_role,
+        internal=internal
+    )
 
 
 def assignment_validate_or_invalidate_assets(event):
     """Handle Assignment validate or invalidate assets workflow event."""
     assignment = event.obj
-    request = event.request
-    if request:
-        author_role = 'qa_manager'
-        to_role = 'professional_user'
-        create_comment_from_wf_transition(
-            assignment,
-            request,
-            author_role,
-            to_role,
-            internal=False
-        )
+    author_role = 'qa_manager'
+    to_role = 'professional_user'
+    create_comment_from_wf_transition(
+        assignment,
+        author_role,
+        to_role,
+        internal=False
+    )
 
 
 def assignment_return_to_qa(event):
     """Handle Assignment return_to_qa workflow event."""
     assignment = event.obj
-    request = event.request
-    if request:
-        author_role = 'project_manager'
-        to_role = 'qa_manager'
-        create_comment_from_wf_transition(
-            assignment,
-            request,
-            author_role,
-            to_role,
-            internal=True
-        )
+    author_role = 'project_manager'
+    to_role = 'qa_manager'
+    create_comment_from_wf_transition(
+        assignment,
+        author_role,
+        to_role,
+        internal=True
+    )
 
 
 def transition_handler(event):
