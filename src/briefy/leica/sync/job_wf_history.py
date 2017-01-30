@@ -171,7 +171,7 @@ def add_order_history(session, obj, kobj):
 
     # check for 'delivered' status
     if kobj.client_delivery_link.url:
-        date = kobj.last_approval_date or last_date
+        date = kobj.delivery_date_to_client or last_date
         person = _get_identifier(kobj, 'qa_manager', default='g:briefy_qa')
         # actor should be qa_manager
         actor_id = obj.assignments[0].qa_manager
