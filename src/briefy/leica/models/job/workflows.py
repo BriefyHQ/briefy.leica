@@ -110,13 +110,13 @@ class AssignmentWorkflow(BriefyWorkflow):
     )
     def assign(self, **kwargs):
         """Define a Professional to the Assignment."""
+        fields = kwargs['fields']
         assignment = self.document
         order = assignment.order
         if order.state == 'received':
             order.workflow.assign()
         # set local role
-        # TODO: validate if the professional_id is available
-        professional_id = assignment.professional_id
+        professional_id = fields.get('professional_id')
         if professional_id:
             assignment.professional_user = professional_id
 
