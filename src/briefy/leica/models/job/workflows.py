@@ -401,6 +401,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         """Validate if the user can return to QA (futher revision) an Assignment Set."""
         return True
 
+    @in_qa.transition(completed, 'can_complete')
     @approved.transition(completed, 'can_complete')
     @refused.transition(completed, 'can_complete')
     def complete(self, **kwargs):
@@ -681,15 +682,13 @@ class OrderWorkflow(BriefyWorkflow):
         message = kwargs.get('message', '')
         order = self.document
         order.availability = []
-        if order.state == 'refused':
-            old_assignment = order.assignment
-            if old_assignment and old_assignment.state == 'refused':
-                old_assignment.workflow.complete(message=message)
-                new_assignment = create_new_assignment_from_order(order, order.request)
-                professional_id = old_assignment.professional_id
-                fields = dict(professional_id=professional_id)
-                message = ASSIGN_AFTER_RENEWSHOOT
-                new_assignment.workflow.assign(fields=fields, message=message)
+        old_assignment = order.assignment
+        old_assignment.workflow.complete(message=message)
+        new_assignment = create_new_assignment_from_order(order, order.request)
+        professional_id = old_assignment.professional_id
+        fields = dict(professional_id=professional_id)
+        message = ASSIGN_AFTER_RENEWSHOOT
+        new_assignment.workflow.assign(fields=fields, message=message)
 
     @Permission(groups=[LR['project_manager'], G['pm'], G['qa'], ])
     def can_reshoot(self):
@@ -706,11 +705,9 @@ class OrderWorkflow(BriefyWorkflow):
         message = kwargs.get('message', '')
         order = self.document
         order.availability = []
-        if order.state == 'refused':
-            old_assignment = order.assignment
-            if old_assignment and old_assignment.state == 'refused':
-                old_assignment.workflow.complete(message=message)
-                create_new_assignment_from_order(order, order.request)
+        old_assignment = order.assignment
+        old_assignment.workflow.complete(message=message)
+        create_new_assignment_from_order(order, order.request)
 
     @Permission(groups=[LR['project_manager'], G['pm'], G['qa'], ])
     def can_new_shoot(self):
