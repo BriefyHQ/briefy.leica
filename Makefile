@@ -74,7 +74,7 @@ lint: ## check style with flake8
 	flake8 --ignore=D102,D103,D205,D101,D400,D210,D401,D100 tests
 
 test: lint ## run tests quickly with the default Python
-	py.test --cov-report term-missing --cov=briefy.leica tests
+	ENV='test' py.test --cov-report term-missing --cov=briefy.leica tests
 
 test-all: ## run tests on every Python version with tox
 	tox
