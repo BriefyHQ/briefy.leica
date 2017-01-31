@@ -85,7 +85,7 @@ def order_new_shoot_or_reshoot(event):
     order = event.obj
     author_role = 'project_manager'
     to_role = 'customer_user'
-    create_comment_from_wf_transition(order, author_role, to_role)
+    create_comment_from_wf_transition(order, author_role, to_role, internal=True)
 
 
 def transition_handler(event):

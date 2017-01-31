@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 SHOOT_TIME_FUTURE_MSG = 'Shoot time should be at least one day in the future.'
+ASSIGN_AFTER_RENEWSHOOT = 'Creative automatically assigned due to a reshoot.'
 
 
 class AssignmentWorkflow(BriefyWorkflow):
@@ -679,6 +680,7 @@ class OrderWorkflow(BriefyWorkflow):
         """Transition: Inform the reshoot of the Order the customer."""
         message = kwargs.get('message', '')
         order = self.document
+        order.availability = []
         if order.state == 'refused':
             old_assignment = order.assignment
             if old_assignment and old_assignment.state == 'refused':
@@ -686,7 +688,7 @@ class OrderWorkflow(BriefyWorkflow):
                 new_assignment = create_new_assignment_from_order(order, order.request)
                 professional_id = old_assignment.professional_id
                 fields = dict(professional_id=professional_id)
-                message = 'Professional automatically assigned after a reshoot transition.'
+                message = ASSIGN_AFTER_RENEWSHOOT
                 new_assignment.workflow.assign(fields=fields, message=message)
 
     @Permission(groups=[LR['project_manager'], G['pm'], G['qa'], ])
@@ -703,6 +705,7 @@ class OrderWorkflow(BriefyWorkflow):
         """Transition: Inform the new shoot of an Order the customer."""
         message = kwargs.get('message', '')
         order = self.document
+        order.availability = []
         if order.state == 'refused':
             old_assignment = order.assignment
             if old_assignment and old_assignment.state == 'refused':
