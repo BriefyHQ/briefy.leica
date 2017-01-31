@@ -11,6 +11,7 @@ from zope.component import getUtility
 import newrelic.agent
 
 
+
 MESSAGE_DISPATCH = {
     'laure.assignment.validated': {
         'name': 'resolving validated assignment',
@@ -18,19 +19,19 @@ MESSAGE_DISPATCH = {
         'success_notification': None,
         'failure_notification': None,
     },
-    'laure.asignemnt.rejected': {
+    'laure.assignment.rejected': {
         'name': 'resolving invalidated assigment',
         'action': actions.invalidate_assignment,
         'success_notification': None,
         'failure_notification': None,
     },
-    'laure.assigment.copied': {
+    'laure.assignment.copied': {
         'name': 'resolving copied assets',
         'action': actions.approve_assignment,
         'success_notification': None,
         'failure_notification': None,
     },
-    'laure.assigment.copy_failure': {
+    'laure.assignment.copy_failure': {
         'name': 'handling asset copy failure',
         'action': actions.asset_copy_malfunction,
         'success_notification': None,
