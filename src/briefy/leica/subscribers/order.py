@@ -68,9 +68,16 @@ def order_remove_schedule(event):
 def order_refuse(event):
     """Handle Order refuse workflow event."""
     order = event.obj
-    author_role = 'customer_user'
-    to_role = 'project_manager'
-    create_comment_from_wf_transition(order, author_role, to_role)
+    user = order.workflow.context
+    if G['customers'] in user.groups:
+        author_role = 'customer_user'
+        to_role = 'project_manager'
+        internal = False
+    else:
+        author_role = 'project_manager'
+        to_role = 'customer_user'
+        internal = True
+    create_comment_from_wf_transition(order, author_role, to_role, internal=internal)
 
 
 def order_new_shoot_or_reshoot(event):

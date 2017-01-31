@@ -387,10 +387,11 @@ class AssignmentWorkflow(BriefyWorkflow):
     def return_to_qa(self, **kwargs):
         """PM move Assignment back to QA for further revision."""
         assignment = self.document
+        message = kwargs.get('message', '')
         assignment.set_type = 'refused_customer'
         order = assignment.order
         if order.state == 'refused':
-            order.workflow.require_revision()
+            order.workflow.require_revision(message=message)
         return True
 
     @Permission(groups=[G['pm'], ])
@@ -657,7 +658,11 @@ class OrderWorkflow(BriefyWorkflow):
     @delivered.transition(refused, 'can_refuse', message_required=True)
     def refuse(self, **kwargs):
         """Transition: Customer refuse the Order."""
-        pass
+        # TODO: fix workflow to pass message in the kwargs
+        message = kwargs.get('message')
+        order = self.document
+        assignment = order.assignment
+        assignment.workflow.refuse(message=message)
 
     @Permission(groups=[G['pm'], G['customers'], LR['project_manager'], LR['customer_user'], ])
     def can_refuse(self):
