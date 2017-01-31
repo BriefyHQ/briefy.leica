@@ -137,7 +137,8 @@ def assignment_reject(event):
 def assignment_upload(event):
     """Handle Assignment upload workflow event."""
     assignment = event.obj
-    user = assignment.workflow.context
+    workflow = assignment.workflow
+    user = workflow.context
     to_role = 'qa_manager'
     professional = Professional.get(user.id)
     if professional:
@@ -152,6 +153,10 @@ def assignment_upload(event):
         to_role,
         internal=internal
     )
+    # TODO: remove this when real machine validation will be activated
+    if assignment.state == 'asset_validation':
+        workflow.context = SystemUser
+        workflow.validate_assets(message='Stub machine validation for test only! :)')
 
 
 def assignment_validate_or_invalidate_assets(event):

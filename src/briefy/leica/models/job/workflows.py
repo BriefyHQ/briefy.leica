@@ -367,8 +367,9 @@ class AssignmentWorkflow(BriefyWorkflow):
     def validate_assets(self, **kwargs):
         """System validate uploaded Assets."""
         order = self.document.order
-        if order.state == 'schedule':
+        if order.state == 'scheduled':
             message = kwargs.get('message')
+            order.workflow.context = self.context
             order.workflow.start_qa(message=message)
 
     @asset_validation.transition(
