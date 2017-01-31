@@ -1,4 +1,5 @@
 """Event subscribers for briefy.leica.models.job.Assignment."""
+from briefy.common.config import ENV
 from briefy.common.users import SystemUser
 from briefy.common.vocabularies.roles import Groups as G
 from briefy.leica.events.assignment import AssignmentCreatedEvent
@@ -154,7 +155,7 @@ def assignment_upload(event):
         internal=internal
     )
     # TODO: remove this when real machine validation will be activated
-    if assignment.state == 'asset_validation':
+    if assignment.state == 'asset_validation' and ENV in ('staging', 'development'):
         workflow.context = SystemUser
         workflow.validate_assets(message='Stub machine validation for test only! :)')
 
