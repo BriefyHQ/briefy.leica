@@ -1,6 +1,5 @@
 """Utils functions for subscribers."""
 from briefy.leica.events.assignment import AssignmentCreatedEvent
-from briefy.leica.models import Assignment
 from briefy.leica.models import Comment
 from sqlalchemy.orm.session import object_session
 
@@ -35,6 +34,7 @@ def create_comment_from_wf_transition(obj, author_role, to_role, internal=False)
 
 def create_new_assignment_from_order(order, request):
     """Create a new Assignment object from Order."""
+    from briefy.leica.models import Assignment
     session = object_session(order)
     payload = {
         'order_id': order.id,

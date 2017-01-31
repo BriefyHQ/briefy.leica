@@ -83,15 +83,9 @@ def order_refuse(event):
 def order_new_shoot_or_reshoot(event):
     """Handle Order new_shoot reshoot workflow event."""
     order = event.obj
-    request = event.request
-    if not order.assignment:
-        assignment = create_new_assignment_from_order(order, request)
-        # assign the new assignment to the previous professional
-        if order.state == 'assigned':
-            last_assignment = order.assignment[-1]
-            professional_id = last_assignment.professional_id
-            fields = dict(professional_id=professional_id)
-            assignment.assign(fields=fields)
+    author_role = 'project_manager'
+    to_role = 'customer_user'
+    create_comment_from_wf_transition(order, author_role, to_role)
 
 
 def transition_handler(event):

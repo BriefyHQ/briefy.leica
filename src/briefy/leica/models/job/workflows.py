@@ -7,6 +7,7 @@ from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import Permission
 from briefy.common.workflow import WorkflowState as WS
 from briefy.common.workflow import WorkflowTransitionException
+from briefy.leica.subscribers.utils import create_new_assignment_from_order
 
 import logging
 
@@ -676,11 +677,17 @@ class OrderWorkflow(BriefyWorkflow):
     @refused.transition(assigned, 'can_reshoot')
     def reshoot(self, **kwargs):
         """Transition: Inform the reshoot of the Order the customer."""
+        message = kwargs.get('message', '')
         order = self.document
         if order.state == 'refused':
-            assignment = order.assignment
-            if assignment and assignment.state == 'refused':
-                assignment.workflow.complete()
+            old_assignment = order.assignment
+            if old_assignment and old_assignment.state == 'refused':
+                old_assignment.workflow.complete(message=message)
+                new_assignment = create_new_assignment_from_order(order, order.request)
+                professional_id = old_assignment.professional_id
+                fields = dict(professional_id=professional_id)
+                message = 'Professional automatically assigned after a reshoot transition.'
+                new_assignment.workflow.assign(fields=fields, message=message)
 
     @Permission(groups=[LR['project_manager'], G['pm'], G['qa'], ])
     def can_reshoot(self):
@@ -694,12 +701,13 @@ class OrderWorkflow(BriefyWorkflow):
     @refused.transition(received, 'can_new_shoot')
     def new_shoot(self, **kwargs):
         """Transition: Inform the new shoot of an Order the customer."""
-        # subscriber handle this transition
+        message = kwargs.get('message', '')
         order = self.document
         if order.state == 'refused':
-            assignment = order.assignment
-            if assignment and assignment.state == 'refused':
-                assignment.workflow.complete()
+            old_assignment = order.assignment
+            if old_assignment and old_assignment.state == 'refused':
+                old_assignment.workflow.complete(message=message)
+                create_new_assignment_from_order(order, order.request)
 
     @Permission(groups=[LR['project_manager'], G['pm'], G['qa'], ])
     def can_new_shoot(self):
