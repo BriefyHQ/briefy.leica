@@ -317,7 +317,7 @@ def add_assignment_history(session, obj, kobj):
         actor_id = obj.professional_user
         actor = str(actor_id) if actor_id else 'g:system'
         history.append({
-            'date': _build_date(date, last_date),
+            'date': _build_date(kobj.assignment_date, last_date),
             'message': "Scheduled by '{0}' on the Knack database".format(person),
             'actor': actor,
             'transition': 'schedule',
