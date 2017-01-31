@@ -230,6 +230,7 @@ CONSTRAINTS = {
     'Belvilla': _belvilla_constraints[1],
     'Classic Driver Pilot': _default_constraints[1],
     'Deliveroo Behind the Scene': _default_constraints[1],
+    'Delivery Hero Pilot': _default_constraints[1],
     'eH Visio Clinics': _eh_constraints[1],
     'eH Visio': _eh_constraints[1],
     'Erento': _default_constraints[1],

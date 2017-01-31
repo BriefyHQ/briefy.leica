@@ -29,6 +29,7 @@ STATUS_MAPPING = {
     'Agoda Re-shoot / New shoot': 'ongoing',
     'Classic Driver Pilot': 'completed',
     'Deliveroo Behind the Scene': 'ongoing',
+    'Delivery Hero Pilot': 'ongoing',
     'eH Visio Clinics': 'ongoing',
     'Erento': 'completed',
     'Everphone Business Portrait': 'completed',

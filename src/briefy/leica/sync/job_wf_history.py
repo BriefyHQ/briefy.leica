@@ -220,7 +220,7 @@ def add_order_history(session, obj, kobj):
 
     # check for 'refused' status
     if knack_state.lower() == 'refused':
-        refuse_date = date.updated_at or kobj.delivery_date_to_client or last_date
+        refuse_date = kobj.updated_at or kobj.delivery_date_to_client or last_date
         # actor should be customer_user or project_manager
         actor_id = obj.customer_user or obj.project_manager
         actor = str(actor_id) if actor_id else 'g:system'
