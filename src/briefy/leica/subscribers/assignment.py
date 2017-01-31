@@ -107,15 +107,18 @@ def assignment_scheduling_issues(event):
     assignment = event.obj
     user = assignment.workflow.context
     to_role = 'project_manager'
+    author_role = 'professional_user'
+    internal = False
     professional = Professional.get(user.id)
-    if professional:
-        author_role = 'professional_user'
-    else:
+    if not professional:
         author_role = 'project_manager'
+        to_role = 'professional_user'
+        internal = True
     create_comment_from_wf_transition(
         assignment,
         author_role,
-        to_role
+        to_role,
+        internal=internal,
     )
 
 
