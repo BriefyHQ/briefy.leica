@@ -141,7 +141,6 @@ class Pool(mixins.KLeicaVersionedMixin, Base):
         stmt = select([func.count(Assignment.id)]).where(
             and_(
                 Assignment.pool_id == cls.id,
-                Assignment.professional_id is None,
                 Assignment.state == 'published'
             )
         ).as_scalar()

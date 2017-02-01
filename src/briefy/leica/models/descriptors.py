@@ -37,7 +37,7 @@ class UnaryRelationshipWrapper:
         """
         # HACK: To avoid a race condition when a new object is not commited
         # to the database yet.
-        sleep(0.1)
+        sleep(0.5)
         if isinstance(value, dict):
             self.create_or_update_sub_object(obj, value)
         elif isinstance(value, self._model):
