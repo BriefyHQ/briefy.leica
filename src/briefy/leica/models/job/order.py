@@ -14,6 +14,7 @@ from sqlalchemy import orm
 from sqlalchemy.ext.hybrid import hybrid_property
 
 import colander
+import copy
 import random
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils
@@ -28,6 +29,18 @@ __listing_attributes__ = __summary_attributes__ + [
     'customer_order_id', 'deliver_date', 'accept_date', 'availability', 'assignment',
     'requirements', 'delivery',
 ]
+
+__colander_alchemy_config_overrides__ = \
+    copy.copy(mixins.OrderBriefyRoles.__colanderalchemy_config__['overrides'])
+
+# added to be able pass professional_id to the Order reassign transition
+__colander_alchemy_config_overrides__.update(
+    {'professional_id': {
+        'title': 'Professional ID',
+        'missing': colander.drop,
+        'typ': colander.String()
+    }}
+)
 
 
 def create_order_slug():
@@ -77,7 +90,8 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
             '_project_manager', '_scout_manager', '_customer_user', 'external_id',
             'assignment', 'assignments',
         ],
-        'overrides': mixins.OrderBriefyRoles.__colanderalchemy_config__['overrides']
+        'overrides': __colander_alchemy_config_overrides__
+
     }
 
     _slug = sa.Column('slug',

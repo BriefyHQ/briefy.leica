@@ -528,8 +528,9 @@ class OrderWorkflow(BriefyWorkflow):
     def unassign(self, **kwargs):
         """Transition: Un-assign the Order by cancel the Assignment and create a new one."""
         order = self.document
+        old_assignment = order.assignment
         message = kwargs.get('message', '')
-        order.assignment.workflow.cancel(message=message)
+        old_assignment.workflow.cancel(message=message)
         create_new_assignment_from_order(order, order.request)
         return True
 
@@ -571,7 +572,14 @@ class OrderWorkflow(BriefyWorkflow):
     )
     def reassign(self, **kwargs):
         """Transition: Inform the reassignment to the customer."""
-        pass
+        order = self.document
+        old_assignment = order.assignment
+        message = kwargs.get('message', '')
+        old_assignment.workflow.cancel(message=message)
+        new_assignment = create_new_assignment_from_order(order, order.request)
+        # pass message and fields to the assign transition of the Assignment
+        new_assignment.workflow.assign(**kwargs)
+        return True
 
     @Permission(groups=[LR['project_manager'], G['pm'], ])
     def can_reassign(self):
