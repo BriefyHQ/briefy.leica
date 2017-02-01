@@ -62,7 +62,11 @@ def order_remove_schedule(event):
         to_role = 'customer_user'
         author_role = 'project_manager'
 
-    create_comment_from_wf_transition(order, author_role, to_role)
+    create_comment_from_wf_transition(
+        order,
+        author_role,
+        to_role
+    )
 
 
 def order_refuse(event):
@@ -77,7 +81,12 @@ def order_refuse(event):
         author_role = 'project_manager'
         to_role = 'customer_user'
         internal = True
-    create_comment_from_wf_transition(order, author_role, to_role, internal=internal)
+    create_comment_from_wf_transition(
+        order,
+        author_role,
+        to_role,
+        internal=internal
+    )
 
 
 def order_new_shoot_or_reshoot(event):
@@ -85,7 +94,25 @@ def order_new_shoot_or_reshoot(event):
     order = event.obj
     author_role = 'project_manager'
     to_role = 'customer_user'
-    create_comment_from_wf_transition(order, author_role, to_role, internal=True)
+    create_comment_from_wf_transition(
+        order,
+        author_role,
+        to_role,
+        internal=True
+    )
+
+
+def order_unassign(event):
+    """Handle Order unassign workflow event."""
+    order = event.obj
+    author_role = 'project_manager'
+    to_role = 'customer_user'
+    create_comment_from_wf_transition(
+        order,
+        author_role,
+        to_role,
+        internal=True
+    )
 
 
 def transition_handler(event):
@@ -101,6 +128,7 @@ def transition_handler(event):
         'order.workflow.refuse': order_refuse,
         'order.workflow.new_shoot': order_new_shoot_or_reshoot,
         'order.workflow.reshoot': order_new_shoot_or_reshoot,
+        'order.workflow.unassign': order_unassign,
     }
     handler = handlers.get(event_name, None)
     if handler:

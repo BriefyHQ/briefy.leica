@@ -526,10 +526,11 @@ class OrderWorkflow(BriefyWorkflow):
     @assigned.transition(received, 'can_unassign')
     @scheduled.transition(received, 'can_unassign')
     def unassign(self, **kwargs):
-        """Transition: Inform the unassignment to the customer."""
+        """Transition: Un-assign the Order by cancel the Assignment and create a new one."""
         order = self.document
-        # this will handle the creation of a new Assignment
-        order.assignment.workflow.cancel()
+        message = kwargs.get('message', '')
+        order.assignment.workflow.cancel(message=message)
+        create_new_assignment_from_order(order, order.request)
         return True
 
     @Permission(groups=[LR['project_manager'], G['pm'], ])
