@@ -2,6 +2,8 @@
 from briefy.common.db import Base
 from uuid import uuid4
 
+from time import sleep
+
 
 class UnaryRelationshipWrapper:
     """Descriptor to wrap set and get values from an unary relationship."""
@@ -33,6 +35,9 @@ class UnaryRelationshipWrapper:
         :param value: value received to
         :return: None
         """
+        # HACK: To avoid a race condition when a new object is not commited
+        # to the database yet.
+        sleep(0.1)
         if isinstance(value, dict):
             self.create_or_update_sub_object(obj, value)
         elif isinstance(value, self._model):
