@@ -48,7 +48,13 @@ class Professional(UserProfile, Base):
               'default': [],
               'missing': colander.drop,
               'typ': colander.List()
-            }
+            },
+            'mobile':  {
+                'title': 'Mobile phone number',
+                'default': '',
+                'missing': colander.drop,
+                'typ': colander.String
+            },
         }
     }
 
