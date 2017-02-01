@@ -41,7 +41,15 @@ class Professional(UserProfile, Base):
     __colanderalchemy_config__ = {
         'excludes': [
             'state_history', 'state', 'profiles', 'type', 'external_id'
-        ]
+        ],
+        'overrides': {
+            'pools_ids': {
+              'title': 'pool ids',
+              'default': [],
+              'missing': colander.drop,
+              'typ': colander.List()
+            }
+        }
     }
 
     __raw_acl__ = (
