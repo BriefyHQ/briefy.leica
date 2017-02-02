@@ -147,18 +147,18 @@ class TestAssignmentModel(BaseModelTest):
         # wf.approve()
         # assert 'Incorrect number of assets' in str(excinfo)
 
-        with pytest.raises(WorkflowTransitionException) as excinfo:
-            wf.reject()
-        assert 'Field qa_manager is required for this transition' in str(excinfo)
+        wf.assign_qa_manager(
+            message='Setting a new QA Manager',
+            fields={'qa_manager': '44f57cff-3db4-4b10-b9dc-8cd8761a6c7e'}
+        )
+
+        assert assignment.state == 'in_qa'
 
         with pytest.raises(WorkflowTransitionException) as excinfo:
-            wf.reject(
-                fields={'qa_manager': '44f57cff-3db4-4b10-b9dc-8cd8761a6c7e'}
-            )
+            wf.reject()
         assert 'Message is required' in str(excinfo)
         wf.reject(
             message='Missing 5 or 6 pictures',
-            fields={'qa_manager': '44f57cff-3db4-4b10-b9dc-8cd8761a6c7e'}
         )
 
         assert assignment.state == 'awaiting_assets'
@@ -180,9 +180,7 @@ class TestAssignmentModel(BaseModelTest):
         # TODO: remove this after automatic Assignment validation
         wf.validate_assets(message='Assets validate.')
 
-        wf.approve(
-            fields={'qa_manager': '44f57cff-3db4-4b10-b9dc-8cd8761a6c7e'}
-        )
+        wf.approve()
         assert assignment.state == 'approved'
         assert 'retract_approval' in wf.transitions
 

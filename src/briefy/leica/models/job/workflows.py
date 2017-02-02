@@ -298,9 +298,18 @@ class AssignmentWorkflow(BriefyWorkflow):
         return True
 
     @in_qa.transition(
+        in_qa,
+        'can_approve',
+        require_message=True,
+        required_fields=('qa_manager', )
+    )
+    def assign_qa_manager(self, **kwargs):
+        """Set a QA manager for this assignment."""
+        return True
+
+    @in_qa.transition(
         approved,
         'can_approve',
-        required_fields=('qa_manager', )
     )
     def approve(self, **kwargs):
         """QA approves the Assignment Set."""
@@ -319,7 +328,6 @@ class AssignmentWorkflow(BriefyWorkflow):
     @in_qa.transition(
         awaiting_assets, 'can_approve',
         require_message=True,
-        required_fields=('qa_manager', )
     )
     def reject(self, **kwargs):
         """QA rejects Assignment Set."""
