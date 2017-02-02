@@ -27,7 +27,7 @@ __summary_attributes__ = [
 
 __listing_attributes__ = __summary_attributes__ + [
     'customer_order_id', 'deliver_date', 'accept_date', 'availability', 'assignment',
-    'requirements', 'delivery',
+    'requirements', 'delivery', 'project', 'customer'
 ]
 
 __colander_alchemy_config_overrides__ = \
@@ -73,7 +73,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     _workflow = workflows.OrderWorkflow
 
     __summary_attributes__ = __summary_attributes__
-    __summary_attributes_relations__ = ['project', 'comments', 'customer', 'assignments']
+    __summary_attributes_relations__ = ['project', 'comments', 'customer', 'assignment']
     __listing_attributes__ = __listing_attributes__
 
     __raw_acl__ = (
@@ -414,7 +414,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     def to_dict(self):
         """Return a dict representation of this object."""
-        data = super().to_dict(excludes=['internal_comments'])
+        data = super().to_dict()
         data['description'] = self.description
         data['briefing'] = self.project.briefing
         data['availability'] = self.availability
