@@ -413,14 +413,14 @@ class AssignmentBriefyRoles(LeicaBriefyRoles):
 
         :return: IDs of the professional users.
         """
-        permissions = dict(
-            can_view=True,
-            can_edit=True,
-            can_list=True,
-            can_delete=False,
-            can_create=False,
-        )
-        return cls.get_association_proxy('professional_user', 'user_id', permissions)
+        # permissions = dict(
+        #     can_view=True,
+        #     can_edit=True,
+        #     can_list=True,
+        #     can_delete=False,
+        #     can_create=False,
+        # )
+        return cls.get_association_proxy('professional_user', 'user_id')
 
     @declared_attr
     def _project_manager(cls):
