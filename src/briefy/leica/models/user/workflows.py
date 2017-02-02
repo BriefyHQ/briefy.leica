@@ -4,6 +4,7 @@ from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import Permission
 from briefy.common.workflow import WorkflowState as WS
 
+from briefy.leica.utils.user import create_rolleiflex_user
 
 import logging
 
@@ -38,7 +39,7 @@ class UserProfileWorkflow(BriefyWorkflow):
     @inactive.transition(active, 'can_activate')
     def activate(self):
         """Activate the UserProfile."""
-        pass
+        create_rolleiflex_user(self.document)
 
     @Permission(groups=[G['system'], G['pm'], G['scout'], G['bizdev']])
     def can_activate(self):
