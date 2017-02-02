@@ -34,6 +34,7 @@ class UserProfileSync(ModelSync):
                 first_name=first_name.strip(),
                 last_name=last_name.strip(),
                 company_name=company_name,
+                owner=briefy_id,
             )
         )
         return result
