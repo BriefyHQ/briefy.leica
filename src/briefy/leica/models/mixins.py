@@ -60,6 +60,12 @@ _ID_COLANDER = {
     'typ': colander.String()
 }
 
+_ID_COLANDER_LIST = {
+    'title': 'List of IDs',
+    'missing': colander.drop,
+    'typ': colander.List()
+}
+
 
 class LeicaBriefyRoles(BaseBriefyRoles):
     """Base class for leica local roles."""
@@ -83,19 +89,23 @@ class LeicaBriefyRoles(BaseBriefyRoles):
         )
 
     @classmethod
-    def get_association_proxy(cls, role_name, remote_attr, permissions=None):
+    def get_association_proxy(cls, role_name, remote_attr, local_attr=None, permissions=None):
         """Get a new association proxy instance."""
+        if not local_attr:
+            local_attr = '_{role_name}'.format(role_name=role_name)
+
         def creator(user_id):
             if isinstance(permissions, dict):
                 return cls.create_local_role(user_id, role_name, **permissions)
             else:
                 return cls.create_local_role(user_id, role_name)
-        local_attr = '_{role_name}'.format(role_name=role_name)
+
         return association_proxy(local_attr, remote_attr, creator=creator)
 
     @classmethod
     def create_local_role(cls, user_id, role_name, can_view=True, can_delete=False,
-                          can_create=False, can_edit=False, can_list=False):
+                          can_create=False, can_edit=False, can_list=False,
+                          entity_type=None, entity_id=None):
         """Create local LocalRole instance for role and user_id."""
         # TODO: find a way to do this validation here..
         # query = LocalRole.query().filter_by(entity_id=cls.id,
@@ -107,10 +117,15 @@ class LeicaBriefyRoles(BaseBriefyRoles):
         # if has_users:
         #    raise Exception('User already has local role: {items}'.format(items=has_users))
 
+        if not entity_type:
+            entity_type = cls.__name__
+        if not entity_id:
+            entity_id = cls.id
+
         return LocalRole(
-            entity_id=cls.id,
+            entity_id=entity_id,
             user_id=user_id,
-            entity_type=cls.__name__,
+            entity_type=entity_type,
             role_name=getattr(LocalRolesChoices, role_name),
             can_view=can_view,
             can_edit=can_edit,
@@ -137,24 +152,66 @@ class LeicaBriefyRoles(BaseBriefyRoles):
         return data
 
 
+class UserProfileBriefyRoles(LeicaBriefyRoles):
+    """Local roles for the UserProfile context."""
+
+    __actors__ = (
+        'owner',
+    )
+
+    __colanderalchemy_config__ = {
+        'overrides': {
+            'owner': _ID_COLANDER,
+        }
+    }
+
+    @declared_attr
+    def _owner(cls):
+        """Relationship: return a list of LocalRoles.
+
+        :return: LocalRoles instances of owner role_name.
+        """
+        return cls.get_role_relationship('owner')
+
+    @declared_attr
+    def owner(cls):
+        """Return a list of ids with owner local role.
+
+        :return: ID of the owner.
+        """
+        # TODO: bug if pass permissions to get_association_proxy
+        permissions = dict(
+            can_view=True,
+            can_edit=True,
+            can_list=True,
+            can_delete=False,
+            can_create=False,
+        )
+        return cls.get_association_proxy('owner', 'user_id')
+
+
 class CustomerBriefyRoles(LeicaBriefyRoles):
     """Local roles for the Customer context."""
 
     __actors__ = (
         'customer_user',
         'account_manager',
+        'customer_users',
+        'account_managers',
     )
 
     __colanderalchemy_config__ = {
         'overrides': {
             'customer_user': _ID_COLANDER,
             'account_manager': _ID_COLANDER,
+            'customer_users': _ID_COLANDER_LIST,
+            'account_managers': _ID_COLANDER_LIST,
         }
     }
 
     @declared_attr
     def _customer_user(cls):
-        """Relationship: return a list of LocalRoles.
+        """Relationship: return a list of LocalRoles. (deprecated)
 
         :return: LocalRoles instances of customer_user role_name.
         """
@@ -162,27 +219,51 @@ class CustomerBriefyRoles(LeicaBriefyRoles):
 
     @declared_attr
     def customer_user(cls):
-        """Return a list of ids of customer users.
+        """Return a list of ids of customer users. (deprecated)
 
         :return: IDs of the customer users.
         """
         return cls.get_association_proxy('customer_user', 'user_id')
 
     @declared_attr
-    def _account_manager(cls) -> list:
+    def _customer_users(cls):
+        """Relationship: return a list of LocalRoles.
+
+        :return: LocalRoles instances of customer_user role_name.
+        """
+        return cls.get_role_relationship('customer_user', uselist=True)
+
+    @declared_attr
+    def customer_users(cls):
+        """Return a list of ids of customer users.
+
+        :return: IDs of the customer users.
+        """
+        return cls.get_association_proxy(
+            'customer_user',
+            'user_id',
+            local_attr='_customer_users'
+        )
+
+    @declared_attr
+    def _account_managers(cls) -> list:
         """Relationship: return a list of LocalRoles.
 
         :return: LocalRoles instances of account_manager role_name.
         """
-        return cls.get_role_relationship('account_manager')
+        return cls.get_role_relationship('account_manager', uselist=True)
 
     @declared_attr
-    def account_manager(cls):
+    def account_managers(cls):
         """Return a list of ids of account manager users.
 
         :return: IDs of the account manager users.
         """
-        return cls.get_association_proxy('account_manager', 'user_id')
+        return cls.get_association_proxy(
+            'account_manager',
+            'user_id',
+            local_attr='_account_managers'
+        )
 
 
 class ProjectBriefyRoles(LeicaBriefyRoles):
