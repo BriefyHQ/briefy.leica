@@ -24,12 +24,12 @@ def add_user_info_to_state_history(state_history):
 
 
 def password_generator(size=8, chars=string.ascii_uppercase + string.digits):
+    """Generate initial random user passwords."""
     return ''.join(random.choice(chars) for _ in range(size))
 
 
 def create_rolleiflex_user(profile):
     """Create a new Rolleiflex user from a UserProfile."""
-
     # add a rolleiflex user
     url = API_BASE + '/users'
     payload = dict(email=profile.email,

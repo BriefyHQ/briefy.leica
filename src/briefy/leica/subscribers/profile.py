@@ -16,5 +16,3 @@ def userprofile_created_handler(event):
 
     # activate the user after creation
     obj.workflow.activate()
-
-

@@ -1,9 +1,7 @@
 """User profile information."""
-from briefy.common.vocabularies.roles import LocalRolesChoices
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models import Customer
-from briefy.leica.models import LocalRole
 from briefy.leica.models.user import workflows
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr

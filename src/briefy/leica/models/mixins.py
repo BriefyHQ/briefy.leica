@@ -180,13 +180,13 @@ class UserProfileBriefyRoles(LeicaBriefyRoles):
         :return: ID of the owner.
         """
         # TODO: bug if pass permissions to get_association_proxy
-        permissions = dict(
-            can_view=True,
-            can_edit=True,
-            can_list=True,
-            can_delete=False,
-            can_create=False,
-        )
+        # permissions = dict(
+        #     can_view=True,
+        #     can_edit=True,
+        #     can_list=True,
+        #     can_delete=False,
+        #     can_create=False,
+        # )
         return cls.get_association_proxy('owner', 'user_id')
 
 
@@ -211,7 +211,7 @@ class CustomerBriefyRoles(LeicaBriefyRoles):
 
     @declared_attr
     def _customer_user(cls):
-        """Relationship: return a list of LocalRoles. (deprecated)
+        """Relationship: return a list of LocalRoles (deprecated).
 
         :return: LocalRoles instances of customer_user role_name.
         """
@@ -219,7 +219,7 @@ class CustomerBriefyRoles(LeicaBriefyRoles):
 
     @declared_attr
     def customer_user(cls):
-        """Return a list of ids of customer users. (deprecated)
+        """Return a list of ids of customer users (deprecated).
 
         :return: IDs of the customer users.
         """
