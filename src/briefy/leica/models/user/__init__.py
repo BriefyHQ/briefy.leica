@@ -1,16 +1,33 @@
 """User profile information."""
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
+from briefy.leica.models import Customer
 from briefy.leica.models.user import workflows
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import UUIDType
 
 import colander
+import copy
 import sqlalchemy as sa
 
 
-class UserProfile(mixins.UserProfileMixin, Base):
+__colander_alchemy_config_overrides__ = \
+    copy.copy(mixins.UserProfileBriefyRoles.__colanderalchemy_config__['overrides'])
+
+__colander_alchemy_config_overrides__.update(
+    {
+        'customer_roles': {
+            'title': 'Customer Roles',
+            'missing': colander.drop,
+            'typ': colander.String()
+        },
+    }
+)
+
+
+class UserProfile(mixins.UserProfileMixin, mixins.UserProfileBriefyRoles, Base):
     """A Professional on our system."""
 
     __tablename__ = 'userprofiles'
@@ -28,8 +45,9 @@ class UserProfile(mixins.UserProfileMixin, Base):
 
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', 'type', 'external_id'
-        ]
+            'state_history', 'state', 'type', 'external_id', '_owner', '_customer_roles'
+        ],
+        'overrides': __colander_alchemy_config_overrides__
     }
 
     id = sa.Column(
@@ -53,7 +71,7 @@ class UserProfile(mixins.UserProfileMixin, Base):
         args = {
             'polymorphic_identity': cls_name,
         }
-        if cls_name == 'link':
+        if cls_name == 'userprofile':
             args['polymorphic_on'] = cls.type
         return args
 
@@ -92,6 +110,45 @@ class CustomerUserProfile(UserProfile):
               'missing': colander.drop,
               'typ': colander.String}}
     )
+
+    @declared_attr
+    def customer_ids(cls):
+        """Return a list of customer ids related to this CustomerUserProfile."""
+        return association_proxy('_customer_roles', 'entity_id')
+
+    @declared_attr
+    def _customer_roles(cls):
+        """Local roles of this user in the Customer context as customer_user."""
+        return sa.orm.relationship(
+            'LocalRole',
+            foreign_keys='LocalRole.user_id',
+            viewonly=True,
+            uselist=True,
+            primaryjoin='''and_(
+                        LocalRole.user_id == CustomerUserProfile.id,
+                        LocalRole.entity_type=="{entity}",
+                        LocalRole.role_name=="{role_name}"
+                    )'''.format(
+                entity='Customer',
+                role_name='customer_user',
+            )
+        )
+
+    @property
+    def customer_roles(self):
+        """Return roles related to this customer user profile."""
+        return self._customer_roles
+
+    @customer_roles.setter
+    def customer_roles(self, customer_id):
+        """Add customer_user role for this customer user profile."""
+        customer = Customer.get(customer_id)
+        if not customer:
+            raise ValueError('Invalid customer ID')
+        if not self.id:
+            return
+        if self.id not in customer.customer_users:
+            customer.customer_users.append(self.id)
 
 
 class BriefyUserProfile(UserProfile):

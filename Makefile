@@ -74,7 +74,7 @@ lint: ## check style with flake8
 	flake8 --ignore=D102,D103,D205,D101,D400,D210,D401,D100 tests
 
 test: lint ## run tests quickly with the default Python
-	py.test --cov-report term-missing --cov=briefy.leica tests
+	ENV='test' py.test --cov-report term-missing --cov=briefy.leica tests
 
 test-all: ## run tests on every Python version with tox
 	tox
@@ -109,16 +109,16 @@ dist: clean ## builds source and wheel package
 install: clean ## install the package to the active Python's site-packages
 	python setup.py install
 
-import_clean_db: clean_dockers create_dockers
+import_clean_db: clean_dockers create_dockers import_knack
+	echo "Start the a clean import.."
+
+import_knack:
 	echo "Waiting Posgtres to start"
-	sleep 40
+	sleep 40s
 	alembic upgrade head
-	python src/briefy/leica/tools/user_import.py
-	python src/briefy/leica/tools/customer_import.py
-	python src/briefy/leica/tools/project_import.py
-	python src/briefy/leica/tools/pool_import.py
-	python src/briefy/leica/tools/photographer_import.py
-	python src/briefy/leica/tools/job_import.py
+	export IMPORT_KNACK=True
+	python src/briefy/leica/tools/import_all.py
+	export IMPORT_KNACK=False
 
 start_dockers:
 	docker start sqs

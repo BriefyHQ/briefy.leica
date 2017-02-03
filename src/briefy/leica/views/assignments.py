@@ -1,6 +1,7 @@
 """Views to handle Assignments creation."""
 from briefy.leica.events import assignment as events
 from briefy.leica.models import Assignment
+from briefy.leica.models import Professional
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources import BaseResource
 from briefy.ws.resources import RESTService
@@ -10,6 +11,7 @@ from cornice.resource import resource
 from cornice.resource import view
 from pyramid.httpexceptions import HTTPNotFound as NotFound
 from pyramid.security import Allow
+
 
 COLLECTION_PATH = '/assignments'
 PATH = COLLECTION_PATH + '/{id}'
@@ -59,6 +61,25 @@ class AssignmentService(RESTService):
         'DELETE': events.AssignmentDeletedEvent,
     }
 
+    def default_filters(self, query) -> object:
+        """Default filters to be applied to every query.
+
+        This is supposed to be specialized by resource classes.
+        :returns: A tuple of default filters to be applied to queries.
+        """
+        user = self.request.user
+        custom_filter = self.request.params.get('_custom_filter')
+        if 'g:professionals' in user.groups and custom_filter == 'pool':
+            # disable security for this custom filter
+            self.enable_security = False
+            professional = Professional.get(user.id)
+            pool_ids = [item.id for item in professional.pools]
+            query = query.filter(
+                Assignment.pool_id.in_(pool_ids),
+                Assignment.state == 'published'
+            )
+        return query
+
 
 @resource(
     collection_path=PATH + '/transitions',
@@ -71,6 +92,7 @@ class AssignmentWorkflowService(WorkflowAwareResource):
 
     model = Assignment
     friendly_name = Assignment.__name__
+    enable_security = False
 
 
 @resource(

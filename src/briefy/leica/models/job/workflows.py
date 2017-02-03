@@ -1,15 +1,22 @@
 """Order, OrderLocation, Assignment and Pool related workflow."""
+from briefy.common.db import datetime_utcnow
 from briefy.common.vocabularies.roles import Groups as G
 from briefy.common.vocabularies.roles import LocalRolesChoices as LR
+from briefy.common.users import SystemUser
 from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import Permission
 from briefy.common.workflow import WorkflowState as WS
-from datetime import datetime
+from briefy.common.workflow import WorkflowTransitionException
+from briefy.leica.subscribers.utils import create_new_assignment_from_order
 
 import logging
 
 
 logger = logging.getLogger(__name__)
+
+
+SHOOT_TIME_FUTURE_MSG = 'Shoot time should be at least one day in the future.'
+ASSIGN_AFTER_RENEWSHOOT = 'Creative automatically assigned due to a reshoot.'
 
 
 class AssignmentWorkflow(BriefyWorkflow):
@@ -86,7 +93,7 @@ class AssignmentWorkflow(BriefyWorkflow):
 
     # Transitions
     @created.transition(pending, 'can_submit')
-    def submit(self):
+    def submit(self, **kwargs):
         """Submit Assignment."""
         # Assignment creation handled by Order creation event subscriber
         pass
@@ -101,19 +108,28 @@ class AssignmentWorkflow(BriefyWorkflow):
         'can_assign',
         required_fields=('professional_id',)
     )
-    def assign(self):
+    def assign(self, **kwargs):
         """Define a Professional to the Assignment."""
-        order = self.document.order
+        fields = kwargs['fields']
+        assignment = self.document
+        order = assignment.order
         if order.state == 'received':
             order.workflow.assign()
+        # set local role
+        professional_id = fields.get('professional_id')
+        if professional_id:
+            assignment.professional_user = professional_id
 
     @Permission(groups=[G['scout'], G['pm'], ])
     def can_assign(self):
         """Validate if user can set the Professional in the Assignment."""
         return True
 
-    @pending.transition(published, 'can_publish')
-    def publish(self):
+    @pending.transition(
+        published, 'can_publish',
+        required_fields=('pool_id', ),
+    )
+    def publish(self, **kwargs):
         """Inform availability dates and move the enable Assignment to be self assigned."""
         order = self.document.order
         if not order.availability:
@@ -127,7 +143,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         return True
 
     @published.transition(pending, 'can_retract')
-    def retract(self):
+    def retract(self, **kwargs):
         """Remove availability dates and return Assignment to pending."""
         order = self.document.order
         order.availability = []
@@ -142,14 +158,19 @@ class AssignmentWorkflow(BriefyWorkflow):
         'can_self_assign',
         required_fields=('scheduled_datetime', 'professional_id')
     )
-    def self_assign(self):
+    def self_assign(self, **kwargs):
         """Professional choose the Assignment from the Pool."""
         # workflow event subscriber will move to schedule after
-        order = self.document.order
+        assignment = self.document
+        order = assignment.order
         if order.state == 'received':
+            order.workflow.context = SystemUser
             order.workflow.assign()
+        # set local role
+        professional_id = self.context.id
+        assignment.professional_user = professional_id
 
-    @Permission(groups=[G['professionals'], G['pm'], G['scout'], ])
+    @Permission(groups=[G['professionals'], G['pm'], G['scout'], G['system']])
     def can_self_assign(self):
         """Validate if user is able to self assign this Assignment."""
         # TODO: Check for existing Assignment already schedule to the same date.
@@ -160,14 +181,21 @@ class AssignmentWorkflow(BriefyWorkflow):
         'can_schedule',
         required_fields=('scheduled_datetime', )
     )
-    def schedule(self):
+    def schedule(self, **kwargs):
         """Professional, Scout or PM schedule the Assignment."""
-        # TODO: validate the scheduled_datetime is in future
-        order = self.document.order
-        if order.state == 'assigned':
-            order.workflow.schedule()
+        fields = kwargs.get('fields')
+        now = datetime_utcnow()
+        date_diff = fields.get('scheduled_datetime') - now
+        if date_diff.days < 1:
+            msg = SHOOT_TIME_FUTURE_MSG
+            raise WorkflowTransitionException(msg)
+        else:
+            order = self.document.order
+            if order.state == 'assigned':
+                order.workflow.context = SystemUser
+                order.workflow.schedule()
 
-    @Permission(groups=[G['professionals'], G['pm'], G['scout'], ])
+    @Permission(groups=[G['professionals'], G['pm'], G['scout'], G['system']])
     def can_schedule(self):
         """Validate if user can schedule an Assignment."""
         return True
@@ -182,17 +210,21 @@ class AssignmentWorkflow(BriefyWorkflow):
         'can_reschedule',
         required_fields=('scheduled_datetime', )
     )
-    def reschedule(self):
+    def reschedule(self, **kwargs):
         """Professional or PM reschedule an Assignment."""
-        # TODO: validate the scheduled_datetime is in future
-        pass
+        fields = kwargs.get('fields')
+        now = datetime_utcnow()
+        date_diff = fields.get('scheduled_datetime') - now
+        if date_diff.days < 1:
+            msg = SHOOT_TIME_FUTURE_MSG
+            raise WorkflowTransitionException(msg)
 
     @assigned.transition(
         assigned,
         'can_reschedule',
         require_message=True,
     )
-    def scheduling_issues(self, message=None):
+    def scheduling_issues(self, **kwargs):
         """Professional or PM reports scheduling issues."""
         # subscriber will create a new Comment instance from this transition
         pass
@@ -203,9 +235,8 @@ class AssignmentWorkflow(BriefyWorkflow):
         return True
 
     @scheduled.transition(assigned, 'can_remove_schedule')
-    def remove_schedule(self):
+    def remove_schedule(self, **kwargs):
         """Customer, Professional or PM removes the Assignment scheduled shoot datetime."""
-        # subscriber handle this transition from Assignment to Order
         pass
 
     @Permission(groups=[G['professionals'], G['customers'], G['pm']])
@@ -218,26 +249,23 @@ class AssignmentWorkflow(BriefyWorkflow):
     @assigned.transition(cancelled, 'can_cancel')
     @scheduled.transition(cancelled, 'can_cancel')
     @awaiting_assets.transition(cancelled, 'can_cancel')
-    def cancel(self):
+    def cancel(self, **kwargs):
         """Customer or PM cancel the Assignment."""
-        now = datetime.now()
+        now = datetime_utcnow()
         assignment = self.document
+        allowed = False
         scheduled_datetime = assignment.scheduled_datetime
         if self.state == self.scheduled:
             date_diff = scheduled_datetime - now
             if date_diff.days >= 1:
-                return True
-            else:
-                return False
-
-        if self.state == self.awaiting_assets:
+                allowed = True
+        elif self.state == self.awaiting_assets:
             submission_path = assignment.submission_path
             date_diff = now - scheduled_datetime
             # let cancel if the there is no upload after 4 days
             if not submission_path and date_diff.days >= 4:
-                return True
-            else:
-                return False
+                allowed = True
+        return allowed
 
     @Permission(groups=[G['customers'], G['pm'], G['qa'], ])
     def can_cancel(self):
@@ -245,9 +273,9 @@ class AssignmentWorkflow(BriefyWorkflow):
         return True
 
     @scheduled.transition(awaiting_assets, 'can_get_ready_for_upload')
-    def ready_for_upload(self):
+    def ready_for_upload(self, **kwargs):
         """System moves Assignment to awaiting assets (upload)."""
-        now = datetime.now()
+        now = datetime_utcnow()
         assignment = self.document
         scheduled_datetime = assignment.scheduled_datetime
         date_diff = scheduled_datetime - now
@@ -262,7 +290,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         return True
 
     @awaiting_assets.transition(in_qa, 'can_approve')
-    def retract_rejection(self):
+    def retract_rejection(self, **kwargs):
         """QA retract rejection or manually move to QA."""
         assignment = self.document
         last_revision = assignment.versions[-1]
@@ -270,11 +298,20 @@ class AssignmentWorkflow(BriefyWorkflow):
         return True
 
     @in_qa.transition(
-        approved,
+        in_qa,
         'can_approve',
+        require_message=True,
         required_fields=('qa_manager', )
     )
-    def approve(self):
+    def assign_qa_manager(self, **kwargs):
+        """Set a QA manager for this assignment."""
+        return True
+
+    @in_qa.transition(
+        approved,
+        'can_approve',
+    )
+    def approve(self, **kwargs):
         """QA approves the Assignment Set."""
         # TODO: return this validation when Mr.C is back
         # assignment = self.document
@@ -295,23 +332,22 @@ class AssignmentWorkflow(BriefyWorkflow):
     @in_qa.transition(
         awaiting_assets, 'can_approve',
         require_message=True,
-        required_fields=('qa_manager', )
     )
-    def reject(self):
+    def reject(self, **kwargs):
         """QA rejects Assignment Set."""
         assignment = self.document
         assignment.set_type = 'returned_photographer'
         return True
 
     @in_qa.transition(perm_rejected, 'can_approve')
-    def perm_reject(self):
+    def perm_reject(self, **kwargs):
         """QA permanently reject the Assignment Set."""
         order = self.document.order
         if order.state == 'in_qa':
             order.workflow.new_shoot()
 
     @approved.transition(in_qa, 'can_approve')
-    def retract_approval(self):
+    def retract_approval(self, **kwargs):
         """QA retracts the approval."""
         # TODO: should we move the Order back if delivered?
         pass
@@ -326,7 +362,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         'can_upload',
         required_fields=('submission_path', )
     )
-    def upload(self):
+    def upload(self, **kwargs):
         """Professional submits all assets for QA."""
         pass
 
@@ -340,18 +376,20 @@ class AssignmentWorkflow(BriefyWorkflow):
         'can_validate_assets',
         require_message=True,
     )
-    def validate_assets(self):
+    def validate_assets(self, **kwargs):
         """System validate uploaded Assets."""
         order = self.document.order
-        if order.state == 'schedule':
-            order.workflow.start_qa()
+        if order.state == 'scheduled':
+            message = kwargs.get('message')
+            order.workflow.context = self.context
+            order.workflow.start_qa(message=message)
 
     @asset_validation.transition(
         awaiting_assets,
         'can_validate_assets',
         require_message=True,
     )
-    def invalidate_assets(self):
+    def invalidate_assets(self, **kwargs):
         """System invalidate uploaded Assets."""
         pass
 
@@ -361,14 +399,14 @@ class AssignmentWorkflow(BriefyWorkflow):
         return True
 
     @refused.transition(in_qa, 'can_return_to_qa')
-    def return_to_qa(self):
+    def return_to_qa(self, **kwargs):
         """PM move Assignment back to QA for further revision."""
         assignment = self.document
+        message = kwargs.get('message', '')
         assignment.set_type = 'refused_customer'
         order = assignment.order
         if order.state == 'refused':
-            order = assignment.order
-            order.workflow.require_revision()
+            order.workflow.require_revision(message=message)
         return True
 
     @Permission(groups=[G['pm'], ])
@@ -376,9 +414,10 @@ class AssignmentWorkflow(BriefyWorkflow):
         """Validate if the user can return to QA (futher revision) an Assignment Set."""
         return True
 
+    @in_qa.transition(completed, 'can_complete')
     @approved.transition(completed, 'can_complete')
     @refused.transition(completed, 'can_complete')
-    def complete(self):
+    def complete(self, **kwargs):
         """Customer, System or PM accept the Assignment Set."""
         # this should be only executed only from the order
         pass
@@ -389,7 +428,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         return True
 
     @approved.transition(refused, 'can_refuse', require_message=True)
-    def refuse(self):
+    def refuse(self, **kwargs):
         """Customer or PM refuses the Assignment Set."""
         # this should be only executed only from the order
         pass
@@ -472,7 +511,7 @@ class OrderWorkflow(BriefyWorkflow):
 
     # Transitions
     @created.transition(received, 'can_submit')
-    def submit(self, request=None):
+    def submit(self, **kwargs):
         """Submit Order."""
         # OrderCreatedEvent subscriber will handle the Assignment creation
         pass
@@ -483,13 +522,13 @@ class OrderWorkflow(BriefyWorkflow):
         return True
 
     @received.transition(assigned, 'can_assign')
-    def assign(self):
+    def assign(self, **kwargs):
         """Transition: Assign a Professional to an Order."""
         # should be only used by the Assignment workflow
         return True
 
 
-    @Permission(groups=[LR['project_manager'], G['pm'], G['scout'], ])
+    @Permission(groups=[LR['project_manager'], G['pm'], G['scout'], G['system'], ])
     def can_assign(self):
         """Permission: Validate if user can assign an Order.
 
@@ -499,11 +538,13 @@ class OrderWorkflow(BriefyWorkflow):
 
     @assigned.transition(received, 'can_unassign')
     @scheduled.transition(received, 'can_unassign')
-    def unassign(self):
-        """Transition: Inform the unassignment to the customer."""
+    def unassign(self, **kwargs):
+        """Transition: Un-assign the Order by cancel the Assignment and create a new one."""
         order = self.document
-        # this will handle the creation of a new Assignment
-        order.assignment.workflow.cancel()
+        old_assignment = order.assignment
+        message = kwargs.get('message', '')
+        old_assignment.workflow.cancel(message=message)
+        create_new_assignment_from_order(order, order.request)
         return True
 
     @Permission(groups=[LR['project_manager'], G['pm'], ])
@@ -516,12 +557,13 @@ class OrderWorkflow(BriefyWorkflow):
 
     @assigned.transition(received, 'can_remove_availability')
     @scheduled.transition(received, 'can_remove_availability')
-    def remove_availability(self):
+    def remove_availability(self, **kwargs):
         """Transition: Inform the removal of availability dates to the customer."""
         order = self.document
         order.availability = []
         # this will handle the creation of a new Assignment
-        order.assignment.workflow.cancel()
+        message = kwargs.get('message', '')
+        order.assignment.workflow.cancel(message=message)
         return True
 
     @Permission(groups=[LR['project_manager'], G['pm'], LR['customer_user'], G['customers'], ])
@@ -541,9 +583,16 @@ class OrderWorkflow(BriefyWorkflow):
         assigned, 'can_reassign',
         required_fields=('professional_id', )
     )
-    def reassign(self):
+    def reassign(self, **kwargs):
         """Transition: Inform the reassignment to the customer."""
-        pass
+        order = self.document
+        old_assignment = order.assignment
+        message = kwargs.get('message', '')
+        old_assignment.workflow.cancel(message=message)
+        new_assignment = create_new_assignment_from_order(order, order.request)
+        # pass message and fields to the assign transition of the Assignment
+        new_assignment.workflow.assign(**kwargs)
+        return True
 
     @Permission(groups=[LR['project_manager'], G['pm'], ])
     def can_reassign(self):
@@ -554,9 +603,8 @@ class OrderWorkflow(BriefyWorkflow):
         return True
 
     @scheduled.transition(assigned, 'can_remove_schedule')
-    def remove_schedule(self):
+    def remove_schedule(self, **kwargs):
         """Transition: Inform the removal of the schedule shoot datetime to the customer."""
-        # subscriber handle this transition from Order to Assignment
         pass
 
     @Permission(groups=[LR['project_manager'], G['pm'], G['professionals'], G['customers'], ])
@@ -570,9 +618,13 @@ class OrderWorkflow(BriefyWorkflow):
     @scheduled.transition(cancelled, 'can_cancel', message_required=True)
     @assigned.transition(cancelled, 'can_cancel', message_required=True)
     @received.transition(cancelled, 'can_cancel', message_required=True)
-    def cancel(self):
+    def cancel(self, **kwargs):
         """Transition: Cancel the Order."""
-        pass
+        order = self.document
+        assignment = order.assignment
+        wkf = assignment.workflow
+        wkf.context = self.context
+        assignment.workflow.cancel()
 
     @Permission(groups=[LR['project_manager'], LR['customer_user'], G['pm'], G['customers'], ])
     def can_cancel(self):
@@ -585,12 +637,13 @@ class OrderWorkflow(BriefyWorkflow):
 
     @received.transition(scheduled, 'can_schedule')
     @assigned.transition(scheduled, 'can_schedule')
-    def schedule(self):
+    def schedule(self, **kwargs):
         """Transition: Inform the schedule to the customer."""
         # this should be executed from the assignment
         pass
 
-    @Permission(groups=[LR['project_manager'], LR['professional_user'], G['pm'], G['scout']])
+    @Permission(groups=[LR['project_manager'], LR['professional_user'],
+                        G['pm'], G['scout'], G['system'], ])
     def can_schedule(self):
         """Permission: Validate if user can schedule an Order.
 
@@ -599,7 +652,7 @@ class OrderWorkflow(BriefyWorkflow):
         return True
 
     @scheduled.transition(in_qa, 'can_start_qa')
-    def start_qa(self):
+    def start_qa(self, **kwargs):
         """Transition: Inform the start of QA to the customer."""
         # this should be executed from the assignment
         pass
@@ -616,7 +669,7 @@ class OrderWorkflow(BriefyWorkflow):
         delivered, 'can_deliver',
         required_fields=('delivery', )
     )
-    def deliver(self):
+    def deliver(self, **kwargs):
         """Transition: Inform the deliver of the Order to the customer."""
         pass
 
@@ -629,9 +682,13 @@ class OrderWorkflow(BriefyWorkflow):
         return True
 
     @delivered.transition(refused, 'can_refuse', message_required=True)
-    def refuse(self):
+    def refuse(self, **kwargs):
         """Transition: Customer refuse the Order."""
-        pass
+        # TODO: fix workflow to pass message in the kwargs
+        message = kwargs.get('message')
+        order = self.document
+        assignment = order.assignment
+        assignment.workflow.refuse(message=message)
 
     @Permission(groups=[G['pm'], G['customers'], LR['project_manager'], LR['customer_user'], ])
     def can_refuse(self):
@@ -643,13 +700,18 @@ class OrderWorkflow(BriefyWorkflow):
 
     @in_qa.transition(assigned, 'can_reshoot')
     @refused.transition(assigned, 'can_reshoot')
-    def reshoot(self):
+    def reshoot(self, **kwargs):
         """Transition: Inform the reshoot of the Order the customer."""
+        message = kwargs.get('message', '')
         order = self.document
-        if order.state == 'refused':
-            assignment = order.assignment
-            if assignment and assignment.state == 'refused':
-                assignment.workflow.complete()
+        order.availability = []
+        old_assignment = order.assignment
+        old_assignment.workflow.complete(message=message)
+        new_assignment = create_new_assignment_from_order(order, order.request)
+        professional_id = old_assignment.professional_id
+        fields = dict(professional_id=professional_id)
+        message = ASSIGN_AFTER_RENEWSHOOT
+        new_assignment.workflow.assign(fields=fields, message=message)
 
     @Permission(groups=[LR['project_manager'], G['pm'], G['qa'], ])
     def can_reshoot(self):
@@ -661,14 +723,14 @@ class OrderWorkflow(BriefyWorkflow):
 
     @in_qa.transition(received, 'can_new_shoot')
     @refused.transition(received, 'can_new_shoot')
-    def new_shoot(self):
+    def new_shoot(self, **kwargs):
         """Transition: Inform the new shoot of an Order the customer."""
-        # subscriber handle this transition
+        message = kwargs.get('message', '')
         order = self.document
-        if order.state == 'refused':
-            assignment = order.assignment
-            if assignment and assignment.state == 'refused':
-                assignment.workflow.complete()
+        order.availability = []
+        old_assignment = order.assignment
+        old_assignment.workflow.complete(message=message)
+        create_new_assignment_from_order(order, order.request)
 
     @Permission(groups=[LR['project_manager'], G['pm'], G['qa'], ])
     def can_new_shoot(self):
@@ -680,7 +742,7 @@ class OrderWorkflow(BriefyWorkflow):
 
     @delivered.transition(accepted, 'can_accept')
     @refused.transition(accepted, 'can_accept')
-    def accept(self):
+    def accept(self, **kwargs):
         """Transition: Customer or PM accept an Order."""
         order = self.document
         final_states = ('cancelled', 'perm_rejected', 'completed')
@@ -701,7 +763,7 @@ class OrderWorkflow(BriefyWorkflow):
         return True
 
     @refused.transition(perm_refused, 'can_perm_refuse', message_required=True)
-    def perm_refuse(self):
+    def perm_refuse(self, **kwargs):
         """Transition: PM permanently refuse an Order."""
         pass
 
@@ -714,7 +776,7 @@ class OrderWorkflow(BriefyWorkflow):
         return True
 
     @refused.transition(in_qa, 'can_require_revision')
-    def require_revision(self):
+    def require_revision(self, **kwargs):
         """Transition: PM or Customer require revision of an Order."""
         # this should be triggered from the Assignment
         pass
@@ -722,6 +784,7 @@ class OrderWorkflow(BriefyWorkflow):
     @Permission(groups=[G['pm'], ])
     def can_require_revision(self):
         """Permission: Validate if user can require revision of an Order."""
+        return True
 
 
 class PoolWorkflow(BriefyWorkflow):
@@ -747,7 +810,7 @@ class PoolWorkflow(BriefyWorkflow):
     )
 
     @created.transition(active, 'submit')
-    def submit(self):
+    def submit(self, **kwargs):
         """Transition: Pool was submitted."""
         pass
 
@@ -760,7 +823,7 @@ class PoolWorkflow(BriefyWorkflow):
         return True
 
     @active.transition(inactive, 'can_disable')
-    def disable(self):
+    def disable(self, **kwargs):
         """Transition: Pool was moved to inactive."""
         pass
 
@@ -773,7 +836,7 @@ class PoolWorkflow(BriefyWorkflow):
         return True
 
     @inactive.transition(active, 'can_reactivated')
-    def reactivated(self):
+    def reactivated(self, **kwargs):
         """Transition: Pool was moved back to active."""
         pass
 

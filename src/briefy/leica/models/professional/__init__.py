@@ -21,12 +21,6 @@ class Professional(UserProfile, Base):
 
     __tablename__ = 'professionals'
 
-    __table_args__ = {'extend_existing': True}
-
-    __mapper_args__ = {
-        'polymorphic_identity': 'professionals',
-    }
-
     _workflow = ProfessionalWorkflow
 
     __summary_attributes__ = [
@@ -36,19 +30,35 @@ class Professional(UserProfile, Base):
 
     __summary_attributes_relations__ = ['links', 'main_location', 'locations', 'pools']
 
-    __listing_attributes__ = __summary_attributes__
+    __listing_attributes__ = __summary_attributes__ + [
+        'main_location'
+    ]
 
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', 'profiles', 'type', 'external_id'
-        ]
+            'state_history', 'state', 'profiles', 'type', 'external_id', '_owner'
+        ],
+        'overrides': {
+            'pools_ids': {
+              'title': 'pool ids',
+              'default': [],
+              'missing': colander.drop,
+              'typ': colander.List()
+            },
+            'mobile':  {
+                'title': 'Mobile phone number',
+                'default': '',
+                'missing': colander.drop,
+                'typ': colander.String
+            },
+        }
     }
 
     __raw_acl__ = (
         ('create', ('g:briefy_scout', 'g:briefy_finance', 'g:briefy_qa', 'g:system')),
         ('list', ('g:briefy', 'g:system')),
         ('view', ('g:briefy', 'g:system')),
-        ('edit', ('g:briefy_scout', 'g:briefy_finance', 'g:briefy_pm', 'g:system')),
+        ('edit', ('g:briefy_scout', 'g:briefy_finance', 'g:briefy_qa', 'g:system')),
         ('delete', ('g:briefy_finance', 'g:system')),
     )
 

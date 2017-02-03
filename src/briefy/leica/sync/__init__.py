@@ -13,11 +13,11 @@ import uuid
 
 
 PLACEHOLDERS = {
-    'city': 'EMPTY_CITY',
+    'city': '',
     'country': '--',
-    'first_name': 'No Name',
-    'last_name': 'No Name',
-    'email': 'contact+import@briefy,co',
+    'first_name': '',
+    'last_name': '',
+    'email': '',
 }
 
 VALID_PHONE_CHARS = digits + '+'

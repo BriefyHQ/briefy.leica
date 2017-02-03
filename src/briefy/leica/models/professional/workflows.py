@@ -5,6 +5,8 @@ from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import Permission
 from briefy.common.workflow import WorkflowState as WS
 
+from briefy.leica.utils.user import create_rolleiflex_user
+
 
 import logging
 
@@ -85,7 +87,8 @@ class ProfessionalWorkflow(BriefyWorkflow):
     @pending.transition(validation, 'can_approve')
     def approve(self):
         """Quality approval of a professional application."""
-        pass
+        groups = ('g:professionals',)
+        create_rolleiflex_user(self.document, groups=groups)
 
     @validation.transition(trial, 'can_validate')
     def validate(self):
@@ -104,12 +107,25 @@ class ProfessionalWorkflow(BriefyWorkflow):
         """Inactivate a professional."""
         pass
 
+    @active.transition(active, 'can_assign', required_fields=('pools_ids',))
+    @trial.transition(trial, 'can_assign', required_fields=('pools_ids',))
+    def assign(self, **kwargs):
+        """Change pools this professional belongs to."""
+        from briefy.leica.models import Pool
+        fields = kwargs['fields']
+        professional = self.document
+        pools = []
+        pool_ids = fields.get('pools_ids')
+        if pool_ids:
+            pools = Pool.query().filter(Pool.id.in_(pool_ids)).all()
+        professional.pools = pools
+
     @Permission(groups=[LR['owner'], G['scout'], ])
     def can_delete(self):
         """Validate if user can delete this professional."""
         return True
 
-    @Permission(groups=[LR['owner'], G['scout'], ])
+    @Permission(groups=[LR['owner'], G['scout'], G['qa'], G['pm']])
     def can_submit(self):
         """Validate if user can submit this professional for QA approval."""
         return True
@@ -142,6 +158,11 @@ class ProfessionalWorkflow(BriefyWorkflow):
     @Permission(groups=[LR['owner'], G['system'], G['pm'], G['qa'], G['scout']])
     def can_inactivate(self):
         """Validate if user can inactivate this professional application."""
+        return True
+
+    @Permission(groups=[G['system'], G['pm'], G['scout']])
+    def can_assign(self):
+        """Validate if user can assign this professional to a pool."""
         return True
 
 

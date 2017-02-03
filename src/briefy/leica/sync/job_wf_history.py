@@ -1,6 +1,5 @@
 """Import Job workflow history for Order and Assignment."""
 from briefy.leica import logger
-from briefy.leica.models import UserProfile
 from collections import OrderedDict
 from datetime import datetime
 
@@ -88,20 +87,7 @@ def add_order_history(session, obj, kobj):
 
     # created and received status
     person = _get_identifier(kobj, 'input_person', default='Briefy')
-    try:
-        first_name, last_name = person.split(' ')
-    except Exception as exc:
-        user_profile = None
-    else:
-        user_profile = UserProfile.query().filter_by(
-            first_name=first_name,
-            last_name=last_name
-        ).one_or_none()
-    # actor should be: user_profile or customer_user or project_manager
-    if user_profile:
-        actor_id = user_profile.id
-    else:
-        actor_id = obj.project_manager if obj.source == 'briefy' else obj.customer_user
+    actor_id = obj.project_manager if obj.source == 'briefy' else obj.customer_user
     actor = str(actor_id) if actor_id else 'g:system'
     history.append({
         'date': _build_date(kobj.input_date),
@@ -185,7 +171,7 @@ def add_order_history(session, obj, kobj):
 
     # check for 'delivered' status
     if kobj.client_delivery_link.url:
-        date = kobj.last_approval_date or last_date
+        date = kobj.delivery_date_to_client or last_date
         person = _get_identifier(kobj, 'qa_manager', default='g:briefy_qa')
         # actor should be qa_manager
         actor_id = obj.assignments[0].qa_manager
@@ -234,19 +220,19 @@ def add_order_history(session, obj, kobj):
 
     # check for 'refused' status
     if knack_state.lower() == 'refused':
-        date = kobj.delivery_date_to_client or last_date
+        refuse_date = kobj.updated_at or kobj.delivery_date_to_client or last_date
         # actor should be customer_user or project_manager
         actor_id = obj.customer_user or obj.project_manager
         actor = str(actor_id) if actor_id else 'g:system'
         history.append({
-            'date': _build_date(date, last_date),
+            'date': _build_date(refuse_date, last_date),
             'message': 'Job refused by client',
             'actor': actor,
             'transition': 'refuse',
             'from': history[-1]['to'],
             'to': order_state
         })
-        last_date = date
+        last_date = refuse_date
 
     obj.state_history = history
     # TODO: stick with knack actual status, last status history is not always accurate
@@ -267,21 +253,8 @@ def add_assignment_history(session, obj, kobj):
 
     # Check for 'created' status
     person = _get_identifier(kobj, 'input_person', default='Briefy')
-    try:
-        first_name, last_name = person.split(' ')
-    except Exception as exc:
-        user_profile = None
-    else:
-        user_profile = UserProfile.query().filter_by(
-            first_name=first_name,
-            last_name=last_name
-        ).one_or_none()
-    # actor should be: user_profile or customer_user or project_manager
-    if user_profile:
-        actor_id = user_profile.id
-    else:
-        actor_id = obj.order.project_manager if \
-            obj.order.source == 'briefy' else obj.order.customer_user
+    actor_id = obj.order.project_manager if \
+        obj.order.source == 'briefy' else obj.order.customer_user
     actor = str(actor_id) if actor_id else 'g:system'
     history.append({
         'date': _build_date(kobj.input_date),
@@ -344,7 +317,7 @@ def add_assignment_history(session, obj, kobj):
         actor_id = obj.professional_user
         actor = str(actor_id) if actor_id else 'g:system'
         history.append({
-            'date': _build_date(date, last_date),
+            'date': _build_date(kobj.assignment_date, last_date),
             'message': "Scheduled by '{0}' on the Knack database".format(person),
             'actor': actor,
             'transition': 'schedule',
@@ -378,7 +351,7 @@ def add_assignment_history(session, obj, kobj):
             'actor': actor,
             'transition': 'upload',
             'from': 'awaiting_assets',
-            'to': 'validation',
+            'to': 'asset_validation',
         })
         last_date = kobj.submission_date
 
@@ -389,8 +362,8 @@ def add_assignment_history(session, obj, kobj):
             'date': _build_date(date, last_date),
             'message': "Automatic validation skipped (from data on Knack)",
             'actor': 'g:system',
-            'transition': 'validate',
-            'from': 'validation',
+            'transition': 'validate_assets',
+            'from': 'asset_validation',
             'to': 'in_qa',  # Note: can't know about intermediary non-validated sets
         })
         last_date = date
@@ -445,20 +418,20 @@ def add_assignment_history(session, obj, kobj):
 
     # Check for 'refused' status
     if knack_state.lower() == 'refused':
-        date = kobj.last_approval_date or kobj.submission_date
-        project = _get_identifier(kobj, 'customer')
+        refuse_date = kobj.updated_at or kobj.last_approval_date or kobj.submission_date
+        project = obj.order.project.title
         # actor should be customer_user or project_manager
         actor_id = order.customer_user or order.project_manager
         actor = str(actor_id) if actor_id else 'g:system'
         history.append({
-            # TODO: verify this date
-            'date': _build_date(kobj.submission_date, last_date),
+            'date': _build_date(refuse_date, last_date),
             'message': "Set of photos refused by client from project '{}'".format(project),
             'actor': actor,
             'transition': 'refuse',
             'from': 'approved',
             'to': assignment_state,
         })
+        last_date = date
 
     obj.state_history = history
     # TODO: stick with knack actual status, last status history is not always accurate

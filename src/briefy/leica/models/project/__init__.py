@@ -51,14 +51,14 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
 
     __listing_attributes__ = [
         'id', 'title', 'description', 'created_at', 'updated_at', 'state',
-        'external_id', 'total_orders', 'slug',
+        'external_id', 'total_orders', 'slug', 'customer'
     ]
 
     __raw_acl__ = (
-        ('create', ('g:briefy_pm', 'g:briefy_finance', 'g:system')),
-        ('list', ('g:briefy', 'g:system')),
-        ('view', ('g:briefy', 'g:system')),
-        ('edit', ('g:briefy_pm', 'g:briefy_finance', 'g:system')),
+        ('create', ('g:briefy_bizdev', 'g:briefy_finance', 'g:system')),
+        ('list', ('g:briefy', 'g:briefy_bizdev', 'g:briefy_finance', 'g:system')),
+        ('view', ('g:briefy', 'g:briefy_bizdev', 'g:briefy_finance', 'g:system')),
+        ('edit', ('g:briefy_bizdev', 'g:briefy_finance', 'g:system')),
         ('delete', ('g:briefy_finance', 'g:system')),
     )
 
@@ -212,6 +212,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         """Return a dict representation of this object."""
         data = super().to_dict()
         data['slug'] = self.slug
+        data['price'] = self.price
         data = self._apply_actors_info(data)
         add_user_info_to_state_history(self.state_history)
         # Apply actor information to data

@@ -14,6 +14,7 @@ from sqlalchemy import orm
 from sqlalchemy.ext.hybrid import hybrid_property
 
 import colander
+import copy
 import random
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils
@@ -26,8 +27,20 @@ __summary_attributes__ = [
 
 __listing_attributes__ = __summary_attributes__ + [
     'customer_order_id', 'deliver_date', 'accept_date', 'availability', 'assignment',
-    'requirements', 'delivery',
+    'requirements', 'delivery', 'project', 'customer'
 ]
+
+__colander_alchemy_config_overrides__ = \
+    copy.copy(mixins.OrderBriefyRoles.__colanderalchemy_config__['overrides'])
+
+# added to be able pass professional_id to the Order reassign transition
+__colander_alchemy_config_overrides__.update(
+    {'professional_id': {
+        'title': 'Professional ID',
+        'missing': colander.drop,
+        'typ': colander.String()
+    }}
+)
 
 
 def create_order_slug():
@@ -60,14 +73,14 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     _workflow = workflows.OrderWorkflow
 
     __summary_attributes__ = __summary_attributes__
-    __summary_attributes_relations__ = ['project', 'comments', 'customer']
+    __summary_attributes_relations__ = ['project', 'comments', 'customer', 'assignment']
     __listing_attributes__ = __listing_attributes__
 
     __raw_acl__ = (
-        ('create', ('g:briefy_pm', 'g:briefy_finance', 'g:system')),
+        ('create', ('g:briefy_pm', 'g:briefy_finance', 'g:briefy_bizdev', 'g:system')),
         ('list', ('g:briefy', 'g:system')),
         ('view', ('g:briefy', 'g:system')),
-        ('edit', ('g:briefy_pm', 'g:briefy_finance', 'g:system')),
+        ('edit', ('g:briefy_pm', 'g:briefy_finance', 'g:briefy_bizdev', 'g:system')),
         ('delete', ('g:briefy_finance', 'g:system')),
     )
 
@@ -77,7 +90,8 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
             '_project_manager', '_scout_manager', '_customer_user', 'external_id',
             'assignment', 'assignments',
         ],
-        'overrides': mixins.OrderBriefyRoles.__colanderalchemy_config__['overrides']
+        'overrides': __colander_alchemy_config_overrides__
+
     }
 
     _slug = sa.Column('slug',
@@ -262,6 +276,24 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     Collection of :class:`briefy.leica.models.job.Assignment`.
     """
 
+    """ # TODO: enable this!
+    _tech_requirements = sa.Column(
+        sautils.JSONType,
+        info={
+            'colanderalchemy': {
+                'title': 'Technical Requirements for this assignemnt.',
+                'missing': colander.drop,
+                'typ': colander.String
+            }
+        }
+    )
+    """
+    """Technical requirements for orders in this order.
+
+    It stores a dictionary of requirements to be fulfilled by each asset of each Assignment.
+    If missing, the Project's technical requirements are used in its place.
+    """
+
     _availability = sa.Column(
         'availability',
         sautils.JSONType,
@@ -367,8 +399,26 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
         :return: A dictionary with technical requirements for an Order.
         """
+        # TODO: enable this:
+        # if self._tech_requirements:
+        #     requirements = self._tech_requirements
+        # else:
+        #     requirements = self.project.tech_requirements
         project = self.project
-        return project.tech_requirements
+        requirements = self.project.tech_requirements
+
+        # The tech requirements is composed with the required
+        # number of photos pr project or per order:
+        all_requirements = {
+            'set': {
+                'minimum_number_of_photos': project.number_required_assets
+                # Due to development constraints.
+                # In the future this should come from
+                # self.number_required_assets
+            },
+            'asset': requirements
+        }
+        return all_requirements
 
     @hybrid_property
     def deliver_date(self) -> datetime:
@@ -400,7 +450,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     def to_dict(self):
         """Return a dict representation of this object."""
-        data = super().to_dict(excludes=['internal_comments'])
+        data = super().to_dict()
         data['description'] = self.description
         data['briefing'] = self.project.briefing
         data['availability'] = self.availability

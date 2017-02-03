@@ -50,11 +50,11 @@ class DashboardCustomerOrderService(RESTService):
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'assigned', 'label': 'Orders Assigned',
+            'field': 'assigned', 'label': 'Assigned Orders',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {
-            'field': 'scheduled', 'label': 'Orders Scheduled',
+            'field': 'scheduled', 'label': 'Scheduled Orders',
             'type': 'integer', 'url': '', 'filter': ''
         },
         {

@@ -40,7 +40,7 @@ class TaxInfo:
         info={
             'colanderalchemy': {
                 'title': 'Tax ID type',
-                'missing': None,
+                'missing': colander.drop,
                 'typ': colander.String
             }
         }
@@ -55,7 +55,7 @@ class TaxInfo:
         info={
             'colanderalchemy': {
                 'title': 'Tax Country',
-                'missing': None,
+                'missing': colander.drop,
                 'typ': colander.String
             }
         }
@@ -84,8 +84,9 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
 
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', '_account_manager', '_customer_user',
-            'business_contact', 'billing_contact', 'external_id'
+            'state_history', 'state', '_customer_user', '_account_manager',
+            '_customer_users', '_account_managers', 'business_contact',
+            'billing_contact', 'external_id'
         ],
         'overrides': mixins.CustomerBriefyRoles.__colanderalchemy_config__['overrides']
     }

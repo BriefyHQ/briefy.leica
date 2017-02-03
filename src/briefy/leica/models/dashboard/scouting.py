@@ -49,7 +49,6 @@ total_assignments_per_country = select([
         OrderLocation.order_id == Order.id,
         Assignment.location.has(country=OrderLocation.country),
         total_professionals_per_country.c.country == OrderLocation.country,
-        # TODO: check if we should limit the search
         Assignment.state.in_(
             ('pending', 'published', 'assigned', 'scheduled')
         )
