@@ -147,6 +147,10 @@ def check_image_constraints(metadata: dict, constraints: dict) -> list:
     :return: List of error messages.
     """
     response = []
+    if 'asset' in constraints:
+        constraints = constraints['asset']
+        if not constraints:
+            return response
     for name, checks in constraints.items():
         if isinstance(checks, dict):
             checks = [checks, ]
