@@ -51,7 +51,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
 
     __listing_attributes__ = [
         'id', 'title', 'description', 'created_at', 'updated_at', 'state',
-        'external_id', 'total_orders', 'slug',
+        'external_id', 'total_orders', 'slug', 'customer'
     ]
 
     __raw_acl__ = (
