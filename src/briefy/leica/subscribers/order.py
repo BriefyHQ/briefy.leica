@@ -15,7 +15,7 @@ def order_created_handler(event):
     request = event.request
 
     location = request.validated.get('location', None)
-    if not order.main_location and location:
+    if not order.location and location:
         # force this because sometimes the obj.id is not available before the flush
         order.location = location
 

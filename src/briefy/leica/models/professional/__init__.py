@@ -30,7 +30,9 @@ class Professional(UserProfile, Base):
 
     __summary_attributes_relations__ = ['links', 'main_location', 'locations', 'pools']
 
-    __listing_attributes__ = __summary_attributes__
+    __listing_attributes__ = __summary_attributes__ + [
+        'main_location'
+    ]
 
     __colanderalchemy_config__ = {
         'excludes': [
