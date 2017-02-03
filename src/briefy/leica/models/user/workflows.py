@@ -39,7 +39,10 @@ class UserProfileWorkflow(BriefyWorkflow):
     @inactive.transition(active, 'can_activate')
     def activate(self):
         """Activate the UserProfile."""
-        create_rolleiflex_user(self.document)
+        profile = self.document
+        if profile.type == 'customeruserprofile':
+            groups = ('g:customers', )
+        create_rolleiflex_user(self.document, groups=groups)
 
     @Permission(groups=[G['system'], G['pm'], G['scout'], G['bizdev']])
     def can_activate(self):
