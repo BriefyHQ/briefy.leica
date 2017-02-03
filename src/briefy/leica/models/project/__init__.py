@@ -212,6 +212,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         """Return a dict representation of this object."""
         data = super().to_dict()
         data['slug'] = self.slug
+        data['price'] = self.price
         data = self._apply_actors_info(data)
         add_user_info_to_state_history(self.state_history)
         # Apply actor information to data
