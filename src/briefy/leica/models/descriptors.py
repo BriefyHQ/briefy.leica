@@ -1,8 +1,6 @@
 """Custom descriptors to handle get, set and delete of special attributes."""
 from briefy.common.db import Base
-from uuid import uuid4
-
-from time import sleep
+from sqlalchemy.orm.session import object_session
 
 
 class UnaryRelationshipWrapper:
@@ -35,13 +33,6 @@ class UnaryRelationshipWrapper:
         :param value: value received to
         :return: None
         """
-        # TODO: HACK: To avoid a race condition when a new object is not committed
-        # to the database yet.
-        from briefy.leica.models import Order, Professional
-        if isinstance(obj, (Order, Professional)):
-            sleep(0.5)
-        ##########################################################################
-
         if isinstance(value, dict):
             self.create_or_update_sub_object(obj, value)
         elif isinstance(value, self._model):
@@ -55,13 +46,6 @@ class UnaryRelationshipWrapper:
         """Remove the related object with soft delete."""
         # TODO: implement a way to delete sub_object
         pass
-
-    @staticmethod
-    def get_or_create_obj_id(obj):
-        """Return the obj ID or create a new one."""
-        if not obj.id:
-            obj.id = uuid4()
-        return obj.id
 
     def raise_value_error(self):
         """Raise ValueError when value is not dict or model instance."""
@@ -77,14 +61,14 @@ class UnaryRelationshipWrapper:
 
     def create_sub_object(self, obj, value):
         """Create a new sub object instance."""
-        session = obj.__session__
-        fk_id = self.get_or_create_obj_id(obj)
+        session = object_session(obj)
+        if not obj.id or not session:
+            # do not try to add a new instance if the obj is not persisted yet.
+            return
+        fk_id = obj.id
         value[self._fk_attr] = fk_id
         sub_object = self._model(**value)
         session.add(sub_object)
-        # TODO:
-        # call obj.some_hook to change something else, like workflow
-        # this could be another optional parameter in the init
 
     def update_sub_object(self, obj, value):
         """Update an existing sub object instance."""

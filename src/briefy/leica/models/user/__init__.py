@@ -18,11 +18,6 @@ __colander_alchemy_config_overrides__ = \
 
 __colander_alchemy_config_overrides__.update(
     {
-        'description': {
-            'title': 'Description',
-            'missing': colander.drop,
-            'typ': colander.String()
-        },
         'customer_roles': {
             'title': 'Customer Roles',
             'missing': colander.drop,

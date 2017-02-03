@@ -13,6 +13,12 @@ def order_created_handler(event):
     """Handle Order created event."""
     order = event.obj
     request = event.request
+
+    location = request.validated.get('location', None)
+    if not order.main_location and location:
+        # force this because sometimes the obj.id is not available before the flush
+        order.location = location
+
     # create a new assignment
     create_new_assignment_from_order(order, request)
     # submit the order

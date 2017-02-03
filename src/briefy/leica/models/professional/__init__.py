@@ -21,12 +21,6 @@ class Professional(UserProfile, Base):
 
     __tablename__ = 'professionals'
 
-    __table_args__ = {'extend_existing': True}
-
-    __mapper_args__ = {
-        'polymorphic_identity': 'professionals',
-    }
-
     _workflow = ProfessionalWorkflow
 
     __summary_attributes__ = [
@@ -62,7 +56,7 @@ class Professional(UserProfile, Base):
         ('create', ('g:briefy_scout', 'g:briefy_finance', 'g:briefy_qa', 'g:system')),
         ('list', ('g:briefy', 'g:system')),
         ('view', ('g:briefy', 'g:system')),
-        ('edit', ('g:briefy_scout', 'g:briefy_finance', 'g:briefy_pm', 'g:system')),
+        ('edit', ('g:briefy_scout', 'g:briefy_finance', 'g:briefy_qa', 'g:system')),
         ('delete', ('g:briefy_finance', 'g:system')),
     )
 
