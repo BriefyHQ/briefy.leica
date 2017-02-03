@@ -87,7 +87,8 @@ class ProfessionalWorkflow(BriefyWorkflow):
     @pending.transition(validation, 'can_approve')
     def approve(self):
         """Quality approval of a professional application."""
-        create_rolleiflex_user(self.document)
+        groups = ('g:professionals',)
+        create_rolleiflex_user(self.document, groups=groups)
 
     @validation.transition(trial, 'can_validate')
     def validate(self):
@@ -124,7 +125,7 @@ class ProfessionalWorkflow(BriefyWorkflow):
         """Validate if user can delete this professional."""
         return True
 
-    @Permission(groups=[LR['owner'], G['scout'], ])
+    @Permission(groups=[LR['owner'], G['scout'], G['qa'], G['pm']])
     def can_submit(self):
         """Validate if user can submit this professional for QA approval."""
         return True
