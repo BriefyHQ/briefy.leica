@@ -276,6 +276,24 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     Collection of :class:`briefy.leica.models.job.Assignment`.
     """
 
+    """ # TODO: enable this!
+    _tech_requirements = sa.Column(
+        sautils.JSONType,
+        info={
+            'colanderalchemy': {
+                'title': 'Technical Requirements for this assignemnt.',
+                'missing': colander.drop,
+                'typ': colander.String
+            }
+        }
+    )
+    """
+    """Technical requirements for orders in this order.
+
+    It stores a dictionary of requirements to be fulfilled by each asset of each Assignment.
+    If missing, the Project's technical requirements are used in its place.
+    """
+
     _availability = sa.Column(
         'availability',
         sautils.JSONType,
@@ -381,8 +399,26 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
         :return: A dictionary with technical requirements for an Order.
         """
+        # TODO: enable this:
+        # if self._tech_requirements:
+        #     requirements = self._tech_requirements
+        # else:
+        #     requirements = self.project.tech_requirements
         project = self.project
-        return project.tech_requirements
+        requirements = self.project.tech_requirements
+
+        # The tech requirements is composed with the required
+        # number of photos pr project or per order:
+        all_requirements = {
+            'set': {
+                'minimum_number_of_photos': project.number_required_assets
+                # Due to development constraints.
+                # In the future this should come from
+                # self.number_required_assets
+            },
+            'asset': requirements
+        }
+        return all_requirements
 
     @hybrid_property
     def deliver_date(self) -> datetime:
