@@ -176,7 +176,6 @@ class JobSync(ModelSync):
         comments.reverse()
         return comments
 
-
     def add_comment(self, obj, kobj):
         """Add Project Manager comment to the Order."""
         if kobj.project_manager_comment:
@@ -259,8 +258,8 @@ class JobSync(ModelSync):
                 session.add(Comment(**payload))
 
         if kobj.quality_assurance_feedback:
-            history = self.parse_machine_log(kobj)
-            failed = [entry for entry in history if entry['action'] == 'invalidate']
+            # history = self.parse_machine_log(kobj)
+            # failed = [entry for entry in history if entry['action'] == 'invalidate']
             qa_manager = obj.qa_manager or obj.project.project_manager
             ms_laure = SystemUser.id
             comments_data = self.parse_quality_assurance_feedback(kobj)

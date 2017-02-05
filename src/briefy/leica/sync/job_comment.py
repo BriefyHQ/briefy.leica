@@ -30,9 +30,13 @@ DATE_PATTERNS = [
     ('\n(\d{1,2})[\., ]{0,2}(Jan|Feb)\ ?(.*)', date_2017_replace),
     ('^(Mar|Apr|May|Jun|Jul|Aug|Agu|Sep|Oct|Nov|Dec)[\., ]?(\d{1,2})\ ?(.*)', date_2016_md_replace),
     (
-    '\n(Mar|Apr|May|Jun|Jul|Aug|Agu|Sep|Oct|Nov|Dec)[\., ]?(\d{1,2})\ ?(.*)', date_2016_md_replace),
+        '\n(Mar|Apr|May|Jun|Jul|Aug|Agu|Sep|Oct|Nov|Dec)[\., ]?(\d{1,2})\ ?(.*)',
+        date_2016_md_replace
+    ),
     (
-    '^(\d{1,2})[\., ]{0,2}(Mar|Apr|May|Jun|Jul|Aug|Agu|Sep|Oct|Nov|Dec)\ ?(.*)', date_2016_replace),
+        '^(\d{1,2})[\., ]{0,2}(Mar|Apr|May|Jun|Jul|Aug|Agu|Sep|Oct|Nov|Dec)\ ?(.*)',
+        date_2016_replace
+    ),
     (
         '\n(\d{1,2})[\., ]{0,2}(Mar|Apr|May|Jun|Jul|Aug|Agu|Sep|Oct|Nov|Dec)\ ?(.*)',
         date_2016_replace
@@ -64,8 +68,14 @@ BASE_PATTERNS = [
 ]
 
 INTERNAL_PATTERNS = BASE_PATTERNS + [
-    ('\nTO ([^:]*): (AR|Ariana|GF|Christian|Flora|francesca|Nayeon)[/, ,:]*(.*)', breaker + r'\2 [\1]'),
-    ('^TO ([^:]*): (AR|Ariana|GF|Christian|Flora|francesca|Nayeon)[/, ,:]*(.*)', breaker + r'\2 [\1]'),
+    (
+        '\nTO ([^:]*): (AR|Ariana|GF|Christian|Flora|francesca|Nayeon)[/, ,:]*(.*)',
+        breaker + r'\2 [\1]'
+    ),
+    (
+        '^TO ([^:]*): (AR|Ariana|GF|Christian|Flora|francesca|Nayeon)[/, ,:]*(.*)',
+        breaker + r'\2 [\1]'
+    ),
     ('\n(AR|Ariana|GF|Christian|Flora|francesca|Nayeon)[/, ,:]*(.*)', breaker + r'\2 [\1]'),
     ('^(AR|Ariana|GF|Christian|Flora|francesca|Nayeon)[/, ,:]*(.*)', breaker + r'\2 [\1]'),
     ('\n(Cancelled using a script)\n?', breaker + r'\1' + breaker),

@@ -107,6 +107,7 @@ def parse_machine_log(kobj):
     history.reverse()
     return history
 
+
 def add_order_history(session, obj, kobj):
     """Add state_history and state information to the Order."""
     history = []
