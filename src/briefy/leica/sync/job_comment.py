@@ -45,7 +45,7 @@ DATE_PATTERNS = [
     ('\n(\d{1,2})[\.,\/](0[6-9]{1}|1[0,1,2]) ?(.*)', date_2016_replace),
     ('^(\d{1,2})[\.,\/](0?[1-2]{1}) ?(.*)', date_2017_replace),
     ('\n(\d{1,2})[\.,\/](0?[1-2]{1}) ?(.*)', date_2017_replace),
-    ('^(\d{4}[-,.]\d{1,2}[-,.]\d{1,2}) ?(.*)', breaker + r'\1-\2-\3T00:00:00.00+00:00 \4'),
+    ('^((\d{4})[-,.](\d{1,2})[-,.](\d{1,2})) ?(.*)', breaker + r'\2-\3-\4T00:00:00.00+00:00 \4'),
     ('-(Jan|1)-', '-01-'),
     ('-(Feb|2)-', '-02-'),
     ('-(Mar|3)-', '-03-'),
@@ -105,7 +105,11 @@ def comment_format_first_line(created_at: datetime = None, body: str='') -> tupl
             new_first_line = new_first_line.replace('\n------------------------------\n', '')
         matches = re.findall(DATE_PATTERN, new_first_line)
     if matches:
-        created_at = datetime(*[int(i) for i in matches[0][1:-1]], tzinfo=timezone.utc)
+        try:
+            created_at = datetime(*[int(i) for i in matches[0][1:-1]], tzinfo=timezone.utc)
+        except:
+            # Deal with error trying to convert wrong dates (ie 34 Jan)
+            created_at = datetime_utcnow()
         new_first_line = re.sub(DATE_PATTERN, '', new_first_line)
         body = body.replace(first_line, new_first_line).strip()
     return created_at, body
