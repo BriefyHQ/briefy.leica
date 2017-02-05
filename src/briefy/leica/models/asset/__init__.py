@@ -250,8 +250,9 @@ class Image(asset.ImageMixin, Asset):
         response = []
         metadata = self.metadata_
         tech_requirements = self.tech_requirements
-        if tech_requirements:
-            response = imaging.check_image_constraints(metadata, tech_requirements)
+        asset_requirements = tech_requirements.get('asset') if tech_requirements else {}
+        if asset_requirements:
+            response = imaging.check_image_constraints(metadata, asset_requirements)
         return response
 
 

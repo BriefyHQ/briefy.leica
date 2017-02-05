@@ -405,7 +405,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         # else:
         #     requirements = self.project.tech_requirements
         project = self.project
-        requirements = self.project.tech_requirements
+        requirements = self.project.tech_requirements or {}
 
         # The tech requirements is composed with the required
         # number of photos pr project or per order:
@@ -416,8 +416,8 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
                 # In the future this should come from
                 # self.number_required_assets
             },
-            'asset': requirements
         }
+        all_requirements.update(requirements)
         return all_requirements
 
     @hybrid_property

@@ -116,7 +116,9 @@ class TestAssetView(BaseVersionedTestView):
             assignment = Assignment.get(payload['assignment_id'])
             project = assignment.order.project
             project.tech_requirements = {
-                'dimensions': {'value': '800x600', 'operator': 'eq'},
+                'asset': {
+                    'dimensions': {'value': '800x600', 'operator': 'eq'},
+                }
             }
             session.add(project)
             session.flush()
