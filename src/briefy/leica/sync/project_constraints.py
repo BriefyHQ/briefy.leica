@@ -273,4 +273,5 @@ CONSTRAINTS = {
     'Love Home Swap': _lovehome_constraints,
     'Stayz Australia': _default_constraints,
     'WeTravel Yoga': _default_constraints,
+    'Wolt Pilot': _default_constraints,
 }

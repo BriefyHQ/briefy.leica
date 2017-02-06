@@ -30,6 +30,9 @@ STATUS_MAPPING = {
     'Classic Driver Pilot': 'completed',
     'Deliveroo Behind the Scene': 'ongoing',
     'Delivery Hero Pilot': 'ongoing',
+    'Delivery Hero Cologne': 'ongoing',
+    'Delivery Hero Munich': 'ongoing',
+    'Delivery Hero Hamburg': 'ongoing',
     'eH Visio Clinics': 'ongoing',
     'Erento': 'completed',
     'Everphone Business Portrait': 'completed',
@@ -41,6 +44,7 @@ STATUS_MAPPING = {
     'Love Home Swap': 'completed',
     'Stayz Australia': 'completed',
     'WeTravel Yoga': 'completed',
+    'Wolt Pilot': 'ongoing',
 }
 
 

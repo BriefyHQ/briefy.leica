@@ -86,6 +86,7 @@ COUNTRY_MAPPING = {
     'France': ('France', 'FR'),
     'Germany': ('Germany', 'DE'),
     'Iceland': ('Iceland', 'IS'),
+    'Finland': ('Finland', 'FI'),
     'ID': ('Indonesia', 'ID'),
     'Indo': ('Indonesia', 'ID'),
     'Indon': ('Indonesia', 'ID'),
