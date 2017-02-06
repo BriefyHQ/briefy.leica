@@ -11,7 +11,6 @@ from zope.component import getUtility
 import newrelic.agent
 
 
-
 MESSAGE_DISPATCH = {
     'laure.assignment.validated': {
         'name': 'resolving validated assignment',
