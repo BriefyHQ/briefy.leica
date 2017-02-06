@@ -21,11 +21,25 @@ from briefy.leica.sync.job_wf_history import add_order_history
 from briefy.leica.sync.location import create_location_dict
 from datetime import datetime
 from datetime import timezone
+from pytz import timezone
+from pytz import utc
 
 import re
 import uuid
 
 isource_mapping = {item.label: item.value for item in ISource.__members__.values()}
+
+
+def datetime_in_timezone(value: datetime, tz_name: str) -> datetime:
+    """Process a datetime, in UTC and return it in the specified timezone."""
+    tz = timezone(tz_name)
+    # We will assume the original date was in UTC
+    # So we need to remove UTC
+    new_value = datetime(
+        *[int(p) for p in value.strftime('%Y-%m-%d-%H-%M-%S').split('-')]
+    )
+    new_value = tz.localize(new_value)
+    return new_value
 
 
 class JobSync(ModelSync):
@@ -74,10 +88,15 @@ class JobSync(ModelSync):
         category = kobj.category.pop() if kobj.category else 'undefined'
         category = 'Accommodation' if category == 'Accomodation' else category
         category = 'Portrait' if category == 'Portraits' else category
-        if kobj.availability_1 and kobj.availability_2:
+        timezone_name = kobj.timezone
+        availability_1 = kobj.availability_1
+        availability_2 = kobj.availability_2
+        if availability_1 and availability_2:
+            availability_1 = datetime_in_timezone(availability_1, timezone_name)
+            availability_2 = datetime_in_timezone(availability_2, timezone_name)
             availability = [
-                kobj.availability_1.isoformat(),
-                kobj.availability_2.isoformat()
+                availability_1.isoformat(),
+                availability_2.isoformat()
             ]
         else:
             availability = None
@@ -308,6 +327,10 @@ class JobSync(ModelSync):
         knack_payout_currency = self.choice_to_str(kobj.currency_payout)
         payout_currency = str(knack_payout_currency) if knack_payout_currency else 'EUR'
         reason_compensation = self.choice_to_str(kobj.reason_for_additional_compensation)
+        timezone_name = kobj.timezone
+        scheduled_datetime = kobj.scheduled_shoot_date_time
+        if scheduled_datetime:
+            scheduled_datetime = datetime_in_timezone(scheduled_datetime, timezone_name)
         payload = dict(
             id=uuid.uuid4(),
             order_id=obj.id,
@@ -317,7 +340,7 @@ class JobSync(ModelSync):
             reason_additional_compensation=reason_compensation or None,
             slug=self.get_slug(job_id, assignment=1),
             professional_id=professional_id,
-            scheduled_datetime=kobj.scheduled_shoot_date_time,
+            scheduled_datetime=scheduled_datetime,
             release_contract=release,
             payout_value=payout_value,
             payout_currency=payout_currency,
