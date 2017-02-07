@@ -31,7 +31,7 @@ __listing_attributes__ = __summary_attributes__ + [
     'set_type', 'number_required_assets', 'category', 'payout_value',
     'availability', 'payout_currency', 'travel_expenses', 'additional_compensation',
     'reason_additional_compensation', 'qa_manager', 'submission_path', 'state_history',
-    'requirements', 'pool_id', 'location'
+    'requirements', 'pool_id', 'location', 'project'
 ]
 
 
