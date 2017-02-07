@@ -8,6 +8,7 @@ from briefy.common.workflow import Permission
 from briefy.common.workflow import WorkflowState as WS
 from briefy.common.workflow import WorkflowTransitionException
 from briefy.leica.subscribers.utils import create_new_assignment_from_order
+from briefy.leica.utils.transitions import create_comment_on_assigment_approval
 
 import logging
 
@@ -310,6 +311,7 @@ class AssignmentWorkflow(BriefyWorkflow):
     @in_qa.transition(
         approved,
         'can_approve',
+        required_fields=('customer_message',)
     )
     def approve(self, **kwargs):
         """QA approves the Assignment Set."""
@@ -323,7 +325,11 @@ class AssignmentWorkflow(BriefyWorkflow):
         # transitions.approve_assets_in_assignment(assignment, self.context)
 
         # This will not trigger the Order just the event to start ms.laure.
-        pass
+        customer_message = kwargs['fields'].get('customer_message', '').strip()
+        if customer_message:
+            actor = self.context.id
+            assignment = self.document
+            create_comment_on_assigment_approval(assignment, actor, customer_message)
 
     @in_qa.transition(
         awaiting_assets, 'can_approve',

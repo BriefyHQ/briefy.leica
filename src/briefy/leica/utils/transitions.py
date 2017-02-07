@@ -2,6 +2,7 @@
 from briefy.common.db import Base
 from briefy.leica import logger
 from datetime import datetime
+from sqlalchemy.orm.session import object_session
 
 
 def get_transition_date(transitions: tuple, obj, first: bool=False) -> datetime:
@@ -45,3 +46,26 @@ def approve_assets_in_assignment(assignment: Base, context) -> list:
         )
     )
     return assets_ids
+
+
+def create_comment_on_assigment_approval(assignment, actor, message):
+    """Create a new Comment instance from the last workflow transition."""
+    from briefy.leica.models import Comment
+
+    session = object_session(assignment)
+    order = assignment.order
+    user_id = actor['id'] if isinstance(actor, dict) else actor
+    author_role = 'qa_manager'
+    to_role = 'customer_user'
+    if message:
+        payload = dict(
+            entity_id=order.id,
+            entity_type=order.__class__.__name__,
+            author_id=user_id,
+            content=message,
+            author_role=author_role,
+            to_role=to_role,
+            internal=False,
+        )
+        comment = Comment(**payload)
+        session.add(comment)

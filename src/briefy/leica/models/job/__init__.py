@@ -34,6 +34,14 @@ __listing_attributes__ = __summary_attributes__ + [
     'requirements', 'pool_id', 'location', 'project', 'timezone'
 ]
 
+overrides = mixins.AssignmentBriefyRoles.__colanderalchemy_config__['overrides']
+overrides['customer_message'] = {
+    'title': 'Customer message',
+    'default': '',
+    'missing': colander.drop,
+    'typ': colander.String()
+}
+
 
 def create_slug_from_order(context):
     """Create a slug for Assignment from the Order slug."""
@@ -130,7 +138,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
             '_scout_manager', '_project_manager', '_qa_manager',
             '_professional_user', 'pool'
         ],
-        'overrides': mixins.AssignmentBriefyRoles.__colanderalchemy_config__['overrides']
+        'overrides': overrides
     }
 
     _slug = sa.Column('slug',
