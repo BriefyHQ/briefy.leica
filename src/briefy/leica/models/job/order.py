@@ -27,7 +27,7 @@ __summary_attributes__ = [
 
 __listing_attributes__ = __summary_attributes__ + [
     'customer_order_id', 'deliver_date', 'accept_date', 'availability', 'assignment',
-    'requirements', 'delivery', 'project', 'customer'
+    'requirements', 'delivery', 'project', 'customer', 'timezone'
 ]
 
 __colander_alchemy_config_overrides__ = \
@@ -423,6 +423,15 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         return all_requirements
 
     @hybrid_property
+    def timezone(self) -> str:
+        """Return Timezone for this order.
+
+        Information will be obtained from main location.
+        """
+        location = self.location
+        return location.timezone
+
+    @hybrid_property
     def deliver_date(self) -> datetime:
         """Return last deliver date for this Orders.
 
@@ -461,6 +470,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data['deliver_date'] = self.deliver_date
         data['delivery'] = self.delivery
         data['location'] = self.location
+        data['timezone'] = self.timezone
         data['assignment'] = self.assignment.to_summary_dict() if self.assignment else None
         data['tech_requirements'] = self.tech_requirements
         # Workflow history
