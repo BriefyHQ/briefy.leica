@@ -31,7 +31,7 @@ __listing_attributes__ = __summary_attributes__ + [
     'set_type', 'number_required_assets', 'category', 'payout_value',
     'availability', 'payout_currency', 'travel_expenses', 'additional_compensation',
     'reason_additional_compensation', 'qa_manager', 'submission_path', 'state_history',
-    'requirements', 'pool_id', 'location', 'project'
+    'requirements', 'pool_id', 'location', 'project', 'timezone'
 ]
 
 
@@ -476,6 +476,18 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         """Return if this Assignment is assigned or not."""
         return True if (self.assignment_date and self.professional_id) else False
 
+    @hybrid_property
+    def timezone(self) -> str:
+        """Return Timezone for this order.
+
+        Information will be obtained from main location.
+        """
+        location = self.location
+        timezone = 'UTC'
+        if location:
+            timezone = location.timezone
+        return timezone
+
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
 
@@ -494,6 +506,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         data['briefing'] = self.briefing
         data['assignment_date'] = self.assignment_date
         data['slug'] = self.slug
+        data['timezone'] = self.timezone
         data['tech_requirements'] = self.project.tech_requirements
         data['availability'] = self.availability
         data['category'] = self.category
