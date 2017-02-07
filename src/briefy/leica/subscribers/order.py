@@ -55,13 +55,13 @@ def order_remove_schedule(event):
     if assignment.state == 'scheduled':
         assignment.workflow.remove_schedule(message=message)
 
-    if G['customers'] in user.groups:
+    if G['customers'].value in user.groups:
         to_role = 'project_manager'
         author_role = 'customer_user'
-    elif G['pm'] in user.groups:
+    elif G['pm'].value in user.groups:
         to_role = 'customer_user'
         author_role = 'project_manager'
-    elif G['professionals'] in user.groups:
+    elif G['professionals'].value in user.groups:
         # this should not create a comment on the order only on the assignment
         return
     else:
@@ -79,7 +79,7 @@ def order_refuse(event):
     """Handle Order refuse workflow event."""
     order = event.obj
     user = order.workflow.context
-    if G['customers'] in user.groups:
+    if G['customers'].value in user.groups:
         author_role = 'customer_user'
         to_role = 'project_manager'
         internal = False

@@ -59,13 +59,13 @@ def assignment_remove_schedule(event):
     if order.state == 'scheduled':
         order.workflow.remove_schedule(message=message)
 
-    if G['customers'] in user.groups:
+    if G['customers'].value in user.groups:
         # this should not create a comment on the assignment only on the order
         return
-    elif G['pm'] in user.groups:
+    elif G['pm'].value in user.groups:
         to_role = 'professional_user'
         author_role = 'project_manager'
-    elif G['professionals'] in user.groups:
+    elif G['professionals'].value in user.groups:
         to_role = 'project_manager'
         author_role = 'professional_user'
     else:
@@ -81,10 +81,10 @@ def assignment_reschedule(event):
     assignment.scheduled_datetime = None
     user = assignment.workflow.context
 
-    if G['pm'] in user.groups:
+    if G['pm'].value in user.groups:
         to_role = 'professional_user'
         author_role = 'project_manager'
-    elif G['professionals'] in user.groups:
+    elif G['professionals'].value in user.groups:
         to_role = 'project_manager'
         author_role = 'professional_user'
     else:
