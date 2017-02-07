@@ -90,8 +90,11 @@ class JobSync(ModelSync):
         availability_1 = kobj.availability_1
         availability_2 = kobj.availability_2
         if availability_1 and availability_2:
+            # First convert to local timezone and then get it in UTC
             availability_1 = datetime_in_timezone(availability_1, timezone_name)
+            availability_1 = availability_1.astimezone(utc)
             availability_2 = datetime_in_timezone(availability_2, timezone_name)
+            availability_2 = availability_2.astimezone(utc)
             availability = [
                 availability_1.isoformat(),
                 availability_2.isoformat()
