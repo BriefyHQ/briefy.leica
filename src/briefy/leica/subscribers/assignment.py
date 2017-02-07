@@ -78,9 +78,26 @@ def assignment_remove_schedule(event):
 def assignment_reschedule(event):
     """Handle Assignment reschedule workflow event."""
     assignment = event.obj
-    assignment.scheduled_datetime = None
     user = assignment.workflow.context
 
+    if G['pm'].value in user.groups:
+        to_role = 'professional_user'
+        author_role = 'project_manager'
+    elif G['professionals'].value in user.groups:
+        to_role = 'project_manager'
+        author_role = 'professional_user'
+    else:
+        to_role = 'professional_user'
+        author_role = 'project_manager'
+
+    create_comment_from_wf_transition(assignment, author_role, to_role)
+
+
+def assignment_schedule(event):
+    """Handle Assignment schedule workflow event."""
+    assignment = event.obj
+    user = assignment.workflow.context
+    import pdb; pdb.set_trace()
     if G['pm'].value in user.groups:
         to_role = 'professional_user'
         author_role = 'project_manager'
@@ -204,6 +221,7 @@ def transition_handler(event):
         'assignment.workflow.return_to_qa': assignment_return_to_qa,
         'assignment.workflow.remove_schedule': assignment_remove_schedule,
         'assignment.workflow.reschedule': assignment_reschedule,
+        'assignment.workflow.schedule': assignment_schedule,
     }
     handler = handlers.get(event_name, None)
     if handler:
