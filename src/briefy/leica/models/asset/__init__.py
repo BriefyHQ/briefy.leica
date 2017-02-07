@@ -70,6 +70,7 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
     professional_id = sa.Column(
         sautils.UUIDType,
         sa.ForeignKey('professionals.id'),
+        index=True,
         info={
             'colanderalchemy': {
                 'title': 'ID',
@@ -101,6 +102,7 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
     assignment_id = sa.Column(
         sautils.UUIDType,
         sa.ForeignKey('assignments.id'),
+        index=True,
         nullable=False,
         info={
             'colanderalchemy': {
@@ -233,6 +235,7 @@ class Image(asset.ImageMixin, Asset):
         return sa.Column(
             UUIDType(),
             sa.ForeignKey('assets.id'),
+            index=True,
             primary_key=True,
             info={'colanderalchemy': {
                 'title': 'Asset id',
@@ -267,6 +270,7 @@ class ThreeSixtyImage(asset.ThreeSixtyImageMixin, Asset):
         return sa.Column(
             UUIDType(),
             sa.ForeignKey('assets.id'),
+            index=True,
             primary_key=True,
             info={'colanderalchemy': {
                 'title': 'Asset id',
@@ -296,6 +300,7 @@ class Video(asset.VideoMixin, Asset):
         return sa.Column(
             UUIDType(),
             sa.ForeignKey('assets.id'),
+            index=True,
             primary_key=True,
             info={'colanderalchemy': {
                 'title': 'Asset id',

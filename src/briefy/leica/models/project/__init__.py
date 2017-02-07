@@ -72,6 +72,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
 
     customer_id = sa.Column(sautils.UUIDType,
                             sa.ForeignKey('customers.id'),
+                            index=True,
                             nullable=False,
                             info={'colanderalchemy': {
                                'title': 'Customer',

@@ -38,6 +38,7 @@ class OrderLocation(ContactInfoMixin, AddressMixin,
     order_id = sa.Column(
         sautils.UUIDType,
         sa.ForeignKey('orders.id'),
+        index=True,
         nullable=False,
         info={
             'colanderalchemy': {

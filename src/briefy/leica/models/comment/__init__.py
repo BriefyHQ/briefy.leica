@@ -78,6 +78,7 @@ class Comment(mixins.LeicaMixin, Base):
 
     in_reply_to = sa.Column(sautils.UUIDType,
                             sa.ForeignKey('comments.id'),
+                            index=True,
                             nullable=True,
                             info={'colanderalchemy': {
                                 'title': 'Parent comment',

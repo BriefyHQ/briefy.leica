@@ -21,7 +21,10 @@ class Link(mixins.LeicaMixin, Base):
     }
 
     professional_id = sa.Column(
-        UUIDType(), sa.ForeignKey('professionals.id'), unique=False,
+        UUIDType(),
+        sa.ForeignKey('professionals.id'),
+        unique=False,
+        index=True,
         info={'colanderalchemy': {
             'title': 'Professional id',
             'validator': colander.uuid,

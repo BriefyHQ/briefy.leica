@@ -28,6 +28,7 @@ class ProfessionalsInPool(mixins.VersionMixin, Timestamp, Base):
     pool_id = sa.Column(
         sautils.UUIDType,
         sa.ForeignKey('pools.id'),
+        index=True,
         primary_key=True,
         info={
             'colanderalchemy': {

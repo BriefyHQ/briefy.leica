@@ -102,6 +102,7 @@ class CustomerUserProfile(UserProfile):
     id = sa.Column(
         UUIDType(),
         sa.ForeignKey('userprofiles.id'),
+        index=True,
         unique=True,
         primary_key=True,
         info={'colanderalchemy': {
@@ -167,6 +168,7 @@ class BriefyUserProfile(UserProfile):
     id = sa.Column(
         UUIDType(),
         sa.ForeignKey('userprofiles.id'),
+        index=True,
         unique=True,
         primary_key=True,
         info={'colanderalchemy': {

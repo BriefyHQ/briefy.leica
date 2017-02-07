@@ -166,6 +166,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     customer_id = sa.Column(
         sautils.UUIDType,
         sa.ForeignKey('customers.id'),
+        index=True,
         default=get_customer_id_from_project,
         nullable=False,
         info={
@@ -186,6 +187,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     project_id = sa.Column(
         sautils.UUIDType,
         sa.ForeignKey('projects.id'),
+        index=True,
         nullable=False,
         info={
             'colanderalchemy': {

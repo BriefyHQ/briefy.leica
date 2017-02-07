@@ -189,6 +189,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     order_id = sa.Column(
         sautils.UUIDType,
         sa.ForeignKey('orders.id'),
+        index=True,
         nullable=False,
         info={
             'colanderalchemy': {
@@ -206,6 +207,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     pool_id = sa.Column(
         sautils.UUIDType,
         sa.ForeignKey('pools.id'),
+        index=True,
         nullable=True,
         info={
             'colanderalchemy': {
@@ -225,6 +227,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     professional_id = sa.Column(
         sautils.UUIDType,
         sa.ForeignKey('professionals.id'),
+        index=True,
         nullable=True,
         info={'colanderalchemy': {
             'title': 'Professional ID',

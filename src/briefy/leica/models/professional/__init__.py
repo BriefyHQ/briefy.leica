@@ -65,6 +65,7 @@ class Professional(UserProfile, Base):
     id = sa.Column(
         UUIDType(),
         sa.ForeignKey('userprofiles.id'),
+        index=True,
         unique=True,
         primary_key=True,
         info={'colanderalchemy': {
@@ -204,6 +205,7 @@ class Photographer(Professional):
     id = sa.Column(
         UUIDType(),
         sa.ForeignKey('professionals.id'),
+        index=True,
         unique=True,
         primary_key=True,
         info={'colanderalchemy': {
@@ -228,6 +230,7 @@ class Videographer(Professional):
     id = sa.Column(
         UUIDType(),
         sa.ForeignKey('professionals.id'),
+        index=True,
         unique=True,
         primary_key=True,
         info={'colanderalchemy': {

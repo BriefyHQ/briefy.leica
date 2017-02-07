@@ -20,9 +20,7 @@ from briefy.leica.sync.job_wf_history import add_assignment_history
 from briefy.leica.sync.job_wf_history import add_order_history
 from briefy.leica.sync.location import create_location_dict
 from datetime import datetime
-from datetime import timezone
 from pytz import timezone
-from pytz import utc
 
 import re
 import uuid
