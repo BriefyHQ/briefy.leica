@@ -65,7 +65,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     __colanderalchemy_config__ = {
         'excludes': [
             'state_history', 'state', 'customer', '_customer_user',
-            '_project_manager', 'external_id'
+            '_project_manager', 'external_id', '_customer_users', '_project_managers'
         ],
         'overrides': mixins.ProjectBriefyRoles.__colanderalchemy_config__['overrides']
     }

@@ -36,6 +36,7 @@ def get_public_user_info(user_id: str) -> dict:
         'last_name': '',
         'fullname': '',
         'email': '',
+        'internal': False,
     }
     from briefy.leica.models import UserProfile
     try:
@@ -50,6 +51,7 @@ def get_public_user_info(user_id: str) -> dict:
             data['last_name'] = raw_data.last_name
             data['fullname'] = raw_data.title
             data['email'] = raw_data.email
+            data['internal'] = raw_data.internal
         return data
 
 
@@ -144,11 +146,16 @@ class LeicaBriefyRoles(BaseBriefyRoles):
         info = self._actors_info()
         for key, attr in actors:
             try:
-                value = info.get(attr).pop()
+                value = info.get(attr)
             except (AttributeError, IndexError):
                 data[key] = None
             else:
-                data[key] = get_public_user_info(value) if value else None
+                result = []
+                for item in value:
+                    user_info = get_public_user_info(item) if item else None
+                    result.append(user_info)
+                data[key] = result
+
         return data
 
 
@@ -365,6 +372,9 @@ class OrderBriefyRoles(LeicaBriefyRoles):
         'customer_user',
         'project_manager',
         'scout_manager',
+        'customer_users',
+        'project_managers',
+        'scout_managers',
     )
 
     __colanderalchemy_config__ = {
@@ -372,6 +382,9 @@ class OrderBriefyRoles(LeicaBriefyRoles):
             'customer_user': _ID_COLANDER,
             'project_manager': _ID_COLANDER,
             'scout_manager': _ID_COLANDER,
+            'customer_users': _ID_COLANDER_LIST,
+            'project_managers': _ID_COLANDER_LIST,
+            'scout_managers': _ID_COLANDER_LIST,
         }
     }
 
@@ -392,6 +405,26 @@ class OrderBriefyRoles(LeicaBriefyRoles):
         return cls.get_association_proxy('customer_user', 'user_id')
 
     @declared_attr
+    def _customer_users(cls):
+        """Relationship: return a list of LocalRoles.
+
+        :return: LocalRoles instances of customer_user role_name.
+        """
+        return cls.get_role_relationship('customer_user', uselist=True)
+
+    @declared_attr
+    def customer_users(cls):
+        """Return a list of ids of customer users.
+
+        :return: IDs of the customer users.
+        """
+        return cls.get_association_proxy(
+            'customer_user',
+            'user_id',
+            local_attr='_customer_users'
+        )
+
+    @declared_attr
     def _project_manager(cls):
         """Relationship: return a list of LocalRoles.
 
@@ -408,6 +441,26 @@ class OrderBriefyRoles(LeicaBriefyRoles):
         return cls.get_association_proxy('project_manager', 'user_id')
 
     @declared_attr
+    def _project_managers(cls):
+        """Relationship: return a list of LocalRoles.
+
+        :return: LocalRoles instances of project_manager role_name.
+        """
+        return cls.get_role_relationship('project_manager', uselist=True)
+
+    @declared_attr
+    def project_managers(cls):
+        """Return a list of ids of project manager users.
+
+        :return: IDs of the project manager users.
+        """
+        return cls.get_association_proxy(
+            'project_manager',
+            'user_id',
+            local_attr='_project_managers'
+        )
+
+    @declared_attr
     def _scout_manager(cls):
         """Relationship: return a list of LocalRoles.
 
@@ -422,6 +475,26 @@ class OrderBriefyRoles(LeicaBriefyRoles):
         :return: IDs of the scout manager users.
         """
         return cls.get_association_proxy('scout_manager', 'user_id')
+
+    @declared_attr
+    def _scout_managers(cls):
+        """Relationship: return a list of LocalRoles.
+
+        :return: LocalRoles instances of scout_manager role_name.
+        """
+        return cls.get_role_relationship('scout_manager', uselist=True)
+
+    @declared_attr
+    def scout_managers(cls):
+        """Return a list of ids of scout manager users.
+
+        :return: IDs of the scout manager users.
+        """
+        return cls.get_association_proxy(
+            'scout_manager',
+            'user_id',
+            local_attr='_scout_managers'
+        )
 
 
 class AssignmentBriefyRoles(LeicaBriefyRoles):
