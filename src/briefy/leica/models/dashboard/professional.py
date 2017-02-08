@@ -34,7 +34,7 @@ total_assignments_professional = select([
             ('assigned', 'scheduled', 'in_qa', 'approved', 'completed',
              'perm_rejected', 'refused', 'cancelled', 'awaiting_assets', 'asset_validation')
         ),
-        Assignment.professional_id == ':professional_id '
+        Assignment.professional_id == ':professional_id'
     )
 ).alias('total_assignments_professional')
 

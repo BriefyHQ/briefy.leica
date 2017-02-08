@@ -272,12 +272,16 @@ class ProjectBriefyRoles(LeicaBriefyRoles):
     __actors__ = (
         'customer_user',
         'project_manager',
+        'customer_users',
+        'project_managers',
     )
 
     __colanderalchemy_config__ = {
         'overrides': {
             'customer_user': _ID_COLANDER,
             'project_manager': _ID_COLANDER,
+            'customer_users': _ID_COLANDER_LIST,
+            'project_managers': _ID_COLANDER_LIST,
         }
     }
 
@@ -298,6 +302,26 @@ class ProjectBriefyRoles(LeicaBriefyRoles):
         return cls.get_association_proxy('customer_user', 'user_id')
 
     @declared_attr
+    def _customer_users(cls):
+        """Relationship: return a list of LocalRoles.
+
+        :return: LocalRoles instances of customer_user role_name.
+        """
+        return cls.get_role_relationship('customer_user', uselist=True)
+
+    @declared_attr
+    def customer_users(cls):
+        """Return a list of ids of customer users.
+
+        :return: IDs of the customer users.
+        """
+        return cls.get_association_proxy(
+            'customer_user',
+            'user_id',
+            local_attr='_customer_users'
+        )
+
+    @declared_attr
     def _project_manager(cls):
         """Relationship: return a list of LocalRoles.
 
@@ -312,6 +336,26 @@ class ProjectBriefyRoles(LeicaBriefyRoles):
         :return: IDs of the project manager users.
         """
         return cls.get_association_proxy('project_manager', 'user_id')
+
+    @declared_attr
+    def _project_managers(cls):
+        """Relationship: return a list of LocalRoles.
+
+        :return: LocalRoles instances of project_manager role_name.
+        """
+        return cls.get_role_relationship('project_manager', uselist=True)
+
+    @declared_attr
+    def project_managers(cls):
+        """Return a list of ids of project manager users.
+
+        :return: IDs of the project manager users.
+        """
+        return cls.get_association_proxy(
+            'project_manager',
+            'user_id',
+            local_attr='_project_managers'
+        )
 
 
 class OrderBriefyRoles(LeicaBriefyRoles):

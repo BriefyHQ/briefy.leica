@@ -55,10 +55,10 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     ]
 
     __raw_acl__ = (
-        ('create', ('g:briefy_bizdev', 'g:briefy_finance', 'g:system')),
-        ('list', ('g:briefy', 'g:briefy_bizdev', 'g:briefy_finance', 'g:system')),
-        ('view', ('g:briefy', 'g:briefy_bizdev', 'g:briefy_finance', 'g:system')),
-        ('edit', ('g:briefy_bizdev', 'g:briefy_finance', 'g:system')),
+        ('create', ('g:briefy_pm', 'g:briefy_bizdev', 'g:briefy_finance', 'g:system')),
+        ('list', ('g:briefy_qa', 'g:briefy_scout', 'g:briefy_finance', 'g:system')),
+        ('view', ('g:briefy_qa', 'g:briefy_scout', 'g:briefy_finance', 'g:system')),
+        ('edit', ('g:briefy_pm', 'g:briefy_bizdev', 'g:briefy_finance', 'g:system')),
         ('delete', ('g:briefy_finance', 'g:system')),
     )
 

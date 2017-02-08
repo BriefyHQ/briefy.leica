@@ -125,8 +125,8 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
 
     __raw_acl__ = (
         ('create', ('g:briefy_pm', 'g:briefy_finance', 'g:briefy_scout', 'g:system')),
-        ('list', ('g:briefy', 'g:system')),
-        ('view', ('g:briefy', 'g:system')),
+        ('list', ('g:briefy_qa', 'g:briefy_scout', 'g:briefy_finance', 'g:system')),
+        ('view', ('g:briefy_qa', 'g:briefy_scout', 'g:briefy_finance', 'g:system')),
         ('edit', ('g:briefy_pm', 'g:briefy_finance', 'g:briefy_scout', 'g:system')),
         ('delete', ('g:briefy_finance', 'g:system')),
     )

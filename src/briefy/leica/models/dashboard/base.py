@@ -1,7 +1,8 @@
 """Base Dashboard models for Briefy."""
+from briefy.leica.models import Customer
 from briefy.leica.models import Order
 from briefy.leica.models import Project
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 from sqlalchemy import case
 from sqlalchemy import distinct
 from sqlalchemy import func
@@ -47,6 +48,11 @@ total_order_project = select([
             )
         ),
         Project.id == Order.project_id,
-        Project.state == 'ongoing'
+        Project.state == 'ongoing',
+        Project.customer_id == Customer.id,
+        or_(
+            Project.local_roles.any(user_id=':user_id', can_view=True),
+            Customer.local_roles.any(user_id=':user_id', can_view=True)
+        )
     )
 ).alias('total_order_project')
