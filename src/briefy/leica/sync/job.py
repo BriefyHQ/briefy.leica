@@ -191,7 +191,10 @@ class JobSync(ModelSync):
     def parse_comment(self, body: str) -> list:
         """Parse comment field and return a list of comments."""
         pattern = '\n([-]+)\n'
-        comment = re.sub(pattern, '\n------------------------------\n', body)
+        comment = body
+        comment = re.sub(pattern, '\n------------------------------\n', comment)
+        pattern = '\n([_]+)\n'
+        comment = re.sub(pattern, '\n------------------------------\n', comment)
         comments = comment.split('------------------------------\n')
         comments = [c for c in comments if c.strip()]
         comments.reverse()
