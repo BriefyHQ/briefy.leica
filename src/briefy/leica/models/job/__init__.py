@@ -513,6 +513,8 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         data['description'] = self.description
         data['briefing'] = self.briefing
         data['assignment_date'] = self.assignment_date
+        data['last_approval_date'] = self.last_approval_date
+        data['last_submission_date'] = self.last_submission_date
         data['slug'] = self.slug
         data['timezone'] = self.timezone
         data['tech_requirements'] = self.project.tech_requirements
