@@ -4,7 +4,7 @@ from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.job import workflows
 from briefy.leica.models.job.order import Order
-from briefy.leica.utils.transitions import get_transition_date
+from briefy.leica.utils.transitions import get_transition_date_from_history
 from briefy.leica.vocabularies import TypesOfSetChoices
 from briefy.leica.utils.user import add_user_info_to_state_history
 from datetime import datetime
@@ -61,6 +61,7 @@ class AssignmentDates:
     scheduled_datetime = sa.Column(
         AwareDateTime(),
         nullable=True,
+        index=True,
         info={
             'colanderalchemy': {
                 'title': 'Scheduled date for shooting',
@@ -71,42 +72,100 @@ class AssignmentDates:
     )
     """Scheduled date time of shooting."""
 
+    assignment_date = sa.Column(
+        AwareDateTime(),
+        nullable=True,
+        index=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Last assignment date for this assignment',
+                'missing': colander.drop,
+                'typ': colander.DateTime
+            }
+        }
+    )
+    """Last assignment date for this assignment."""
+
+    last_approval_date = sa.Column(
+        AwareDateTime(),
+        nullable=True,
+        index=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Last QA transition date for this assignment',
+                'missing': colander.drop,
+                'typ': colander.DateTime
+            }
+        }
+    )
+    """Last QA transition date for this assignment."""
+
+    submission_date = sa.Column(
+        AwareDateTime(),
+        nullable=True,
+        index=True,
+        info={
+            'colanderalchemy': {
+                'title': 'First submission date.',
+                'missing': colander.drop,
+                'typ': colander.DateTime
+            }
+        }
+    )
+    """First submission date."""
+
+    last_submission_date = sa.Column(
+        AwareDateTime(),
+        nullable=True,
+        index=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Last submission date.',
+                'missing': colander.drop,
+                'typ': colander.DateTime
+            }
+        }
+    )
+    """Last submission date date for this Assignment."""
+
     # Relevant dates
-    @hybrid_property
-    def assignment_date(self) -> datetime:
+    @sautils.observes('state_history')
+    def assignment_date_observer(self, state_history) -> datetime:
         """Return last assignment date for this Assignment.
 
         Information will be extracted from state history field.
         """
         transitions = ('assign', 'self_assign', )
-        return get_transition_date(transitions, self)
+        self.assignment_date = get_transition_date_from_history(transitions, state_history)
 
-    @hybrid_property
-    def last_approval_date(self) -> datetime:
+    @sautils.observes('state_history')
+    def last_approval_date_observer(self, state_history) -> datetime:
         """Return last QA transition date for this Assignment.
 
         Information will be extracted from state history field.
         """
         transitions = ('approve', 'reject', )
-        return get_transition_date(transitions, self)
+        self.last_approval_date = get_transition_date_from_history(transitions, state_history)
 
-    @hybrid_property
-    def submission_date(self) -> datetime:
+    @sautils.observes('state_history')
+    def submission_date_observer(self, state_history) -> datetime:
         """Return first submission date date for this Assignment.
 
         Information will be extracted from state history field.
         """
         transitions = ('ready_for_upload', )
-        return get_transition_date(transitions, self, first=True)
+        self.submission_date = get_transition_date_from_history(
+            transitions, state_history, first=True
+        )
 
-    @hybrid_property
-    def last_submission_date(self) -> datetime:
+    @sautils.observes('state_history')
+    def last_submission_date_observer(self, state_history) -> datetime:
         """Return last submission date date for this Assignment.
 
         Information will be extracted from state history field.
         """
         transitions = ('ready_for_upload', )
-        return get_transition_date(transitions, self)
+        self.last_submission_date = get_transition_date_from_history(transitions, state_history)
 
 
 @implementer(IAssignment)
@@ -468,11 +527,27 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
             ),
         )
 
-    @hybrid_property
-    def customer_approval_date(self) -> datetime:
+    customer_approval_date = sa.Column(
+        AwareDateTime(),
+        nullable=True,
+        index=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Customer approval date.',
+                'missing': colander.drop,
+                'typ': colander.DateTime
+            }
+        }
+    )
+    """Last Accept/Refusal date for the parent order."""
+
+    # Relevant dates
+    @sautils.observes('order')
+    def customer_approval_date(self, order) -> datetime:
         """Return last accept/refusal date for the parent order."""
         transitions = ('accept', 'refuse')
-        return get_transition_date(transitions, self.order, first=True)
+        history = order.state_history
+        return get_transition_date_from_history(transitions, history, first=True)
 
     @property
     def briefing(self) -> str:

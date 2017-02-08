@@ -280,7 +280,13 @@ def add_assignment_history(session, obj, kobj):
     knack_state = first(kobj.approval_status)
     if not knack_state:
         raise ValueError('Job without approval_status')
+
     assignment_state = assignment_status_mapping.get(knack_state)
+    created_at = kobj.input_date
+    assignment_date = kobj.assignment_date
+    last_approval_date = kobj.last_approval_date
+    scheduled_shoot_date_time = kobj.scheduled_shoot_date_time
+    submission_date = kobj.submission_date
 
     # Check for 'created' status
     person = _get_identifier(kobj, 'input_person', default='Briefy')
