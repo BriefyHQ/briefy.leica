@@ -97,7 +97,6 @@ def assignment_schedule(event):
     """Handle Assignment schedule workflow event."""
     assignment = event.obj
     user = assignment.workflow.context
-    import pdb; pdb.set_trace()
     if G['pm'].value in user.groups:
         to_role = 'professional_user'
         author_role = 'project_manager'
