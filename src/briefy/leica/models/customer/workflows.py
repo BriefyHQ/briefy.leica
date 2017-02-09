@@ -55,7 +55,7 @@ class CustomerWorkflow(BriefyWorkflow):
         """Inactivate a customer."""
         pass
 
-    @Permission(groups=[LR['owner'], G['bizdev'], ])
+    @Permission(groups=[LR['owner'], G['bizdev'], G['finance']])
     def can_submit(self):
         """Validate if user can submit a profile."""
         return True
