@@ -78,8 +78,8 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     __raw_acl__ = (
         ('create', ('g:briefy_pm', 'g:briefy_finance', 'g:briefy_bizdev', 'g:system')),
-        ('list', ('g:briefy_qa', 'g:briefy_scout', 'g:briefy_finance', 'g:system')),
-        ('view', ('g:briefy_qa', 'g:briefy_scout', 'g:briefy_finance', 'g:system')),
+        ('list', ('g:briefy_qa', 'g:briefy_bizdev', 'g:briefy_scout', 'g:briefy_finance', 'g:system')),
+        ('view', ('g:briefy_qa', 'g:briefy_bizdev', 'g:briefy_scout', 'g:briefy_finance', 'g:system')),
         ('edit', ('g:briefy_pm', 'g:briefy_finance', 'g:briefy_bizdev', 'g:system')),
         ('delete', ('g:briefy_finance', 'g:system')),
     )
