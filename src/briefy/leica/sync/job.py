@@ -10,6 +10,7 @@ from briefy.leica.models import Order
 from briefy.leica.models import Pool
 from briefy.leica.models import Project
 from briefy.leica.vocabularies import OrderInputSource as ISource
+from briefy.leica.sync import get_model_and_data
 from briefy.leica.sync import PLACEHOLDERS
 from briefy.leica.sync import ModelSync
 from briefy.leica.sync import category_mapping
@@ -49,6 +50,21 @@ class JobSync(ModelSync):
     knack_parent_model = 'Project'
     parent_model = Project
     bulk_insert = False
+    knack_version_model = None
+    versions = {}
+
+    def get_version_items(self):
+        """Get all items for one knack model."""
+        self.knack_version_model, items = get_model_and_data('JobVersion')
+        versions = {}
+        for item in items:
+            if not item.job:
+                continue
+            id_ = item.job[0]['id']
+            if id_ not in versions:
+                versions[id_] = []
+            versions[id_].append(item)
+        self.versions = versions
 
     def updated_at(self, kobj):
         """Return updated_at value."""
@@ -71,6 +87,7 @@ class JobSync(ModelSync):
         """Create new slug for Order and Assignment."""
         # TODO: check jobs in knack with internal_job_id == 0
         job_id = job_id.replace('C', '')
+        job_id = job_id.replace('_', '')
         job_id = '{job_id:04d}'.format(job_id=int(job_id.replace('-', '')[-4:]))
         slug = '1701-PS{0}-{1}'.format(job_id[0], job_id[1:4])
         if assignment:
@@ -112,14 +129,14 @@ class JobSync(ModelSync):
 
         requirements = kobj.client_specific_requirement or None
         knack_input_source = self.choice_to_str(kobj.input_source)
-
+        category = category_mapping.get(category, '') or project.category
         order_payload.update(
             dict(
                 title=kobj.job_name,
                 description='',
                 created_at=_build_date(kobj.input_date),
                 updated_at=self.updated_at(kobj),
-                category=category_mapping.get(category, 'undefined'),
+                category=category,
                 project_id=project.id,
                 customer_id=project.customer.id,
                 price=self.parse_decimal(kobj.set_price) or project.price,
@@ -265,15 +282,37 @@ class JobSync(ModelSync):
 
     def add_assignment_comments(self, obj, kobj):
         """Import Assignment comments."""
+        if kobj.note_from_pm:
+            project_manager = obj.project.project_manager
+            comments_data = self.parse_comment(kobj.note_from_pm)
+            for content in comments_data:
+                created_at, body = comment_format_first_line(datetime_utcnow(), content)
+                author_role = 'project_manager'
+                author_id = project_manager
+                payload = dict(
+                    id=uuid.uuid4(),
+                    entity_id=obj.id,
+                    entity_type=obj.__class__.__name__,
+                    author_id=author_id,
+                    content=body,
+                    created_at=created_at,
+                    author_role=author_role,
+                    to_role='professional_user',
+                    internal=False,
+                )
+                session = self.session
+                session.add(Comment(**payload))
         if kobj.photographers_comment and obj.professional_id:
             comments_data = self.parse_comment(kobj.photographers_comment)
             for content in comments_data:
+                created_at, body = comment_format_first_line(datetime_utcnow(), content)
                 payload = dict(
                     id=uuid.uuid4(),
                     entity_id=obj.id,
                     entity_type=obj.__class__.__name__,
                     author_id=obj.professional_id,
-                    content=content,
+                    content=body,
+                    created_at=created_at,
                     author_role='professional_user',
                     to_role='qa_manager',
                     internal=False,
@@ -288,6 +327,7 @@ class JobSync(ModelSync):
             ms_laure = SystemUser.id
             comments_data = self.parse_quality_assurance_feedback(kobj)
             for content in comments_data:
+                created_at, body = comment_format_first_line(datetime_utcnow(), content)
                 author_role = 'qa_manager'
                 author_id = qa_manager
                 if content.startswith('This is an automatic'):
@@ -298,7 +338,8 @@ class JobSync(ModelSync):
                     entity_id=obj.id,
                     entity_type=obj.__class__.__name__,
                     author_id=author_id,
-                    content=content,
+                    content=body,
+                    created_at=created_at,
                     author_role=author_role,
                     to_role='professional_user',
                     internal=False,
@@ -308,12 +349,9 @@ class JobSync(ModelSync):
 
     def add_assignment(self, obj, kobj):
         """Add a related assign object."""
-        # TODO: import comments
-
         payable = True
         if kobj.approval_status == {'Cancelled'}:
             payable = False
-
         professional_id = self.get_user(kobj, 'responsible_photographer')
         job_id = str(kobj.internal_job_id or kobj.job_id)
         kpool_id = kobj.job_pool[0]['id'] if kobj.job_pool else None
@@ -336,6 +374,7 @@ class JobSync(ModelSync):
         scheduled_datetime = kobj.scheduled_shoot_date_time
         if scheduled_datetime:
             scheduled_datetime = datetime_in_timezone(scheduled_datetime, timezone_name)
+            scheduled_datetime = scheduled_datetime.astimezone(utc)
         payload = dict(
             id=uuid.uuid4(),
             order_id=obj.id,
@@ -398,7 +437,8 @@ class JobSync(ModelSync):
         )
 
         # update assignment state history
-        add_assignment_history(self.session, assignment, kobj)
+        versions = self.versions.get(kobj.id, [])
+        add_assignment_history(self.session, assignment, kobj, versions)
         if assignment.state == 'cancelled':
             assignment.payout_value = 0
         # add assignment comments
@@ -460,3 +500,8 @@ class JobSync(ModelSync):
         add_order_history(self.session, obj, kobj)
         logger.debug('Additional data imported for this order: History, Location, Comment.')
         return obj
+
+    def __call__(self, knack_id=None, limit=None):
+        """Syncronize one or all items from knack to sqlalchemy model."""
+        self.get_version_items()
+        return super().__call__(knack_id=limit)

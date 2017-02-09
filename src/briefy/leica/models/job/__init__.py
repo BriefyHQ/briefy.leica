@@ -31,7 +31,7 @@ __listing_attributes__ = __summary_attributes__ + [
     'set_type', 'number_required_assets', 'category', 'payout_value',
     'availability', 'payout_currency', 'travel_expenses', 'additional_compensation',
     'reason_additional_compensation', 'qa_manager', 'submission_path', 'state_history',
-    'requirements', 'pool_id', 'location', 'project', 'timezone'
+    'requirements', 'pool_id', 'location', 'project', 'timezone', 'closed_on_date'
 ]
 
 overrides = mixins.AssignmentBriefyRoles.__colanderalchemy_config__['overrides']
@@ -127,45 +127,6 @@ class AssignmentDates:
         }
     )
     """Last submission date date for this Assignment."""
-
-    # Relevant dates
-    @sautils.observes('state_history')
-    def assignment_date_observer(self, state_history) -> datetime:
-        """Return last assignment date for this Assignment.
-
-        Information will be extracted from state history field.
-        """
-        transitions = ('assign', 'self_assign', )
-        self.assignment_date = get_transition_date_from_history(transitions, state_history)
-
-    @sautils.observes('state_history')
-    def last_approval_date_observer(self, state_history) -> datetime:
-        """Return last QA transition date for this Assignment.
-
-        Information will be extracted from state history field.
-        """
-        transitions = ('approve', 'reject', )
-        self.last_approval_date = get_transition_date_from_history(transitions, state_history)
-
-    @sautils.observes('state_history')
-    def submission_date_observer(self, state_history) -> datetime:
-        """Return first submission date date for this Assignment.
-
-        Information will be extracted from state history field.
-        """
-        transitions = ('ready_for_upload', )
-        self.submission_date = get_transition_date_from_history(
-            transitions, state_history, first=True
-        )
-
-    @sautils.observes('state_history')
-    def last_submission_date_observer(self, state_history) -> datetime:
-        """Return last submission date date for this Assignment.
-
-        Information will be extracted from state history field.
-        """
-        transitions = ('ready_for_upload', )
-        self.last_submission_date = get_transition_date_from_history(transitions, state_history)
 
 
 @implementer(IAssignment)
@@ -542,12 +503,37 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     """Last Accept/Refusal date for the parent order."""
 
     # Relevant dates
-    @sautils.observes('order')
-    def customer_approval_date(self, order) -> datetime:
-        """Return last accept/refusal date for the parent order."""
+    @sautils.observes('state')
+    def dates_observer(self, state) -> datetime:
+        """Calculate dates on a change of a state."""
+        if self.state != state:
+            print(state, self.state)
+        state_history = self.state_history
+        transitions = ('assign', 'self_assign', )
+        self.assignment_date = get_transition_date_from_history(transitions, state_history)
+
+        transitions = ('approve', 'reject', )
+        self.last_approval_date = get_transition_date_from_history(transitions, state_history)
+
+        transitions = ('ready_for_upload', )
+        self.submission_date = get_transition_date_from_history(
+            transitions, state_history, first=True
+        )
+
+        transitions = ('ready_for_upload', )
+        self.last_submission_date = get_transition_date_from_history(transitions, state_history)
+
         transitions = ('accept', 'refuse')
-        history = order.state_history
-        return get_transition_date_from_history(transitions, history, first=True)
+        self.customer_approval_date = get_transition_date_from_history(
+            transitions, state_history, first=True
+        )
+
+    @property
+    def closed_on_date(self) -> datetime:
+        """Return the date of the closing info for this assignment."""
+        state_history = self.state_history
+        transitions = ('approve', 'perm_reject', 'cancel')
+        return get_transition_date_from_history(transitions, state_history)
 
     @property
     def briefing(self) -> str:
@@ -590,6 +576,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         data['assignment_date'] = self.assignment_date
         data['last_approval_date'] = self.last_approval_date
         data['last_submission_date'] = self.last_submission_date
+        data['closed_on_date'] = self.closed_on_date
         data['slug'] = self.slug
         data['timezone'] = self.timezone
         data['tech_requirements'] = self.project.tech_requirements
