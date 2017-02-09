@@ -544,6 +544,11 @@ class OrderWorkflow(BriefyWorkflow):
         """Set order availability dates in the Order."""
         pass
 
+    @Permission(groups=[G['customers'], G['pm'], G['system'], ])
+    def can_set_availability(self):
+        """Validate if user can set availability dates of an Order."""
+        return True
+
     @received.transition(assigned, 'can_assign')
     def assign(self, **kwargs):
         """Transition: Assign a Professional to an Order."""
