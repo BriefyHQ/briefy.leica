@@ -272,6 +272,22 @@ class CustomerBriefyRoles(LeicaBriefyRoles):
         )
 
     @declared_attr
+    def _account_manager(cls) -> list:
+        """Relationship: return a list of LocalRoles.
+
+        :return: LocalRoles instances of account_manager role_name.
+        """
+        return cls.get_role_relationship('account_manager')
+
+    @declared_attr
+    def account_manager(cls):
+        """Return a list of ids of account manager users.
+
+        :return: IDs of the account manager users.
+        """
+        return cls.get_association_proxy('account_manager', 'user_id')
+
+    @declared_attr
     def _account_managers(cls) -> list:
         """Relationship: return a list of LocalRoles.
 
