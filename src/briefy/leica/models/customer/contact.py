@@ -28,6 +28,7 @@ class CustomerContact(NameMixin, BaseMetadata, mixins.LeicaMixin, Base):
     customer_id = sa.Column(
         sautils.UUIDType,
         sa.ForeignKey('customers.id'),
+        index=True,
         nullable=False,
         info={
             'colanderalchemy': {

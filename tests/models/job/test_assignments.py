@@ -180,7 +180,11 @@ class TestAssignmentModel(BaseModelTest):
         # TODO: remove this after automatic Assignment validation
         wf.validate_assets(message='Assets validate.')
 
-        wf.approve()
+        wf.approve(
+            fields={
+                'customer_message': ''
+            }
+        )
         assert assignment.state == 'approved'
         assert 'retract_approval' in wf.transitions
 
@@ -213,7 +217,7 @@ class TestAssignmentModel(BaseModelTest):
         request.user = roles['qa']
         assert 'approve' in wf.transitions
         wf.approve(
-            fields={'qa_manager': '44f57cff-3db4-4b10-b9dc-8cd8761a6c7e'}
+            fields={'customer_message': ''}
         )
 
         # now PM can complete or refuse again

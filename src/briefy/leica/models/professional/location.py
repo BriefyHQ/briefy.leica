@@ -40,6 +40,7 @@ class WorkingLocation(Address, mixins.LeicaMixin, Base):
     professional_id = sa.Column(
         UUIDType(),
         sa.ForeignKey('professionals.id'),
+        index=True,
         unique=False,
         info={'colanderalchemy': {
             'title': 'Professional id',

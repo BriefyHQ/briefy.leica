@@ -25,7 +25,8 @@ class CustomerFactory(BaseFactory):
         :rtype: list
         """
         _acls = [
-            (Allow, 'g:briefy_bizdev', ['add', 'delete', 'edit', 'list', 'view'])
+            (Allow, 'g:briefy_bizdev', ['list', 'view']),
+            (Allow, 'g:customers', ['list', 'view'])
         ]
         return _acls
 

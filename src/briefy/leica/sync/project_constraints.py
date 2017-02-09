@@ -19,9 +19,11 @@ _is_raw = [
 _is_landscape = [{'value': 'landscape', 'operator': 'eq'}]
 _is_portrait = [{'value': 'portrait', 'operator': 'eq'}]
 
-_agoda_constraints = (
-    10,
-    {
+_agoda_constraints = {
+    'set': {
+        'minimum_number_of_photos': 10,
+    },
+    'asset': {
         'dimensions': [
             {
                 'value': '4150x3100',
@@ -41,11 +43,13 @@ _agoda_constraints = (
         ],
         'mimetype': _is_jpeg
     }
-)
+}
 
-_aladina_constraints = (
-    10,
-    {
+_aladina_constraints = {
+    'set': {
+        'minimum_number_of_photos': 10,
+    },
+    'asset': {
         'dimensions': [
             {
                 'value': '780x780',
@@ -64,11 +68,13 @@ _aladina_constraints = (
         ],
         'mimetype': _is_jpeg
     }
-)
+}
 
-_beauty_constraints = (
-    10,
-    {
+_beauty_constraints = {
+    'set': {
+        'minimum_number_of_photos': 10,
+    },
+    'asset': {
         'dimensions': [
             {
                 'value': '2000x2000',
@@ -78,11 +84,13 @@ _beauty_constraints = (
         'orientation': _is_landscape,
         'mimetype': _is_jpeg
     }
-)
+}
 
-_belvilla_constraints = (
-    40,
-    {
+_belvilla_constraints = {
+    'set': {
+        'minimum_number_of_photos': 40,
+    },
+    'asset': {
         'dimensions': [
             {
                 'value': '3822x2854',
@@ -102,11 +110,13 @@ _belvilla_constraints = (
         ],
         'mimetype': _is_jpeg
     }
-)
+}
 
-_auctionata_constraints = (
-    50,
-    {
+_auctionata_constraints = {
+    'set': {
+        'minimum_number_of_photos': 50,
+    },
+    'asset': {
         'dimensions': [
             {
                 'value': '5205x3470',
@@ -116,11 +126,13 @@ _auctionata_constraints = (
         'orientation': _is_landscape,
         'mimetype': _is_raw
     }
-)
+}
 
-_eh_constraints = (
-    10,
-    {
+_eh_constraints = {
+    'set': {
+        'minimum_number_of_photos': 10,
+    },
+    'asset': {
         'dimensions': [
             {
                 'value': '2000x2000',
@@ -130,11 +142,13 @@ _eh_constraints = (
         'orientation': _is_landscape,
         'mimetype': _is_jpeg
     }
-)
+}
 
-_ez_constraints = (
-    20,
-    {
+_ez_constraints = {
+    'set': {
+        'minimum_number_of_photos': 20,
+    },
+    'asset': {
         'dimensions': [
             {
                 'value': '2950x2200',
@@ -148,11 +162,13 @@ _ez_constraints = (
         'orientation': _is_landscape,
         'mimetype': _is_jpeg
     }
-)
+}
 
-_homeday_constraints = (
-    1,
-    {
+_homeday_constraints = {
+    'set': {
+        'minimum_number_of_photos': 1,
+    },
+    'asset': {
         'dimensions': [
             {
                 'value': '2313x3494',
@@ -172,11 +188,13 @@ _homeday_constraints = (
         'orientation': _is_portrait,
         'mimetype': _is_jpeg
     }
-)
+}
 
-_lovehome_constraints = (
-    20,
-    {
+_lovehome_constraints = {
+    'set': {
+        'minimum_number_of_photos': 20,
+    },
+    'asset': {
         'dimensions': [
             {
                 'value': '800x450',
@@ -185,11 +203,13 @@ _lovehome_constraints = (
         ],
         'mimetype': _is_jpeg
     }
-)
+}
 
-_just_eat_constraints = (
-    12,
-    {
+_just_eat_constraints = {
+    'set': {
+        'minimum_number_of_photos': 12,
+    },
+    'asset': {
         'dimensions': [
             {
                 'value': '4000x3000',
@@ -199,11 +219,13 @@ _just_eat_constraints = (
         'orientation': _is_landscape,
         'mimetype': _is_jpeg_or_png,
     }
-)
+}
 
-_default_constraints = (
-    10,
-    {
+_default_constraints = {
+    'set': {
+        'minimum_number_of_photos': 10,
+    },
+    'asset': {
         'dimensions': [
             {
                 'value': '4000x3000',
@@ -213,39 +235,43 @@ _default_constraints = (
         'orientation': _is_landscape,
         'mimetype': _is_jpeg_or_png,
     }
-)
+}
 
 
 CONSTRAINTS = {
-    'Agoda Bali': _agoda_constraints[1],
-    'Agoda Bangkok': _agoda_constraints[1],
-    'Agoda Pattaya': _agoda_constraints[1],
-    'Agoda Phuket': _agoda_constraints[1],
-    'Agoda Re-shoot / New shoot': _agoda_constraints[1],
-    'Aladinia Spa Project (Pilot)': _default_constraints[1],
-    'Aladinia': _aladina_constraints[1],
-    'Auctionata': _auctionata_constraints[1],
-    'Beauty Spotter Clinics': _beauty_constraints[1],
-    'Beauty Spotter': _beauty_constraints[1],
-    'Belvilla': _belvilla_constraints[1],
-    'Classic Driver Pilot': _default_constraints[1],
-    'Deliveroo Behind the Scene': _default_constraints[1],
-    'Delivery Hero Pilot': _default_constraints[1],
-    'eH Visio Clinics': _eh_constraints[1],
-    'eH Visio': _eh_constraints[1],
-    'Erento': _default_constraints[1],
-    'Everphone Business Portrait': _default_constraints[1],
-    'EZ cater': _ez_constraints[1],
-    'ezCater USA': _ez_constraints[1],
-    'Foodora Wien': _default_constraints[1],
-    'Homeday Portraits': _homeday_constraints[1],
-    'Homeday Properties': _homeday_constraints[1],
-    'Just Eat finalists UK': _just_eat_constraints[1],
-    'Leisure Group Belvilla DE': _default_constraints[1],
-    'Leisure Group Belvilla ES': _default_constraints[1],
-    'Leisure Group Belvilla FR': _default_constraints[1],
-    'Leisure Group Belvilla IT': _default_constraints[1],
-    'Love Home Swap': _lovehome_constraints[1],
-    'Stayz Australia': _default_constraints[1],
-    'WeTravel Yoga': _default_constraints[1],
+    'Agoda Bali': _agoda_constraints,
+    'Agoda Bangkok': _agoda_constraints,
+    'Agoda Pattaya': _agoda_constraints,
+    'Agoda Phuket': _agoda_constraints,
+    'Agoda Re-shoot / New shoot': _agoda_constraints,
+    'Aladinia Spa Project (Pilot)': _default_constraints,
+    'Aladinia': _aladina_constraints,
+    'Auctionata': _auctionata_constraints,
+    'Beauty Spotter Clinics': _beauty_constraints,
+    'Beauty Spotter': _beauty_constraints,
+    'Belvilla': _belvilla_constraints,
+    'Classic Driver Pilot': _default_constraints,
+    'Deliveroo Behind the Scene': _default_constraints,
+    'Delivery Hero Cologne': _default_constraints,
+    'Delivery Hero Hamburg': _default_constraints,
+    'Delivery Hero Munich': _default_constraints,
+    'Delivery Hero Pilot': _default_constraints,
+    'eH Visio Clinics': _eh_constraints,
+    'eH Visio': _eh_constraints,
+    'Erento': _default_constraints,
+    'Everphone Business Portrait': _default_constraints,
+    'EZ cater': _ez_constraints,
+    'ezCater USA': _ez_constraints,
+    'Foodora Wien': _default_constraints,
+    'Homeday Portraits': _homeday_constraints,
+    'Homeday Properties': _homeday_constraints,
+    'Just Eat finalists UK': _just_eat_constraints,
+    'Leisure Group Belvilla DE': _default_constraints,
+    'Leisure Group Belvilla ES': _default_constraints,
+    'Leisure Group Belvilla FR': _default_constraints,
+    'Leisure Group Belvilla IT': _default_constraints,
+    'Love Home Swap': _lovehome_constraints,
+    'Stayz Australia': _default_constraints,
+    'WeTravel Yoga': _default_constraints,
+    'Wolt Pilot': _default_constraints,
 }

@@ -86,6 +86,7 @@ COUNTRY_MAPPING = {
     'France': ('France', 'FR'),
     'Germany': ('Germany', 'DE'),
     'Iceland': ('Iceland', 'IS'),
+    'Finland': ('Finland', 'FI'),
     'ID': ('Indonesia', 'ID'),
     'Indo': ('Indonesia', 'ID'),
     'Indon': ('Indonesia', 'ID'),
@@ -201,6 +202,7 @@ def create_location_dict(address_field: str, kobj: KnackEntity, country: str='')
             formatted_address=formatted_address,
             info=info,
             locality=city,
+            timezone=kobj.__dict__.get('timezone', 'UTC'),
             **extra_location_info
         )
         if extra_location_info.get('coordinates'):

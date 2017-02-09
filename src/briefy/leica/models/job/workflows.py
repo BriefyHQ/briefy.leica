@@ -8,6 +8,7 @@ from briefy.common.workflow import Permission
 from briefy.common.workflow import WorkflowState as WS
 from briefy.common.workflow import WorkflowTransitionException
 from briefy.leica.subscribers.utils import create_new_assignment_from_order
+from briefy.leica.utils.transitions import create_comment_on_assigment_approval
 
 import logging
 
@@ -310,6 +311,7 @@ class AssignmentWorkflow(BriefyWorkflow):
     @in_qa.transition(
         approved,
         'can_approve',
+        required_fields=('customer_message',)
     )
     def approve(self, **kwargs):
         """QA approves the Assignment Set."""
@@ -327,7 +329,12 @@ class AssignmentWorkflow(BriefyWorkflow):
         # TODO: Copying assets to destination delivery and archive locations
         # is not instant.  Maybe we could have a transitory state
         # somewhat along "delivering_process" before "approved"
-        pass
+
+        customer_message = kwargs['fields'].get('customer_message', '').strip()
+        if customer_message:
+            actor = self.context.id
+            assignment = self.document
+            create_comment_on_assigment_approval(assignment, actor, customer_message)
 
     @in_qa.transition(
         awaiting_assets, 'can_approve',
@@ -519,6 +526,21 @@ class OrderWorkflow(BriefyWorkflow):
     @Permission(groups=[G['customers'], G['pm'], G['bizdev'], G['system'], ])
     def can_submit(self):
         """Validate if user can submit an Order."""
+        return True
+
+    # Transitions
+    @received.transition(
+        received,
+        'can_set_availability',
+        required_fields=('availability', )
+    )
+    def set_availability(self, **kwargs):
+        """Set order availability dates in the Order."""
+        pass
+
+    @Permission(groups=[G['customers'], G['pm'], G['system'], ])
+    def can_set_availability(self):
+        """Validate if user can set availability dates of an Order."""
         return True
 
     @received.transition(assigned, 'can_assign')

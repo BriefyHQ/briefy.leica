@@ -31,8 +31,16 @@ __listing_attributes__ = __summary_attributes__ + [
     'set_type', 'number_required_assets', 'category', 'payout_value',
     'availability', 'payout_currency', 'travel_expenses', 'additional_compensation',
     'reason_additional_compensation', 'qa_manager', 'submission_path', 'state_history',
-    'requirements', 'pool_id', 'location'
+    'requirements', 'pool_id', 'location', 'project', 'timezone'
 ]
+
+overrides = mixins.AssignmentBriefyRoles.__colanderalchemy_config__['overrides']
+overrides['customer_message'] = {
+    'title': 'Customer message',
+    'default': '',
+    'missing': colander.drop,
+    'typ': colander.String()
+}
 
 
 def create_slug_from_order(context):
@@ -117,8 +125,8 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
 
     __raw_acl__ = (
         ('create', ('g:briefy_pm', 'g:briefy_finance', 'g:briefy_scout', 'g:system')),
-        ('list', ('g:briefy', 'g:system')),
-        ('view', ('g:briefy', 'g:system')),
+        ('list', ('g:briefy_qa', 'g:briefy_scout', 'g:briefy_finance', 'g:system')),
+        ('view', ('g:briefy_qa', 'g:briefy_scout', 'g:briefy_finance', 'g:system')),
         ('edit', ('g:briefy_pm', 'g:briefy_finance', 'g:briefy_scout', 'g:system')),
         ('delete', ('g:briefy_finance', 'g:system')),
     )
@@ -130,7 +138,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
             '_scout_manager', '_project_manager', '_qa_manager',
             '_professional_user', 'pool'
         ],
-        'overrides': mixins.AssignmentBriefyRoles.__colanderalchemy_config__['overrides']
+        'overrides': overrides
     }
 
     _slug = sa.Column('slug',
@@ -189,6 +197,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     order_id = sa.Column(
         sautils.UUIDType,
         sa.ForeignKey('orders.id'),
+        index=True,
         nullable=False,
         info={
             'colanderalchemy': {
@@ -206,6 +215,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     pool_id = sa.Column(
         sautils.UUIDType,
         sa.ForeignKey('pools.id'),
+        index=True,
         nullable=True,
         info={
             'colanderalchemy': {
@@ -225,6 +235,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     professional_id = sa.Column(
         sautils.UUIDType,
         sa.ForeignKey('professionals.id'),
+        index=True,
         nullable=True,
         info={'colanderalchemy': {
             'title': 'Professional ID',
@@ -473,6 +484,18 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         """Return if this Assignment is assigned or not."""
         return True if (self.assignment_date and self.professional_id) else False
 
+    @hybrid_property
+    def timezone(self) -> str:
+        """Return Timezone for this order.
+
+        Information will be obtained from main location.
+        """
+        location = self.location
+        timezone = 'UTC'
+        if location:
+            timezone = location.timezone
+        return timezone
+
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
 
@@ -490,7 +513,10 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         data['description'] = self.description
         data['briefing'] = self.briefing
         data['assignment_date'] = self.assignment_date
+        data['last_approval_date'] = self.last_approval_date
+        data['last_submission_date'] = self.last_submission_date
         data['slug'] = self.slug
+        data['timezone'] = self.timezone
         data['tech_requirements'] = self.project.tech_requirements
         data['availability'] = self.availability
         data['category'] = self.category

@@ -52,14 +52,19 @@ class TestImageModel(BaseModelTest):
         assignment = asset.assignment
         project = assignment.order.project
         project.tech_requirements = {
-            'dimensions': {'value': '5760x3840', 'operator': 'eq'},
+            'asset':
+                {
+                    'dimensions': {'value': '5760x3840', 'operator': 'eq'},
+                }
         }
 
         assert asset.is_valid is True
-
         project.tech_requirements = {
-            'dpi': {'value': '300', 'operator': 'eq'},
-            'dimensions': {'value': '5760x3840', 'operator': 'eq'},
+            'asset':
+                {
+                    'dpi': {'value': '300', 'operator': 'eq'},
+                    'dimensions': {'value': '5760x3840', 'operator': 'eq'},
+                }
         }
 
         assert asset.is_valid is False

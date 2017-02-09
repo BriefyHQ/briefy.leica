@@ -1,4 +1,6 @@
 """Import and sync Knack Job to Leica Job."""
+from briefy.common.db import datetime_utcnow
+from briefy.common.users import SystemUser
 from briefy.leica import logger
 from briefy.leica.config import FILES_BASE
 from briefy.leica.models import Comment
@@ -11,14 +13,32 @@ from briefy.leica.vocabularies import OrderInputSource as ISource
 from briefy.leica.sync import PLACEHOLDERS
 from briefy.leica.sync import ModelSync
 from briefy.leica.sync import category_mapping
+from briefy.leica.sync.job_comment import comment_format_first_line
+from briefy.leica.sync.job_comment import parse_internal_comments
 from briefy.leica.sync.job_wf_history import _build_date
 from briefy.leica.sync.job_wf_history import add_assignment_history
 from briefy.leica.sync.job_wf_history import add_order_history
 from briefy.leica.sync.location import create_location_dict
+from datetime import datetime
+from pytz import utc
+from pytz import timezone
 
+import re
 import uuid
 
 isource_mapping = {item.label: item.value for item in ISource.__members__.values()}
+
+
+def datetime_in_timezone(value: datetime, tz_name: str) -> datetime:
+    """Process a datetime, in UTC and return it in the specified timezone."""
+    tz = timezone(tz_name)
+    # We will assume the original date was in UTC
+    # So we need to remove UTC
+    new_value = datetime(
+        *[int(p) for p in value.strftime('%Y-%m-%d-%H-%M-%S').split('-')]
+    )
+    new_value = tz.localize(new_value)
+    return new_value
 
 
 class JobSync(ModelSync):
@@ -67,10 +87,18 @@ class JobSync(ModelSync):
         category = kobj.category.pop() if kobj.category else 'undefined'
         category = 'Accommodation' if category == 'Accomodation' else category
         category = 'Portrait' if category == 'Portraits' else category
-        if kobj.availability_1 and kobj.availability_2:
+        timezone_name = kobj.timezone
+        availability_1 = kobj.availability_1
+        availability_2 = kobj.availability_2
+        if availability_1 and availability_2:
+            # First convert to local timezone and then get it in UTC
+            availability_1 = datetime_in_timezone(availability_1, timezone_name)
+            availability_1 = availability_1.astimezone(utc)
+            availability_2 = datetime_in_timezone(availability_2, timezone_name)
+            availability_2 = availability_2.astimezone(utc)
             availability = [
-                kobj.availability_1.isoformat(),
-                kobj.availability_2.isoformat()
+                availability_1.isoformat(),
+                availability_2.isoformat()
             ]
         else:
             availability = None
@@ -149,68 +177,134 @@ class JobSync(ModelSync):
             msg = 'Failure to create location for Job: {job}, no location found.'
             logger.info(msg.format(job=obj.customer_order_id))
 
+    def parse_machine_log(self, kobj):
+        """Parse machine log on Knack object."""
+        history = []
+        pattern = """(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.[\d]*:([^ ]*)"""
+        matches = re.findall(pattern, kobj.machine_log)
+        for item in matches:
+            data = datetime(*[int(i) for i in item[0:-1]], tzinfo=timezone.utc)
+            action = item[-1]
+            history.append({'data': data, 'action': action})
+        return history
+
+    def parse_comment(self, body: str) -> list:
+        """Parse comment field and return a list of comments."""
+        pattern = '\n([-]+)\n'
+        comment = body
+        comment = re.sub(pattern, '\n------------------------------\n', comment)
+        pattern = '\n([_]+)\n'
+        comment = re.sub(pattern, '\n------------------------------\n', comment)
+        comments = comment.split('------------------------------\n')
+        comments = [c for c in comments if c.strip()]
+        comments.reverse()
+        return comments
+
     def add_comment(self, obj, kobj):
         """Add Project Manager comment to the Order."""
         if kobj.project_manager_comment:
             project_manager = obj.project.project_manager if obj.project.project_manager else None
-            payload = dict(
-                id=uuid.uuid4(),
-                entity_id=obj.id,
-                entity_type=obj.__class__.__name__,
-                author_id=project_manager,
-                content=kobj.project_manager_comment,
-                author_role='project_manager',
-                to_role='customer_user',
-                internal=False,
-            )
-            session = self.session
-            session.add(Comment(**payload))
+            comments_data = self.parse_comment(kobj.project_manager_comment)
+            for content in comments_data:
+                created_at, body = comment_format_first_line(datetime_utcnow(), content)
+                payload = dict(
+                    id=uuid.uuid4(),
+                    entity_id=obj.id,
+                    entity_type=obj.__class__.__name__,
+                    author_id=project_manager,
+                    content=body,
+                    created_at=created_at,
+                    updated_at=created_at,
+                    author_role='project_manager',
+                    to_role='customer_user',
+                    internal=False,
+                )
+                session = self.session
+                session.add(Comment(**payload))
 
         if kobj.client_feedback:
             customer_user = obj.project.customer_user or obj.project.project_manager
-            payload = dict(
-                id=uuid.uuid4(),
-                entity_id=obj.id,
-                entity_type=obj.__class__.__name__,
-                author_id=customer_user,
-                content=kobj.client_feedback,
-                author_role='customer_user',
-                to_role='project_manager',
-                internal=False,
-            )
+            comments_data = self.parse_comment(kobj.client_feedback)
+            for content in comments_data:
+                created_at, body = comment_format_first_line(datetime_utcnow(), content)
+                payload = dict(
+                    id=uuid.uuid4(),
+                    entity_id=obj.id,
+                    entity_type=obj.__class__.__name__,
+                    author_id=customer_user,
+                    content=body,
+                    created_at=created_at,
+                    updated_at=created_at,
+                    author_role='customer_user',
+                    to_role='project_manager',
+                    internal=False,
+                )
+                session = self.session
+                session.add(Comment(**payload))
+
+    def add_internal_comments(self, obj, kobj):
+        """Add Project Manager comment to the Order."""
+        if kobj.internal_comments:
+            comments_data = parse_internal_comments(obj, kobj)
             session = self.session
-            session.add(Comment(**payload))
+            for comment in comments_data:
+                session.add(Comment(**comment))
+
+    def parse_quality_assurance_feedback(self, kobj):
+        """Quality assurance feedback can be parsed to a list of comments."""
+        raw_comment = kobj.quality_assurance_feedback
+        comment = raw_comment.replace(
+            'This is an automatic feedback.\n',
+            '------------------------------\nThis is an automatic feedback.\n'
+        )
+        comment = comment.replace(
+            '\nThe images listed below do not meet our technical requirements:\n\nNext steps:',
+            '\n\nNext steps:',
+        )
+        return self.parse_comment(comment)
 
     def add_assignment_comments(self, obj, kobj):
         """Import Assignment comments."""
         if kobj.photographers_comment and obj.professional_id:
-            payload = dict(
-                id=uuid.uuid4(),
-                entity_id=obj.id,
-                entity_type=obj.__class__.__name__,
-                author_id=obj.professional_id,
-                content=kobj.photographers_comment,
-                author_role='professional_user',
-                to_role='qa_manager',
-                internal=False,
-            )
-            session = self.session
-            session.add(Comment(**payload))
+            comments_data = self.parse_comment(kobj.photographers_comment)
+            for content in comments_data:
+                payload = dict(
+                    id=uuid.uuid4(),
+                    entity_id=obj.id,
+                    entity_type=obj.__class__.__name__,
+                    author_id=obj.professional_id,
+                    content=content,
+                    author_role='professional_user',
+                    to_role='qa_manager',
+                    internal=False,
+                )
+                session = self.session
+                session.add(Comment(**payload))
 
         if kobj.quality_assurance_feedback:
+            # history = self.parse_machine_log(kobj)
+            # failed = [entry for entry in history if entry['action'] == 'invalidate']
             qa_manager = obj.qa_manager or obj.project.project_manager
-            payload = dict(
-                id=uuid.uuid4(),
-                entity_id=obj.id,
-                entity_type=obj.__class__.__name__,
-                author_id=qa_manager,
-                content=kobj.quality_assurance_feedback,
-                author_role='qa_manager',
-                to_role='professional_user',
-                internal=False,
-            )
-            session = self.session
-            session.add(Comment(**payload))
+            ms_laure = SystemUser.id
+            comments_data = self.parse_quality_assurance_feedback(kobj)
+            for content in comments_data:
+                author_role = 'qa_manager'
+                author_id = qa_manager
+                if content.startswith('This is an automatic'):
+                    author_role = 'system'
+                    author_id = ms_laure
+                payload = dict(
+                    id=uuid.uuid4(),
+                    entity_id=obj.id,
+                    entity_type=obj.__class__.__name__,
+                    author_id=author_id,
+                    content=content,
+                    author_role=author_role,
+                    to_role='professional_user',
+                    internal=False,
+                )
+                session = self.session
+                session.add(Comment(**payload))
 
     def add_assignment(self, obj, kobj):
         """Add a related assign object."""
@@ -238,6 +332,10 @@ class JobSync(ModelSync):
         knack_payout_currency = self.choice_to_str(kobj.currency_payout)
         payout_currency = str(knack_payout_currency) if knack_payout_currency else 'EUR'
         reason_compensation = self.choice_to_str(kobj.reason_for_additional_compensation)
+        timezone_name = kobj.timezone
+        scheduled_datetime = kobj.scheduled_shoot_date_time
+        if scheduled_datetime:
+            scheduled_datetime = datetime_in_timezone(scheduled_datetime, timezone_name)
         payload = dict(
             id=uuid.uuid4(),
             order_id=obj.id,
@@ -247,7 +345,7 @@ class JobSync(ModelSync):
             reason_additional_compensation=reason_compensation or None,
             slug=self.get_slug(job_id, assignment=1),
             professional_id=professional_id,
-            scheduled_datetime=kobj.scheduled_shoot_date_time,
+            scheduled_datetime=scheduled_datetime,
             release_contract=release,
             payout_value=payout_value,
             payout_currency=payout_currency,
@@ -355,6 +453,7 @@ class JobSync(ModelSync):
 
         self.add_location(obj, kobj)
         self.add_comment(obj, kobj)
+        self.add_internal_comments(obj, kobj)
         self.add_assignment(obj, kobj)
 
         # this should be after import the assignment

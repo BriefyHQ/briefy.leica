@@ -102,6 +102,7 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
     parent_customer_id = sa.Column(
         sautils.UUIDType,
         sa.ForeignKey('customers.id'),
+        index=True,
         nullable=True,
         info={'colanderalchemy': {
                 'title': 'Customer',

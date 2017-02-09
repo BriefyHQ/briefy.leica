@@ -1,8 +1,12 @@
 """Import Job workflow history for Order and Assignment."""
+from briefy.common.users import SystemUser
 from briefy.leica import logger
 from collections import OrderedDict
 from datetime import datetime
+from datetime import timedelta
+from datetime import timezone
 
+import re
 import pytz
 
 # Field 'approval_status' on Knack.
@@ -77,6 +81,33 @@ def _get_identifier(kobj, field, default='Unknown'):
     return attr[0].get('identifier', default)
 
 
+def parse_machine_log(kobj):
+    """Parse machine log on Knack object."""
+    history = []
+    pattern = """(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.[\d]*:([^ ]*)"""
+    matches = re.findall(pattern, kobj.machine_log)
+    for item in matches:
+        date = datetime(*[int(i) for i in item[0:-1]], tzinfo=timezone.utc)
+        action = item[-1]
+        message = 'This submission was {action}d by Briefy automatic system'.format(
+            action=action
+        )
+        transition = 'validate_assets' if action == 'validate' else 'invalidate_assets'
+        to_ = 'in_qa' if action == 'validate' else 'awaiting_assets'
+        history.append(
+            {
+                'date': date,
+                'message': message,
+                'actor': SystemUser.id,
+                'transition': transition,
+                'from': 'asset_validation',
+                'to': to_
+            }
+        )
+    history.reverse()
+    return history
+
+
 def add_order_history(session, obj, kobj):
     """Add state_history and state information to the Order."""
     history = []
@@ -88,7 +119,7 @@ def add_order_history(session, obj, kobj):
     # created and received status
     person = _get_identifier(kobj, 'input_person', default='Briefy')
     actor_id = obj.project_manager if obj.source == 'briefy' else obj.customer_user
-    actor = str(actor_id) if actor_id else 'g:system'
+    actor = str(actor_id) if actor_id else SystemUser.id
     history.append({
         'date': _build_date(kobj.input_date),
         'message': 'Created by {} on Knack database'.format(person),
@@ -113,7 +144,7 @@ def add_order_history(session, obj, kobj):
         person = _get_identifier(kobj, 'scouting_manager', default='Unknown')
         # actor should be assignment scout_manager if available
         actor_id = obj.assignments[0].scout_manager
-        actor = str(actor_id) if actor_id else 'g:system'
+        actor = str(actor_id) if actor_id else SystemUser.id
         history.append({
             'date': _build_date(kobj.assignment_date, last_date),
             'message': "Photographer assigned by '{}' on the Knack database".format(person),
@@ -141,7 +172,7 @@ def add_order_history(session, obj, kobj):
 
         # actor should be professional_user
         actor_id = obj.assignments[0].professional_user
-        actor = str(actor_id) if actor_id else 'g:system'
+        actor = str(actor_id) if actor_id else SystemUser.id
         history.append({
             'date': _build_date(date, last_date),
             'message': "Scheduled by '{}' on the Knack database".format(person) + extra_message,
@@ -158,7 +189,7 @@ def add_order_history(session, obj, kobj):
         person = _get_identifier(kobj, 'responsible_photographer', default='Photographer')
         # actor should be professional_user
         actor_id = obj.assignments[0].professional_user
-        actor = str(actor_id) if actor_id else 'g:system'
+        actor = str(actor_id) if actor_id else SystemUser.id
         history.append({
             'date': _build_date(date, last_date),
             'message': "Submited by '{}' on the Knack database".format(person),
@@ -191,7 +222,7 @@ def add_order_history(session, obj, kobj):
         date = kobj.last_approval_date or last_date
         # actor should be customer_user or project_manager
         actor_id = obj.customer_user or obj.project_manager
-        actor = str(actor_id) if actor_id else 'g:system'
+        actor = str(actor_id) if actor_id else SystemUser.id
         history.append({
             'date': _build_date(date, last_date),
             'message': "Marked as  'completed' on the Knack database",
@@ -207,7 +238,7 @@ def add_order_history(session, obj, kobj):
         date = kobj.last_approval_date or last_date
         # actor should be customer_user or project_manager
         actor_id = obj.customer_user or obj.project_manager
-        actor = str(actor_id) if actor_id else 'g:system'
+        actor = str(actor_id) if actor_id else SystemUser.id
         history.append({
             'date': _build_date(date, last_date),
             'message': 'Job cancelled on the Knack database by unknown actor',
@@ -223,7 +254,7 @@ def add_order_history(session, obj, kobj):
         refuse_date = kobj.updated_at or kobj.delivery_date_to_client or last_date
         # actor should be customer_user or project_manager
         actor_id = obj.customer_user or obj.project_manager
-        actor = str(actor_id) if actor_id else 'g:system'
+        actor = str(actor_id) if actor_id else SystemUser.id
         history.append({
             'date': _build_date(refuse_date, last_date),
             'message': 'Job refused by client',
@@ -253,9 +284,9 @@ def add_assignment_history(session, obj, kobj):
 
     # Check for 'created' status
     person = _get_identifier(kobj, 'input_person', default='Briefy')
-    actor_id = obj.order.project_manager if \
+    actor_id = SystemUser.id if \
         obj.order.source == 'briefy' else obj.order.customer_user
-    actor = str(actor_id) if actor_id else 'g:system'
+    actor = str(actor_id) if actor_id else SystemUser.id
     history.append({
         'date': _build_date(kobj.input_date),
         'message': 'Created by {} on Knack database'.format(person),
@@ -278,7 +309,7 @@ def add_assignment_history(session, obj, kobj):
     if _get_identifier(kobj, 'scouting_manager').lower().strip() == 'job pool':
         # actor should be customer_user or project_manager
         actor_id = order.customer_user or order.project_manager
-        actor = str(actor_id) if actor_id else 'g:system'
+        actor = str(actor_id) if actor_id else SystemUser.id
         history.append({
             'date': _build_date(kobj.input_date),
             'message': 'Assignment sent to job pool',
@@ -294,7 +325,7 @@ def add_assignment_history(session, obj, kobj):
         # actor should be professional_user or scout_manager
         is_job_pool = history[-1]['to'] == 'published'
         actor_id = obj.professional_user if is_job_pool else obj.scout_manager
-        actor = str(actor_id) if actor_id else 'g:system'
+        actor = str(actor_id) if actor_id else SystemUser.id
         history.append({
             'date': _build_date(kobj.assignment_date, kobj.input_date),
             'message': "Photographer assigned by '{}' on the Knack database".format(person),
@@ -315,7 +346,7 @@ def add_assignment_history(session, obj, kobj):
 
         # actor should be professional_user
         actor_id = obj.professional_user
-        actor = str(actor_id) if actor_id else 'g:system'
+        actor = str(actor_id) if actor_id else SystemUser.id
         history.append({
             'date': _build_date(kobj.assignment_date, last_date),
             'message': "Scheduled by '{0}' on the Knack database".format(person),
@@ -332,41 +363,58 @@ def add_assignment_history(session, obj, kobj):
         history.append({
             'date': _build_date(kobj.scheduled_shoot_date_time, last_date),
             'message': 'Waiting for asset upload (from data on Knack)',
-            'actor': 'g:system',
+            'actor': SystemUser.id,
             'transition': 'ready_for_upload',
             'from': 'scheduled',
             'to': 'awaiting_assets',
         })
         last_date = kobj.scheduled_shoot_date_time
 
-    # Check for Validation status: # TODO currently broken on the knack workflow.
-    if kobj.submission_date:
+    submission_log = parse_machine_log(kobj)
+
+    if submission_log:
+        actor_id = obj.professional_user
+        actor = str(actor_id) if actor_id else SystemUser.id
+        person = _get_identifier(kobj, 'responsible_photographer', default='Photographer')
+        for entry in submission_log:
+            history.append({
+                'date': (entry['date'] - timedelta(1/86400)).isoformat(),
+                'message': "Submited by '{0}' (from data on Knack)".format(person),
+                'actor': actor,
+                'transition': 'upload',
+                'from': 'awaiting_assets',
+                'to': 'asset_validation',
+            })
+            last_date = entry['date']
+            entry['date'] = entry['date'].isoformat()
+            history.append(entry)
+
+    elif kobj.submission_date:
         person = _get_identifier(kobj, 'responsible_photographer', default='Photographer')
         # actor should be professional_user
         actor_id = obj.professional_user
-        actor = str(actor_id) if actor_id else 'g:system'
+        actor = str(actor_id) if actor_id else SystemUser.id
+        date = _build_date(kobj.submission_date, last_date)
         history.append({
-            'date': _build_date(kobj.submission_date, last_date),
-            'message': "Submited by '{}' (from data on Knack)".format(person),
+            'date': date,
+            'message': "Submited by '{0}' (from data on Knack)".format(person),
             'actor': actor,
             'transition': 'upload',
             'from': 'awaiting_assets',
             'to': 'asset_validation',
         })
-        last_date = kobj.submission_date
-
-    # Check for 'in_qa' status
-    if kobj.submission_date:
-        date = kobj.last_approval_date or kobj.submission_date
-        history.append({
-            'date': _build_date(date, last_date),
-            'message': "Automatic validation skipped (from data on Knack)",
-            'actor': 'g:system',
-            'transition': 'validate_assets',
-            'from': 'asset_validation',
-            'to': 'in_qa',  # Note: can't know about intermediary non-validated sets
-        })
         last_date = date
+        if kobj.last_approval_date:
+            date = kobj.last_approval_date or kobj.submission_date
+            history.append({
+                'date': _build_date(date, last_date),
+                'message': "Automatic validation skipped (from data on Knack)",
+                'actor': SystemUser.id,
+                'transition': 'validate_assets',
+                'from': 'asset_validation',
+                'to': 'in_qa',  # Note: can't know about intermediary non-validated sets
+            })
+            last_date = date
 
     # TODO: check if job was returned back to awaiting assets (EDIT NEEDED)
 
@@ -390,7 +438,7 @@ def add_assignment_history(session, obj, kobj):
     if knack_state.lower() == 'completed':
         # actor should be customer_user or project_manager
         actor_id = order.customer_user or order.project_manager
-        actor = str(actor_id) if actor_id else 'g:system'
+        actor = str(actor_id) if actor_id else SystemUser.id
         history.append({
             'date': _build_date(kobj.submission_date, last_date),
             'message': "completed",
@@ -405,7 +453,7 @@ def add_assignment_history(session, obj, kobj):
         date = kobj.last_approval_date or kobj.submission_date
         # actor should be customer_user or project_manager
         actor_id = order.customer_user or order.project_manager
-        actor = str(actor_id) if actor_id else 'g:system'
+        actor = str(actor_id) if actor_id else SystemUser.id
         history.append({
             # TODO: verify this date
             'date': _build_date(kobj.submission_date, last_date),
@@ -422,7 +470,7 @@ def add_assignment_history(session, obj, kobj):
         project = obj.order.project.title
         # actor should be customer_user or project_manager
         actor_id = order.customer_user or order.project_manager
-        actor = str(actor_id) if actor_id else 'g:system'
+        actor = str(actor_id) if actor_id else SystemUser.id
         history.append({
             'date': _build_date(refuse_date, last_date),
             'message': "Set of photos refused by client from project '{}'".format(project),

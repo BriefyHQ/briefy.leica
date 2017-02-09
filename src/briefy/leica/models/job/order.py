@@ -27,7 +27,7 @@ __summary_attributes__ = [
 
 __listing_attributes__ = __summary_attributes__ + [
     'customer_order_id', 'deliver_date', 'accept_date', 'availability', 'assignment',
-    'requirements', 'delivery', 'project', 'customer'
+    'requirements', 'delivery', 'project', 'customer', 'timezone'
 ]
 
 __colander_alchemy_config_overrides__ = \
@@ -78,8 +78,8 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     __raw_acl__ = (
         ('create', ('g:briefy_pm', 'g:briefy_finance', 'g:briefy_bizdev', 'g:system')),
-        ('list', ('g:briefy', 'g:system')),
-        ('view', ('g:briefy', 'g:system')),
+        ('list', ('g:briefy_qa', 'g:briefy_scout', 'g:briefy_finance', 'g:system')),
+        ('view', ('g:briefy_qa', 'g:briefy_scout', 'g:briefy_finance', 'g:system')),
         ('edit', ('g:briefy_pm', 'g:briefy_finance', 'g:briefy_bizdev', 'g:system')),
         ('delete', ('g:briefy_finance', 'g:system')),
     )
@@ -88,7 +88,8 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         'excludes': [
             'state_history', 'state', 'project', 'comments', 'customer',
             '_project_manager', '_scout_manager', '_customer_user', 'external_id',
-            'assignment', 'assignments',
+            'assignment', 'assignments', '_project_managers', '_scout_managers',
+            '_customer_users',
         ],
         'overrides': __colander_alchemy_config_overrides__
 
@@ -166,6 +167,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     customer_id = sa.Column(
         sautils.UUIDType,
         sa.ForeignKey('customers.id'),
+        index=True,
         default=get_customer_id_from_project,
         nullable=False,
         info={
@@ -186,6 +188,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     project_id = sa.Column(
         sautils.UUIDType,
         sa.ForeignKey('projects.id'),
+        index=True,
         nullable=False,
         info={
             'colanderalchemy': {
@@ -405,7 +408,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         # else:
         #     requirements = self.project.tech_requirements
         project = self.project
-        requirements = self.project.tech_requirements
+        requirements = self.project.tech_requirements or {}
 
         # The tech requirements is composed with the required
         # number of photos pr project or per order:
@@ -416,9 +419,21 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
                 # In the future this should come from
                 # self.number_required_assets
             },
-            'asset': requirements
         }
+        all_requirements.update(requirements)
         return all_requirements
+
+    @hybrid_property
+    def timezone(self) -> str:
+        """Return Timezone for this order.
+
+        Information will be obtained from main location.
+        """
+        location = self.location
+        timezone = 'UTC'
+        if location:
+            timezone = location.timezone
+        return timezone
 
     @hybrid_property
     def deliver_date(self) -> datetime:
@@ -459,6 +474,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data['deliver_date'] = self.deliver_date
         data['delivery'] = self.delivery
         data['location'] = self.location
+        data['timezone'] = self.timezone
         data['assignment'] = self.assignment.to_summary_dict() if self.assignment else None
         data['tech_requirements'] = self.tech_requirements
         # Workflow history

@@ -47,6 +47,7 @@ STATUS_MAPPING = {
     'Traveloka': 'inactive',
     'WeTravel': 'inactive',
     'Wine in Black': 'inactive',
+    'Wolt': 'active',
 }
 
 
@@ -87,6 +88,7 @@ class CustomerSync(ModelSync):
         country = COUNTRY_MAPPING.get(
             kobj.company_address.country
         )[1] if kobj.company_address.country else 'DE'
+
         mobile = cleanse_phone_number(
             kobj.contact_phone.get('number'),
             country,

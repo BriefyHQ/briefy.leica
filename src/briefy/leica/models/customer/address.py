@@ -24,7 +24,9 @@ class CustomerBillingAddress(Address, mixins.LeicaMixin, Base):
 
     customer_id = sa.Column(
         UUIDType(),
-        sa.ForeignKey('customers.id'), unique=False,
+        sa.ForeignKey('customers.id'),
+        unique=False,
+        index=True,
         info={'colanderalchemy': {
             'title': 'Customer id',
             'validator': colander.uuid,
