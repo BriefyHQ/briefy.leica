@@ -154,9 +154,11 @@ class LocalRolesGetSetFactory:
     """Factory that return get and set functions to the AssociationProxy."""
 
     def __init__(self, permission):
+        """Initialize LocalRolesGetSetFactory."""
         self._permissions = permission
 
     def __call__(self, collection, proxy):
+        """Create a new descriptor instance and return the set and get functions."""
         descriptor = LocalRoleProxyDescriptor(
             collection,
             proxy,

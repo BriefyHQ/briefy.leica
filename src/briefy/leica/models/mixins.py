@@ -10,7 +10,6 @@ from briefy.common.db.mixins import PersonalInfoMixin
 from briefy.common.db.models.roles import LocalRole
 from briefy.common.vocabularies.roles import LocalRolesChoices
 from briefy.common.utils.cache import timeout_cache
-from briefy.leica import logger
 from briefy.leica.models.descriptors import LocalRolesGetSetFactory
 from briefy.leica.db import Session
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -144,12 +143,6 @@ class LeicaBriefyRoles(BaseBriefyRoles):
         if permissions:
             payload.update(permissions)
         result = LocalRole(**payload)
-
-        # else:
-        #     msg = 'User already has local role: {item}. Skip adding local role to avoid duplication.'
-        #     logger.info(msg.format(item=has_user))
-        #     result = None
-
         return result
 
     def _apply_actors_info(self, data: dict) -> dict:
