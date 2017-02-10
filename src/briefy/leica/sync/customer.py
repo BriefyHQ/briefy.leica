@@ -11,6 +11,7 @@ from briefy.leica.models import CustomerContact
 from briefy.leica.models import CustomerBillingAddress
 from briefy.leica.sync.location import COUNTRY_MAPPING
 from briefy.leica.sync.location import create_location_dict
+from datetime import datetime
 
 NOW = to_serializable(datetime_utcnow())
 ACTOR = SystemUser.id
@@ -37,7 +38,7 @@ STATUS_MAPPING = {
     'Holiday Lettings': 'inactive',
     'Homeday': 'active',
     'Hostelworld.com': 'inactive',
-    'Just Eat': 'inactive',
+    'Just Eat': 'active',
     'Locadi': 'inactive',
     'Love Home Swap': 'inactive',
     'M Cube Incubator': 'inactive',
@@ -48,6 +49,84 @@ STATUS_MAPPING = {
     'WeTravel': 'inactive',
     'Wine in Black': 'inactive',
     'Wolt': 'active',
+}
+
+DATES_MAPPING = {
+    '@Leisure': (
+        ('2016', '05', '10', '00', '00', '00'), ('2016', '05', '10', '00', '00', '00')
+    ),
+    'Delivery Hero': (
+        ('2017', '02', '09', '00', '00', '00'), ('2017', '02', '09', '00', '00', '00')
+    ),
+    'Agoda': (
+        ('2016', '09', '06', '00', '00', '00'), ('2016', '09', '06', '00', '00', '00')
+    ),
+    'Aladinia': (
+        ('2015', '11', '03', '00', '00', '00'), ('2016', '11', '21', '00', '00', '00')
+    ),
+    'Auctionata': (
+        ('2016', '09', '15', '00', '00', '00'), ('2016', '10', '17', '00', '00', '00')
+    ),
+    'Beauty Spotter': (
+        ('2016', '06', '21', '00', '00', '00'), ('2016', '06', '21', '00', '00', '00')
+    ),
+    'Briefy': (
+        ('2013', '02', '01', '00', '00', '00'), ('2016', '06', '01', '00', '00', '00')
+    ),
+    'Classic Driver': (
+        ('2016', '08', '30', '00', '00', '00'), ('2016', '09', '07', '00', '00', '00')
+    ),
+    'Deliveroo Germany GmbH': (
+        ('2016', '11', '14', '00', '00', '00'), ('2016', '11', '14', '00', '00', '00')
+    ),
+    'Deliveroo Germany': (
+        ('2016', '11', '14', '00', '00', '00'), ('2016', '11', '14', '00', '00', '00')
+    ),
+    'eH Visio': (
+        ('2016', '06', '21', '00', '00', '00'), ('2016', '06', '21', '00', '00', '00')
+    ),
+    'Erento': (
+        ('2016', '01', '26', '00', '00', '00'), ('2016', '06', '22', '00', '00', '00')
+    ),
+    'Everphone': (
+        ('2016', '07', '21', '00', '00', '00'), ('2016', '08', '02', '00', '00', '00')
+    ),
+    'ezCater': (
+        ('2016', '06', '30', '00', '00', '00'), ('2016', '06', '30', '00', '00', '00')
+    ),
+    'Foodora': (
+        ('2016', '04', '12', '00', '00', '00'), ('2016', '06', '30', '00', '00', '00')
+    ),
+    'Holiday Lettings': (
+        ('2015', '09', '21', '00', '00', '00'), ('2016', '06', '21', '00', '00', '00')
+    ),
+    'Homeday': (
+        ('2016', '06', '21', '00', '00', '00'), ('2016', '06', '21', '00', '00', '00')
+    ),
+    'Hostelworld.com': (
+        ('2015', '06', '01', '00', '00', '00'), ('2015', '06', '01', '00', '00', '00')
+    ),
+    'Just Eat': (
+        ('2016', '02', '01', '00', '00', '00'), ('2016', '02', '01', '00', '00', '00')
+    ),
+    'Locadi': (
+        ('2015', '08', '01', '00', '00', '00'), ('2016', '08', '17', '00', '00', '00')
+    ),
+    'Love Home Swap': (
+        ('2015', '10', '15', '00', '00', '00'), ('2016', '08', '17', '00', '00', '00')
+    ),
+    'Stayz Pty': (
+        ('2016', '05', '15', '00', '00', '00'), ('2016', '07', '29', '00', '00', '00')
+    ),
+    'WeTravel': (
+        ('2016', '08', '10', '00', '00', '00'), ('2016', '09', '30', '00', '00', '00')
+    ),
+    'Wine in Black': (
+        ('2015', '12', '22', '00', '00', '00'), ('2017', '01', '01', '00', '00', '00')
+    ),
+    'Wolt': (
+        ('2017', '01', '01', '00', '00', '00'), ('2017', '01', '01', '00', '00', '00')
+    ),
 }
 
 
@@ -111,11 +190,13 @@ class CustomerSync(ModelSync):
         )
         self._add_contact(kobj, obj, contact_dict, 'billing_contact_person')
 
-    def _state_history(self, state: str='active'):
+    def _state_history(self, state: str, created_at: datetime, updated_at: datetime):
         """Create state history structure."""
+        created_at = to_serializable(created_at)
+        updated_at = to_serializable(updated_at)
         history = [
             {
-                'date': NOW,
+                'date': created_at,
                 'message': 'Imported customer from Knack database',
                 'actor': ACTOR,
                 'transition': '',
@@ -123,7 +204,7 @@ class CustomerSync(ModelSync):
                 'to': 'created'
             },
             {
-                'date': NOW,
+                'date': created_at,
                 'message': 'Automatic transition',
                 'actor': ACTOR,
                 'transition': 'activate',
@@ -134,7 +215,7 @@ class CustomerSync(ModelSync):
         if state == 'inactive':
             history.append(
                 {
-                    'date': NOW,
+                    'date': updated_at,
                     'message': 'Automatic transition',
                     'actor': ACTOR,
                     'transition': 'inactivate',
@@ -150,10 +231,15 @@ class CustomerSync(ModelSync):
         location_dict = create_location_dict('company_address', kobj)
         title = kobj.company_name
         slug = generate_slug(title)
+        raw_dates = DATES_MAPPING[title]
+        created_at = datetime(*[int(p) for p in raw_dates[0]])
+        updated_at = datetime(*[int(p) for p in raw_dates[0]])
         state = STATUS_MAPPING[title]
-        state_history = self._state_history(state)
+        state_history = self._state_history(state, created_at, updated_at)
         result.update(
             dict(
+                created_at=created_at,
+                updated_at=updated_at,
                 external_id=kobj.id,
                 slug=slug,
                 state=state,
