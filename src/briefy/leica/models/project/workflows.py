@@ -54,17 +54,17 @@ class ProjectWorkflow(BriefyWorkflow):
         """Pause a project, no new activity should happen here."""
         pass
 
-    @Permission(groups=[G['bizdev'], G['system']])
+    @Permission(groups=[G['bizdev'], G['pm'], G['system']])
     def can_start(self):
         """Validate if user can start this project."""
         return True
 
-    @Permission(groups=[G['bizdev'], G['system']])
+    @Permission(groups=[G['pm'], G['system']])
     def can_pause(self):
         """Validate if user can pause this project."""
         return True
 
-    @Permission(groups=[G['bizdev'], G['system']])
+    @Permission(groups=[G['pm'], G['system']])
     def can_close(self):
         """Validate if user can close this project."""
         return True

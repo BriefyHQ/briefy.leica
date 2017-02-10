@@ -8,5 +8,5 @@ def customer_created_handler(event):
     """Handle Customer created event."""
     obj = event.obj
 
-    # submit custoemr after creation
+    # submit customer after creation
     obj.workflow.submit()
