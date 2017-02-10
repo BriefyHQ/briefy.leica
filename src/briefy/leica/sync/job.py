@@ -212,6 +212,8 @@ class JobSync(ModelSync):
         comment = re.sub(pattern, '\n------------------------------\n', comment)
         pattern = '\n([_]+)\n'
         comment = re.sub(pattern, '\n------------------------------\n', comment)
+        pattern = '\n([\+]+)\n'
+        comment = re.sub(pattern, '\n------------------------------\n', comment)
         comments = comment.split('------------------------------\n')
         comments = [c for c in comments if c.strip()]
         comments.reverse()
