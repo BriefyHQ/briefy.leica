@@ -8,7 +8,12 @@ from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
 
+import pytz
 import re
+
+
+ms_laure_start = datetime(2016,11,1, 0,0,0,tzinfo=pytz.utc)
+
 
 # Field 'approval_status' on Knack.
 # (Actually maps to several states on JobOrder and associated JobAssignments)
@@ -407,6 +412,7 @@ def add_assignment_history(session, obj, kobj, versions=()):
         dates.add(scheduled_shoot_date_time)
         last_date = scheduled_shoot_date_time
 
+    new_set = kobj.new_set
     submission_log = parse_machine_log(kobj)
     if submission_log:
         actor_id = obj.professional_user
@@ -415,6 +421,39 @@ def add_assignment_history(session, obj, kobj, versions=()):
         previous_state = ''
         previous_date = None
         for entry in submission_log:
+            if (last_approval_date < ms_laure_start) and not new_set:
+                # There was at least a reproval here
+                person = professional
+                actor_id = obj.professional_user
+                actor = str(actor_id) if actor_id else system_id
+                date = _build_date(submission_date, last_date)
+                history.append({
+                    'date': date,
+                    'message': "Submitted by '{0}' (from data on Knack)".format(person),
+                    'actor': actor,
+                    'transition': 'upload',
+                    'from': 'awaiting_assets',
+                    'to': 'asset_validation',
+                })
+                dates.add(date)
+                date = submission_date
+                history.append({
+                    'date': _build_date(date, last_date),
+                    'message': "Automatic validation skipped (from data on Knack)",
+                    'actor': system_id,
+                    'transition': 'validate_assets',
+                    'from': 'asset_validation',
+                    'to': 'in_qa',  # Note: can't know about intermediary non-validated sets
+                })
+                id_ = str(obj.qa_manager) or system_id
+                history.append({
+                    'date': date.isoformat(),
+                    'message': "Rejected by '{0}' (from data on Knack)".format(qa_manager),
+                    'actor': id_,
+                    'transition': 'reject',
+                    'from': 'in_qa',
+                    'to': 'awaiting_assets',
+                })
             if previous_state == 'in_qa':
                 #  QA Manager must have refused this
                 if entry['date'] > last_approval_date:
@@ -475,7 +514,6 @@ def add_assignment_history(session, obj, kobj, versions=()):
         dates.add(date)
         last_date = date
 
-    new_set = kobj.new_set
     previous_state = history[-1]['to']
     if (last_approval_date and not new_set) and previous_state not in ('awaiting_assets', ):
         # TODO: Improve date checking here
