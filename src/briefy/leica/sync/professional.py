@@ -1,5 +1,8 @@
 """Import Professionals to Leica."""
 from briefy.leica import logger
+from briefy.common.db import datetime_utcnow
+from briefy.common.users import SystemUser
+from briefy.common.utils.transformers import to_serializable
 from briefy.leica.models import AdditionalWorkingLocation
 from briefy.leica.models import Facebook
 from briefy.leica.models import FiveHundred
@@ -22,6 +25,78 @@ class PhotographerSync(ModelSync):
 
     model = Photographer
     knack_model_name = 'Photographer'
+
+    def _state_history(self, state: str):
+        """Create state history structure."""
+        now = datetime_utcnow()
+        created_at = to_serializable(now)
+        updated_at = to_serializable(now)
+        ACTOR = str(SystemUser.id)
+        history = []
+        history.append(
+            {
+                'date': created_at,
+                'message': 'Imported professional from Knack database',
+                'actor': ACTOR,
+                'transition': '',
+                'from': '',
+                'to': 'created'
+            },
+        )
+        history.append(
+                {
+                    'date': created_at,
+                    'message': 'Automatic transition',
+                    'actor': ACTOR,
+                    'transition': 'submit',
+                    'from': 'created',
+                    'to': 'pending',
+                },
+        )
+        history.append(
+            {
+                'date': updated_at,
+                'message': 'Automatic transition',
+                'actor': ACTOR,
+                'transition': 'approve',
+                'from': 'pending',
+                'to': 'validation',
+            },
+        )
+        history.append(
+            {
+                'date': updated_at,
+                'message': 'Automatic transition',
+                'actor': ACTOR,
+                'transition': 'validate',
+                'from': 'validation',
+                'to': 'trial',
+            },
+        )
+        if state in ('active', ):
+            history.append(
+                {
+                    'date': updated_at,
+                    'message': 'Automatic transition',
+                    'actor': ACTOR,
+                    'transition': 'activate',
+                    'from': 'trial',
+                    'to': 'active',
+                },
+            )
+        elif state in ('trial', ):
+            history.append(
+                {
+                    'date': updated_at,
+                    'message': 'Automatic transition',
+                    'actor': ACTOR,
+                    'transition': 'inactivate',
+                    'from': 'trial',
+                    'to': 'inactive',
+                },
+            )
+
+        return history
 
     def add_address(self, kobj, obj, location_model=None, field_name=''):
         """Add working location address from knack object."""
@@ -55,9 +130,11 @@ class PhotographerSync(ModelSync):
             mobile = cleanse_phone_number(mobile, country, kobj)
 
         state = 'inactive' if kobj.blacklist else 'active'
+        state_history = self._state_history(state)
         result.update(
             dict(
                 state=state,
+                state_history=state_history,
                 email=kobj.email.email or PLACEHOLDERS['email'],
                 first_name=first_name.strip(),
                 last_name=last_name.strip(),

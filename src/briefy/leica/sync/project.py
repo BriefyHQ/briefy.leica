@@ -9,20 +9,22 @@ from briefy.leica.models import Project
 from briefy.leica.sync import ModelSync
 from briefy.leica.sync import category_mapping
 from briefy.leica.sync.project_constraints import CONSTRAINTS
+from datetime import datetime
 
 NOW = to_serializable(datetime_utcnow())
 ACTOR = SystemUser.id
 
 
 STATUS_MAPPING = {
-    'Leisure Group Belvilla DE': 'paused',
-    'Leisure Group Belvilla ES': 'paused',
-    'Leisure Group Belvilla FR': 'paused',
-    'Leisure Group Belvilla IT': 'paused',
+    'Leisure Group Belvilla DE': 'ongoing',
+    'Leisure Group Belvilla ES': 'ongoing',
+    'Leisure Group Belvilla FR': 'ongoing',
+    'Leisure Group Belvilla IT': 'ongoing',
     'Agoda Bali': 'ongoing',
     'Agoda Bangkok': 'ongoing',
     'Agoda Pattaya': 'ongoing',
     'Agoda Phuket': 'ongoing',
+    'Re-shoots / New shoots': 'ongoing',
     'Aladinia Spa Project (Pilot)': 'completed',
     'Auctionata': 'completed',
     'Beauty Spotter Clinics': 'ongoing',
@@ -47,6 +49,99 @@ STATUS_MAPPING = {
     'Wolt Pilot': 'ongoing',
 }
 
+DATES_MAPPING = {
+    'Leisure Group Belvilla DE': (
+        ('2016', '05', '10', '00', '00', '00'), ('2016', '05', '10', '00', '00', '00')
+    ),
+    'Leisure Group Belvilla ES': (
+        ('2016', '05', '10', '00', '00', '00'), ('2016', '05', '10', '00', '00', '00')
+    ),
+    'Leisure Group Belvilla FR': (
+        ('2016', '05', '10', '00', '00', '00'), ('2016', '05', '10', '00', '00', '00')
+    ),
+    'Leisure Group Belvilla IT': (
+        ('2016', '05', '10', '00', '00', '00'), ('2016', '05', '10', '00', '00', '00')
+    ),
+    'Delivery Hero Cologne': (
+        ('2017', '02', '09', '00', '00', '00'), ('2017', '02', '09', '00', '00', '00')
+    ),
+    'Delivery Hero Hamburg': (
+        ('2017', '02', '09', '00', '00', '00'), ('2017', '02', '09', '00', '00', '00')
+    ),
+    'Delivery Hero Munich': (
+        ('2017', '02', '09', '00', '00', '00'), ('2017', '02', '09', '00', '00', '00')
+    ),
+    'Delivery Hero Pilot': (
+        ('2017', '02', '09', '00', '00', '00'), ('2017', '02', '09', '00', '00', '00')
+    ),
+    'Agoda Bali': (
+        ('2016', '09', '06', '00', '00', '00'), ('2016', '09', '06', '00', '00', '00')
+    ),
+    'Agoda Bangkok': (
+        ('2016', '09', '06', '00', '00', '00'), ('2016', '09', '06', '00', '00', '00')
+    ),
+    'Agoda Pattaya': (
+        ('2016', '12', '07', '00', '00', '00'), ('2016', '12', '07', '00', '00', '00')
+    ),
+    'Agoda Phuket': (
+        ('2016', '12', '07', '00', '00', '00'), ('2016', '12', '07', '00', '00', '00')
+    ),
+    'Aladinia Spa Project (Pilot)': (
+        ('2016', '08', '10', '00', '00', '00'), ('2016', '11', '21', '00', '00', '00')
+    ),
+    'Auctionata': (
+        ('2016', '09', '15', '00', '00', '00'), ('2016', '10', '17', '00', '00', '00')
+    ),
+    'Beauty Spotter Clinics': (
+        ('2016', '06', '21', '00', '00', '00'), ('2016', '06', '21', '00', '00', '00')
+    ),
+    'Re-shoots / New shoots': (
+        ('2016', '06', '01', '00', '00', '00'), ('2016', '06', '01', '00', '00', '00')
+    ),
+    'Classic Driver Pilot': (
+        ('2016', '08', '30', '00', '00', '00'), ('2016', '09', '07', '00', '00', '00')
+    ),
+    'Deliveroo Behind the Scene': (
+        ('2016', '11', '14', '00', '00', '00'), ('2016', '11', '14', '00', '00', '00')
+    ),
+    'eH Visio Clinics': (
+        ('2016', '06', '21', '00', '00', '00'), ('2016', '06', '21', '00', '00', '00')
+    ),
+    'Erento': (
+        ('2016', '01', '26', '00', '00', '00'), ('2016', '06', '22', '00', '00', '00')
+    ),
+    'Everphone Business Portrait': (
+        ('2016', '07', '21', '00', '00', '00'), ('2016', '08', '02', '00', '00', '00')
+    ),
+    'ezCater USA': (
+        ('2016', '06', '30', '00', '00', '00'), ('2016', '06', '30', '00', '00', '00')
+    ),
+    'Foodora Wien': (
+        ('2016', '04', '12', '00', '00', '00'), ('2016', '06', '30', '00', '00', '00')
+    ),
+    'Homeday Properties': (
+        ('2016', '06', '21', '00', '00', '00'), ('2016', '06', '21', '00', '00', '00')
+    ),
+    'Homeday Portraits': (
+        ('2016', '06', '21', '00', '00', '00'), ('2016', '06', '21', '00', '00', '00')
+    ),
+    'Just Eat finalists UK': (
+        ('2016', '10', '24', '00', '00', '00'), ('2016', '11', '22', '00', '00', '00')
+    ),
+    'Love Home Swap': (
+        ('2015', '10', '15', '00', '00', '00'), ('2016', '08', '17', '00', '00', '00')
+    ),
+    'Stayz Australia': (
+        ('2016', '05', '15', '00', '00', '00'), ('2016', '07', '29', '00', '00', '00')
+    ),
+    'WeTravel Yoga': (
+        ('2016', '08', '10', '00', '00', '00'), ('2016', '09', '30', '00', '00', '00')
+    ),
+    'Wolt Pilot': (
+        ('2017', '01', '01', '00', '00', '00'), ('2017', '01', '01', '00', '00', '00')
+    ),
+}
+
 
 class ProjectSync(ModelSync):
     """Syncronize Projects."""
@@ -56,11 +151,13 @@ class ProjectSync(ModelSync):
     knack_parent_model = 'Company'
     parent_model = Customer
 
-    def _state_history(self, state: str='ongoing'):
+    def _state_history(self, state: str, created_at: datetime, updated_at: datetime):
         """Create state history structure."""
+        created_at = to_serializable(created_at)
+        updated_at = to_serializable(updated_at)
         history = [
             {
-                'date': NOW,
+                'date': created_at,
                 'message': 'Imported project from Knack database',
                 'actor': ACTOR,
                 'transition': '',
@@ -71,7 +168,7 @@ class ProjectSync(ModelSync):
         if state in ('ongoing', 'paused', 'completed'):
             history.append(
                     {
-                        'date': NOW,
+                        'date': created_at,
                         'message': 'Automatic transition',
                         'actor': ACTOR,
                         'transition': 'start',
@@ -82,7 +179,7 @@ class ProjectSync(ModelSync):
             if state == 'paused':
                 history.append(
                     {
-                        'date': NOW,
+                        'date': updated_at,
                         'message': 'Automatic transition',
                         'actor': ACTOR,
                         'transition': 'pause',
@@ -93,7 +190,7 @@ class ProjectSync(ModelSync):
             if state == 'completed':
                 history.append(
                     {
-                        'date': NOW,
+                        'date': updated_at,
                         'message': 'Automatic transition',
                         'actor': ACTOR,
                         'transition': 'close',
@@ -113,8 +210,11 @@ class ProjectSync(ModelSync):
         title = kobj.project_name.strip()
         slug = generate_slug(title)
         tech_requirements = CONSTRAINTS[title]
+        raw_dates = DATES_MAPPING[title]
+        created_at = datetime(*[int(p) for p in raw_dates[0]])
+        updated_at = datetime(*[int(p) for p in raw_dates[0]])
         state = STATUS_MAPPING[title]
-        state_history = self._state_history(state)
+        state_history = self._state_history(state, created_at, updated_at)
         briefing = kobj.briefing
         if briefing:
             briefing = '{0}/files/projects/{1}/briefing/{2}'.format(
@@ -158,6 +258,8 @@ class ProjectSync(ModelSync):
                 price_currency=price_currency,
                 external_id=kobj.id,
                 release_template=release_template,
+                created_at=created_at,
+                updated_at=updated_at,
                 tech_requirements=tech_requirements
             )
         )

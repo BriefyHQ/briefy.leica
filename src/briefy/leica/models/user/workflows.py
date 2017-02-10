@@ -44,7 +44,7 @@ class UserProfileWorkflow(BriefyWorkflow):
             groups = ('g:customers', )
         create_rolleiflex_user(self.document, groups=groups)
 
-    @Permission(groups=[G['system'], G['pm'], G['scout'], G['bizdev']])
+    @Permission(groups=[G['system'], G['pm'], G['scout'], G['bizdev'], G['finance']])
     def can_activate(self):
         """Validate if user can activate this user profile."""
         return True
@@ -55,7 +55,7 @@ class UserProfileWorkflow(BriefyWorkflow):
         """Inactivate the UserProfile."""
         pass
 
-    @Permission(groups=[G['system'], G['pm'], G['scout'], G['bizdev']])
+    @Permission(groups=[G['system'], G['pm'], G['scout'], G['bizdev'], G['finance']])
     def can_inactivate(self):
         """Validate if user can inactivate this user profile."""
         return True

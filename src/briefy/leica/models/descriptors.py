@@ -100,3 +100,68 @@ class MultipleRelationshipWrapper(UnaryRelationshipWrapper):
                 self.raise_value_error()
         if sub_model_instances:
             setattr(obj, self._field_name, sub_model_instances)
+
+
+class LocalRoleProxyDescriptor:
+    """Descriptor to wrap set and get values from an unary relationship."""
+
+    def __init__(self, collection, proxy, permissions) -> None:
+        """Initialize the unary relationship wrapper.
+
+        :param field_name: string with the name of the real relationship field
+        :param model: class object of the model to be used as related field
+        :param fk_attr: string with the name of the foreign ky attribute to the parent model
+        """
+        self._collection = collection
+        self._proxy = proxy
+        self._permissions = permissions
+
+    def __get__(self, obj, obj_type=None) -> Base:
+        """Get the data from the field.
+
+        :param obj: instance of the model where the descriptor attribute is defined
+        :param obj_type: not used
+        :return: instance of the related object
+        """
+        attr = self._proxy.value_attr
+        if obj and attr:
+            session = obj.__session__
+            if obj not in session.deleted:
+                return getattr(obj, attr)
+
+    def __set__(self, obj, value) -> None:
+        """Set the new instance of the related object.
+
+        :param obj: instance of the model where the descriptor attribute is defined
+        :param value: value received to
+        :return: None
+        """
+        if value is None and obj:
+            session = obj.__session__
+            session.delete(obj)
+
+        if value and obj:
+            attr = self._proxy.value_attr
+            setattr(obj, attr, value)
+
+    def __delete__(self, obj):
+        """Remove the related object with soft delete."""
+        # TODO: implement a way to delete sub_object
+        pass
+
+
+class LocalRolesGetSetFactory:
+    """Factory that return get and set functions to the AssociationProxy."""
+
+    def __init__(self, permission):
+        """Initialize LocalRolesGetSetFactory."""
+        self._permissions = permission
+
+    def __call__(self, collection, proxy):
+        """Create a new descriptor instance and return the set and get functions."""
+        descriptor = LocalRoleProxyDescriptor(
+            collection,
+            proxy,
+            self._permissions
+        )
+        return descriptor.__get__, descriptor.__set__

@@ -15,7 +15,7 @@ date_2016_md_replace = breaker + r'2016-\1-\2T00:00:00.00+00:00 \3'
 date_2017_replace = breaker + r'2017-\2-\1T00:00:00.00+00:00 \3'
 date_2017_md_replace = breaker + r'2017-\1-\2T00:00:00.00+00:00 \3'
 
-DATE_PATTERN = """^((\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.[\d]*\+00:00)"""
+DATE_PATTERN = r'^((\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.?[\d]*\+00:00)'
 
 DATE_PATTERNS = [
     ('^(\d{1,2})\ (May|Jun|Jul|Aug|Agu|Sep|Oct|Nov|Dec)\ 2016(.*)', date_2016_replace),
@@ -128,8 +128,12 @@ def parse_internal_comments(obj, kobj):
     contents = [c.strip() for c in contents if c.strip()]
     contents.reverse()
     author = obj.project.project_manager if obj.project.project_manager else SystemUser.id
+    author_role = 'project_manager'
     for body in contents:
         created_at, body = comment_format_first_line(datetime_utcnow(), body)
+        if 'using a script' in body:
+            author = SystemUser.id
+            author_role = 'system'
         comments.append(
             dict(
                 id=uuid4(),
@@ -139,7 +143,7 @@ def parse_internal_comments(obj, kobj):
                 content=body,
                 created_at=created_at,
                 updated_at=created_at,
-                author_role='project_manager',
+                author_role=author_role,
                 to_role='briefy',
                 internal=True,
             )

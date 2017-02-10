@@ -14,5 +14,10 @@ def professional_created_handler(event):
         # force this because sometimes the obj.id is not available before the flush
         obj.main_location = location
 
+    links = request.validated.get('links', None)
+    if not obj.links and links:
+        # force this because sometimes the obj.id is not available before the flush
+        obj.links = links
+
     # submit for QA validation after creation
     obj.workflow.submit()

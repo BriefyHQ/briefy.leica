@@ -10,7 +10,7 @@ from briefy.common.db.mixins import PersonalInfoMixin
 from briefy.common.db.models.roles import LocalRole
 from briefy.common.vocabularies.roles import LocalRolesChoices
 from briefy.common.utils.cache import timeout_cache
-from briefy.leica import logger
+from briefy.leica.models.descriptors import LocalRolesGetSetFactory
 from briefy.leica.db import Session
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
@@ -103,7 +103,13 @@ class LeicaBriefyRoles(BaseBriefyRoles):
             else:
                 return cls.create_local_role(user_id, role_name)
 
-        return association_proxy(local_attr, remote_attr, creator=creator)
+        getset_factory = LocalRolesGetSetFactory(permissions)
+        return association_proxy(
+            local_attr,
+            remote_attr,
+            creator=creator,
+            getset_factory=getset_factory
+        )
 
     @classmethod
     def create_local_role(cls, user_id, role_name, permissions=None,
@@ -114,34 +120,29 @@ class LeicaBriefyRoles(BaseBriefyRoles):
         if not entity_id:
             entity_id = cls.id
 
-        query = LocalRole.query().filter(
-            LocalRole.entity_id == entity_id,
-            LocalRole.user_id == user_id,
-            LocalRole.entity_type == entity_type,
-            LocalRole.role_name == role_name
+        # TODO: this query do not work
+        # query = LocalRole.query().filter(
+        #      LocalRole.entity_id == entity_id,
+        #      LocalRole.user_id == user_id,
+        #      LocalRole.entity_type == entity_type,
+        #      LocalRole.role_name == role_name
+        # )
+        # has_user = query.one_or_none()
+
+        payload = dict(
+            entity_id=entity_id,
+            user_id=user_id,
+            entity_type=entity_type,
+            role_name=getattr(LocalRolesChoices, role_name),
+            can_view=True,
+            can_edit=False,
+            can_list=False,
+            can_delete=False,
+            can_create=False,
         )
-
-        has_user = query.one_or_none()
-        if not has_user:
-            payload = dict(
-                entity_id=entity_id,
-                user_id=user_id,
-                entity_type=entity_type,
-                role_name=getattr(LocalRolesChoices, role_name),
-                can_view=True,
-                can_edit=False,
-                can_list=False,
-                can_delete=False,
-                can_create=False,
-            )
-            if permissions:
-                payload.update(permissions)
-            result = LocalRole(**payload)
-        else:
-            msg = 'User already has local role: {item}. Skip adding local role to avoid duplication.'
-            logger.info(msg.format(item=has_user))
-            result = None
-
+        if permissions:
+            payload.update(permissions)
+        result = LocalRole(**payload)
         return result
 
     def _apply_actors_info(self, data: dict) -> dict:
@@ -262,6 +263,22 @@ class CustomerBriefyRoles(LeicaBriefyRoles):
             'user_id',
             local_attr='_customer_users'
         )
+
+    @declared_attr
+    def _account_manager(cls) -> list:
+        """Relationship: return a list of LocalRoles.
+
+        :return: LocalRoles instances of account_manager role_name.
+        """
+        return cls.get_role_relationship('account_manager')
+
+    @declared_attr
+    def account_manager(cls):
+        """Return a list of ids of account manager users.
+
+        :return: IDs of the account manager users.
+        """
+        return cls.get_association_proxy('account_manager', 'user_id')
 
     @declared_attr
     def _account_managers(cls) -> list:

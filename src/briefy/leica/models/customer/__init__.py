@@ -92,9 +92,9 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
     }
 
     __raw_acl__ = (
-        ('list', ('g:briefy', 'g:system')),
+        ('list', ('g:briefy_finance', 'g:briefy_pm', 'g:briefy_bizdev', 'g:system')),
         ('create', ('g:briefy_bizdev', 'g:briefy_finance', 'g:system')),
-        ('view', ('g:briefy', 'g:system')),
+        ('view', ('g:briefy_finance', 'g:briefy_pm', 'g:briefy_bizdev', 'g:system')),
         ('edit', ('g:briefy_bizdev', 'g:briefy_finance', 'g:system')),
         ('delete', ('g:briefy_finance', 'g:system')),
     )

@@ -528,7 +528,18 @@ class OrderWorkflow(BriefyWorkflow):
         """Validate if user can submit an Order."""
         return True
 
-    # Transitions
+    @received.transition(received, 'can_edit_location', required_fields=('location', ))
+    @assigned.transition(assigned, 'can_edit_location', required_fields=('location', ))
+    @scheduled.transition(scheduled, 'can_edit_location', required_fields=('location', ))
+    def edit_location(self, **kwargs):
+        """Update location in a Order."""
+        pass
+
+    @Permission(groups=[G['customers'], G['pm'], G['system'], ])
+    def can_edit_location(self):
+        """Validate if user can edit a location of an Order."""
+        return True
+
     @received.transition(
         received,
         'can_set_availability',

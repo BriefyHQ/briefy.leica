@@ -9,14 +9,29 @@ def get_transition_date(transitions: tuple, obj, first: bool=False) -> datetime:
     """Return the datetime for a named transition.
 
     Return None if transition never occured.
-    :param transition: List of Transitions names.
+    :param transitions: List of Transitions names.
     :param obj: Workflow aware object.
     :param first: Return the first occurence of this transition.
     """
-    order = 0 if first else -1
     history_attr = getattr(obj, 'state_history', None)
-    valid_history_attr = history_attr and isinstance(history_attr, list)
-    history = obj.state_history if valid_history_attr else []
+    return get_transition_date_from_history(
+        transitions, history_attr, first
+    )
+
+
+def get_transition_date_from_history(
+        transitions: tuple, history: list, first: bool=False
+) -> datetime:
+    """Return the datetime for a named transition.
+
+    Return None if transition never occurred.
+    :param transitions: List of Transitions names.
+    :param history: Workflow history.
+    :param first: Return the first occurrence of this transition.
+    """
+    order = 0 if first else -1
+    valid_history_attr = history and isinstance(history, list)
+    history = history if valid_history_attr else []
     valid = [t for t in history if t['transition'] in transitions]
     return valid[order]['date'] if valid else None
 
