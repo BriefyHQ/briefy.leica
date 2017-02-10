@@ -400,6 +400,9 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     def tech_requirements(self) -> dict:
         """Tech requirements for this Order.
 
+        IMPORTANT: This difers from project tech_requirements - those
+        are wrapped in the 'asset' key issued from here.
+
         :return: A dictionary with technical requirements for an Order.
         """
         # TODO: enable this:
@@ -415,12 +418,13 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         all_requirements = {
             'set': {
                 'minimum_number_of_photos': project.number_required_assets
-                # Due to development constraints.
+                # TODO: this is due to development time (live) project constraints.
                 # In the future this should come from
                 # self.number_required_assets
             },
+            'asset': requirements
+            # Tech requirements at Project are actually per asset requirements
         }
-        all_requirements.update(requirements)
         return all_requirements
 
     @hybrid_property

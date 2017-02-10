@@ -517,7 +517,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         data['last_submission_date'] = self.last_submission_date
         data['slug'] = self.slug
         data['timezone'] = self.timezone
-        data['tech_requirements'] = self.project.tech_requirements
+        data['tech_requirements'] = self.order.tech_requirements
         data['availability'] = self.availability
         data['category'] = self.category
 
