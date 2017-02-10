@@ -447,7 +447,7 @@ def add_assignment_history(session, obj, kobj, versions=()):
         previous_state = ''
         previous_date = None
         for entry in submission_log:
-            if (last_approval_date < ms_laure_start) and not new_set:
+            if last_approval_date and (last_approval_date < ms_laure_start) and not new_set:
                 # There was at least a reproval here
                 person = professional
                 actor_id = obj.professional_user
