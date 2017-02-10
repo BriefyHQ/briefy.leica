@@ -93,8 +93,8 @@ def parse_machine_log(kobj):
         message = 'This submission was {action}d by Briefy automatic system'.format(
             action=action
         )
-        transition = 'validate_assets' if action == 'validate' else 'invalidate_assets'
-        to_ = 'in_qa' if action == 'validate' else 'awaiting_assets'
+        transition = 'invalidate_assets' if action == 'invalidate' else 'validate_assets'
+        to_ = 'awaiting_assets' if action == 'invalidate' else 'in_qa'
         history.append(
             {
                 'date': date,
