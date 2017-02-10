@@ -212,6 +212,7 @@ def transition_handler(event):
         'assignment.workflow.submit': assignment_submit,
         'assignment.workflow.perm_reject': assignment_perm_reject,
         'assignment.workflow.self_assign': assignment_self_assign,
+        'assignment.workflow.assign_pool': assignment_self_assign,
         'assignment.workflow.scheduling_issues': assignment_scheduling_issues,
         'assignment.workflow.reject': assignment_reject,
         'assignment.workflow.upload': assignment_upload,

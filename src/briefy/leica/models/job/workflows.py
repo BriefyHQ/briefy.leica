@@ -175,9 +175,32 @@ class AssignmentWorkflow(BriefyWorkflow):
         professional_id = self.context.id
         assignment.professional_user = professional_id
 
-    @Permission(groups=[G['professionals'], G['pm'], G['scout'], G['system']])
+    @Permission(groups=[G['professionals'], G['system']])
     def can_self_assign(self):
         """Validate if user is able to self assign this Assignment."""
+        # TODO: Check for existing Assignment already schedule to the same date.
+        return True
+
+    @published.transition(
+        assigned,
+        'can_assign_pool',
+        required_fields=('scheduled_datetime', 'professional_id')
+    )
+    def assign_pool(self, **kwargs):
+        """PM or Scout assign an Assignment from the Pool."""
+        # workflow event subscriber will move to schedule after
+        assignment = self.document
+        order = assignment.order
+        if order.state == 'received':
+            order.workflow.assign()
+        # set local role
+        fields = kwargs['fields']
+        professional_id = fields.get('professional_id')
+        assignment.professional_user = professional_id
+
+    @Permission(groups=[G['pm'], G['scout'], G['system']])
+    def can_assign_pool(self):
+        """Validate if user is able to assign this Assignment from Pool."""
         # TODO: Check for existing Assignment already schedule to the same date.
         return True
 
