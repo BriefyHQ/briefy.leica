@@ -793,11 +793,11 @@ class AssignmentFinancialInfo(ProfessionalPayoutInfo):
     reason_additional_compensation = sa.Column(
         sa.Text(),
         nullable=True,
-        default='',
+        default=None,
         info={
             'colanderalchemy': {
                 'title': 'Type of Set',
-                'default': '',
+                'default': None,
                 'missing': colander.drop,
                 'typ': colander.String
             }
