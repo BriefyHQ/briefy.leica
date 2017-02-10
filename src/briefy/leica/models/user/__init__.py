@@ -3,6 +3,7 @@ from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models import Customer
 from briefy.leica.models.user import workflows
+from briefy.leica.utils.user import add_user_info_to_state_history
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -84,6 +85,12 @@ class UserProfile(mixins.UserProfileMixin, mixins.UserProfileBriefyRoles, Base):
     def title(cls):
         """Return the User fullname."""
         return sa.orm.column_property(cls.first_name + " " + cls.last_name)
+
+    def to_dict(self):
+        """Return a dict representation of this object."""
+        data = super().to_dict()
+        add_user_info_to_state_history(self.state_history)
+        return data
 
 
 class CustomerUserProfile(UserProfile):
