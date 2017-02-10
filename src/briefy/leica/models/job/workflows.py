@@ -17,7 +17,10 @@ logger = logging.getLogger(__name__)
 
 
 SHOOT_TIME_FUTURE_MSG = 'Shoot time should be at least one day in the future.'
-ASSIGN_AFTER_RENEWSHOOT = 'Creative automatically assigned due to a reshoot.'
+ASSIGN_AFTER_RENEWSHOOT = 'Creative automatically assigned due to a re  shoot.'
+
+# required fields
+PAYOUT_REQUIRED_FIELDS = ('payout_value', 'payout_currency', )
 
 
 class AssignmentWorkflow(BriefyWorkflow):
@@ -438,6 +441,37 @@ class AssignmentWorkflow(BriefyWorkflow):
     @Permission(groups=[G['customers'], G['pm'], ])
     def can_refuse(self):
         """Validate if user can refuse an Assignment Set."""
+        return True
+
+    @pending.transition(pending, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
+    @published.transition(published, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
+    @assigned.transition(assigned, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
+    @scheduled.transition(scheduled, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
+    @awaiting_assets.transition(awaiting_assets, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
+    @cancelled.transition(cancelled, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
+    @in_qa.transition(in_qa, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
+    @perm_rejected.transition(perm_reject, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
+    @approved.transition(approved, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
+    @refused.transition(refused, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
+    @completed.transition(completed, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
+    def edit_payout(self, **kwargs):
+        """Update payout and travel expenses of an Assignment."""
+        pass
+
+    @Permission(groups=[G['finance'], G['scout'], G['scout'], G['system'], ])
+    def can_edit_payout(self):
+        """Validate if user can edit payout and travel expenses of an Assignment."""
+        final_states = ('cancelled', 'completed', 'perm_rejected', )
+        scout_states = ('pending', 'published',)
+        user = self.context
+        state = self.state
+
+        if G['finance'] not in user.groups and state in final_states:
+            return False
+
+        if G['scout'] in user.groups and state not in scout_states:
+            return False
+
         return True
 
 

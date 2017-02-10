@@ -10,6 +10,7 @@ from briefy.leica.utils.user import add_user_info_to_state_history
 from datetime import datetime
 from sqlalchemy import orm
 from sqlalchemy import select
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from zope.interface import implementer
@@ -545,17 +546,13 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         """Return if this Assignment is assigned or not."""
         return True if (self.assignment_date and self.professional_id) else False
 
-    @hybrid_property
+    @declared_attr
     def timezone(self) -> str:
         """Return Timezone for this order.
 
         Information will be obtained from main location.
         """
-        location = self.location
-        timezone = 'UTC'
-        if location:
-            timezone = location.timezone
-        return timezone
+        return association_proxy('location', 'timezone')
 
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
