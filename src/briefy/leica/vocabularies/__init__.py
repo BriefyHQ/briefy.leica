@@ -2,7 +2,7 @@
 from briefy.common.vocabularies import LabeledEnum
 
 
-options = [
+order_options = [
     ('undefined', 'undefined', 'undefined'),
     ('job_received', 'job_received', 'Job received'),
     ('in_scheduling_process', 'in_scheduling_process', 'In scheduling process'),
@@ -14,10 +14,10 @@ options = [
 ]
 
 
-OrderStatusChoices = LabeledEnum('OrderStatusChoices', options)
+OrderStatusChoices = LabeledEnum('OrderStatusChoices', order_options)
 
 
-options = [
+scheduling_options = [
     ('undefined', 'undefined', 'undefined'),
     ('owner_not_responding', 'owner_not_responding', 'A1. Owner not responding'),
     (
@@ -50,30 +50,30 @@ options = [
 ]
 
 
-SchedulingIssuesChoices = LabeledEnum('SchedulingIssuesChoices', options)
+SchedulingIssuesChoices = LabeledEnum('SchedulingIssuesChoices', scheduling_options)
 
 
-options = [
+input_options = [
     ('customer', 'customer', 'Input by Customer'),
     ('briefy', 'briefy', 'Input by Briefy'),
 ]
 
 
-OrderInputSource = LabeledEnum('OrderInputSource', options)
+OrderInputSource = LabeledEnum('OrderInputSource', input_options)
 
 
-options = [
+contact_options = [
     ('billing', 'billing', 'Billing contact'),
     ('business', 'business', 'Business contact'),
 ]
 
 
-ContactTypes = LabeledEnum('ContactTypes', options)
+ContactTypes = LabeledEnum('ContactTypes', contact_options)
 
-options = [
+types_options = [
     ('new', 'new', 'New Set'),
     ('returned_photographer', 'returned_photographer', 'Returned by Photographer'),
     ('refused_customer', 'refused_customer', 'Refused by Customer'),
 ]
 
-TypesOfSetChoices = LabeledEnum('TypesOfSetChoices', options)
+TypesOfSetChoices = LabeledEnum('TypesOfSetChoices', types_options)

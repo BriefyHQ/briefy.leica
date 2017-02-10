@@ -45,7 +45,7 @@ DATE_PATTERNS = [
     ('\n(\d{1,2})[\.,\/](0[6-9]{1}|1[0,1,2]) ?(.*)', date_2016_replace),
     ('^(\d{1,2})[\.,\/](0?[1-2]{1}) ?(.*)', date_2017_replace),
     ('\n(\d{1,2})[\.,\/](0?[1-2]{1}) ?(.*)', date_2017_replace),
-    ('^((\d{4})[-,.](\d{1,2})[-,.](\d{1,2})) ?(.*)', breaker + r'\2-\3-\4T00:00:00.00+00:00 \4'),
+    ('^((\d{4})[-,.](\d{1,2})[-,.](\d{1,2}))[^T](.*)', breaker + r'\2-\3-\4T00:00:00.00+00:00 \5'),
     ('-(Jan|1)-', '-01-'),
     ('-(Feb|2)-', '-02-'),
     ('-(Mar|3)-', '-03-'),
@@ -103,6 +103,8 @@ def comment_format_first_line(created_at: datetime = None, body: str='') -> tupl
         for pattern, replacer in DATE_PATTERNS:
             new_first_line = re.sub(pattern, replacer, new_first_line)
             new_first_line = new_first_line.replace('\n------------------------------\n', '')
+        # Replace orphan time
+        new_first_line = new_first_line.replace(' T00:00:00.00+00:00', '')
         matches = re.findall(DATE_PATTERN, new_first_line)
     if matches:
         try:

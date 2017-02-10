@@ -212,6 +212,8 @@ class JobSync(ModelSync):
         comment = re.sub(pattern, '\n------------------------------\n', comment)
         pattern = '\n([_]+)\n'
         comment = re.sub(pattern, '\n------------------------------\n', comment)
+        pattern = '\n([\+]+)\n'
+        comment = re.sub(pattern, '\n------------------------------\n', comment)
         comments = comment.split('------------------------------\n')
         comments = [c for c in comments if c.strip()]
         comments.reverse()
@@ -370,6 +372,7 @@ class JobSync(ModelSync):
         knack_payout_currency = self.choice_to_str(kobj.currency_payout)
         payout_currency = str(knack_payout_currency) if knack_payout_currency else 'EUR'
         reason_compensation = self.choice_to_str(kobj.reason_for_additional_compensation)
+        last_approval_date = kobj.last_approval_date
         timezone_name = kobj.timezone
         scheduled_datetime = kobj.scheduled_shoot_date_time
         if scheduled_datetime:
@@ -397,7 +400,6 @@ class JobSync(ModelSync):
         self.session.add(assignment)
         self.session.flush()
         logger.debug('Assignment added: {id}'.format(id=assignment.id))
-
         if professional_id:
             professional_permissions = ['view', 'edit']
             self.update_local_roles(
@@ -409,6 +411,12 @@ class JobSync(ModelSync):
 
         # qa manager context roles
         qa_manager_roles = self.get_local_roles(kobj, 'qa_manager')
+        if last_approval_date and not qa_manager_roles:
+            id_ = '0efa2980-07f9-4add-a8bf-1882a2e988e1'  # Laure
+            kobj.qa_manager = [{'id': id_, 'identifier': '''Laure d'Utruy'''}]
+            qa_manager_roles = [
+                id_
+            ]
         permissions = ['view', 'edit']
         self.update_local_roles(
             assignment,
