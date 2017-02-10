@@ -759,7 +759,8 @@ class AssignmentFinancialInfo(ProfessionalPayoutInfo):
         info={
             'colanderalchemy': {
                 'title': 'Travel Expenses',
-                'missing': None,
+                'default': 0,
+                'missing': colander.drop,
                 'typ': colander.Integer
             }
         }
@@ -777,7 +778,8 @@ class AssignmentFinancialInfo(ProfessionalPayoutInfo):
         info={
             'colanderalchemy': {
                 'title': 'Additional Compensation',
-                'missing': None,
+                'default': 0,
+                'missing': colander.drop,
                 'typ': colander.Integer
             }
         }

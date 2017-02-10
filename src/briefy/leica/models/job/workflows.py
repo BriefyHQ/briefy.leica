@@ -20,7 +20,7 @@ SHOOT_TIME_FUTURE_MSG = 'Shoot time should be at least one day in the future.'
 ASSIGN_AFTER_RENEWSHOOT = 'Creative automatically assigned due to a re  shoot.'
 
 # required fields
-PAYOUT_REQUIRED_FIELDS = ('payout_value', 'payout_currency', )
+PAYOUT_REQUIRED_FIELDS = ('payout_value', 'payout_currency', 'travel_expenses')
 
 
 class AssignmentWorkflow(BriefyWorkflow):
