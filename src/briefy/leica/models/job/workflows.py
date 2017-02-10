@@ -863,7 +863,7 @@ class OrderWorkflow(BriefyWorkflow):
         order = self.document
         final_states = ('cancelled', 'perm_rejected', 'completed')
         for assignment in order.assignments:
-            if assignment.state == 'approved':
+            if assignment.state in ('approved', 'refused'):
                 assignment.workflow.complete()
             elif assignment.state not in final_states:
                 return False
