@@ -98,7 +98,6 @@ class PhotographerSync(ModelSync):
 
         return history
 
-
     def add_address(self, kobj, obj, location_model=None, field_name=''):
         """Add working location address from knack object."""
         location_dict = create_location_dict(field_name, kobj)
