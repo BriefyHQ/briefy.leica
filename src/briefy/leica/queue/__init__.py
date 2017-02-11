@@ -12,6 +12,7 @@ logger = logging.getLogger('briefy.leica')
 
 class Schema(colander.MappingSchema):
     """Payload for the leica queue."""
+
     pass
 
 
