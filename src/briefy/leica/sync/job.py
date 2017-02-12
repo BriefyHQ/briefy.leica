@@ -21,6 +21,7 @@ from briefy.leica.sync.job_wf_history import add_assignment_history
 from briefy.leica.sync.job_wf_history import add_order_history
 from briefy.leica.sync.location import create_location_dict
 from datetime import datetime
+from dateutil import parser
 from pytz import utc
 from pytz import timezone
 
@@ -284,6 +285,27 @@ class JobSync(ModelSync):
 
     def add_assignment_comments(self, obj, kobj):
         """Import Assignment comments."""
+        state_history = obj.state_history
+        for item in state_history:
+            if item['transition'] == 'scheduling_issues':
+                to_role = 'project_manager'
+                author_role = 'professional_user'
+                author_id = item['actor']
+                body = item['message']
+                created_at = parser.parse(item['date'])
+                payload = dict(
+                    id=uuid.uuid4(),
+                    entity_id=obj.id,
+                    entity_type=obj.__class__.__name__,
+                    author_id=author_id,
+                    content=body,
+                    created_at=created_at,
+                    author_role=author_role,
+                    to_role=to_role,
+                    internal=False,
+                )
+                session = self.session
+                session.add(Comment(**payload))
         if kobj.note_from_pm:
             project_manager = obj.project.project_manager
             comments_data = self.parse_comment(kobj.note_from_pm)
