@@ -188,9 +188,15 @@ class CustomerUserProfile(UserProfile):
                         LocalRole.role_name=="{role_name}"
                     )'''.format(
                 entity='Project',
-                role_name='customer_users',
+                role_name='customer_user',
             )
         )
+
+    @property
+    def customers(self):
+        """Customers attached to this profile."""
+        customer_ids = self.customer_ids
+        return Customer.query().filter(Customer.id.in_(customer_ids)).all()
 
     @property
     def project_roles(self):
@@ -213,6 +219,34 @@ class CustomerUserProfile(UserProfile):
                 id_ = UUID(id_)
             if id_ not in project.customer_users:
                 project.customer_users.append(id_)
+
+    @property
+    def projects(self):
+        """Projects attached to this profile."""
+        from briefy.leica.models import Project
+
+        project_ids = self.project_ids
+        return Project.query().filter(Project.id.in_(project_ids)).all()
+
+    def summarize_relations(self, objs):
+        """Return a summarized version of an object."""
+        response = []
+        for obj in objs:
+            response.append(
+                {
+                    'id': obj.id,
+                    'title': obj.title,
+                    'state': obj.state,
+                }
+            )
+        return response
+
+    def to_dict(self):
+        """Return a dict representation of this object."""
+        data = super().to_dict()
+        data['customers'] = self.summarize_relations(self.customers)
+        data['projects'] = self.summarize_relations(self.projects)
+        return data
 
 
 class BriefyUserProfile(UserProfile):
