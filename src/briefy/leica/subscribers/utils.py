@@ -8,8 +8,15 @@ from sqlalchemy.orm.session import object_session
 def apply_local_roles_from_parent(obj, parent, excludes=()):
     """Copy local roles from parent."""
     local_roles = []
+    entity_type = obj.__class__.__name__
+    existing = LocalRole.query().filter(
+        LocalRole.entity_id == obj.id, LocalRole.entity_type == entity_type
+    ).all()
+    existing = [(l.user_id, l.role_name.value) for l in existing]
     for lr in parent.local_roles:
-        if lr.role_name.value in excludes:
+        role_name = lr.role_name.value
+        key = (lr.user_id, role_name)
+        if role_name in excludes or key in existing:
             continue
         payload = dict(
             entity_type=obj.__class__.__name__,
