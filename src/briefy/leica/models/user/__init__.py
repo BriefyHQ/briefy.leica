@@ -215,7 +215,6 @@ class CustomerUserProfile(UserProfile):
                 project.customer_users.append(id_)
 
 
-
 class BriefyUserProfile(UserProfile):
     """A Briefy user on our system."""
 
