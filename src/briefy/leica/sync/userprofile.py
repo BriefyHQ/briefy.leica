@@ -29,6 +29,7 @@ class UserProfileSync(ModelSync):
 
         result.update(
             dict(
+                external_id=kobj.id,
                 state=state,
                 email=kobj.email.email or PLACEHOLDERS['email'],
                 first_name=first_name.strip(),
