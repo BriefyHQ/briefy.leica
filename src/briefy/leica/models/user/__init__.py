@@ -8,6 +8,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import UUIDType
+from uuid import UUID
 
 import colander
 import copy
@@ -151,12 +152,15 @@ class CustomerUserProfile(UserProfile):
     def customer_roles(self, customer_id):
         """Add customer_user role for this customer user profile."""
         customer = Customer.get(customer_id)
+        id_ = self.id
         if not customer:
             raise ValueError('Invalid customer ID')
-        if not self.id:
+        if not id_:
             return
-        if self.id not in customer.customer_users:
-            customer.customer_users.append(self.id)
+        if isinstance(id_, str):
+            id_ = UUID(id_)
+        if id_ not in customer.customer_users:
+            customer.customer_users.append(id_)
 
 
 class BriefyUserProfile(UserProfile):
