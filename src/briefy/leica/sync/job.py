@@ -21,6 +21,7 @@ from briefy.leica.sync.job_wf_history import add_assignment_history
 from briefy.leica.sync.job_wf_history import add_order_history
 from briefy.leica.sync.location import create_location_dict
 from datetime import datetime
+from dateutil import parser
 from pytz import utc
 from pytz import timezone
 
@@ -212,6 +213,8 @@ class JobSync(ModelSync):
         comment = re.sub(pattern, '\n------------------------------\n', comment)
         pattern = '\n([_]+)\n'
         comment = re.sub(pattern, '\n------------------------------\n', comment)
+        pattern = '\n([\+]+)\n'
+        comment = re.sub(pattern, '\n------------------------------\n', comment)
         comments = comment.split('------------------------------\n')
         comments = [c for c in comments if c.strip()]
         comments.reverse()
@@ -282,6 +285,27 @@ class JobSync(ModelSync):
 
     def add_assignment_comments(self, obj, kobj):
         """Import Assignment comments."""
+        state_history = obj.state_history
+        for item in state_history:
+            if item['transition'] == 'scheduling_issues':
+                to_role = 'project_manager'
+                author_role = 'professional_user'
+                author_id = item['actor']
+                body = item['message']
+                created_at = parser.parse(item['date'])
+                payload = dict(
+                    id=uuid.uuid4(),
+                    entity_id=obj.id,
+                    entity_type=obj.__class__.__name__,
+                    author_id=author_id,
+                    content=body,
+                    created_at=created_at,
+                    author_role=author_role,
+                    to_role=to_role,
+                    internal=False,
+                )
+                session = self.session
+                session.add(Comment(**payload))
         if kobj.note_from_pm:
             project_manager = obj.project.project_manager
             comments_data = self.parse_comment(kobj.note_from_pm)
@@ -370,6 +394,7 @@ class JobSync(ModelSync):
         knack_payout_currency = self.choice_to_str(kobj.currency_payout)
         payout_currency = str(knack_payout_currency) if knack_payout_currency else 'EUR'
         reason_compensation = self.choice_to_str(kobj.reason_for_additional_compensation)
+        last_approval_date = kobj.last_approval_date
         timezone_name = kobj.timezone
         scheduled_datetime = kobj.scheduled_shoot_date_time
         if scheduled_datetime:
@@ -397,7 +422,6 @@ class JobSync(ModelSync):
         self.session.add(assignment)
         self.session.flush()
         logger.debug('Assignment added: {id}'.format(id=assignment.id))
-
         if professional_id:
             professional_permissions = ['view', 'edit']
             self.update_local_roles(
@@ -409,6 +433,12 @@ class JobSync(ModelSync):
 
         # qa manager context roles
         qa_manager_roles = self.get_local_roles(kobj, 'qa_manager')
+        if last_approval_date and not qa_manager_roles:
+            id_ = '0efa2980-07f9-4add-a8bf-1882a2e988e1'  # Laure
+            kobj.qa_manager = [{'id': id_, 'identifier': '''Laure d'Utruy'''}]
+            qa_manager_roles = [
+                id_
+            ]
         permissions = ['view', 'edit']
         self.update_local_roles(
             assignment,

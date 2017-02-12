@@ -5,6 +5,7 @@ from briefy.common.vocabularies.roles import Groups as G
 from briefy.leica.events.assignment import AssignmentCreatedEvent
 from briefy.leica.models import Professional
 from briefy.leica.subscribers import safe_workflow_trigger_transitions
+from briefy.leica.subscribers.utils import apply_local_roles_from_parent
 from briefy.leica.subscribers.utils import create_new_assignment_from_order
 from briefy.leica.subscribers.utils import create_comment_from_wf_transition
 from pyramid.events import subscriber
@@ -13,6 +14,9 @@ from pyramid.events import subscriber
 @subscriber(AssignmentCreatedEvent)
 def assignment_created_handler(event):
     """Handle Assignment created event."""
+    assignment = event.obj
+    order = assignment.order
+    apply_local_roles_from_parent(assignment, order, ('customer_user'))
     transitions = [('submit', ''), ]
     safe_workflow_trigger_transitions(event, transitions=transitions)
 
@@ -52,13 +56,16 @@ def assignment_perm_reject(event):
 def assignment_remove_schedule(event):
     """Handle Assignment remove_schedule workflow event."""
     assignment = event.obj
-    assignment.scheduled_datetime = None
     user = assignment.workflow.context
+
+    # this should be always in the subscriber
+    # to avoid loop with the order remove_schedule
     order = assignment.order
     message = assignment.state_history[-1]['message']
     if order.state == 'scheduled':
         order.workflow.remove_schedule(message=message)
 
+    # create the comment
     if G['customers'].value in user.groups:
         # this should not create a comment on the assignment only on the order
         return
@@ -212,6 +219,7 @@ def transition_handler(event):
         'assignment.workflow.submit': assignment_submit,
         'assignment.workflow.perm_reject': assignment_perm_reject,
         'assignment.workflow.self_assign': assignment_self_assign,
+        'assignment.workflow.assign_pool': assignment_self_assign,
         'assignment.workflow.scheduling_issues': assignment_scheduling_issues,
         'assignment.workflow.reject': assignment_reject,
         'assignment.workflow.upload': assignment_upload,

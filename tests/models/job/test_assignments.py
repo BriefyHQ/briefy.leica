@@ -24,6 +24,7 @@ class TestAssignmentModel(BaseModelTest):
     def test_workflow(self, instance_obj, roles):
         """Test workflow for this model."""
         from briefy.common.workflow.exceptions import WorkflowTransitionException
+        from briefy.common.workflow.exceptions import WorkflowPermissionException
 
         now = datetime_utcnow()
         request = DummyRequest()
@@ -233,7 +234,32 @@ class TestAssignmentModel(BaseModelTest):
         wf.complete()
         assert assignment.state == 'completed'
 
-        # After completion, only the system can execute a transition to the assignment
-        for role in ('customer', 'professional', 'pm', 'qa', 'scout'):
+        # After completion, customer, professional and qa can not do anything
+        for role in ('customer', 'professional', 'qa'):
             wf.context = roles[role]
+            # two transitions are possible, but the guard should block from these roles
             assert len(wf.transitions) == 0
+
+        # But scout, pm and finance can
+        completed_role_map = dict(pm=0, scout=0)
+        for role, number in completed_role_map.items():
+            wf.context = roles[role]
+            # two transitions are possible, but the guard should block from these roles
+            assert len(wf.transitions) == number
+
+            payout_fields = dict(
+                payout_value=12000,
+                payout_currency='GBP',
+                travel_expenses=5000,
+            )
+            with pytest.raises(WorkflowPermissionException) as excinfo:
+                wf.edit_payout(fields=payout_fields)
+                assert 'Incorrect number of assets' in str(excinfo)
+
+            compensation_fields = dict(
+                additional_compensation=3000,
+                reason_additional_compensation='Post processing',
+            )
+            with pytest.raises(WorkflowPermissionException) as excinfo:
+                wf.edit_compensation(fields=compensation_fields)
+                assert 'Incorrect number of assets' in str(excinfo)

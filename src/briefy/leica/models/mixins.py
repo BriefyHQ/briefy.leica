@@ -9,6 +9,7 @@ from briefy.common.db.mixins import OptIn
 from briefy.common.db.mixins import PersonalInfoMixin
 from briefy.common.db.models.roles import LocalRole
 from briefy.common.vocabularies.roles import LocalRolesChoices
+from briefy.common.users import SystemUser
 from briefy.common.utils.cache import timeout_cache
 from briefy.leica.models.descriptors import LocalRolesGetSetFactory
 from briefy.leica.db import Session
@@ -45,7 +46,12 @@ def get_public_user_info(user_id: str) -> dict:
     except (ValueError, AttributeError) as exc:
         return data
     else:
-        raw_data = UserProfile.get(user_id)
+        if user_id == SystemUser.id:
+            raw_data = SystemUser
+            raw_data.internal = True
+            raw_data.title = raw_data.fullname
+        else:
+            raw_data = UserProfile.get(user_id)
         if raw_data:
             data['id'] = str(raw_data.id)
             data['first_name'] = raw_data.first_name
@@ -759,7 +765,8 @@ class AssignmentFinancialInfo(ProfessionalPayoutInfo):
         info={
             'colanderalchemy': {
                 'title': 'Travel Expenses',
-                'missing': None,
+                'default': 0,
+                'missing': colander.drop,
                 'typ': colander.Integer
             }
         }
@@ -777,7 +784,8 @@ class AssignmentFinancialInfo(ProfessionalPayoutInfo):
         info={
             'colanderalchemy': {
                 'title': 'Additional Compensation',
-                'missing': None,
+                'default': 0,
+                'missing': colander.drop,
                 'typ': colander.Integer
             }
         }
@@ -791,11 +799,11 @@ class AssignmentFinancialInfo(ProfessionalPayoutInfo):
     reason_additional_compensation = sa.Column(
         sa.Text(),
         nullable=True,
-        default='',
+        default=None,
         info={
             'colanderalchemy': {
                 'title': 'Type of Set',
-                'default': '',
+                'default': None,
                 'missing': colander.drop,
                 'typ': colander.String
             }

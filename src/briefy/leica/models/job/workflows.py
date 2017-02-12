@@ -17,7 +17,11 @@ logger = logging.getLogger(__name__)
 
 
 SHOOT_TIME_FUTURE_MSG = 'Shoot time should be at least one day in the future.'
-ASSIGN_AFTER_RENEWSHOOT = 'Creative automatically assigned due to a reshoot.'
+ASSIGN_AFTER_RENEWSHOOT = 'Creative automatically assigned due to a re  shoot.'
+
+# required fields
+PAYOUT_REQUIRED_FIELDS = ('payout_value', 'payout_currency', 'travel_expenses')
+COMPENSATION_REQUIRED_FIELDS = ('additional_compensation', 'reason_additional_compensation')
 
 
 class AssignmentWorkflow(BriefyWorkflow):
@@ -171,9 +175,32 @@ class AssignmentWorkflow(BriefyWorkflow):
         professional_id = self.context.id
         assignment.professional_user = professional_id
 
-    @Permission(groups=[G['professionals'], G['pm'], G['scout'], G['system']])
+    @Permission(groups=[G['professionals'], G['system']])
     def can_self_assign(self):
         """Validate if user is able to self assign this Assignment."""
+        # TODO: Check for existing Assignment already schedule to the same date.
+        return True
+
+    @published.transition(
+        assigned,
+        'can_assign_pool',
+        required_fields=('scheduled_datetime', 'professional_id')
+    )
+    def assign_pool(self, **kwargs):
+        """PM or Scout assign an Assignment from the Pool."""
+        # workflow event subscriber will move to schedule after
+        assignment = self.document
+        order = assignment.order
+        if order.state == 'received':
+            order.workflow.assign()
+        # set local role
+        fields = kwargs['fields']
+        professional_id = fields.get('professional_id')
+        assignment.professional_user = professional_id
+
+    @Permission(groups=[G['pm'], G['scout'], G['system']])
+    def can_assign_pool(self):
+        """Validate if user is able to assign this Assignment from Pool."""
         # TODO: Check for existing Assignment already schedule to the same date.
         return True
 
@@ -236,9 +263,13 @@ class AssignmentWorkflow(BriefyWorkflow):
         return True
 
     @scheduled.transition(assigned, 'can_remove_schedule')
+    @awaiting_assets.transition(assigned, 'can_remove_schedule')
     def remove_schedule(self, **kwargs):
         """Customer, Professional or PM removes the Assignment scheduled shoot datetime."""
-        pass
+        assignment = self.document
+        if assignment.submission_path:
+            return False
+        assignment.scheduled_datetime = None
 
     @Permission(groups=[G['professionals'], G['customers'], G['pm']])
     def can_remove_reschedule(self):
@@ -443,6 +474,92 @@ class AssignmentWorkflow(BriefyWorkflow):
     @Permission(groups=[G['customers'], G['pm'], ])
     def can_refuse(self):
         """Validate if user can refuse an Assignment Set."""
+        return True
+
+    @pending.transition(pending, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
+    @published.transition(published, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
+    @assigned.transition(assigned, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
+    @scheduled.transition(scheduled, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
+    @awaiting_assets.transition(
+        awaiting_assets, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS
+    )
+    @cancelled.transition(cancelled, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
+    @in_qa.transition(in_qa, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
+    @perm_rejected.transition(
+        perm_reject, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS
+    )
+    @approved.transition(approved, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
+    @refused.transition(refused, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
+    @completed.transition(completed, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
+    def edit_payout(self, **kwargs):
+        """Update payout and travel expenses of an Assignment."""
+        pass
+
+    @Permission(groups=[G['finance'], G['scout'], G['pm'], G['system'], ])
+    def can_edit_payout(self):
+        """Validate if user can edit payout and travel expenses of an Assignment."""
+        final_states = ('cancelled', 'completed', 'perm_rejected', )
+        scout_states = ('pending', 'published',)
+        user = self.context
+        state = self.state
+
+        if G['system'].value in user.groups:
+            permission = True
+        elif G['finance'].value in user.groups:
+            permission = True
+        elif G['scout'].value in user.groups and state.name not in scout_states:
+            permission = False
+        elif G['pm'].value in user.groups and state.name in final_states:
+            permission = False
+        else:
+            permission = True
+
+        return permission
+
+    @assigned.transition(
+        assigned, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
+    )
+    @scheduled.transition(
+        scheduled, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
+    )
+    @awaiting_assets.transition(
+        awaiting_assets, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
+    )
+    @cancelled.transition(
+        cancelled, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
+    )
+    @in_qa.transition(
+        in_qa, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
+    )
+    @perm_rejected.transition(
+        perm_reject, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
+    )
+    @approved.transition(
+        approved, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
+    )
+    @refused.transition(
+        refused, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
+    )
+    @completed.transition(
+        completed, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
+    )
+    def edit_compensation(self, **kwargs):
+        """Update additional compensation value and reason of an Assignment."""
+        pass
+
+    @Permission(groups=[G['finance'], G['pm'], G['system'], ])
+    def can_edit_compensation(self):
+        """Validate if user can edit additional compensation value and reason of an Assignment."""
+        final_states = ('cancelled', 'completed', 'perm_rejected', )
+        user = self.context
+        state = self.state
+
+        if G['system'].value in user.groups:
+            return True
+
+        if G['finance'].value not in user.groups and state.name in final_states:
+            return False
+
         return True
 
 
@@ -779,7 +896,7 @@ class OrderWorkflow(BriefyWorkflow):
         order = self.document
         final_states = ('cancelled', 'perm_rejected', 'completed')
         for assignment in order.assignments:
-            if assignment.state == 'approved':
+            if assignment.state in ('approved', 'refused'):
                 assignment.workflow.complete()
             elif assignment.state not in final_states:
                 return False

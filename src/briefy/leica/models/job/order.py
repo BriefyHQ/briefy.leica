@@ -73,7 +73,9 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     _workflow = workflows.OrderWorkflow
 
     __summary_attributes__ = __summary_attributes__
-    __summary_attributes_relations__ = ['project', 'comments', 'customer', 'assignment']
+    __summary_attributes_relations__ = [
+        'project', 'comments', 'customer', 'assignment', 'assignments'
+    ]
     __listing_attributes__ = __listing_attributes__
 
     __raw_acl__ = (

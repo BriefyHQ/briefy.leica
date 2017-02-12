@@ -2,6 +2,7 @@
 from briefy.common.users import SystemUser
 from briefy.common.vocabularies.roles import Groups as G
 from briefy.leica.events.order import OrderCreatedEvent
+from briefy.leica.subscribers.utils import apply_local_roles_from_parent
 from briefy.leica.subscribers.utils import create_new_assignment_from_order
 from briefy.leica.subscribers.utils import create_comment_from_wf_transition
 # from briefy.leica.subscribers import safe_workflow_trigger_transitions
@@ -13,7 +14,8 @@ def order_created_handler(event):
     """Handle Order created event."""
     order = event.obj
     request = event.request
-
+    project = order.project
+    apply_local_roles_from_parent(order, project, ())
     location = request.validated.get('location', None)
     if not order.location and location:
         # force this because sometimes the obj.id is not available before the flush
@@ -49,12 +51,15 @@ def order_remove_schedule(event):
     """Handle Order remove_schedule workflow event."""
     order = event.obj
     user = order.workflow.context
+
+    # this should be always in the subscriber
+    # to avoid loop with the order remove_schedule
     assignment = order.assignment
-    assignment.scheduled_datetime = None
     message = order.state_history[-1]['message']
     if assignment.state == 'scheduled':
         assignment.workflow.remove_schedule(message=message)
 
+    # create comment
     if G['customers'].value in user.groups:
         to_role = 'project_manager'
         author_role = 'customer_user'
