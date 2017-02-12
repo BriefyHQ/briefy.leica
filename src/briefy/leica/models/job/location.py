@@ -31,6 +31,14 @@ class OrderLocation(ContactInfoMixin, AddressMixin,
             'can_create_roles', 'can_view_roles', 'can_edit_roles', 'can_delete_roles',
             'can_list_roles', 'local_roles'
         ],
+        'overrides': {
+            'mobile': {
+                'title': 'Mobile phone number',
+                'default': '',
+                'missing': colander.drop,
+                'typ': colander.String
+            },
+        }
     }
 
     __listing_attributes__ = __summary_attributes__
