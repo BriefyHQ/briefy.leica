@@ -65,9 +65,9 @@ def get_project_managers(projects: list):
                 project_managers.append(get_public_user_info(str(pm)))
     return project_managers
 
+
 def intercom_payload_professional(professional):
     """Return the intercom payload for a professional."""
-
     # Priority is to old external id info (Knack id)
     old_id = professional.external_id
     user_id = old_id if old_id else professional.id
