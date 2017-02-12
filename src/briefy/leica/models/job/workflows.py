@@ -22,6 +22,7 @@ ASSIGN_AFTER_RENEWSHOOT = 'Creative automatically assigned due to a re  shoot.'
 # required fields
 PAYOUT_REQUIRED_FIELDS = ('payout_value', 'payout_currency', 'travel_expenses')
 COMPENSATION_REQUIRED_FIELDS = ('additional_compensation', 'reason_additional_compensation')
+REQUIREMENTS_REQUIRED_FIELDS = ('number_required_assets', 'requirements')
 
 
 class AssignmentWorkflow(BriefyWorkflow):
@@ -649,12 +650,34 @@ class OrderWorkflow(BriefyWorkflow):
     @assigned.transition(assigned, 'can_edit_location', required_fields=('location', ))
     @scheduled.transition(scheduled, 'can_edit_location', required_fields=('location', ))
     def edit_location(self, **kwargs):
-        """Update location in a Order."""
+        """Update location in an Order."""
         pass
 
     @Permission(groups=[G['customers'], G['pm'], G['system'], ])
     def can_edit_location(self):
         """Validate if user can edit a location of an Order."""
+        return True
+
+    @received.transition(
+        received,
+        'can_edit_requirements',
+        required_fields=REQUIREMENTS_REQUIRED_FIELDS
+    )
+    @assigned.transition(
+        assigned,
+        'can_edit_requirements',
+        required_fields=REQUIREMENTS_REQUIRED_FIELDS)
+    @scheduled.transition(
+        scheduled,
+        'can_edit_requirements',
+        required_fields=REQUIREMENTS_REQUIRED_FIELDS)
+    def edit_requirements(self, **kwargs):
+        """Update requirements in an Order."""
+        pass
+
+    @Permission(groups=[G['customers'], G['pm'], G['system'], ])
+    def can_edit_requirements(self):
+        """Validate if user can edit requirements of an Order."""
         return True
 
     @received.transition(
