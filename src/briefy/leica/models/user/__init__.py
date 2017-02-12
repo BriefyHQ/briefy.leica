@@ -25,6 +25,11 @@ __colander_alchemy_config_overrides__.update(
             'missing': colander.drop,
             'typ': colander.String()
         },
+        'project_roles': {
+            'title': 'Project Roles',
+            'missing': colander.drop,
+            'typ': colander.List()
+        },
     }
 )
 
@@ -47,7 +52,9 @@ class UserProfile(mixins.UserProfileMixin, mixins.UserProfileBriefyRoles, Base):
 
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', 'type', 'external_id', '_owner', '_customer_roles'
+            'state_history', 'state', 'type', 'external_id', '_owner', '_customer_roles',
+            '_project_roles'
+
         ],
         'overrides': __colander_alchemy_config_overrides__
     }
@@ -161,6 +168,52 @@ class CustomerUserProfile(UserProfile):
             id_ = UUID(id_)
         if id_ not in customer.customer_users:
             customer.customer_users.append(id_)
+
+    @declared_attr
+    def project_ids(cls):
+        """Return a list of project ids related to this CustomerUserProfile."""
+        return association_proxy('_project_roles', 'entity_id')
+
+    @declared_attr
+    def _project_roles(cls):
+        """Local roles of this user in the Customer context as project_user."""
+        return sa.orm.relationship(
+            'LocalRole',
+            foreign_keys='LocalRole.user_id',
+            viewonly=True,
+            uselist=True,
+            primaryjoin='''and_(
+                        LocalRole.user_id == CustomerUserProfile.id,
+                        LocalRole.entity_type=="{entity}",
+                        LocalRole.role_name=="{role_name}"
+                    )'''.format(
+                entity='Project',
+                role_name='customer_users',
+            )
+        )
+
+    @property
+    def project_roles(self):
+        """Return roles related to this project user profile."""
+        return self._project_roles
+
+    @project_roles.setter
+    def project_roles(self, project_ids):
+        """Add project_user role for this project user profile."""
+        from briefy.leica.models import Project
+
+        for project_id in project_ids:
+            project = Project.get(project_id)
+            id_ = self.id
+            if not project:
+                raise ValueError('Invalid project ID')
+            if not id_:
+                return
+            if isinstance(id_, str):
+                id_ = UUID(id_)
+            if id_ not in project.customer_users:
+                project.customer_users.append(id_)
+
 
 
 class BriefyUserProfile(UserProfile):
