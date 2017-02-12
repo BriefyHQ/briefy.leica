@@ -7,6 +7,7 @@ from briefy.leica.models.professional.link import Link
 from briefy.leica.models.professional.location import WorkingLocation
 from briefy.leica.models.professional.location import MainWorkingLocation
 from briefy.leica.models.user import UserProfile
+from briefy.leica.utils.intercom import intercom_payload_professional
 from briefy.leica.utils.user import add_user_info_to_state_history
 from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
@@ -184,6 +185,7 @@ class Professional(UserProfile, Base):
         data['slug'] = self.slug
         data['locations'] = self.locations
         data['links'] = self.links
+        data['intercom'] = intercom_payload_professional(self)
 
         # Workflow history
         add_user_info_to_state_history(self.state_history)

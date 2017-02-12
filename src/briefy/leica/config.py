@@ -27,6 +27,11 @@ DATABASE_URL = config('DATABASE_URL',)
 # Agoda custom config
 AGODA_DELIVERY_GDRIVE = config('AGODA_DELIVERY_GDRIVE', default='')
 
+
+# Intercom
+INTERCOM_APP_ID = config('INTERCOM_APP_ID', default='c4iuqr75')
+INTERCOM_HASH_KEY = config('INTERCOM_HASH_KEY', default='2p3C2UgAWLxlHiuCGKwhCTzrrPWdMAAqIwN7W0Cf')
+
 # Check if running under DEIS
 DEIS_APP = config('DEIS_APP', default='')
 

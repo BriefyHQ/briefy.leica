@@ -133,6 +133,7 @@ class PhotographerSync(ModelSync):
         state_history = self._state_history(state)
         result.update(
             dict(
+                external_id=kobj.id,
                 state=state,
                 state_history=state_history,
                 email=kobj.email.email or PLACEHOLDERS['email'],
@@ -140,6 +141,7 @@ class PhotographerSync(ModelSync):
                 last_name=last_name.strip(),
                 # TODO: this will be removed when update DB (title is now a computed value)
                 title='{0} {1}'.format(first_name, last_name),
+                owner=briefy_id,
                 mobile=mobile
             )
         )
