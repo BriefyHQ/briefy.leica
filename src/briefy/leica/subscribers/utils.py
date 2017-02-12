@@ -1,7 +1,29 @@
 """Utils functions for subscribers."""
 from briefy.leica.events.assignment import AssignmentCreatedEvent
 from briefy.leica.models import Comment
+from briefy.leica.models import LocalRole
 from sqlalchemy.orm.session import object_session
+
+
+def apply_local_roles_from_parent(obj, parent, excludes=()):
+    """Copy local roles from parent."""
+    local_roles = []
+    for lr in parent.local_roles:
+        if lr.role_name.value in excludes:
+            continue
+        payload = dict(
+            entity_type=obj.__class__.__name__,
+            entity_id=obj.id,
+            user_id=lr.user_id,
+            role_name=lr.role_name,
+            can_create=lr.can_create,
+            can_delete=lr.can_delete,
+            can_edit=lr.can_edit,
+            can_list=lr.can_list,
+            can_view=lr.can_view
+        )
+        local_roles.append(LocalRole(**payload))
+    obj.local_roles = local_roles
 
 
 def create_comment_from_wf_transition(obj, author_role, to_role, internal=False):
