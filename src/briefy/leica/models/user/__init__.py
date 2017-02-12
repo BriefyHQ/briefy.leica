@@ -194,7 +194,7 @@ class CustomerUserProfile(UserProfile):
 
     @property
     def customers(self):
-        """Customers attached to this profile."""
+        """Return Customers attached to this profile."""
         customer_ids = self.customer_ids
         return Customer.query().filter(Customer.id.in_(customer_ids)).all()
 
@@ -222,7 +222,7 @@ class CustomerUserProfile(UserProfile):
 
     @property
     def projects(self):
-        """Projects attached to this profile."""
+        """Return Projects attached to this profile."""
         from briefy.leica.models import Project
 
         project_ids = self.project_ids
