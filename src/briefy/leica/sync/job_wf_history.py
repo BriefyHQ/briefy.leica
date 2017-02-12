@@ -13,9 +13,8 @@ import pytz
 import re
 
 
-ms_laure_start = datetime(2016,11,1, 0,0,0,tzinfo=pytz.utc)
+ms_laure_start = datetime(2016, 11, 1, 0, 0, 0, tzinfo=pytz.utc)
 SCHEDULING = {i[2]: i[0] for i in scheduling_options}
-
 
 
 # Field 'approval_status' on Knack.

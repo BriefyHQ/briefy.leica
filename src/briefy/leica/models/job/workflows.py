@@ -475,10 +475,14 @@ class AssignmentWorkflow(BriefyWorkflow):
     @published.transition(published, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
     @assigned.transition(assigned, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
     @scheduled.transition(scheduled, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
-    @awaiting_assets.transition(awaiting_assets, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
+    @awaiting_assets.transition(
+        awaiting_assets, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS
+    )
     @cancelled.transition(cancelled, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
     @in_qa.transition(in_qa, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
-    @perm_rejected.transition(perm_reject, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
+    @perm_rejected.transition(
+        perm_reject, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS
+    )
     @approved.transition(approved, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
     @refused.transition(refused, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
     @completed.transition(completed, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
@@ -494,26 +498,46 @@ class AssignmentWorkflow(BriefyWorkflow):
         user = self.context
         state = self.state
 
-        if G['system'] in user.groups:
-            return True
+        if G['system'].value in user.groups:
+            permission = True
+        elif G['finance'].value in user.groups:
+            permission = True
+        elif G['scout'].value in user.groups and state.name not in scout_states:
+            permission = False
+        elif G['pm'].value in user.groups and state.name in final_states:
+            permission = False
+        else:
+            permission = True
 
-        if G['finance'] not in user.groups and state in final_states:
-            return False
+        return permission
 
-        if G['scout'] in user.groups and state not in scout_states:
-            return False
-
-        return True
-
-    @assigned.transition(assigned, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS)
-    @scheduled.transition(scheduled, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS)
-    @awaiting_assets.transition(awaiting_assets, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS)
-    @cancelled.transition(cancelled, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS)
-    @in_qa.transition(in_qa, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS)
-    @perm_rejected.transition(perm_reject, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS)
-    @approved.transition(approved, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS)
-    @refused.transition(refused, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS)
-    @completed.transition(completed, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS)
+    @assigned.transition(
+        assigned, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
+    )
+    @scheduled.transition(
+        scheduled, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
+    )
+    @awaiting_assets.transition(
+        awaiting_assets, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
+    )
+    @cancelled.transition(
+        cancelled, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
+    )
+    @in_qa.transition(
+        in_qa, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
+    )
+    @perm_rejected.transition(
+        perm_reject, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
+    )
+    @approved.transition(
+        approved, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
+    )
+    @refused.transition(
+        refused, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
+    )
+    @completed.transition(
+        completed, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
+    )
     def edit_compensation(self, **kwargs):
         """Update additional compensation value and reason of an Assignment."""
         pass
@@ -525,10 +549,10 @@ class AssignmentWorkflow(BriefyWorkflow):
         user = self.context
         state = self.state
 
-        if G['system'] in user.groups:
+        if G['system'].value in user.groups:
             return True
 
-        if G['finance'] not in user.groups and state in final_states:
+        if G['finance'].value not in user.groups and state.name in final_states:
             return False
 
         return True
