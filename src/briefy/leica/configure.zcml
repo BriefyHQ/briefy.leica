@@ -3,5 +3,6 @@
 	<include package="zope.component" />
 	<include package="briefy.common" />
 	<include package=".subscribers" />
+	<include package=".queue" />
 
 </configure>
