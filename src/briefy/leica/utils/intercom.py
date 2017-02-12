@@ -70,7 +70,7 @@ def intercom_payload_professional(professional):
     """Return the intercom payload for a professional."""
     # Priority is to old external id info (Knack id)
     old_id = professional.external_id
-    user_id = old_id if old_id else professional.id
+    user_id = old_id if old_id else str(professional.id)
     email = professional.email
     name = professional.title
     user_hash = user_hash_from_user_id(user_id)
