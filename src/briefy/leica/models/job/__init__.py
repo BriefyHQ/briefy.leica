@@ -57,7 +57,7 @@ class IAssignment(Interface):
 
 
 class AssignmentDates:
-    """Mixin providing date-related information of a Assignment."""
+    """Mixin providing date-related information of an Assignment."""
 
     scheduled_datetime = sa.Column(
         AwareDateTime(),
@@ -576,7 +576,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         data['closed_on_date'] = self.closed_on_date
         data['slug'] = self.slug
         data['timezone'] = self.timezone
-        data['tech_requirements'] = self.project.tech_requirements
+        data['tech_requirements'] = self.order.tech_requirements
         data['availability'] = self.availability
         data['category'] = self.category
 
