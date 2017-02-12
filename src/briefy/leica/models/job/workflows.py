@@ -263,9 +263,13 @@ class AssignmentWorkflow(BriefyWorkflow):
         return True
 
     @scheduled.transition(assigned, 'can_remove_schedule')
+    @awaiting_assets.transition(assigned, 'can_remove_schedule')
     def remove_schedule(self, **kwargs):
         """Customer, Professional or PM removes the Assignment scheduled shoot datetime."""
-        pass
+        assignment = self.document
+        if assignment.submission_path:
+            return False
+        assignment.scheduled_datetime = None
 
     @Permission(groups=[G['professionals'], G['customers'], G['pm']])
     def can_remove_reschedule(self):

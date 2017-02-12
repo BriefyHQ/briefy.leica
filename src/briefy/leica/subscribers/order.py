@@ -49,12 +49,15 @@ def order_remove_schedule(event):
     """Handle Order remove_schedule workflow event."""
     order = event.obj
     user = order.workflow.context
+
+    # this should be always in the subscriber
+    # to avoid loop with the order remove_schedule
     assignment = order.assignment
-    assignment.scheduled_datetime = None
     message = order.state_history[-1]['message']
     if assignment.state == 'scheduled':
         assignment.workflow.remove_schedule(message=message)
 
+    # create comment
     if G['customers'].value in user.groups:
         to_role = 'project_manager'
         author_role = 'customer_user'

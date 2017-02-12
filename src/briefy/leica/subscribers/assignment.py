@@ -52,13 +52,16 @@ def assignment_perm_reject(event):
 def assignment_remove_schedule(event):
     """Handle Assignment remove_schedule workflow event."""
     assignment = event.obj
-    assignment.scheduled_datetime = None
     user = assignment.workflow.context
+
+    # this should be always in the subscriber
+    # to avoid loop with the order remove_schedule
     order = assignment.order
     message = assignment.state_history[-1]['message']
     if order.state == 'scheduled':
         order.workflow.remove_schedule(message=message)
 
+    # create the comment
     if G['customers'].value in user.groups:
         # this should not create a comment on the assignment only on the order
         return
