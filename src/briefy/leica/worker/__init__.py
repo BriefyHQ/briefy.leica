@@ -1,14 +1,30 @@
 """Briefy Leica worker."""
+from briefy.common.log import LOG_SERVER
+from briefy.common.log import logstash
 from briefy.common.queue import IQueue
 from briefy.common.queue.message import SQSMessage
 from briefy.common.utils.data import Objectify
 from briefy.common.worker.queue import QueueWorker
 from briefy.leica.config import NEW_RELIC_LICENSE_KEY
-from briefy.leica import logger
 from briefy.leica.worker import actions
 from zope.component import getUtility
 
 import newrelic.agent
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+cs = logging.StreamHandler()
+cs.setLevel(logging.INFO)
+
+logger.addHandler(cs)
+
+if LOG_SERVER:
+    log_handler = logstash.LogstashHandler(
+        LOG_SERVER, 5543, version=1, tags=['Worker', 'briefy.leica']
+    )
+    logger.addHandler(log_handler)
 
 
 MESSAGE_DISPATCH = {
