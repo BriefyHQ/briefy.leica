@@ -222,6 +222,8 @@ class AssignmentWorkflow(BriefyWorkflow):
             order = self.document.order
             if order.state == 'assigned':
                 order.workflow.context = SystemUser
+                # Hack to get this date on the SQS
+                order.scheduled_datetime = fields.get('scheduled_datetime')
                 order.workflow.schedule()
 
     @Permission(groups=[G['professionals'], G['pm'], G['scout'], G['system']])
