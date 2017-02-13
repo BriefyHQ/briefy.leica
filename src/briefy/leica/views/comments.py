@@ -1,9 +1,8 @@
 """Views to handle Comments creation."""
+from briefy.leica.events import comment as events
 from briefy.leica.models import Comment
-from briefy.leica.models.events import comment as events
-from briefy.ws.resources import RESTService
-from briefy.ws.resources import WorkflowAwareResource
 from briefy.ws import CORS_POLICY
+from briefy.ws.resources import RESTService
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
 from pyramid.security import Allow
@@ -14,16 +13,11 @@ class CommentFactory(BaseFactory):
 
     model = Comment
 
-    @property
-    def __base_acl__(self) -> list:
-        """Hook to be use by subclasses to define default ACLs in context.
-        :return: list of ACLs
-        :rtype: list
-        """
-        _acls = [
-            (Allow, 'g:briefy_pm', ['add', 'delete', 'edit', 'list', 'view'])
-        ]
-        return _acls
+    __base_acl__ = [
+        (Allow, 'g:briefy', ['create', 'list', 'view']),
+        (Allow, 'g:professionals', ['create', 'list', 'view']),
+        (Allow, 'g:customers', ['create', 'list', 'view']),
+    ]
 
 
 class CommentService(RESTService):
@@ -32,6 +26,7 @@ class CommentService(RESTService):
     model = Comment
     friendly_name = model.__name__
     default_order_by = 'created_at'
+    default_order_direction = -1
 
     _default_notify_events = {
         'POST': events.CommentCreatedEvent,
@@ -44,28 +39,20 @@ class CommentService(RESTService):
     def filter_allowed_fields(self):
         """List of fields allowed in filtering and sorting."""
         allowed_fields = super().filter_allowed_fields
-        # Remove job_id and asset_id
+        # Remove assignment_id and asset_id
         allowed_fields.remove('entity_id')
         return allowed_fields
 
-    @property
-    def default_filters(self) -> tuple:
+    def default_filters(self, query) -> object:
         """Default filters for this Service."""
         entity_id = self.request.matchdict.get('entity_id', '')
-        filters = list(super().default_filters)
-        filters.append((self.model.entity_id == entity_id))
-        return tuple(filters)
+        query = query.filter(self.model.entity_id == entity_id)
+        return query
 
 
-class CommentsWorkflowService(WorkflowAwareResource):
-    """Comments workflow service."""
-    model = Comment
-    friendly_name = Comment.__name__
+ASSIGNMENT_PATH = '/assignments/{assignment_id}'
 
-
-JOB_PATH = '/jobs/{job_id}'
-
-COLLECTION_PATH = '/jobs/{entity_id}/comments'
+COLLECTION_PATH = '/assignments/{entity_id}/comments'
 PATH = COLLECTION_PATH + '/{id}'
 
 
@@ -75,21 +62,11 @@ PATH = COLLECTION_PATH + '/{id}'
     cors_policy=CORS_POLICY,
     factory=CommentFactory
 )
-class JobCommentService(CommentService):
-    """Comments for a Job."""
+class AssignmentCommentService(CommentService):
+    """Comments for an Assignment."""
 
 
-@resource(
-    collection_path=PATH + '/transitions',
-    path=PATH + '/transitions/{transition_id}',
-    cors_policy=CORS_POLICY,
-    factory=CommentFactory
-)
-class JobCommentWorkflowService(CommentsWorkflowService):
-    """JobComment workflow resource."""
-
-
-COLLECTION_PATH = JOB_PATH + '/assets/{entity_id}/comments'
+COLLECTION_PATH = ASSIGNMENT_PATH + '/assets/{entity_id}/comments'
 PATH = COLLECTION_PATH + '/{id}'
 
 
@@ -100,14 +77,18 @@ PATH = COLLECTION_PATH + '/{id}'
     factory=CommentFactory
 )
 class AssetCommentService(CommentService):
-    """Comments for an asset."""
+    """Comments for an Asset."""
+
+
+COLLECTION_PATH = '/orders/{entity_id}/comments'
+PATH = COLLECTION_PATH + '/{id}'
 
 
 @resource(
-    collection_path=PATH + '/transitions',
-    path=PATH + '/transitions/{transition_id}',
+    collection_path=COLLECTION_PATH,
+    path=PATH,
     cors_policy=CORS_POLICY,
     factory=CommentFactory
 )
-class AssetCommentWorkflowService(CommentsWorkflowService):
-    """AssetComment workflow resource."""
+class OrderCommentService(CommentService):
+    """Comments for an Order."""

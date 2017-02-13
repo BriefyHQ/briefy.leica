@@ -1,9 +1,9 @@
 Codebase
-=================
+========
 
-Documentation for *briefy.common* codebase.
+Documentation for *briefy.leica* codebase.
 
 .. toctree::
    :maxdepth: 2
 
-   briefy
+   briefy.leica

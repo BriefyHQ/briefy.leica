@@ -15,6 +15,12 @@ class TestProjectView(BaseTestView):
     ]
     file_path = 'data/projects.json'
     model = models.Project
+    initial_wf_state = 'ongoing'
+    ignore_validation_fields = [
+        'state_history', 'state', 'customer', 'updated_at',
+        'qa_manager', 'project_manager', 'scout_manager',
+    ]
+
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {

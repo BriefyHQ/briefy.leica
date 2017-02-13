@@ -15,15 +15,16 @@ requires = [
     'briefy.common',
     'briefy.ws',
     'colanderalchemy',
-    'cornice',
+    'cornice==2.2.0',
     'newrelic',
     'phonenumbers',
     'pycountry',
-    'pyramid',
+    'pyramid==1.7.3',
     'pyramid_tm',
+    'pyramid_zcml',
     'requests',
     'setuptools',
-    's3transfer==0.1.2',
+    's3transfer==0.1.10',
     'sqlalchemy',
     'sqlalchemy_continuum',
     'waitress',
@@ -41,7 +42,7 @@ test_requirements = [
 
 setup(
     name='briefy.leica',
-    version='1.1.0',
+    version='2.0.0',
     description='Image Handling System',
     long_description=README + '\n\n' + CHANGES,
     classifiers=[
@@ -62,7 +63,7 @@ setup(
     entry_points="""
     [paste.app_factory]
      main = briefy.leica:main
-
-
+    [console_scripts]
+     worker = briefy.leica.worker:main
     """,
 )

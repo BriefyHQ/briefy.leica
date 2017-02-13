@@ -1,4 +1,4 @@
-"""Test comments view."""
+"""Test Asset comments view."""
 from briefy.leica import models
 from conftest import BaseTestView
 
@@ -10,21 +10,21 @@ class TestAssetComment(BaseTestView):
     """Test Comments for an Asset."""
 
     base_path = (
-        '/jobs/cf326cc7/assets/bf721f30-79ce-4bc7-9887-79b6c53c681d/comments'
+        '/assignments/cf326cc7/assets/bf721f30-79ce-4bc7-9887-79b6c53c681d/comments'
     )
     dependencies = [
+        (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
-        (models.Job, 'data/jobs.json'),
-        (models.Asset, 'data/assets.json')
+        (models.Order, 'data/orders.json'),
+        (models.Assignment, 'data/assignments.json'),
+        (models.Image, 'data/images.json')
     ]
     file_path = 'data/comments.json'
     model = models.Comment
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
-
     payload_position = 5
-
     update_map = {
         'content': 'new message content',
         'author_id': '18d0e257-14d6-4e33-b873-fb506fffb42e',

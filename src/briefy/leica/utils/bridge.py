@@ -1,4 +1,5 @@
 """Bridge helpers between Knack and Briefy."""
+from briefy.common.db import Base
 from briefy.knack.config import KNACK_API_KEY
 from briefy.knack.config import KNACK_APPLICATION_ID
 
@@ -8,13 +9,10 @@ import logging
 logger = logging.getLogger('briefy.leica')
 logger.setLevel(logging.INFO)
 
-if KNACK_API_KEY and KNACK_APPLICATION_ID:
-    KJob = K.get_model('Job')
-else:
-    KJob = None
+KJob = None
 
 
-def _get_comments_from_job(job: 'Job') -> list:
+def _get_comments_from_job(job: Base) -> list:
     """Return the list of comment contents for a job.
 
     :param job: Internal Briefy Job
@@ -24,11 +22,10 @@ def _get_comments_from_job(job: 'Job') -> list:
     return comments
 
 
-def get_info_from_job(job: 'Job') -> dict:
+def get_info_from_job(job: Base) -> dict:
     """Return information about the job."""
     result = {
         'id': job.id,
-        'external_id': job.external_id,
         'comments': _get_comments_from_job(job),
     }
     return result
@@ -40,8 +37,12 @@ def get_knack_job(job_info: dict) -> KJob:
     :param job_info: Internal Briefy Job information.
     :return: A connect Job on Knack.
     """
+    global KJob
     if not KJob:
-        raise ValueError('Knack bridge is not configured')
+        if KNACK_API_KEY and KNACK_APPLICATION_ID:
+            KJob = K.get_model('Job')
+        else:
+            raise ValueError('Knack bridge is not configured')
 
     knack_id = job_info['external_id']
     if not knack_id:
@@ -66,7 +67,7 @@ def _update_job_on_knack(job_info: dict, knack_state: str):
     knack_job.quality_assurance_feedback = qa_feedback
 
     # Update
-    KJob.commit_knack_object(
+    K.commit_knack_object(
         knack_job,
         only_fields=(
             'approval_status',

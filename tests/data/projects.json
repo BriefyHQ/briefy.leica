@@ -1,11 +1,10 @@
 [
   {
-    "_project_manager": null,
+    "project_manager": "77f88fab-dbdf-4705-8da1-8512f6012a86",
     "state": "created",
     "title": "Project 01",
-    "_finance_manager": null,
     "id": "36d359f0-8e92-41bb-8d1c-fedfd60e7046",
-    "_qa_manager": null,
+    "qa_manager": "5f767bb3-125f-42d4-9ba5-af57a3d1b6d0",
     "description": null,
     "updated_at": "2016-09-18T18:55:19.566235+00:00",
     "state_history": [
@@ -20,17 +19,16 @@
     ],
     "tech_requirements": null,
     "customer_id": "c2034c1b-0a40-4b84-9ace-54b958f64ed4",
-    "_slug": null,
+    "slug": "project-01",
     "created_at": "2016-09-18T18:55:19.566193+00:00",
-    "_scout_manager": null
+    "scout_manager": null
   },
   {
-    "_project_manager": null,
+    "project_manager": "77f88fab-dbdf-4705-8da1-8512f6012a86",
     "state": "created",
-    "title": "Project 01",
-    "_finance_manager": null,
+    "title": "Project 02",
     "id": "0f3d99eb-0a99-40cc-9ad7-168fe77ee6ce",
-    "_qa_manager": null,
+    "qa_manager": "5f767bb3-125f-42d4-9ba5-af57a3d1b6d0",
     "description": null,
     "updated_at": "2016-09-18T18:55:22.645968+00:00",
     "state_history": [
@@ -45,17 +43,16 @@
     ],
     "tech_requirements": null,
     "customer_id": "51eaab79-1c05-44fa-b3cf-278ecf311978",
-    "_slug": null,
+    "slug": "project-02",
     "created_at": "2016-09-18T18:55:22.645950+00:00",
-    "_scout_manager": null
+    "scout_manager": null
   },
   {
-    "_project_manager": null,
+    "project_manager": "77f88fab-dbdf-4705-8da1-8512f6012a86",
     "state": "created",
-    "title": "Project 01",
-    "_finance_manager": null,
+    "title": "Project 03",
     "id": "74b2090b-9cc0-4122-9455-17901b282abe",
-    "_qa_manager": null,
+    "qa_manager": "5f767bb3-125f-42d4-9ba5-af57a3d1b6d0",
     "description": null,
     "updated_at": "2016-09-18T18:55:25.410891+00:00",
     "state_history": [
@@ -70,17 +67,16 @@
     ],
     "tech_requirements": null,
     "customer_id": "979191be-0412-4d70-8587-5df5beb1b4c6",
-    "_slug": null,
+    "slug": "project-03",
     "created_at": "2016-09-18T18:55:25.410873+00:00",
-    "_scout_manager": null
+    "scout_manager": null
   },
   {
-    "_project_manager": null,
+    "project_manager": "77f88fab-dbdf-4705-8da1-8512f6012a86",
     "state": "created",
-    "title": "Project 01",
-    "_finance_manager": null,
+    "title": "Project 04",
     "id": "15ec538f-c604-4476-9126-1523c2b24355",
-    "_qa_manager": null,
+    "qa_manager": "5f767bb3-125f-42d4-9ba5-af57a3d1b6d0",
     "description": null,
     "updated_at": "2016-09-18T18:55:28.036965+00:00",
     "state_history": [
@@ -95,17 +91,16 @@
     ],
     "tech_requirements": null,
     "customer_id": "f61437ce-ca13-4a64-8474-c43906267215",
-    "_slug": null,
+    "slug": "project-04",
     "created_at": "2016-09-18T18:55:28.036939+00:00",
-    "_scout_manager": null
+    "scout_manager": null
   },
   {
-    "_project_manager": null,
+    "project_manager": "77f88fab-dbdf-4705-8da1-8512f6012a86",
     "state": "created",
-    "title": "Project 01",
-    "_finance_manager": null,
+    "title": "Project 05",
     "id": "4a068a1b-3646-4acf-937d-15563853e388",
-    "_qa_manager": null,
+    "qa_manager": "5f767bb3-125f-42d4-9ba5-af57a3d1b6d0",
     "description": null,
     "updated_at": "2016-09-18T18:55:30.747823+00:00",
     "state_history": [
@@ -120,8 +115,8 @@
     ],
     "tech_requirements": null,
     "customer_id": "efd00ae0-55d2-4c63-a70b-cfc716d66a11",
-    "_slug": null,
+    "slug": "project-05",
     "created_at": "2016-09-18T18:55:30.747809+00:00",
-    "_scout_manager": null
+    "scout_manager": null
   }
 ]

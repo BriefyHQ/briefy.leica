@@ -70,10 +70,11 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr htmlcov/
 
 lint: ## check style with flake8
-	flake8 src/briefy/leica tests setup.py migrations
+	flake8 src/briefy/leica setup.py
+	flake8 --ignore=D102,D103,D205,D101,D400,D210,D401,D100 tests
 
 test: lint ## run tests quickly with the default Python
-	py.test --cov-report term-missing --cov=briefy.leica tests
+	ENV='test' py.test --cov-report term-missing --cov=briefy.leica tests
 
 test-all: ## run tests on every Python version with tox
 	tox
@@ -89,7 +90,7 @@ docs: ## generate Sphinx HTML documentation, including API docs
 	rm -rf $(BUILDDIR)/*
 	rm -f docs/codebase/briefy*
 	rm -f docs/codebase/modules.rst
-	$(SPHINXAPIDOC) -o docs/codebase src/briefy
+	$(SPHINXAPIDOC) -M -d 1 -o docs/codebase src/briefy
 	rm -f docs/codebase/modules.rst
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
 
@@ -108,19 +109,39 @@ dist: clean ## builds source and wheel package
 install: clean ## install the package to the active Python's site-packages
 	python setup.py install
 
+import_clean_db: clean_dockers create_dockers import_knack
+	echo "Start the a clean import.."
+
+import_knack:
+	IMPORT_KNACK=True python src/briefy/leica/tools/import_all.py
+	unset IMPORT_KNACK
+
+start_dockers:
+	docker start sqs
+	docker start briefy-leica-test
+	docker start briefy-leica-unit_test
 
 stop_dockers: ## stop and remove docker containers
 	# sqs
 	docker stop sqs
-	docker rm sqs
-	# postgres
 	docker stop briefy-leica-test
-	docker rm briefy-leica-test
+	docker stop briefy-leica-unit_test
 
-run_dockers: ## run docker containers
+clean_dockers: stop_dockers
+	docker rm sqs
+	docker rm briefy-leica-test
+	docker rm briefy-leica-unit_test
+
+export_db_env:
+	export DATABASE_URL=postgresql://briefy:briefy@127.0.0.1:9999/briefy-leica
+	export DATABASE_TEST_URL=postgresql://briefy:briefy@127.0.0.1:9998/briefy-leica-unit_test
+
+create_dockers: export_db_env
 	docker run -d -p 127.0.0.1:5000:5000 --name sqs briefy/aws-test:latest sqs
 	export SQS_IP=127.0.0.1 SQS_PORT=5000
 	docker run -d -p 127.0.0.1:9999:5432 -e POSTGRES_PASSWORD=briefy -e POSTGRES_USER=briefy -e POSTGRES_DB=briefy-leica --name briefy-leica-test mdillon/postgis:9.5
-	export DATABASE_URL=postgresql://briefy:briefy@127.0.0.1:9999/briefy-leica
-	sleep 5
+	docker run -d -p 127.0.0.1:9998:5432 -e POSTGRES_PASSWORD=briefy -e POSTGRES_USER=briefy -e POSTGRES_DB=briefy-leica-unit_test --name briefy-leica-unit_test mdillon/postgis:9.5
+	echo "Waiting Posgtres to start"
+	sleep 40s
+	alembic upgrade head
 

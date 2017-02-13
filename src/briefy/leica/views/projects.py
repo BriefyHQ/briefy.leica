@@ -1,9 +1,9 @@
 """Views to handle Projects creation."""
+from briefy.leica.events import project as events
 from briefy.leica.models import Project
-from briefy.leica.models.events import project as events
+from briefy.ws import CORS_POLICY
 from briefy.ws.resources import RESTService
 from briefy.ws.resources import WorkflowAwareResource
-from briefy.ws import CORS_POLICY
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
 from pyramid.security import Allow
@@ -20,11 +20,12 @@ class ProjectFactory(BaseFactory):
     @property
     def __base_acl__(self) -> list:
         """Hook to be use by subclasses to define default ACLs in context.
+
         :return: list of ACLs
         :rtype: list
         """
         _acls = [
-            (Allow, 'g:briefy_pm', ['add', 'delete', 'edit', 'list', 'view'])
+            (Allow, 'g:customers', ['list', 'view']),
         ]
         return _acls
 
@@ -38,7 +39,7 @@ class ProjectService(RESTService):
 
     model = Project
     friendly_name = model.__name__
-    default_order_by = 'created_at'
+    default_order_by = 'title'
 
     _default_notify_events = {
         'POST': events.ProjectCreatedEvent,
@@ -47,6 +48,10 @@ class ProjectService(RESTService):
         'DELETE': events.ProjectDeletedEvent,
     }
 
+    filter_related_fields = [
+        'customer_user', 'customer.id', 'project_manager', 'customer.title',
+    ]
+
 
 @resource(
     collection_path=PATH + '/transitions',
@@ -54,7 +59,7 @@ class ProjectService(RESTService):
     cors_policy=CORS_POLICY,
     factory=ProjectFactory
 )
-class ProjectWorkflow(WorkflowAwareResource):
+class ProjectWorkflowService(WorkflowAwareResource):
     """Project workflow resource."""
 
     model = Project

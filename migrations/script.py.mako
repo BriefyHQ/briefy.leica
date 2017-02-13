@@ -5,10 +5,18 @@ Revises: ${down_revision | comma,n}
 Create Date: ${create_date}
 """
 from alembic import op
-from briefy.leica.models import types
+from briefy.common.db.types import geo
+from briefy.common.db.types.aware_datetime import AwareDateTime
+from briefy.common.vocabularies.categories import CategoryChoices
+from briefy.common.vocabularies.person import GenderCategories
+from briefy.common.vocabularies.roles import LocalRolesChoices
+from briefy.leica.vocabularies import OrderInputSource
+from briefy.leica.vocabularies import TypesOfSetChoices
+from briefy.leica.vocabularies import ContactTypes
+from briefy.leica.models.professional.location import DistanceUnits
+from sqlalchemy_utils import types
 ${imports if imports else ""}
 
-import briefy.common
 import sqlalchemy as sa
 import sqlalchemy_utils
 
@@ -16,20 +24,6 @@ revision = ${repr(up_revision)}
 down_revision = ${repr(down_revision)}
 branch_labels = ${repr(branch_labels)}
 depends_on = ${repr(depends_on)}
-
-
-# Monkey patch calls for which alembic create bogus parameters:
-
-original_uuid_type = sqlalchemy_utils.types.uuid.UUIDType
-def monkey_uuid_type(*args, length=None,  **kw):
-    return original_uuid_type(*args, **kw)
-sqlalchemy_utils.types.uuid.UUIDType = monkey_uuid_type
-
-
-original_timezone_type=sqlalchemy_utils.types.timezone.TimezoneType
-def monkey_timezone_type(*args, length=None, **kw):
-    return original_timezone_type(*args, **kw)
-sqlalchemy_utils.types.timezone.TimezoneType=monkey_timezone_type
 
 
 def upgrade():

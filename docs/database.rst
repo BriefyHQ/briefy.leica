@@ -1,13 +1,14 @@
 Database
 --------
 
-Database ER models.
+ER diagram
+++++++++++
 
-Models
-++++++
+Complete database models ER diagram.
+
 
 .. sadisplay::
     :module: briefy.leica.models
     :link:
-    :alt: Briefy Leica database models
-    :render: plantuml
+    :alt: Briefy Leica database models diagram.
+    :render: graphviz

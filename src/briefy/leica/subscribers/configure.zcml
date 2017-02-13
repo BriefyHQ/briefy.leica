@@ -1,0 +1,7 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+    <subscriber for="briefy.common.event.workflow.IWorkflowTransitionEvent" handler=".asset.transition_handler" />
+    <subscriber for="briefy.common.event.workflow.IWorkflowTransitionEvent" handler=".assignment.transition_handler" />
+    <subscriber for="briefy.common.event.workflow.IWorkflowTransitionEvent" handler=".order.transition_handler" />
+
+</configure>

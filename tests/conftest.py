@@ -1,24 +1,48 @@
 """Conftest for Leica."""
+from briefy import leica
+from briefy.common.types import BaseUser
 from briefy.common.utils.transformers import to_serializable
+from briefy.leica import models
 from briefy.leica.db import Base
 from briefy.leica.db import create_engine
 from briefy.leica.db import Session as DBSession
-from briefy.ws.auth import AuthenticatedUser
 from briefy.ws.config import JWT_EXPIRATION
 from briefy.ws.config import JWT_SECRET
+from datetime import date
 from datetime import datetime
-from pyramid import testing
+from prettyconf import config
 from pyramid_jwt.policy import JWTAuthenticationPolicy
 from pyramid.paster import get_app
+from sqlalchemy_utils import PhoneNumber
 from webtest import TestApp
+from zope.configuration.xmlconfig import XMLConfig
 
+import botocore
 import configparser
 import enum
 import json
-import httmock
+import requests
 import pytest
 import os
 import uuid
+
+
+@pytest.fixture(scope='session', autouse=True)
+def mock_boto():
+    """Mock botocore endpoint to use the docker image."""
+    host = config('SQS_IP', default='127.0.0.1')
+    port = config('SQS_PORT', default='5000')
+    queue_url = 'http://{host}:{port}'.format(host=host, port=port)
+
+    class MockEndpoint(botocore.endpoint.Endpoint):
+        def __init__(self, host, *args, **kwargs):
+            super().__init__(queue_url, *args, **kwargs)
+
+    if not hasattr(botocore.endpoint, 'OrigEndpoint'):
+        botocore.endpoint.OrigEndpoint = botocore.endpoint.Endpoint
+    botocore.endpoint.Endpoint = MockEndpoint
+
+    XMLConfig('configure.zcml', leica)()
 
 
 @pytest.fixture(scope='session')
@@ -34,7 +58,7 @@ def db_settings():
     return config.get('app:main', 'sqlalchemy.url')
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope='session')
 def sql_engine(request, db_settings):
     """Create new engine based on db_settings fixture.
 
@@ -44,6 +68,7 @@ def sql_engine(request, db_settings):
     """
     engine = create_engine(db_settings)
     DBSession.configure(bind=engine)
+    Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
 
     def teardown():
@@ -89,9 +114,10 @@ def session():
     return DBSession()
 
 
-@pytest.mark.usefixtures('db_transaction', 'create_dummy_request')
+@pytest.mark.usefixtures('db_transaction')
 class BaseModelTest:
     """Base class to test all models."""
+
     cardinality = 1
     number_of_wf_transtions = 0
     dependencies = []
@@ -99,16 +125,7 @@ class BaseModelTest:
     payload_position = 0
     model = None
     request = None
-
-    def setup_method(self, method):
-        """Setup testing environment."""
-        self.config = testing.setUp(request=self.request)
-        app = get_app('configs/testing.ini#main')
-        self.testapp = TestApp(app)
-
-    def teardown_method(self, method):
-        """Teardown testing environment."""
-        testing.tearDown()
+    initial_wf_state = 'created'
 
     def test_obj_is_instance_of_model(self, instance_obj):
         """Test if the created object is an instance of self.model klass."""
@@ -130,13 +147,22 @@ class BaseModelTest:
         assert self.cardinality == Model.query().count()
         assert obj in Model.query().all()
 
-    def test_can_persist_model_instance(self):
+    def test_can_persist_model_instance(self, obj_payload):
         """Test if we can persist a model instance."""
         Model = self.model
         obj = Model.query().first()
         objs = Model.query().all()
         assert len(objs) == self.cardinality
-        assert objs[0].id == obj.id
+
+        # composed primary keys
+        if isinstance(obj_payload['id'], list):
+            new_payload = dict(obj_payload.items())
+            new_payload.pop('id')
+            for key, value in new_payload.items():
+                assert getattr(objs[0], key) == getattr(obj, key)
+        else:
+            assert objs[0].id == obj.id
+
         assert objs[0].created_at == obj.created_at
         assert objs[0].updated_at == obj.updated_at
 
@@ -144,8 +170,32 @@ class BaseModelTest:
         """Test if we have a workflow setup in here, some objects d'ont have."""
         wf = instance_obj.workflow
         if wf is not None:
-            assert instance_obj.state == 'created'
+            assert instance_obj.state == self.initial_wf_state
             assert len(wf.transitions) == self.number_of_wf_transtions
+
+
+@pytest.mark.usefixtures('db_transaction')
+class BaseLocationTest(BaseModelTest):
+    """Base class to test locations."""
+
+    def test_working_location_base_class(self, instance_obj):
+        """Test inheritance to models.WorkingLocation."""
+        assert isinstance(instance_obj, leica.models.WorkingLocation)
+
+
+@pytest.mark.usefixtures('db_transaction')
+class BaseLinkTest(BaseModelTest):
+    """Base class to test Links."""
+
+    social = True
+
+    def test_link_base_class(self, instance_obj):
+        """Test inheritance to models.Link."""
+        assert isinstance(instance_obj, leica.models.Link)
+
+    def test_is_social(self, instance_obj):
+        """Test is_social flat."""
+        assert instance_obj.is_social is self.social
 
 
 @pytest.fixture(scope='class')
@@ -162,9 +212,16 @@ def instance_obj(request, session, obj_payload):
         cls.create_dependencies(session)
 
     payload = obj_payload
-    obj = model.get(payload['id'])
+    obj_id = payload['id']
+    obj = model.get(obj_id)
     if not obj:
-        obj = cls.model(**payload)
+        # composed primary keys
+        if isinstance(obj_id, list):
+            new_payload = dict(payload.items())
+            new_payload.pop('id')
+            obj = cls.model(**new_payload)
+        else:
+            obj = cls.model(**payload)
         session.add(obj)
         session.flush()
     return obj
@@ -204,6 +261,7 @@ def create_dependencies(request, session):
 @pytest.mark.usefixtures('db_transaction', 'login')
 class BaseTestView:
     """BaseTestView class"""
+
     auth_header = None
     base_path = ''
     dependencies = []
@@ -258,7 +316,7 @@ class BaseTestView:
         for key, value in payload.items():
             if key not in self.ignore_validation_fields:
                 obj_value = getattr(db_obj, key)
-                if isinstance(obj_value, (datetime, uuid.UUID, enum.Enum)):
+                if isinstance(obj_value, (date, datetime, uuid.UUID, enum.Enum, PhoneNumber)):
                     obj_value = to_serializable(obj_value)
                 assert obj_value == value
 
@@ -276,7 +334,7 @@ class BaseTestView:
 
         for key, value in db_obj.to_dict().items():
             if key not in self.ignore_validation_fields:
-                if isinstance(value, (datetime, uuid.UUID, enum.Enum)):
+                if isinstance(value, (date, datetime, uuid.UUID, enum.Enum, PhoneNumber)):
                     value = to_serializable(value)
                 assert result.get(key) == value
 
@@ -293,7 +351,7 @@ class BaseTestView:
         assert result['total'] == len(result['data'])
 
     def test_successful_update(self, obj_payload, app):
-        """Teste put CustomerInfo to existing object."""
+        """Teste put Data to existing object."""
         payload = self.update_map
         obj_id = obj_payload['id']
         request = app.put_json('{base}/{id}'.format(base=self.base_path, id=obj_id),
@@ -312,7 +370,7 @@ class BaseTestView:
         updated_obj = self.model.get(obj_id)
         for key, value in payload.items():
             obj_value = getattr(updated_obj, key)
-            if isinstance(obj_value, (datetime, uuid.UUID, enum.Enum)):
+            if isinstance(obj_value, (date, datetime, uuid.UUID, enum.Enum)):
                 obj_value = to_serializable(obj_value)
             assert obj_value == value
 
@@ -357,7 +415,109 @@ class BaseTestView:
         assert error['description'] == 'The id informed is not 16 byte uuid valid.'
 
 
-@pytest.fixture()
+@pytest.mark.usefixtures('db_transaction', 'login')
+class BaseVersionedTestView(BaseTestView):
+    """Test resources with versions."""
+
+    check_versions_field = 'title'
+
+    def test_versions_get_item(self, app, obj_payload):
+        """Test get a item."""
+        payload = obj_payload
+        obj_id = payload['id']
+        # Get original version
+        request = app.get(
+            '{base}/{id}/versions/0'.format(
+                base=self.base_path, id=obj_id
+            ),
+            headers=self.headers,
+            status=200
+        )
+        result = request.json
+        db_obj = self.model.query().get(obj_id)
+        field = self.check_versions_field
+        assert getattr(db_obj, field) != result[field]
+        version = db_obj.versions[0]
+        assert getattr(version, field) == result[field]
+
+    def test_versions_get_item_wrong_id(self, app, obj_payload):
+        """Test get a item passing the wrong id."""
+        payload = obj_payload
+        obj_id = payload['id']
+        # Get version 42 (does not exist here)
+        request = app.get(
+            '{base}/{id}/versions/42'.format(
+                base=self.base_path, id=obj_id
+            ),
+            headers=self.headers,
+            status=404
+        )
+        result = request.json
+        assert 'with version: 42 not found' in result['message']
+
+    def test_versions_get_collection(self, app, obj_payload):
+        """Test get list of versions of an item."""
+        payload = obj_payload
+        obj_id = payload['id']
+        request = app.get(
+            '{base}/{id}/versions'.format(
+                base=self.base_path, id=obj_id
+            ),
+            headers=self.headers,
+            status=200
+        )
+        result = request.json
+        assert 'versions' in result
+        assert 'total' in result
+        assert result['total'] == len(result['versions'])
+
+        assert 'id' in result['versions'][0]
+        assert 'updated_at' in result['versions'][0]
+        assert 'id' in result['versions'][1]
+        assert 'updated_at' in result['versions'][1]
+
+        assert result['versions'][1]['id'] > result['versions'][0]['id']
+        assert result['versions'][1]['updated_at'] > result['versions'][0]['updated_at']
+
+
+@pytest.mark.usefixtures('db_transaction', 'create_dependencies', 'login')
+class BaseDashboardTestView:
+    """Test dashboards view base class."""
+
+    # tuple of dashboards endpoints
+    base_paths = ()
+
+    dependencies = [
+        (models.Professional, 'data/professionals.json'),
+        (models.Customer, 'data/customers.json'),
+        (models.Project, 'data/projects.json'),
+        (models.Order, 'data/orders.json'),
+        (models.Assignment, 'data/assignments.json')
+    ]
+
+    @property
+    def headers(self):
+        return {'X-Locale': 'en_GB',
+                'Authorization': 'JWT {token}'.format(token=self.token)}
+
+    def test_get_dashboards(self, app):
+        """Test get all dashboards defined in the base_paths tuple."""
+        headers = self.headers
+        for path in self.base_paths:
+            request = app.get(
+                path,
+                headers=headers,
+                status=200
+            )
+
+            result = request.json
+            assert 'data' in result
+            assert 'columns' in result
+            assert 'columns' in result
+        # TODO: implement more checks about dashboard structure
+
+
+@pytest.fixture(scope='session')
 def app():
     """Fixture to create new app instance.
 
@@ -377,7 +537,7 @@ def login(request):
         "first_name": "Rudá",
         "email": "rudazz@gmail.com",
         "last_name": "Filgueiras",
-        "groups": ["g:briefy_qa", "g:briefy_pm"]
+        "groups": ["g:briefy_qa", "g:briefy_pm", "g:briefy_bizdev", "g:briefy_scout", "g:briefy"]
     }
     policy = JWTAuthenticationPolicy(private_key=JWT_SECRET,
                                      expiration=int(JWT_EXPIRATION))
@@ -387,24 +547,39 @@ def login(request):
     return user_payload
 
 
-@pytest.fixture('class')
-def create_dummy_request(request, login):
-    """Create and attach a DummyRequest on the test class."""
-    dummy_request = testing.DummyRequest()
-    user_id = login.pop('id')
-    dummy_request.user = AuthenticatedUser(user_id, login)
-    # this request is py.test request (who declare the fixture)
-    cls = request.cls
-    # this request is web request
-    cls.request = dummy_request
+@pytest.fixture(scope='session')
+def mock_request():
+    def mock_requests_response(self, method, url, *args, **kwargs):
+        """Mock a response"""
+        if 'briefy-thumbor' in url:
+            filename = 'data/thumbor.json'
+        elif 'internal/users' in url:
+            filename = 'data/user.json'
+        status_code = 200
+        headers = {
+            'content-type': 'application/json',
+        }
+        data = open(os.path.join(__file__.rsplit('/', 1)[0], filename)).read()
+        resp = requests.Response()
+        resp.status_code = status_code
+        resp.headers = headers
+        resp._content = data.encode('utf8')
+        return resp
+    return mock_requests_response
 
 
-@httmock.urlmatch(netloc=r'briefy-thumbor')
-def mock_thumbor(url, request):
+@pytest.fixture(autouse=True)
+def mock_api(monkeypatch, mock_request):
+    """Mock all api calls."""
+    monkeypatch.setattr(requests.sessions.Session, 'request', mock_request)
+
+
+@pytest.fixture('session')
+def roles():
     """Mock request to briefy-thumbor."""
-    status_code = 200
-    headers = {
-        'content-type': 'application/json',
+    data = json.load(open(os.path.join(__file__.rsplit('/', 1)[0], 'data/roles.json')))
+    roles = {
+        k: BaseUser(data[k]['id'], data=data[k])
+        for k in data
     }
-    data = open(os.path.join(__file__.rsplit('/', 1)[0], 'data/thumbor.json')).read()
-    return httmock.response(status_code, data, headers, None, 5, request)
+    return roles
