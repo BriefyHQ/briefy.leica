@@ -1,36 +1,24 @@
 """Utils functions for subscribers."""
 from briefy.leica.events.assignment import AssignmentCreatedEvent
 from briefy.leica.models import Comment
-from briefy.leica.models import LocalRole
 from sqlalchemy.orm.session import object_session
+from sqlalchemy.ext.associationproxy import _AssociationList
 
 
-def apply_local_roles_from_parent(obj, parent, excludes=()):
+def apply_local_roles_from_parent(obj, parent, add_roles=()):
     """Copy local roles from parent."""
-    local_roles = []
-    entity_type = obj.__class__.__name__
-    existing = LocalRole.query().filter(
-        LocalRole.entity_id == obj.id, LocalRole.entity_type == entity_type
-    ).all()
-    existing = [(l.user_id, l.role_name.value) for l in existing]
-    for lr in parent.local_roles:
-        role_name = lr.role_name.value
-        key = (lr.user_id, role_name)
-        if role_name in excludes or key in existing:
-            continue
-        payload = dict(
-            entity_type=obj.__class__.__name__,
-            entity_id=obj.id,
-            user_id=lr.user_id,
-            role_name=lr.role_name,
-            can_create=lr.can_create,
-            can_delete=lr.can_delete,
-            can_edit=lr.can_edit,
-            can_list=lr.can_list,
-            can_view=lr.can_view
-        )
-        local_roles.append(LocalRole(**payload))
-    obj.local_roles = local_roles
+    parent_actors = parent.__actors__
+    obj_actors = obj.__actors__
+
+    for role in parent_actors:
+        if role in obj_actors and role in add_roles:
+            parent_role_value = getattr(parent, role)
+            obj_role_value = getattr(obj, role)
+            if isinstance(parent_role_value, _AssociationList):
+                for item in parent_role_value:
+                    obj_role_value.append(item)
+            else:
+                obj_role_value = parent_role_value
 
 
 def create_comment_from_wf_transition(obj, author_role, to_role, internal=False):

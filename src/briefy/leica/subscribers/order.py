@@ -5,7 +5,6 @@ from briefy.leica.events.order import OrderCreatedEvent
 from briefy.leica.subscribers.utils import apply_local_roles_from_parent
 from briefy.leica.subscribers.utils import create_new_assignment_from_order
 from briefy.leica.subscribers.utils import create_comment_from_wf_transition
-# from briefy.leica.subscribers import safe_workflow_trigger_transitions
 from pyramid.events import subscriber
 
 
@@ -15,7 +14,8 @@ def order_created_handler(event):
     order = event.obj
     request = event.request
     project = order.project
-    apply_local_roles_from_parent(order, project, ())
+    add_roles = ('customer_users', 'project_managers')
+    apply_local_roles_from_parent(order, project, add_roles)
     location = request.validated.get('location', None)
     if not order.location and location:
         # force this because sometimes the obj.id is not available before the flush

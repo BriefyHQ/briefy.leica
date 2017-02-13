@@ -436,7 +436,18 @@ class OrderBriefyRoles(LeicaBriefyRoles):
 
         :return: IDs of the customer users.
         """
-        return cls.get_association_proxy('customer_user', 'user_id')
+        permissions = dict(
+             can_view=True,
+             can_edit=True,
+             can_list=True,
+             can_delete=False,
+             can_create=False,
+        )
+        return cls.get_association_proxy(
+            'customer_user',
+            'user_id',
+            permissions=permissions
+        )
 
     @declared_attr
     def _customer_users(cls):
@@ -452,10 +463,18 @@ class OrderBriefyRoles(LeicaBriefyRoles):
 
         :return: IDs of the customer users.
         """
+        permissions = dict(
+             can_view=True,
+             can_edit=True,
+             can_list=True,
+             can_delete=False,
+             can_create=False,
+        )
         return cls.get_association_proxy(
             'customer_user',
             'user_id',
-            local_attr='_customer_users'
+            local_attr='_customer_users',
+            permissions=permissions
         )
 
     @declared_attr
@@ -472,7 +491,18 @@ class OrderBriefyRoles(LeicaBriefyRoles):
 
         :return: IDs of the project manager users.
         """
-        return cls.get_association_proxy('project_manager', 'user_id')
+        permissions = dict(
+             can_view=True,
+             can_edit=True,
+             can_list=True,
+             can_delete=False,
+             can_create=False,
+        )
+        return cls.get_association_proxy(
+            'project_manager',
+            'user_id',
+            permissions=permissions
+        )
 
     @declared_attr
     def _project_managers(cls):
@@ -488,10 +518,18 @@ class OrderBriefyRoles(LeicaBriefyRoles):
 
         :return: IDs of the project manager users.
         """
+        permissions = dict(
+             can_view=True,
+             can_edit=True,
+             can_list=True,
+             can_delete=False,
+             can_create=False,
+        )
         return cls.get_association_proxy(
             'project_manager',
             'user_id',
-            local_attr='_project_managers'
+            local_attr='_project_managers',
+            permissions=permissions
         )
 
     @declared_attr
@@ -508,7 +546,18 @@ class OrderBriefyRoles(LeicaBriefyRoles):
 
         :return: IDs of the scout manager users.
         """
-        return cls.get_association_proxy('scout_manager', 'user_id')
+        permissions = dict(
+             can_view=True,
+             can_edit=True,
+             can_list=True,
+             can_delete=False,
+             can_create=False,
+        )
+        return cls.get_association_proxy(
+            'scout_manager',
+            'user_id',
+            permissions=permissions
+        )
 
     @declared_attr
     def _scout_managers(cls):
@@ -524,10 +573,18 @@ class OrderBriefyRoles(LeicaBriefyRoles):
 
         :return: IDs of the scout manager users.
         """
+        permissions = dict(
+             can_view=True,
+             can_edit=True,
+             can_list=True,
+             can_delete=False,
+             can_create=False,
+        )
         return cls.get_association_proxy(
             'scout_manager',
             'user_id',
-            local_attr='_scout_managers'
+            local_attr='_scout_managers',
+            permissions=permissions
         )
 
 

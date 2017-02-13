@@ -16,7 +16,8 @@ def assignment_created_handler(event):
     """Handle Assignment created event."""
     assignment = event.obj
     order = assignment.order
-    apply_local_roles_from_parent(assignment, order, ('customer_user'))
+    add_roles = ('project_managers', )
+    apply_local_roles_from_parent(assignment, order, add_roles)
     transitions = [('submit', ''), ]
     safe_workflow_trigger_transitions(event, transitions=transitions)
 
@@ -29,8 +30,6 @@ def assignment_submit(event):
     transitions.append(
         ('validate', 'Machine check approved')
     )
-    # TODO: doing nothing for while, review this or remove
-    # safe_workflow_trigger_transitions(event, transitions=transitions, state='validation')
 
 
 def assignment_perm_reject(event):
