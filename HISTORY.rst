@@ -2,7 +2,13 @@
 History
 =======
 
-1.1.1 (Unreleased)
+2.0.1 (2017-02-13)
+------------------
+
+    * Added timezone attribute to Assingment summary and fix the timezone property (rudaporto).
+ 
+
+2.0.0 (2017-02-13)
 ------------------
      * Remove foreign key from jobs to professional. (rudaporto)
      * Add logging with logstash to this package. (ericof)
