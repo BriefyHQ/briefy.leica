@@ -1,5 +1,5 @@
 """Event subscribers for briefy.leica.models.job.Assignment."""
-from briefy.common.config import ENV
+# from briefy.common.config import ENV
 from briefy.common.users import SystemUser
 from briefy.common.vocabularies.roles import Groups as G
 from briefy.leica.events.assignment import AssignmentCreatedEvent
