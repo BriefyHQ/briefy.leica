@@ -91,7 +91,7 @@ def approve_assignment(laure_data: object) -> (bool, dict):
     :param laure_data: Python object representing Laure data after assignment approval
     :return: Flag indicating wether operation was successfull, empty dict
     """
-    assignment_id = laure_data.assignment_info.id
+    assignment_id = laure_data.guid
     assignment = Assignment.query().get(assignment_id)
 
     # Ensure the correct key is updated and object is set as dirty
