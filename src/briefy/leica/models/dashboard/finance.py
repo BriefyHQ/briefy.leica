@@ -58,6 +58,6 @@ class DashboardFinanceOrder(Base):
 
     __table__ = total_order_project
     __mapper_args__ = {
-        'primary_key': [total_order_project.c.total]
+        'primary_key': [total_order_project.c.absolute_url]
     }
     __session__ = Session

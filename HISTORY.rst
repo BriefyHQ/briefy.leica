@@ -2,10 +2,15 @@
 History
 =======
 
+2.0.2 (2017-02-14)
+------------------
+
+    * Fix primary key of dashboard declarative models (rudaporto).
+
 2.0.1 (2017-02-14)
 ------------------
 
-    * Added timezone attribute to Assingment summary and fix the timezone property (rudaporto).
+    * Added timezone attribute to Assignment summary and fix the timezone property (rudaporto).
  
 
 2.0.0 (2017-02-13)
