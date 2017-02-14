@@ -2,7 +2,7 @@
 History
 =======
 
-2.0.1 (2017-02-13)
+2.0.1 (2017-02-14)
 ------------------
 
     * Added timezone attribute to Assingment summary and fix the timezone property (rudaporto).
