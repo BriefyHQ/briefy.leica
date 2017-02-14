@@ -99,7 +99,7 @@ class Worker(QueueWorker):
 
         if not dispatch:
             logger.info('Unknown event type - message {0} ignored'.format(body['id']))
-            return True
+            return False
 
         try:
             assignment_status, payload = dispatch.action(assignment)
