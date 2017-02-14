@@ -551,11 +551,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
 
         Information will be obtained from main location.
         """
-        location = self.location
-        timezone = 'UTC'
-        if location:
-            timezone = location.timezone
-        return timezone
+        return self.order.timezone
 
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.

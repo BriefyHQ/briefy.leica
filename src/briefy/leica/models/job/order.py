@@ -437,7 +437,11 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
         Information will be obtained from main location.
         """
-        return self.order.timezone
+        location = self.location
+        timezone = 'UTC'
+        if location:
+            timezone = location.timezone
+        return timezone
 
     @hybrid_property
     def deliver_date(self) -> datetime:
