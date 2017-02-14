@@ -59,6 +59,6 @@ class DashboardCustomerOrder(Base):
 
     __table__ = total_order_customer
     __mapper_args__ = {
-        'primary_key': [total_order_customer.c.total]
+        'primary_key': [total_order_customer.c.absolute_url]
     }
     __session__ = Session
