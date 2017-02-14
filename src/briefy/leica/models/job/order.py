@@ -444,25 +444,6 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         return timezone
 
     @hybrid_property
-    def assignment_info(self) -> dict:
-        """Return public info from Assignment.
-
-        Information will be obtained from assignment attribute.
-        """
-        if self.assignment:
-            assignment = self.assignment
-            last_name = assignment.professional.last_name if assignment.professional else None
-            data = dict(
-                professional=dict(
-                    last_name=last_name
-                ),
-                set_type=assignment.set_type,
-                scheduled_datetime=assignment.scheduled_datetime,
-                state=assignment.state
-            )
-            return data
-
-    @hybrid_property
     def deliver_date(self) -> datetime:
         """Return last deliver date for this Orders.
 
@@ -501,7 +482,6 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data['deliver_date'] = self.deliver_date
         data['delivery'] = self.delivery
         data['location'] = self.location
-        data['assignment_info'] = self.assignment_info
         data['timezone'] = self.timezone
         data['assignment'] = self.assignment.to_summary_dict() if self.assignment else None
         data['tech_requirements'] = self.tech_requirements

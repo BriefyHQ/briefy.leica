@@ -10,7 +10,6 @@ from briefy.leica.utils.user import add_user_info_to_state_history
 from datetime import datetime
 from sqlalchemy import orm
 from sqlalchemy import select
-from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from zope.interface import implementer
@@ -24,7 +23,7 @@ import sqlalchemy_utils as sautils
 __summary_attributes__ = [
     'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
     'number_required_assets', 'approvable', 'total_assets', 'total_approvable_assets',
-    'category', 'scheduled_datetime', 'professional'
+    'category', 'scheduled_datetime', 'professional', 'timezone'
 ]
 
 __listing_attributes__ = __summary_attributes__ + [
@@ -32,7 +31,7 @@ __listing_attributes__ = __summary_attributes__ + [
     'set_type', 'number_required_assets', 'category', 'payout_value',
     'availability', 'payout_currency', 'travel_expenses', 'additional_compensation',
     'reason_additional_compensation', 'qa_manager', 'submission_path', 'state_history',
-    'requirements', 'pool_id', 'location', 'project', 'timezone', 'closed_on_date'
+    'requirements', 'pool_id', 'location', 'project', 'closed_on_date'
 ]
 
 overrides = mixins.AssignmentBriefyRoles.__colanderalchemy_config__['overrides']
@@ -546,13 +545,17 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         """Return if this Assignment is assigned or not."""
         return True if (self.assignment_date and self.professional_id) else False
 
-    @declared_attr
+    @hybrid_property
     def timezone(self) -> str:
         """Return Timezone for this order.
 
         Information will be obtained from main location.
         """
-        return association_proxy('location', 'timezone')
+        location = self.location
+        timezone = 'UTC'
+        if location:
+            timezone = location.timezone
+        return timezone
 
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
