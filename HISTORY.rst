@@ -2,6 +2,11 @@
 History
 =======
 
+2.0.3 (2017-02-14)
+------------------
+   
+  * Fix add creative with portfolio link (rudaporto).
+
 2.0.2 (2017-02-14)
 ------------------
 
