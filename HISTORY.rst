@@ -7,6 +7,7 @@ History
 
     * Split workflows for Briefy and Customer profiles (ericof).
     * Fix Submission Date calculation on Assignment (ericof).
+    * Expose initial password on UserProfile creation (ericof).
 
 
 2.0.3 (2017-02-14)
