@@ -6,7 +6,6 @@ from briefy.common.queue.message import SQSMessage
 from briefy.common.utils.data import Objectify
 from briefy.common.worker.queue import QueueWorker
 from briefy.leica.config import NEW_RELIC_LICENSE_KEY
-from briefy.leica.worker import actions
 from zope.component import getUtility
 
 import newrelic.agent
@@ -14,6 +13,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
+from briefy.leica.worker import actions  # noQA
+# Late import allows module to import the logger.
 
 cs = logging.StreamHandler()
 cs.setLevel(logging.INFO)
@@ -76,12 +78,15 @@ def ignite_database_session():
     from briefy.common.db.model import Base
     from briefy.leica.config import DATABASE_URL
     from sqlalchemy import create_engine
-    from sqlalchemy.orm import sessionmaker
+    # from sqlalchemy.orm import sessionmaker
+    from briefy.leica.db import Session
 
-    engine = create_engine(DATABASE_URL)
+
+    engine = create_engine(DATABASE_URL,  pool_recycle=3600)
     # Magic conjuration ritual to actually creating a session to be used along the engine:
-    Session = sessionmaker(bind=engine)  # noQA
-    session = Session()  # noQA
+    # Session = sessionmaker(bind=engine)  # noQA
+    # session = Session()  # noQA
+    Session.configure(bind=engine)
     Base.metadata.bind = engine
 
 
@@ -110,6 +115,7 @@ class Worker(QueueWorker):
         status = True
 
         body = message.body
+        logger.info('Deis-worker: Processing message {0}'.format(body.get('id', None)))
         assignment = Objectify(body.get('data', {}))
         event = body.get('event_name', '')
         dispatch = Objectify(MESSAGE_DISPATCH.get(event, {}))
@@ -119,10 +125,9 @@ class Worker(QueueWorker):
             return False
 
         try:
-            assignment_status, payload = dispatch.action(assignment)
+            status, payload = dispatch.action(assignment)
 
         except Exception as error:
-            status = False
             logger.error(
                 'Unknown exception raised on \'{0}\' assignment {1}. Error: {2}'.format(
                     dispatch.name,
@@ -136,6 +141,9 @@ class Worker(QueueWorker):
             event = dispatch.success_notification(payload)
         elif not status and dispatch.failure_notification:
             event = dispatch.failure_notification(payload)
+        elif not status:
+                logger.warning('''Could not proccess message, and there are no '''
+                               '''further actions on failure: {0}'''.format(body))
         if event:
             event()
         return status
