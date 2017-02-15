@@ -2,6 +2,12 @@
 History
 =======
 
+2.0.5 (2017-02-15)
+------------------
+
+    * Update and merge all Leica fixes in the worker (rudaporto).
+    * Fix Leica worker (jsbueno).
+
 2.0.4 (2017-02-15)
 ------------------
 
@@ -26,6 +32,7 @@ History
 ------------------
 
     * Fix add creative with portfolio link (rudaporto).
+    * Split workflows for Briefy and Customer profiles (ericof).
 
 2.0.2 (2017-02-14)
 ------------------
