@@ -42,7 +42,7 @@ class Link(mixins.LeicaMixin, Base):
     @is_social.expression
     def is_social(cls):
         """Check if this link points to a social network?."""
-        return sa.not_(cls.type.in_(('link', 'porfolio', )))
+        return sa.not_(cls.type.in_(('link', 'portfolio', )))
 
     @declared_attr
     def __mapper_args__(cls):
