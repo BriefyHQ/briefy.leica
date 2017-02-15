@@ -35,11 +35,28 @@ __colander_alchemy_config_overrides__ = \
 
 # added to be able pass professional_id to the Order reassign transition
 __colander_alchemy_config_overrides__.update(
-    {'professional_id': {
-        'title': 'Professional ID',
-        'missing': colander.drop,
-        'typ': colander.String()
-    }}
+    dict(
+        professional_id={
+            'title': 'Professional ID',
+            'missing': colander.drop,
+            'typ': colander.String()
+        },
+        payout_value={
+            'title': 'Payout Value',
+            'missing': colander.drop,
+            'typ': colander.Integer()
+        },
+        payout_currency={
+            'title': 'Payout Currency',
+            'missing': colander.drop,
+            'typ': colander.String()
+        },
+        travel_expenses={
+            'title': 'Travel Expenses',
+            'missing': colander.drop,
+            'typ': colander.Integer()
+        }
+    )
 )
 
 

@@ -23,13 +23,13 @@ import sqlalchemy_utils as sautils
 __summary_attributes__ = [
     'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
     'number_required_assets', 'approvable', 'total_assets', 'total_approvable_assets',
-    'category', 'scheduled_datetime', 'professional', 'timezone', 'professional_user'
+    'category', 'scheduled_datetime', 'professional', 'timezone', 'professional_user',
+    'payout_value', 'payout_currency', 'travel_expenses'
 ]
 
 __listing_attributes__ = __summary_attributes__ + [
     'assignment_date', 'last_approval_date', 'submission_date', 'last_submission_date',
-    'set_type', 'number_required_assets', 'category', 'payout_value',
-    'availability', 'payout_currency', 'travel_expenses', 'additional_compensation',
+    'set_type', 'number_required_assets', 'category', 'availability', 'additional_compensation',
     'reason_additional_compensation', 'qa_manager', 'submission_path', 'state_history',
     'requirements', 'pool_id', 'location', 'project', 'closed_on_date'
 ]
