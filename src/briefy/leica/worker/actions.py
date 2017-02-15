@@ -7,7 +7,7 @@ from briefy.leica.models import Comment
 import transaction
 
 
-def validate_assignment(laure_data: object) -> (bool, dict):
+def validate_assignment(laure_data: object, session: object) -> (bool, dict):
     """Perform necessary transition after photo set validation.
 
     :param laure_data: Python object representing Laure data after assignment validation
@@ -44,7 +44,7 @@ def validate_assignment(laure_data: object) -> (bool, dict):
     return True, {}
 
 
-def invalidate_assignment(laure_data: object) -> (bool, dict):
+def invalidate_assignment(laure_data: object, session: object) -> (bool, dict):
     """Perform necessary transition and field update after photo set was deemed invalid.
 
     :param laure_data: Python object representing Laure data after assignment validation
@@ -71,11 +71,16 @@ def invalidate_assignment(laure_data: object) -> (bool, dict):
         )
 
         feedback_comment = Comment(
+            entity_id=assignment_id,
+            entity_type=assignment.__class__.__name__,
             author_id=SystemUser.id,
-            author_role='system',
-            to_role='professional',
-            content=feedback_text
+            author_role='qa_manager',
+            to_role='professional_user',
+            content=feedback_text,
+            internal=False,
+
         )
+        session.add(feedback_comment)
 
         logger.info(
             '''Assignment '{0}' assets reported as not sufficient. Transitioning back '''
@@ -96,7 +101,7 @@ def invalidate_assignment(laure_data: object) -> (bool, dict):
         return True, {}
 
 
-def approve_assignment(laure_data: object) -> (bool, dict):
+def approve_assignment(laure_data: object, session: object) -> (bool, dict):
     """Perform necessary updates after set was copied to destination folders.
 
     :param laure_data: Python object representing Laure data after assignment approval
@@ -136,7 +141,7 @@ def approve_assignment(laure_data: object) -> (bool, dict):
     return True, {}
 
 
-def asset_copy_malfunction(laure_data: object) -> (bool, dict):
+def asset_copy_malfunction(laure_data: object, session: object) -> (bool, dict):
     """Perform necessary transition and field update after photo set was deemed invalid.
 
     :param laure_data: Python object representing Laure data after assignment validation
@@ -163,12 +168,15 @@ def asset_copy_malfunction(laure_data: object) -> (bool, dict):
                 '''Please take manual actions that may be needed.''')
 
         comment = Comment(
+            entity_id=assignment_id,
+            entity_type=assignment.__class__.__name__,
             author_id=SystemUser.id,
             author_role='system',
             to_role='qa_manager',
             content=text,
             internal=True,
         )
+        session.add(comment)
 
         logger.warn(
             '''There was a problem copying assets to delivery folders.'''

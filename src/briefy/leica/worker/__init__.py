@@ -37,7 +37,7 @@ MESSAGE_DISPATCH = {
         'failure_notification': None,
     },
     'laure.assignment.rejected': {
-        'name': 'resolving invalidated assigment',
+        'name': 'resolving invalidated assignment',
         'action': actions.invalidate_assignment,
         'success_notification': None,
         'failure_notification': None,
@@ -82,6 +82,7 @@ def ignite_database_session():
     engine = create_engine(DATABASE_URL,  pool_recycle=3600)
     Session.configure(bind=engine)
     Base.metadata.bind = engine
+    return Session
 
 
 class Worker(QueueWorker):
@@ -99,6 +100,19 @@ class Worker(QueueWorker):
     _events_queue = None
     """Events queue."""
 
+    _session = None
+    """Session instance."""
+
+    Session = None
+    """Session factory."""
+
+    @property
+    def session(self):
+        """Return session instance from Session factory."""
+        if not self._session:
+            self._session = self.Session()
+        return self._session
+
     @newrelic.agent.background_task(name='process_message', group='Task')
     def process_message(self, message: SQSMessage) -> bool:
         """Process a message retrieved from the input_queue.
@@ -107,7 +121,6 @@ class Worker(QueueWorker):
         :returns: Status from the process
         """
         status = True
-
         body = message.body
         logger.info('Deis-worker: Processing message {0}'.format(body.get('id', None)))
         assignment = Objectify(body.get('data', {}))
@@ -119,7 +132,7 @@ class Worker(QueueWorker):
             return False
 
         try:
-            status, payload = dispatch.action(assignment)
+            status, payload = dispatch.action(assignment, self.session)
 
         except Exception as error:
             logger.error(
@@ -150,8 +163,9 @@ def main():
     if NEW_RELIC_LICENSE_KEY:
         newrelic.agent.register_application(timeout=10.0)
     try:
-        ignite_database_session()
+        worker.Session = ignite_database_session()
         worker()
+
     except:
         logger.exception('{name} exiting due to an exception.'.format(name=Worker.name))
         raise
