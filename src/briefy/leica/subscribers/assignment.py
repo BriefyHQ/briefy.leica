@@ -36,11 +36,12 @@ def assignment_perm_reject(event):
     """Handle Assignment perm_reject workflow event."""
     request = event.request
     assignment = event.obj
-
-    # TODO: test if this cause circular failure
     order = assignment.order
+
     # just create a new Assignment if there is no active assignment
-    if not order.assignment and order.state not in ('cancelled', 'perm_refused'):
+    order_final_states = ('cancelled', 'perm_refused',)
+    assignment_final_states = ('cancelled', 'completed', 'perm_rejected',)
+    if assignment.state in assignment_final_states and order.state not in order_final_states:
         create_new_assignment_from_order(order, request)
 
     to_role = 'professional_user'
@@ -50,6 +51,42 @@ def assignment_perm_reject(event):
         author_role,
         to_role
     )
+
+
+def assignment_cancel(event):
+    """Handle Assignment cancel workflow event."""
+    request = event.request
+    assignment = event.obj
+    order = assignment.order
+    user = assignment.workflow.context
+
+    # just create a new Assignment if there is no active assignment
+    order_final_states = ('cancelled', 'perm_refused',)
+    assignment_final_states = ('cancelled', 'completed', 'perm_rejected',)
+    if assignment.state in assignment_final_states and order.state not in order_final_states:
+        create_new_assignment_from_order(order, request)
+
+    # create the comment
+    do_comment = True
+    if G['customers'].value in user.groups:
+        # this should not create a comment on the assignment only on the order
+        do_comment = False
+    elif G['pm'].value in user.groups:
+        to_role = 'professional_user'
+        author_role = 'project_manager'
+    elif G['finance'].value in user.groups:
+        to_role = 'professional_user'
+        author_role = 'project_manager'
+    else:
+        # for now do not comment anything
+        do_comment = False
+
+    if do_comment:
+        create_comment_from_wf_transition(
+            assignment,
+            author_role,
+            to_role
+        )
 
 
 def assignment_remove_schedule(event):
@@ -220,6 +257,7 @@ def transition_handler(event):
         'assignment.workflow.self_assign': assignment_self_assign,
         'assignment.workflow.assign_pool': assignment_self_assign,
         'assignment.workflow.scheduling_issues': assignment_scheduling_issues,
+        'assignment.workflow.cancel': assignment_cancel,
         'assignment.workflow.reject': assignment_reject,
         'assignment.workflow.upload': assignment_upload,
         'assignment.workflow.invalidate_assets': assignment_validate_or_invalidate_assets,
