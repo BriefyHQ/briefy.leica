@@ -502,12 +502,9 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     )
     """Last Accept/Refusal date for the parent order."""
 
-    # Relevant dates
-    @sautils.observes('state')
-    def dates_observer(self, state) -> datetime:
-        """Calculate dates on a change of a state."""
-        if self.state != state:
-            print(state, self.state)
+    def _update_dates_from_history(self, keep_updated_at: bool = False):
+        """Update dates from history."""
+        updated_at = self.updated_at
         state_history = self.state_history
         transitions = ('assign', 'self_assign', )
         self.assignment_date = get_transition_date_from_history(transitions, state_history)
@@ -515,18 +512,28 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         transitions = ('approve', 'reject', )
         self.last_approval_date = get_transition_date_from_history(transitions, state_history)
 
-        transitions = ('ready_for_upload', )
+        transitions = ('upload', )
         self.submission_date = get_transition_date_from_history(
             transitions, state_history, first=True
         )
 
-        transitions = ('ready_for_upload', )
+        transitions = ('upload', )
         self.last_submission_date = get_transition_date_from_history(transitions, state_history)
 
         transitions = ('accept', 'refuse')
         self.customer_approval_date = get_transition_date_from_history(
             transitions, state_history, first=True
         )
+        if keep_updated_at:
+            self.updated_at = updated_at
+
+    # Relevant dates
+    @sautils.observes('state')
+    def dates_observer(self, state) -> datetime:
+        """Calculate dates on a change of a state."""
+        # Update all dates
+        self._update_dates_from_history()
+
 
     @property
     def closed_on_date(self) -> datetime:

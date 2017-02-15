@@ -2,10 +2,16 @@
 History
 =======
 
-2.0.3 (2017-02-14)
+2.0.4 (2017-02-15)
 ------------------
 
     * Split workflows for Briefy and Customer profiles (ericof).
+    * Fix Submission Date calculation on Assignment (ericof).
+
+
+2.0.3 (2017-02-14)
+------------------
+
     * Fix add creative with portfolio link (rudaporto).
 
 2.0.2 (2017-02-14)
