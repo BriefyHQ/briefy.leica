@@ -55,16 +55,8 @@ def assignment_perm_reject(event):
 
 def assignment_cancel(event):
     """Handle Assignment cancel workflow event."""
-    request = event.request
     assignment = event.obj
-    order = assignment.order
     user = assignment.workflow.context
-
-    # just create a new Assignment if there is no active assignment
-    order_final_states = ('cancelled', 'perm_refused',)
-    assignment_final_states = ('cancelled', 'completed', 'perm_rejected',)
-    if assignment.state in assignment_final_states and order.state not in order_final_states:
-        create_new_assignment_from_order(order, request)
 
     # create the comment
     do_comment = True

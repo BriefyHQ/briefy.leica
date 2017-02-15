@@ -23,6 +23,12 @@ ASSIGN_AFTER_RENEWSHOOT = 'Creative automatically assigned due to a re  shoot.'
 PAYOUT_REQUIRED_FIELDS = ('payout_value', 'payout_currency', 'travel_expenses')
 COMPENSATION_REQUIRED_FIELDS = ('additional_compensation', 'reason_additional_compensation')
 REQUIREMENTS_REQUIRED_FIELDS = ('number_required_assets', 'requirements')
+ASSIGN_REQUIRED_FIELDS = (
+    'payout_value',
+    'payout_currency',
+    'travel_expenses',
+    'professional_id'
+)
 
 
 class AssignmentWorkflow(BriefyWorkflow):
@@ -112,7 +118,7 @@ class AssignmentWorkflow(BriefyWorkflow):
     @pending.transition(
         assigned,
         'can_assign',
-        required_fields=('professional_id',)
+        required_fields=ASSIGN_REQUIRED_FIELDS
     )
     def assign(self, **kwargs):
         """Define a Professional to the Assignment."""
@@ -738,6 +744,7 @@ class OrderWorkflow(BriefyWorkflow):
         # this will handle the creation of a new Assignment
         message = kwargs.get('message', '')
         order.assignment.workflow.cancel(message=message)
+        create_new_assignment_from_order(order, order.request)
         return True
 
     @Permission(groups=[LR['project_manager'], G['pm'], LR['customer_user'], G['customers'], ])
