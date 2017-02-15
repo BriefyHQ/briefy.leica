@@ -76,10 +76,18 @@ class TestAssignmentModel(BaseModelTest):
         request.user = roles['scout']
         order_wf.context = roles['scout']
         assert 'assign' in wf.transitions
+        fields_payload = dict(
+            professional_id='23d94a43-3947-42fc-958c-09245ecca5f2',
+            payout_value=12000,
+            payout_currency='EUR',
+            travel_expenses=1000,
+        )
         wf.assign(
-            fields={'professional_id': '23d94a43-3947-42fc-958c-09245ecca5f2'}
+            fields=fields_payload
         )
         assert assignment.state == 'assigned'
+        for key, value in fields_payload.items():
+            assert getattr(assignment, key) == value
 
         # Customer can still cancel the assignment
         wf.context = roles['customer']

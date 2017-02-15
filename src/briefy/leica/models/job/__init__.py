@@ -23,13 +23,13 @@ import sqlalchemy_utils as sautils
 __summary_attributes__ = [
     'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
     'number_required_assets', 'approvable', 'total_assets', 'total_approvable_assets',
-    'category', 'scheduled_datetime', 'professional', 'timezone'
+    'category', 'scheduled_datetime', 'professional', 'timezone', 'professional_user',
+    'payout_value', 'payout_currency', 'travel_expenses'
 ]
 
 __listing_attributes__ = __summary_attributes__ + [
     'assignment_date', 'last_approval_date', 'submission_date', 'last_submission_date',
-    'set_type', 'number_required_assets', 'category', 'payout_value',
-    'availability', 'payout_currency', 'travel_expenses', 'additional_compensation',
+    'set_type', 'number_required_assets', 'category', 'availability', 'additional_compensation',
     'reason_additional_compensation', 'qa_manager', 'submission_path', 'state_history',
     'requirements', 'pool_id', 'location', 'project', 'closed_on_date'
 ]
@@ -502,12 +502,9 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     )
     """Last Accept/Refusal date for the parent order."""
 
-    # Relevant dates
-    @sautils.observes('state')
-    def dates_observer(self, state) -> datetime:
-        """Calculate dates on a change of a state."""
-        if self.state != state:
-            print(state, self.state)
+    def _update_dates_from_history(self, keep_updated_at: bool = False):
+        """Update dates from history."""
+        updated_at = self.updated_at
         state_history = self.state_history
         transitions = ('assign', 'self_assign', )
         self.assignment_date = get_transition_date_from_history(transitions, state_history)
@@ -515,18 +512,27 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         transitions = ('approve', 'reject', )
         self.last_approval_date = get_transition_date_from_history(transitions, state_history)
 
-        transitions = ('ready_for_upload', )
+        transitions = ('upload', )
         self.submission_date = get_transition_date_from_history(
             transitions, state_history, first=True
         )
 
-        transitions = ('ready_for_upload', )
+        transitions = ('upload', )
         self.last_submission_date = get_transition_date_from_history(transitions, state_history)
 
         transitions = ('accept', 'refuse')
         self.customer_approval_date = get_transition_date_from_history(
             transitions, state_history, first=True
         )
+        if keep_updated_at:
+            self.updated_at = updated_at
+
+    # Relevant dates
+    @sautils.observes('state')
+    def dates_observer(self, state) -> datetime:
+        """Calculate dates on a change of a state."""
+        # Update all dates
+        self._update_dates_from_history()
 
     @property
     def closed_on_date(self) -> datetime:

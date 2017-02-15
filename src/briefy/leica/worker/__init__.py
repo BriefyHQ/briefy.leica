@@ -58,7 +58,7 @@ MESSAGE_DISPATCH = {
 Dictionary for event dispatching. Expected format:
 each key is the event name itself - each value being another dictionary
 with the following keys:
- 'name': String withthe action name for purposes of logging and creating other messages
+ 'name': String with the action name for purposes of logging and creating other messages
  'action': A callable that will process the event 'objectified' payload,
            and return a tuple with a boolean and a dict the boolean indicates wether
            the action succeeded or failed; the dict is to be used
@@ -66,6 +66,23 @@ with the following keys:
  'success_notification': briefy.BaseEvent subclass to be created when the action suceeds
  'failure_notification': briefy.BaseEvent subclass to be created when the action fails
 """
+
+
+def ignite_database_session():
+    """Create and bind SQLAlchemy Session to stand alone usage.
+
+    return: None
+    """
+    from briefy.common.db.model import Base
+    from briefy.leica.config import DATABASE_URL
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+
+    engine = create_engine(DATABASE_URL)
+    # Magic conjuration ritual to actually creating a session to be used along the engine:
+    Session = sessionmaker(bind=engine)  # noQA
+    session = Session()  # noQA
+    Base.metadata.bind = engine
 
 
 class Worker(QueueWorker):
@@ -99,17 +116,20 @@ class Worker(QueueWorker):
 
         if not dispatch:
             logger.info('Unknown event type - message {0} ignored'.format(body['id']))
-            return True
+            return False
 
         try:
             assignment_status, payload = dispatch.action(assignment)
 
         except Exception as error:
             status = False
-            logger.error('Unknown exception raised on \'{0}\' assignment {1}. Error: {2}'.format(
-                dispatch.name,
-                assignment.dct,
-                error))
+            logger.error(
+                'Unknown exception raised on \'{0}\' assignment {1}. Error: {2}'.format(
+                    dispatch.name,
+                    assignment.dct,
+                    error
+                )
+            )
             raise  # Let newrelic deal with it.
         event = None
         if status and dispatch.success_notification:
@@ -128,6 +148,7 @@ def main():
     if NEW_RELIC_LICENSE_KEY:
         newrelic.agent.register_application(timeout=10.0)
     try:
+        ignite_database_session()
         worker()
     except:
         logger.exception('{name} exiting due to an exception.'.format(name=Worker.name))

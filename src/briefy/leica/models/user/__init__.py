@@ -106,6 +106,8 @@ class CustomerUserProfile(UserProfile):
 
     __tablename__ = 'customeruserprofiles'
 
+    _workflow = workflows.CustomerUserProfileWorkflow
+
     __raw_acl__ = (
         ('create', ('g:briefy_bizdev', 'g:briefy_finance', 'g:briefy_pm', 'g:system')),
         ('list', ('g:briefy', 'g:system')),
@@ -253,6 +255,8 @@ class BriefyUserProfile(UserProfile):
     """A Briefy user on our system."""
 
     __tablename__ = 'briefyuserprofiles'
+
+    _workflow = workflows.BriefyUserProfileWorkflow
 
     __raw_acl__ = (
         ('create', ('g:briefy_finance', 'g:briefy_tech', 'g:system')),

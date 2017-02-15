@@ -59,3 +59,15 @@ class UserProfileWorkflow(BriefyWorkflow):
     def can_inactivate(self):
         """Validate if user can inactivate this user profile."""
         return True
+
+
+class CustomerUserProfileWorkflow(UserProfileWorkflow):
+    """Workflow for a Customer User profile."""
+
+    entity = 'customeruserprofile'
+
+
+class BriefyUserProfileWorkflow(UserProfileWorkflow):
+    """Workflow for a Briefy user profile."""
+
+    entity = 'briefyuserprofile'

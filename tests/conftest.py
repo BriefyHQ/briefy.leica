@@ -555,6 +555,8 @@ def mock_request():
             filename = 'data/thumbor.json'
         elif 'internal/users' in url:
             filename = 'data/user.json'
+        elif 'api.geonames.org':
+            filename = 'data/timezone.json'
         status_code = 200
         headers = {
             'content-type': 'application/json',

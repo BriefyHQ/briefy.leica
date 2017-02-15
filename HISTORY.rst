@@ -2,10 +2,30 @@
 History
 =======
 
+2.0.4 (2017-02-15)
+------------------
+
+    * Split workflows for Briefy and Customer profiles (ericof).
+    * Fix Submission Date calculation on Assignment (ericof).
+    * Expose initial password on UserProfile creation (ericof).
+    * Set timezone on new and updated OrderLocations (ericof).
+    * Improve Order to_dict to add actors info to the current Assignment (rudaporto).
+    * Improve LeicaBriefyRoles._apply_actors_info to also accept another instance object and not use self (rudaporto).
+    * Improve Professional and Assignment summary attributes (rudaporto).
+    * Fix remove_availability transition: now the new assignment is created after cancel the old one (rudaporto).
+    * Change Assignment assign transition to require payout currency, value and travel expenses (rudaporto).
+    * Change remove availability to create the assignment inside the transition (rudaporto).
+    * Scout dashboard now support links on projects (ericof).
+    * Added payout value and currency and travel expenses to the summary attributes (rudaporto).
+    * Create new assignment function can now copy the payout value, currency and travel expenses (rudaporto).
+    * Update reshoot to receive all payout value, currency and travel expenses and use it to assign the new assignment (rudaporto).
+    * Update new shoot to use the new option to copy payout values from the old shoot (rudaporto).
+
+
 2.0.3 (2017-02-14)
 ------------------
-   
-  * Fix add creative with portfolio link (rudaporto).
+
+    * Fix add creative with portfolio link (rudaporto).
 
 2.0.2 (2017-02-14)
 ------------------

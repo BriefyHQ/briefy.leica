@@ -23,6 +23,17 @@ ASSIGN_AFTER_RENEWSHOOT = 'Creative automatically assigned due to a re  shoot.'
 PAYOUT_REQUIRED_FIELDS = ('payout_value', 'payout_currency', 'travel_expenses')
 COMPENSATION_REQUIRED_FIELDS = ('additional_compensation', 'reason_additional_compensation')
 REQUIREMENTS_REQUIRED_FIELDS = ('number_required_assets', 'requirements')
+ASSIGN_REQUIRED_FIELDS = (
+    'payout_value',
+    'payout_currency',
+    'travel_expenses',
+    'professional_id'
+)
+RESHOOT_REQUIRED_FIELDS = (
+    'payout_value',
+    'payout_currency',
+    'travel_expenses',
+)
 
 
 class AssignmentWorkflow(BriefyWorkflow):
@@ -112,7 +123,7 @@ class AssignmentWorkflow(BriefyWorkflow):
     @pending.transition(
         assigned,
         'can_assign',
-        required_fields=('professional_id',)
+        required_fields=ASSIGN_REQUIRED_FIELDS
     )
     def assign(self, **kwargs):
         """Define a Professional to the Assignment."""
@@ -718,7 +729,7 @@ class OrderWorkflow(BriefyWorkflow):
         old_assignment = order.assignment
         message = kwargs.get('message', '')
         old_assignment.workflow.cancel(message=message)
-        create_new_assignment_from_order(order, order.request)
+        create_new_assignment_from_order(order, order.request, copy_payout=True)
         return True
 
     @Permission(groups=[LR['project_manager'], G['pm'], ])
@@ -738,6 +749,7 @@ class OrderWorkflow(BriefyWorkflow):
         # this will handle the creation of a new Assignment
         message = kwargs.get('message', '')
         order.assignment.workflow.cancel(message=message)
+        create_new_assignment_from_order(order, order.request)
         return True
 
     @Permission(groups=[LR['project_manager'], G['pm'], LR['customer_user'], G['customers'], ])
@@ -751,11 +763,11 @@ class OrderWorkflow(BriefyWorkflow):
 
     @assigned.transition(
         assigned, 'can_reassign',
-        required_fields=('professional_id', )
+        required_fields=ASSIGN_REQUIRED_FIELDS
     )
     @scheduled.transition(
         assigned, 'can_reassign',
-        required_fields=('professional_id', )
+        required_fields=ASSIGN_REQUIRED_FIELDS
     )
     def reassign(self, **kwargs):
         """Transition: Inform the reassignment to the customer."""
@@ -872,8 +884,16 @@ class OrderWorkflow(BriefyWorkflow):
         """
         return True
 
-    @in_qa.transition(assigned, 'can_reshoot')
-    @refused.transition(assigned, 'can_reshoot')
+    @in_qa.transition(
+        assigned,
+        'can_reshoot',
+        required_fields=RESHOOT_REQUIRED_FIELDS
+    )
+    @refused.transition(
+        assigned,
+        'can_reshoot',
+        required_fields=RESHOOT_REQUIRED_FIELDS
+    )
     def reshoot(self, **kwargs):
         """Transition: Inform the reshoot of the Order the customer."""
         message = kwargs.get('message', '')
@@ -883,9 +903,9 @@ class OrderWorkflow(BriefyWorkflow):
         old_assignment.workflow.complete(message=message)
         new_assignment = create_new_assignment_from_order(order, order.request)
         professional_id = old_assignment.professional_id
-        fields = dict(professional_id=professional_id)
-        message = ASSIGN_AFTER_RENEWSHOOT
-        new_assignment.workflow.assign(fields=fields, message=message)
+        kwargs.update(message=ASSIGN_AFTER_RENEWSHOOT)
+        kwargs['fields']['professional_id'] = professional_id
+        new_assignment.workflow.assign(**kwargs)
 
     @Permission(groups=[LR['project_manager'], G['pm'], G['qa'], ])
     def can_reshoot(self):
@@ -904,7 +924,7 @@ class OrderWorkflow(BriefyWorkflow):
         order.availability = []
         old_assignment = order.assignment
         old_assignment.workflow.complete(message=message)
-        create_new_assignment_from_order(order, order.request)
+        create_new_assignment_from_order(order, order.request, copy_payout=True)
 
     @Permission(groups=[LR['project_manager'], G['pm'], G['qa'], ])
     def can_new_shoot(self):
