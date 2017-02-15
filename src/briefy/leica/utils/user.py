@@ -35,12 +35,13 @@ def create_rolleiflex_user(profile, groups=()):
     # add a rolleiflex user
     url = API_BASE + '/users'
     groups = [{'name': value for value in groups}]
+    initial_password = password_generator()
     payload = dict(
         id=str(profile.id),
         email=profile.email,
         first_name=profile.first_name,
         last_name=profile.last_name,
-        password=password_generator(),
+        password=initial_password,
         locale='en_GB',
         groups=groups,
     )
@@ -53,6 +54,8 @@ def create_rolleiflex_user(profile, groups=()):
     response = requests.request("POST", url, data=json.dumps(payload), headers=headers)
     if response.status_code in (200, 201):
         logger.info('Success user creation. Email: {email}.'.format(email=profile.email))
+        # We put this here to be serialized to sqs
+        profile.initial_password = initial_password
         return response.json()
     else:
         try:

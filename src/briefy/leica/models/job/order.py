@@ -35,11 +35,28 @@ __colander_alchemy_config_overrides__ = \
 
 # added to be able pass professional_id to the Order reassign transition
 __colander_alchemy_config_overrides__.update(
-    {'professional_id': {
-        'title': 'Professional ID',
-        'missing': colander.drop,
-        'typ': colander.String()
-    }}
+    dict(
+        professional_id={
+            'title': 'Professional ID',
+            'missing': colander.drop,
+            'typ': colander.String()
+        },
+        payout_value={
+            'title': 'Payout Value',
+            'missing': colander.drop,
+            'typ': colander.Integer()
+        },
+        payout_currency={
+            'title': 'Payout Currency',
+            'missing': colander.drop,
+            'typ': colander.String()
+        },
+        travel_expenses={
+            'title': 'Travel Expenses',
+            'missing': colander.drop,
+            'typ': colander.Integer()
+        }
+    )
 )
 
 
@@ -473,7 +490,13 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     def to_dict(self):
         """Return a dict representation of this object."""
-        data = super().to_dict()
+        data = super().to_dict(excludes=['assignment', 'assignments'])
+
+        assignment = self.assignment
+        if assignment:
+            assignment_data = self.assignment.to_summary_dict()
+            assignment_data = self._apply_actors_info(assignment_data, assignment)
+
         data['description'] = self.description
         data['briefing'] = self.project.briefing
         data['availability'] = self.availability
@@ -483,7 +506,8 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data['delivery'] = self.delivery
         data['location'] = self.location
         data['timezone'] = self.timezone
-        data['assignment'] = self.assignment.to_summary_dict() if self.assignment else None
+        data['assignment'] = assignment_data
+        data['assignments'] = [item.to_summary_dict() for item in self.assignments]
         data['tech_requirements'] = self.tech_requirements
         # Workflow history
         add_user_info_to_state_history(self.state_history)

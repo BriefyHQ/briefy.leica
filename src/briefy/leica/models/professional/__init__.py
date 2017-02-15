@@ -26,7 +26,7 @@ class Professional(UserProfile, Base):
 
     __summary_attributes__ = [
         'id', 'title', 'description', 'created_at', 'updated_at', 'state',
-        'email', 'mobile', 'type', 'photo_path', 'slug'
+        'email', 'mobile', 'type', 'photo_path', 'slug', 'first_name', 'last_name',
     ]
 
     __summary_attributes_relations__ = ['links', 'main_location', 'locations', 'pools']

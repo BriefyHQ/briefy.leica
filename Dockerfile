@@ -1,5 +1,5 @@
 FROM briefy/python3:1.2.0
-MAINTAINER RideLink <developers@briefy.co>
+MAINTAINER Briefy <developers@briefy.co>
 
 ADD . /app
 WORKDIR /app
