@@ -39,7 +39,6 @@ deploy:
   on:
     repo: BriefyHQ/briefy.leica
     branch: develop
-    tags: true
 addons:
   apt:
     packages:
