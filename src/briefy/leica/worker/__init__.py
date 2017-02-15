@@ -6,7 +6,6 @@ from briefy.common.queue.message import SQSMessage
 from briefy.common.utils.data import Objectify
 from briefy.common.worker.queue import QueueWorker
 from briefy.leica.config import NEW_RELIC_LICENSE_KEY
-from briefy.leica.worker import actions
 from zope.component import getUtility
 
 import newrelic.agent
@@ -14,6 +13,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
+from briefy.leica.worker import actions  # noQA
+# Late import allows module to import the logger.
 
 cs = logging.StreamHandler()
 cs.setLevel(logging.INFO)
@@ -35,7 +37,7 @@ MESSAGE_DISPATCH = {
         'failure_notification': None,
     },
     'laure.assignment.rejected': {
-        'name': 'resolving invalidated assigment',
+        'name': 'resolving invalidated assignment',
         'action': actions.invalidate_assignment,
         'success_notification': None,
         'failure_notification': None,
@@ -76,13 +78,11 @@ def ignite_database_session():
     from briefy.common.db.model import Base
     from briefy.leica.config import DATABASE_URL
     from sqlalchemy import create_engine
-    from sqlalchemy.orm import sessionmaker
-
-    engine = create_engine(DATABASE_URL)
-    # Magic conjuration ritual to actually creating a session to be used along the engine:
-    Session = sessionmaker(bind=engine)  # noQA
-    session = Session()  # noQA
+    from briefy.leica.db import Session
+    engine = create_engine(DATABASE_URL,  pool_recycle=3600)
+    Session.configure(bind=engine)
     Base.metadata.bind = engine
+    return Session
 
 
 class Worker(QueueWorker):
@@ -100,6 +100,19 @@ class Worker(QueueWorker):
     _events_queue = None
     """Events queue."""
 
+    _session = None
+    """Session instance."""
+
+    Session = None
+    """Session factory."""
+
+    @property
+    def session(self):
+        """Return session instance from Session factory."""
+        if not self._session:
+            self._session = self.Session()
+        return self._session
+
     @newrelic.agent.background_task(name='process_message', group='Task')
     def process_message(self, message: SQSMessage) -> bool:
         """Process a message retrieved from the input_queue.
@@ -108,8 +121,8 @@ class Worker(QueueWorker):
         :returns: Status from the process
         """
         status = True
-
         body = message.body
+        logger.info('Deis-worker: Processing message {0}'.format(body.get('id', None)))
         assignment = Objectify(body.get('data', {}))
         event = body.get('event_name', '')
         dispatch = Objectify(MESSAGE_DISPATCH.get(event, {}))
@@ -119,10 +132,9 @@ class Worker(QueueWorker):
             return False
 
         try:
-            assignment_status, payload = dispatch.action(assignment)
+            status, payload = dispatch.action(assignment, self.session)
 
         except Exception as error:
-            status = False
             logger.error(
                 'Unknown exception raised on \'{0}\' assignment {1}. Error: {2}'.format(
                     dispatch.name,
@@ -136,6 +148,9 @@ class Worker(QueueWorker):
             event = dispatch.success_notification(payload)
         elif not status and dispatch.failure_notification:
             event = dispatch.failure_notification(payload)
+        elif not status:
+                logger.warning('''Could not proccess message, and there are no '''
+                               '''further actions on failure: {0}'''.format(body))
         if event:
             event()
         return status
@@ -148,8 +163,9 @@ def main():
     if NEW_RELIC_LICENSE_KEY:
         newrelic.agent.register_application(timeout=10.0)
     try:
-        ignite_database_session()
+        worker.Session = ignite_database_session()
         worker()
+
     except:
         logger.exception('{name} exiting due to an exception.'.format(name=Worker.name))
         raise
