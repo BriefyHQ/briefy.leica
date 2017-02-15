@@ -473,7 +473,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     def to_dict(self):
         """Return a dict representation of this object."""
-        data = super().to_dict()
+        data = super().to_dict(excludes=['assignment', 'assignments'])
         data['description'] = self.description
         data['briefing'] = self.project.briefing
         data['availability'] = self.availability
@@ -484,6 +484,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data['location'] = self.location
         data['timezone'] = self.timezone
         data['assignment'] = self.assignment.to_summary_dict() if self.assignment else None
+        data['assignments'] = [item.to_summary_dict() for item in self.assignments]
         data['tech_requirements'] = self.tech_requirements
         # Workflow history
         add_user_info_to_state_history(self.state_history)
