@@ -26,6 +26,7 @@ History
 ------------------
 
     * Fix add creative with portfolio link (rudaporto).
+    * Split workflows for Briefy and Customer profiles (ericof).
 
 2.0.2 (2017-02-14)
 ------------------
