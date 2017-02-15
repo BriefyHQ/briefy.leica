@@ -8,6 +8,7 @@ History
     * Split workflows for Briefy and Customer profiles (ericof).
     * Fix Submission Date calculation on Assignment (ericof).
     * Expose initial password on UserProfile creation (ericof).
+    * Set timezone on new and updated OrderLocations (ericof).
     * Fix remove_availability transition: now the new assignment is created after cancel the old one (rudaporto).
 
 

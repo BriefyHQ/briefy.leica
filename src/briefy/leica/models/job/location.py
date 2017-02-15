@@ -4,8 +4,10 @@ from briefy.common.db.mixins import ContactInfoMixin
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.job import workflows
+from briefy.leica.utils.timezone import timezone_from_coordinates
 
 import colander
+import json
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils
 
@@ -60,6 +62,19 @@ class OrderLocation(ContactInfoMixin, AddressMixin,
 
     Reference to the Order this location is attached to.
     """
+
+    @sautils.observes('_coordinates')
+    def _update_timezone(self, _coordinates):
+        """Update timezone when coordinates change."""
+        lat = None
+        lng = None
+        value = json.loads(_coordinates)
+        point = value.get('coordinates', None) if value else None
+        if point:
+            lng, lat = point
+
+        if lat and lng:
+            self.timezone = timezone_from_coordinates(lat, lng)
 
     def to_dict(self):
         """Custom to_dict method."""
