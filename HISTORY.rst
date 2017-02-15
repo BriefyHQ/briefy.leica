@@ -2,6 +2,12 @@
 History
 =======
 
+2.0.5 (Unreleased)
+------------------
+
+    * Fix remove_availbility transition: now the new assignment is created after cancel the old one (rudaporto).
+
+
 2.0.4 (2017-02-15)
 ------------------
 
