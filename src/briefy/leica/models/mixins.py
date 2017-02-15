@@ -151,14 +151,17 @@ class LeicaBriefyRoles(BaseBriefyRoles):
         result = LocalRole(**payload)
         return result
 
-    def _apply_actors_info(self, data: dict) -> dict:
+    def _apply_actors_info(self, data: dict, instance=None) -> dict:
         """Apply actors information for a given data dictionary.
 
         :param data: Data dictionary.
         :return: Data dictionary.
         """
-        actors = [(k, k) for k in self.__actors__]
-        info = self._actors_info()
+        if not instance:
+            instance = self
+
+        actors = [(k, k) for k in instance.__actors__]
+        info = instance._actors_info()
         for key, attr in actors:
             try:
                 value = info.get(attr)
