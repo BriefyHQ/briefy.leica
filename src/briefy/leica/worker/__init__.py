@@ -78,14 +78,8 @@ def ignite_database_session():
     from briefy.common.db.model import Base
     from briefy.leica.config import DATABASE_URL
     from sqlalchemy import create_engine
-    # from sqlalchemy.orm import sessionmaker
     from briefy.leica.db import Session
-
-
     engine = create_engine(DATABASE_URL,  pool_recycle=3600)
-    # Magic conjuration ritual to actually creating a session to be used along the engine:
-    # Session = sessionmaker(bind=engine)  # noQA
-    # session = Session()  # noQA
     Session.configure(bind=engine)
     Base.metadata.bind = engine
 

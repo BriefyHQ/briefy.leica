@@ -54,7 +54,6 @@ def invalidate_assignment(laure_data: object) -> (bool, dict):
         assignment_id = laure_data.assignment.id
         assignment = Assignment.get(assignment_id)
 
-
         if not assignment:
             logger.error('''Got message with unexisting assignment id {0}'''.format(assignment_id))
             return False, {}
@@ -116,8 +115,9 @@ def approve_assignment(laure_data: object) -> (bool, dict):
         delivery_info['gdrive'] = laure_data.delivery_url
         delivery_info['archive'] = laure_data.archive_url
 
+        msg = '''Assets copied over on laure - committing delivery URL to order '{order_id}' '''
         logger.info(
-            '''Assets copied over on laure - committing delivery URL to order '{order_id}' '''.format(
+            msg.format(
                 order_id=assignment.order.id
             )
         )
