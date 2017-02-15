@@ -534,7 +534,6 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         # Update all dates
         self._update_dates_from_history()
 
-
     @property
     def closed_on_date(self) -> datetime:
         """Return the date of the closing info for this assignment."""
