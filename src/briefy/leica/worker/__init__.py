@@ -68,6 +68,23 @@ with the following keys:
 """
 
 
+def ignite_database_session():
+    """Create and bind SQLAlchemy Session to stand alone usage.
+
+    return: None
+    """
+    from briefy.common.db.model import Base
+    from briefy.leica.config import DATABASE_URL
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+
+    engine = create_engine(DATABASE_URL)
+    # Magic conjuration ritual to actually creating a session to be used along the engine:
+    Session = sessionmaker(bind=engine)  # noQA
+    session = Session()  # noQA
+    Base.metadata.bind = engine
+
+
 class Worker(QueueWorker):
     """Briefy.leica queue worker."""
 
@@ -131,6 +148,7 @@ def main():
     if NEW_RELIC_LICENSE_KEY:
         newrelic.agent.register_application(timeout=10.0)
     try:
+        ignite_database_session()
         worker()
     except:
         logger.exception('{name} exiting due to an exception.'.format(name=Worker.name))

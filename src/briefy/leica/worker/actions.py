@@ -30,7 +30,7 @@ def validate_assignment(laure_data: object) -> (bool, dict):
             assignment_id
         )
     )
-    assignment.workflow_context = SystemUser
+    assignment.workflow.context = SystemUser
     with transaction.manager:
         assignment.workflow.validate_assets(
             message='Validated submission.'
