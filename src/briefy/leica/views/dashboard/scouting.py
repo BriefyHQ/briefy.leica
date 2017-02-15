@@ -89,8 +89,12 @@ class DashboardScoutingProjectService(RESTService):
 
     _columns_map = (
         {
+            'field': 'absolute_url', 'label': 'url',
+            'type': 'hidden', 'url': '', 'filter': ''
+        },
+        {
             'field': 'title', 'label': 'Project',
-            'type': 'text', 'url': '', 'filter': ''
+            'type': 'text', 'url': 'absolute_url', 'filter': ''
         },
         {
             'field': 'total', 'label': 'Total',

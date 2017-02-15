@@ -11,7 +11,9 @@ from sqlalchemy import case
 from sqlalchemy import distinct
 from sqlalchemy import func
 from sqlalchemy import select
+from sqlalchemy import types
 from sqlalchemy.sql import and_
+from sqlalchemy.sql import expression
 
 
 total_professionals_per_country = select([
@@ -67,6 +69,7 @@ class DashboardScoutingCountry(Base):
 
 
 total_assignments_per_project = select([
+    func.CONCAT('/projects/', expression.cast(Project.id, types.Unicode)).label('absolute_url'),
     Project.title,
     func.count(distinct(Assignment.id)).label('total'),
     func.sum(
@@ -84,7 +87,7 @@ total_assignments_per_project = select([
     ).label('assigned'),
     func.count(distinct(Assignment.professional_id)).label('professionals'),
 ]).group_by(
-    Project.title
+    Project.title, Project.id
 ).where(
     and_(
         Project.id == Order.project_id,
