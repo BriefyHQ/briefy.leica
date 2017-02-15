@@ -2,18 +2,13 @@
 History
 =======
 
-2.0.5 (Unreleased)
-------------------
-
-    * Fix remove_availbility transition: now the new assignment is created after cancel the old one (rudaporto).
-
-
 2.0.4 (2017-02-15)
 ------------------
 
     * Split workflows for Briefy and Customer profiles (ericof).
     * Fix Submission Date calculation on Assignment (ericof).
     * Expose initial password on UserProfile creation (ericof).
+    * Fix remove_availability transition: now the new assignment is created after cancel the old one (rudaporto).
 
 
 2.0.3 (2017-02-14)
