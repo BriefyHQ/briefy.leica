@@ -6,6 +6,7 @@ History
 ------------------
 
    * Fix Order.to_dict to avoid failure when there is no active Assignment (rudaporto).
+   * Leica Worker: Support handling ignored assignments (ericof).
 
 
 2.0.5 (2017-02-15)
