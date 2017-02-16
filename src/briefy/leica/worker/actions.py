@@ -44,6 +44,43 @@ def validate_assignment(laure_data: object, session: object) -> (bool, dict):
     return True, {}
 
 
+def ignored_assignment(laure_data: object, session: object) -> (bool, dict):
+    """Perform necessary transition after photo set validation.
+
+    :param laure_data: Python object representing Laure data after assignment validation
+    :return: Flag indicating whether operation was sucessful, empty dict
+    """
+    with transaction.manager:
+        assignment_id = laure_data.assignment.id
+        assignment = Assignment.get(assignment_id)
+
+        if not assignment:
+            logger.error('''Got message for unknown assignment id {0}'''.format(assignment_id))
+            return False, {}
+
+        if assignment.state != 'asset_validation':
+            logger.error(
+                '''Got message to transition assignment '{0}' which is in state '{1}' '''.format(
+                    assignment_id,
+                    assignment.state
+                )
+            )
+            return False, {}
+
+        logger.info(
+            '''Assignment '{0}' assets validation ignored. Transitioning to 'in_qa' '''.format(
+                assignment_id
+            )
+        )
+        assignment.workflow.context = SystemUser
+        assignment.workflow.validate_assets(
+                message='Ignored validation.'
+            )
+        logger.info('''Assignment {0} state set to {1}'''.format(assignment.slug, assignment.state))
+
+    return True, {}
+
+
 def invalidate_assignment(laure_data: object, session: object) -> (bool, dict):
     """Perform necessary transition and field update after photo set was deemed invalid.
 
