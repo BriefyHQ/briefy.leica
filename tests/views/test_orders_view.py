@@ -16,7 +16,7 @@ class TestOrderView(BaseVersionedTestView):
         (models.Project, 'data/projects.json'),
     ]
     ignore_validation_fields = [
-        'state_history', 'state', 'updated_at', 'customer', 'project','timezone',
+        'state_history', 'state', 'updated_at', 'customer', 'project', 'timezone',
         'customer_user', 'project_manager', 'scout_manager', 'location',
         'external_id', 'assignment', 'assignments'
     ]

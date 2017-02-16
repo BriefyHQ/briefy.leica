@@ -539,7 +539,6 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
             if new != existing:
                 setattr(self, attr, new)
 
-
         transitions = ('assign', 'self_assign', )
         updated_if_changed('assignment_date', transitions, False)
 
