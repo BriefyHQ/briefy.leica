@@ -304,25 +304,20 @@ class AssignmentWorkflow(BriefyWorkflow):
     @Permission(groups=[G['customers'], G['pm'], G['system'], ])
     def can_cancel(self):
         """Validate if user can cancel an Assignment."""
-        user = self.context
         assignment = self.document
-        uploaded = assignment.submission_path
-        allowed = False
+        user = self.context
+        allowed = True
+        uploaded = True if assignment.submission_path else False
 
-        if G['system'].value in user.groups and not uploaded:
-            allowed = True
-
-        elif G['pm'].value in user.groups and not uploaded:
-            allowed = True
-
-        elif G['customers'].value in user.groups:
+        if G['customers'].value in user.groups:
             now = datetime_utcnow()
             scheduled_datetime = assignment.scheduled_datetime
-            date_diff = scheduled_datetime - now
-            if date_diff.days >= 1:
-                allowed = True
+            if scheduled_datetime:
+                date_diff = scheduled_datetime - now
+                if date_diff.days <= 1:
+                    allowed = False
 
-        return allowed
+        return allowed and not uploaded
 
     @scheduled.transition(awaiting_assets, 'can_get_ready_for_upload')
     def ready_for_upload(self, **kwargs):
@@ -829,25 +824,23 @@ class OrderWorkflow(BriefyWorkflow):
 
         Groups: g:pm, g:customers, r:project_manager, r:customer_user
         """
-        user = self.context
         order = self.document
         assignment = order.assignment
-        allowed = False
+        user = self.context
+        allowed = True
+        uploaded = False
 
         if assignment:
-            uploaded = assignment.submission_path
-            if G['system'].value in user.groups and not uploaded:
-                allowed = True
-            elif G['pm'].value in user.groups and not uploaded:
-                allowed = True
-            elif G['customers'].value in user.groups:
+            uploaded = True if assignment.submission_path else False
+            if G['customers'].value in user.groups:
                 now = datetime_utcnow()
                 scheduled_datetime = assignment.scheduled_datetime
-                date_diff = scheduled_datetime - now
-                if date_diff.days >= 1:
-                    allowed = True
+                if scheduled_datetime:
+                    date_diff = scheduled_datetime - now
+                    if date_diff.days <= 1:
+                        allowed = False
 
-        return allowed
+        return allowed and not uploaded
 
     @received.transition(scheduled, 'can_schedule')
     @assigned.transition(scheduled, 'can_schedule')

@@ -11,6 +11,8 @@ History
    * Change unassign and reshoot transition create a new assignment before cancel or complete the old one (rudaporto).
    * Cancel an Assignment will always set payout_value to zero (rudaporto).
    * Change newrelic config to ignore pyramid.httpexceptions:HTTPForbidden exceptions (rudaporto).
+   * Change can_cancel logic for Order and Assignment (rudaporto).
+   * Remove Assignment.scheduled_datetime when it's cancelled (rudaporto).
 
 
 2.0.5 (2017-02-15)
