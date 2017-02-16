@@ -12,6 +12,7 @@ from sqlalchemy import orm
 from sqlalchemy import select
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy_utils import TimezoneType
 from zope.interface import implementer
 from zope.interface import Interface
 
@@ -156,10 +157,18 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
             'state_history', 'state', 'order', 'comments',
             'professional', 'assets', 'project', 'location',
             '_scout_manager', '_project_manager', '_qa_manager',
-            '_professional_user', 'pool'
+            '_professional_user', 'pool', 'active_order'
         ],
         'overrides': overrides
     }
+
+    __versioned__ = {
+        'exclude': ['state_history', '_state_history', 'timezone']
+    }
+    """SQLAlchemy Continuum settings.
+
+    By default we do not keep track of state_history and helper columns.
+    """
 
     _slug = sa.Column('slug',
                       sa.String(255),
@@ -248,7 +257,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     )
     """Pool ID.
 
-    Relantionship to :class:`briefy.leica.models.job.pool.Pool`
+    Relationship to :class:`briefy.leica.models.job.pool.Pool`
     """
 
     # Professional
@@ -360,6 +369,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         secondary="join(Order, OrderLocation, Order.id == OrderLocation.order_id)",
         secondaryjoin="Order.id == OrderLocation.order_id",
         primaryjoin="Order.id == Assignment.order_id",
+        backref=orm.backref('assigments'),
         viewonly=True,
         uselist=False
     )
@@ -380,6 +390,19 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
             }
         }
     )
+
+    timezone = sa.Column(TimezoneType(backend='pytz'), default='UTC')
+    """Timezone in which this address is located.
+
+    i.e.: UTC, Europe/Berlin
+    """
+    # Deal with timezone changes
+    @sautils.observes('location')
+    def _timezone_observer(self, location):
+        """Update timezone on this object."""
+        if location and location.timezone:
+            timezone = location.timezone
+            self.timezone = timezone
 
     @sautils.aggregated('assets', sa.Column(sa.Integer, default=0))
     def total_assets(self):
@@ -506,24 +529,30 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         """Update dates from history."""
         updated_at = self.updated_at
         state_history = self.state_history
+
+        def updated_if_changed(attr, t_list, first=False):
+            """Update only if changed."""
+            existing = getattr(self, attr)
+            new = get_transition_date_from_history(
+                t_list, state_history, first=first
+            )
+            if new != existing:
+                setattr(self, attr, new)
+
+
         transitions = ('assign', 'self_assign', )
-        self.assignment_date = get_transition_date_from_history(transitions, state_history)
+        updated_if_changed('assignment_date', transitions, False)
 
         transitions = ('approve', 'reject', )
-        self.last_approval_date = get_transition_date_from_history(transitions, state_history)
+        updated_if_changed('last_approval_date', transitions, False)
 
         transitions = ('upload', )
-        self.submission_date = get_transition_date_from_history(
-            transitions, state_history, first=True
-        )
-
-        transitions = ('upload', )
-        self.last_submission_date = get_transition_date_from_history(transitions, state_history)
+        updated_if_changed('submission_date', transitions, True)
+        updated_if_changed('last_submission_date', transitions, False)
 
         transitions = ('accept', 'refuse')
-        self.customer_approval_date = get_transition_date_from_history(
-            transitions, state_history, first=True
-        )
+        updated_if_changed('customer_approval_date', transitions, False)
+
         if keep_updated_at:
             self.updated_at = updated_at
 
@@ -550,14 +579,6 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     def assigned(self) -> bool:
         """Return if this Assignment is assigned or not."""
         return True if (self.assignment_date and self.professional_id) else False
-
-    @hybrid_property
-    def timezone(self) -> str:
-        """Return Timezone for this order.
-
-        Information will be obtained from main location.
-        """
-        return self.order.timezone
 
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.

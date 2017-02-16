@@ -31,6 +31,7 @@
     ],
     "job_id": "1",
     "availability": ["2016-09-18T18:55:25.930638+00:00", "2016-09-18T18:55:25.930638+00:00"],
+    "timezone": "Europe/Berlin",
     "location":  {
       "id": "d85dc102-7d3b-4574-a261-4bf72db571db",
       "order_id": "011418fa-f450-4deb-b6ea-7f8e103a66d1",
@@ -79,6 +80,7 @@
     "state": "received",
     "title": "Job Title 2",
     "external_id": "ID2222",
+    "timezone": "Europe/Berlin",
     "state_history": [
       {
         "to": "created",
@@ -112,6 +114,7 @@
     "state": "received",
     "title": "Job Title 3",
     "external_id": "ID3333",
+    "timezone": "Europe/Berlin",
     "state_history": [
       {
         "to": "created",
@@ -145,6 +148,7 @@
     "state": "received",
     "title": "Job Title 4",
     "external_id": "ID4444",
+    "timezone": "Europe/Berlin",
     "state_history": [
       {
         "to": "created",
@@ -178,6 +182,7 @@
     "state": "received",
     "title": "Job Title 5",
     "external_id": "ID5555",
+    "timezone": "Europe/Berlin",
     "state_history": [
       {
         "to": "created",

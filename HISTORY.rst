@@ -11,6 +11,10 @@ History
    * Change unassign and reshoot transition create a new assignment before cancel or complete the old one (rudaporto).
    * Cancel an Assignment will always set payout_value to zero (rudaporto).
    * Change newrelic config to ignore pyramid.httpexceptions:HTTPForbidden exceptions (rudaporto).
+   * Assignment: Add timezone attribute (ericof).
+   * Order: Add timezone attribute (ericof).
+   * Order: Add scheduled_datetime, deliver_date, last_deliver_date, accept_date (ericof).
+   * Order: Add script to update computed dates (ericof).
 
 
 2.0.5 (2017-02-15)
