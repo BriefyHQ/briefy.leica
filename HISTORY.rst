@@ -2,6 +2,12 @@
 History
 =======
 
+2.0.6 (2017-02-16)
+------------------
+
+   * Fix Order.to_dict to avoid failure when there is no active Assignment (rudaporto).
+
+
 2.0.5 (2017-02-15)
 ------------------
 
