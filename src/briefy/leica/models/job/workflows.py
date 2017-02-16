@@ -297,28 +297,32 @@ class AssignmentWorkflow(BriefyWorkflow):
     @awaiting_assets.transition(cancelled, 'can_cancel')
     def cancel(self, **kwargs):
         """Customer or PM cancel the Assignment."""
-        now = datetime_utcnow()
         assignment = self.document
+        assignment.payout_value = 0
+        assignment.scheduled_datetime = None
+
+    @Permission(groups=[G['customers'], G['pm'], G['system'], ])
+    def can_cancel(self):
+        """Validate if user can cancel an Assignment."""
+        user = self.context
+        assignment = self.document
+        uploaded = assignment.submission_path
         allowed = False
-        scheduled_datetime = assignment.scheduled_datetime
-        if self.state == self.scheduled:
+
+        if G['system'].value in user.groups and not uploaded:
+            allowed = True
+
+        elif G['pm'].value in user.groups and not uploaded:
+            allowed = True
+
+        elif G['customers'].value in user.groups:
+            now = datetime_utcnow()
+            scheduled_datetime = assignment.scheduled_datetime
             date_diff = scheduled_datetime - now
             if date_diff.days >= 1:
                 allowed = True
-        elif self.state == self.awaiting_assets:
-            submission_path = assignment.submission_path
-            date_diff = now - scheduled_datetime
-            # let cancel if the there is no upload after 4 days
-            if not submission_path and date_diff.days >= 4:
-                allowed = True
-        if allowed:
-            assignment.payout_value = 0
-        return allowed
 
-    @Permission(groups=[G['customers'], G['pm'], G['qa'], ])
-    def can_cancel(self):
-        """Validate if user can cancel an Assignment."""
-        return True
+        return allowed
 
     @scheduled.transition(awaiting_assets, 'can_get_ready_for_upload')
     def ready_for_upload(self, **kwargs):
@@ -819,14 +823,31 @@ class OrderWorkflow(BriefyWorkflow):
         wkf.context = self.context
         assignment.workflow.cancel()
 
-    @Permission(groups=[LR['project_manager'], LR['customer_user'], G['pm'], G['customers'], ])
+    @Permission(groups=[G['pm'], G['customers'], G['system'], ])
     def can_cancel(self):
         """Permission: Validate if user can move the Order to the cancelled state.
 
         Groups: g:pm, g:customers, r:project_manager, r:customer_user
         """
-        # TODO: validate if the restrictions before cancel the Order
-        return True
+        user = self.context
+        order = self.document
+        assignment = order.assignment
+        allowed = False
+
+        if assignment:
+            uploaded = assignment.submission_path
+            if G['system'].value in user.groups and not uploaded:
+                allowed = True
+            elif G['pm'].value in user.groups and not uploaded:
+                allowed = True
+            elif G['customers'].value in user.groups:
+                now = datetime_utcnow()
+                scheduled_datetime = assignment.scheduled_datetime
+                date_diff = scheduled_datetime - now
+                if date_diff.days >= 1:
+                    allowed = True
+
+        return allowed
 
     @received.transition(scheduled, 'can_schedule')
     @assigned.transition(scheduled, 'can_schedule')

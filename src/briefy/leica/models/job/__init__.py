@@ -24,13 +24,13 @@ __summary_attributes__ = [
     'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
     'number_required_assets', 'approvable', 'total_assets', 'total_approvable_assets',
     'category', 'scheduled_datetime', 'professional', 'timezone', 'professional_user',
-    'payout_value', 'payout_currency', 'travel_expenses'
+    'payout_value', 'payout_currency', 'travel_expenses', 'submission_path'
 ]
 
 __listing_attributes__ = __summary_attributes__ + [
     'assignment_date', 'last_approval_date', 'submission_date', 'last_submission_date',
     'set_type', 'number_required_assets', 'category', 'availability', 'additional_compensation',
-    'reason_additional_compensation', 'qa_manager', 'submission_path', 'state_history',
+    'reason_additional_compensation', 'qa_manager', 'state_history',
     'requirements', 'pool_id', 'location', 'project', 'closed_on_date'
 ]
 
