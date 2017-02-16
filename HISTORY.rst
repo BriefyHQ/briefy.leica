@@ -15,6 +15,8 @@ History
    * Order: Add timezone attribute (ericof).
    * Order: Add scheduled_datetime, deliver_date, last_deliver_date, accept_date (ericof).
    * Order: Add script to update computed dates (ericof).
+   * Change can_cancel logic for Order and Assignment (rudaporto).
+   * Remove Assignment.scheduled_datetime when it's cancelled (rudaporto).
 
 
 2.0.5 (2017-02-15)
