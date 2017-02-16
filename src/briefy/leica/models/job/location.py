@@ -24,7 +24,8 @@ class OrderLocation(ContactInfoMixin, AddressMixin,
 
     __summary_attributes__ = [
         'id', 'country', 'locality', 'coordinates', 'email', 'mobile',
-        'additional_phone', 'fullname', 'formatted_address', 'info'
+        'additional_phone', 'fullname', 'first_name', 'last_name',
+        'formatted_address', 'info'
     ]
 
     __colanderalchemy_config__ = {

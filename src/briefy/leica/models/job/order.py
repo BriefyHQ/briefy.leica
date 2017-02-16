@@ -493,6 +493,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data = super().to_dict(excludes=['assignment', 'assignments'])
 
         assignment = self.assignment
+        assignment_data = None
         if assignment:
             assignment_data = self.assignment.to_summary_dict()
             assignment_data = self._apply_actors_info(assignment_data, assignment)

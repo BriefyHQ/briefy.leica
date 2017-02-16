@@ -297,26 +297,27 @@ class AssignmentWorkflow(BriefyWorkflow):
     @awaiting_assets.transition(cancelled, 'can_cancel')
     def cancel(self, **kwargs):
         """Customer or PM cancel the Assignment."""
-        now = datetime_utcnow()
         assignment = self.document
-        allowed = False
-        scheduled_datetime = assignment.scheduled_datetime
-        if self.state == self.scheduled:
-            date_diff = scheduled_datetime - now
-            if date_diff.days >= 1:
-                allowed = True
-        elif self.state == self.awaiting_assets:
-            submission_path = assignment.submission_path
-            date_diff = now - scheduled_datetime
-            # let cancel if the there is no upload after 4 days
-            if not submission_path and date_diff.days >= 4:
-                allowed = True
-        return allowed
+        assignment.payout_value = 0
+        assignment.scheduled_datetime = None
 
-    @Permission(groups=[G['customers'], G['pm'], G['qa'], ])
+    @Permission(groups=[G['customers'], G['pm'], G['system'], ])
     def can_cancel(self):
         """Validate if user can cancel an Assignment."""
-        return True
+        assignment = self.document
+        user = self.context
+        allowed = True
+        uploaded = True if assignment.submission_path else False
+
+        if G['customers'].value in user.groups:
+            now = datetime_utcnow()
+            scheduled_datetime = assignment.scheduled_datetime
+            if scheduled_datetime:
+                date_diff = scheduled_datetime - now
+                if date_diff.days <= 1:
+                    allowed = False
+
+        return allowed and not uploaded
 
     @scheduled.transition(awaiting_assets, 'can_get_ready_for_upload')
     def ready_for_upload(self, **kwargs):
@@ -728,8 +729,13 @@ class OrderWorkflow(BriefyWorkflow):
         order = self.document
         old_assignment = order.assignment
         message = kwargs.get('message', '')
+        create_new_assignment_from_order(
+            order,
+            order.request,
+            copy_payout=True,
+            old_assignment=old_assignment
+        )
         old_assignment.workflow.cancel(message=message)
-        create_new_assignment_from_order(order, order.request, copy_payout=True)
         return True
 
     @Permission(groups=[LR['project_manager'], G['pm'], ])
@@ -812,14 +818,29 @@ class OrderWorkflow(BriefyWorkflow):
         wkf.context = self.context
         assignment.workflow.cancel()
 
-    @Permission(groups=[LR['project_manager'], LR['customer_user'], G['pm'], G['customers'], ])
+    @Permission(groups=[G['pm'], G['customers'], G['system'], ])
     def can_cancel(self):
         """Permission: Validate if user can move the Order to the cancelled state.
 
         Groups: g:pm, g:customers, r:project_manager, r:customer_user
         """
-        # TODO: validate if the restrictions before cancel the Order
-        return True
+        order = self.document
+        assignment = order.assignment
+        user = self.context
+        allowed = True
+        uploaded = False
+
+        if assignment:
+            uploaded = True if assignment.submission_path else False
+            if G['customers'].value in user.groups:
+                now = datetime_utcnow()
+                scheduled_datetime = assignment.scheduled_datetime
+                if scheduled_datetime:
+                    date_diff = scheduled_datetime - now
+                    if date_diff.days <= 1:
+                        allowed = False
+
+        return allowed and not uploaded
 
     @received.transition(scheduled, 'can_schedule')
     @assigned.transition(scheduled, 'can_schedule')
@@ -923,8 +944,13 @@ class OrderWorkflow(BriefyWorkflow):
         order = self.document
         order.availability = []
         old_assignment = order.assignment
+        create_new_assignment_from_order(
+            order,
+            order.request,
+            copy_payout=True,
+            old_assignment=old_assignment
+        )
         old_assignment.workflow.complete(message=message)
-        create_new_assignment_from_order(order, order.request, copy_payout=True)
 
     @Permission(groups=[LR['project_manager'], G['pm'], G['qa'], ])
     def can_new_shoot(self):

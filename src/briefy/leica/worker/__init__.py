@@ -36,6 +36,12 @@ MESSAGE_DISPATCH = {
         'success_notification': None,
         'failure_notification': None,
     },
+    'laure.assignment.ignored': {
+        'name': 'resolving ignored assignment',
+        'action': actions.ignored_assignment,
+        'success_notification': None,
+        'failure_notification': None,
+    },
     'laure.assignment.rejected': {
         'name': 'resolving invalidated assignment',
         'action': actions.invalidate_assignment,
