@@ -311,6 +311,8 @@ class AssignmentWorkflow(BriefyWorkflow):
             # let cancel if the there is no upload after 4 days
             if not submission_path and date_diff.days >= 4:
                 allowed = True
+        if allowed:
+            assignment.payout_value = 0
         return allowed
 
     @Permission(groups=[G['customers'], G['pm'], G['qa'], ])
@@ -728,8 +730,13 @@ class OrderWorkflow(BriefyWorkflow):
         order = self.document
         old_assignment = order.assignment
         message = kwargs.get('message', '')
+        create_new_assignment_from_order(
+            order,
+            order.request,
+            copy_payout=True,
+            old_assignment=old_assignment
+        )
         old_assignment.workflow.cancel(message=message)
-        create_new_assignment_from_order(order, order.request, copy_payout=True)
         return True
 
     @Permission(groups=[LR['project_manager'], G['pm'], ])
@@ -923,8 +930,13 @@ class OrderWorkflow(BriefyWorkflow):
         order = self.document
         order.availability = []
         old_assignment = order.assignment
+        create_new_assignment_from_order(
+            order,
+            order.request,
+            copy_payout=True,
+            old_assignment=old_assignment
+        )
         old_assignment.workflow.complete(message=message)
-        create_new_assignment_from_order(order, order.request, copy_payout=True)
 
     @Permission(groups=[LR['project_manager'], G['pm'], G['qa'], ])
     def can_new_shoot(self):

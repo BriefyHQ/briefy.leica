@@ -7,6 +7,10 @@ History
 
    * Fix Order.to_dict to avoid failure when there is no active Assignment (rudaporto).
    * Leica Worker: Support handling ignored assignments (ericof).
+   * Improve new assignment creation function to also receive the old assignment (rudaporto).
+   * Change unassign and reshoot transition create a new assignment before cancel or complete the old one (rudaporto).
+   * Cancel an Assignment will always set payout_value to zero (rudaporto).
+   * Change newrelic config to ignore pyramid.httpexceptions:HTTPForbidden exceptions (rudaporto).
 
 
 2.0.5 (2017-02-15)

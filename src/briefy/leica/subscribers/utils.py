@@ -49,7 +49,7 @@ def create_comment_from_wf_transition(obj, author_role, to_role, internal=False)
         session.add(comment)
 
 
-def create_new_assignment_from_order(order, request, copy_payout=False):
+def create_new_assignment_from_order(order, request, copy_payout=False, old_assignment=None):
     """Create a new Assignment object from Order."""
     from briefy.leica.models import Assignment
     session = object_session(order)
@@ -59,7 +59,7 @@ def create_new_assignment_from_order(order, request, copy_payout=False):
 
     if copy_payout:
         payout_fields = ('payout_value', 'payout_currency', 'travel_expenses')
-        old_assignment = order.assignment
+        old_assignment = old_assignment or order.assignment
         for key in payout_fields:
             payload[key] = getattr(old_assignment, key)
 
