@@ -8,6 +8,7 @@ History
   * Script to update all Agoda orders with original latitude and longitude from Agoda spreadsheets (rudaporto).
   * Script to move assignments from scheduled to awaiting assets (rudaporto).
   * Script to move assignments to the Pool (rudaporto).
+  * Update worker approve_assignment action to execute the Order workflow delivery transition (rudaporto).
 
 
 2.0.6 (2017-02-16)

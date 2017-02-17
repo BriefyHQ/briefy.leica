@@ -163,8 +163,14 @@ def approve_assignment(laure_data: object, session: object) -> (bool, dict):
                 order_id=assignment.order.id
             )
         )
-
-        assignment.order.delivery = delivery_info
+        order = assignment.order
+        fields = dict(delivery=delivery_info)
+        wf = order.workflow
+        wf.context = SystemUser
+        wf.delivery(
+            fields=fields,
+            message='Assets automatic delivered.'
+        )
 
         # TODO: Unless google drive is phased out soon, this URL should be
         # stored on the model.
