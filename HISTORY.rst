@@ -12,6 +12,9 @@ History
    * Order: Add script to update computed dates (ericof).
    * Add project pool_id attribute (ericof).
    * Add project delivery info attribute (ericof).
+  * Script to move assignments from scheduled to awaiting assets (rudaporto).
+  * Script to move assignments to the Pool (rudaporto).
+  * Update worker approve_assignment action to execute the Order workflow delivery transition (rudaporto)
 
 
 2.0.6 (2017-02-16)
