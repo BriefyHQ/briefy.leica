@@ -1,10 +1,13 @@
+from briefy.common.db import datetime_utcnow
 from briefy.common.users import SystemUser
 from briefy.leica import logger
 from briefy.leica.db import Session
 from briefy.leica.sync import db
 from briefy.leica.models import Order
+from dateutil.parser import parse
 
 import transaction
+
 
 POOLS_CONFIG = (
     (
@@ -54,12 +57,23 @@ def main(session):
         ).all()
 
         for order in orders:
+            now = datetime_utcnow()
             if order.availability:
+                has_availability = False
+                for date in order.availability:
+                    date = parse(date)
+                    date_diff = date - now
+                    if date_diff.days >= 2:
+                        has_availability = True
+
                 assignment = order.assignment
                 has_payout = assignment.payout_value and assignment.payout_currency
                 print_msg = True
+
                 if assignment.state != 'pending':
                     print_msg = False
+                elif not has_availability:
+                    msg = 'Assignment {id} has no availability two days in future.'
                 elif assignment.pool_id:
                     msg = 'Assignment {id} is pending but already has a pool id.'
                 elif not has_payout:
