@@ -167,7 +167,7 @@ def approve_assignment(laure_data: object, session: object) -> (bool, dict):
         fields = dict(delivery=delivery_info)
         wf = order.workflow
         wf.context = SystemUser
-        wf.delivery(
+        wf.deliver(
             fields=fields,
             message='Assets automatic delivered.'
         )
