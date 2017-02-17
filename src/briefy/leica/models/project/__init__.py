@@ -47,7 +47,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         'id', 'title', 'description', 'created_at', 'updated_at', 'state', 'slug'
     ]
 
-    __summary_attributes_relations__ = ['customer']
+    __summary_attributes_relations__ = ['customer', 'pool']
 
     __listing_attributes__ = [
         'id', 'title', 'description', 'created_at', 'updated_at', 'state',
@@ -132,6 +132,58 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     It stores a dictionary of requirements to be full filed by each asset of each Assignment.
     """
 
+    delivery = sa.Column(
+        sautils.JSONType,
+        info={
+            'colanderalchemy': {
+                'title': 'Delivery information for this project.',
+                'missing': colander.drop,
+                'typ': colander.String
+            }
+        }
+    )
+    """Delivery configuration for orders in this project.
+
+    It stores a dictionary of configurations to be used by the delivery mechanism.
+
+    i.e::
+        {
+          "approve": {
+            "archive": {
+              "driver": "gdrive",
+              "parentId": "",
+              "subfolders": true,
+              "images": true,
+              "other": true,
+              "name": "order.customer_order_id",
+              "resize": []
+            },
+            "gdrive": {
+              "driver": "gdrive",
+              "parentId": "",
+              "subfolders": false,
+              "images": true,
+              "other": false,
+              "name": "order.customer_order_id",
+              "resize": []
+            },
+          },
+          "accept": {
+            "sftp": {
+              "driver": "sftp",
+              "subfolders": false,
+              "images": true,
+              "other": false,
+              "name": "order.customer_order_id",
+              "resize": [
+                {"name": "resized", "filter": "maxbytes": 4000000}
+              ]
+            }
+          }
+        }
+
+    """
+
     cancellation_window = sa.Column(sa.Integer, default=0)
     """Period, in hours, before the shooting, an Assignment can be cancelled.
 
@@ -200,6 +252,25 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         }
     )
     """Path to release template file."""
+
+    pool_id = sa.Column(
+        sautils.UUIDType,
+        sa.ForeignKey('pools.id'),
+        index=True,
+        nullable=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Pool ID',
+                'validator': colander.uuid,
+                'missing': colander.drop,
+                'typ': colander.String
+            }
+        }
+    )
+    """Pool ID.
+
+    Relationship between a project and a Pool.
+    """
 
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.

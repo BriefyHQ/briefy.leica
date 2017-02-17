@@ -1,3 +1,4 @@
+"""Script to update Agoda coordinates."""
 from briefy.leica.db import Session
 from briefy.leica.models import Customer
 from briefy.leica.models import Project
