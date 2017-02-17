@@ -1,4 +1,5 @@
 """Briefy Leica OrderLocation model."""
+from briefy.common.config import IMPORT_KNACK
 from briefy.common.db.mixins import Address as AddressMixin
 from briefy.common.db.mixins import ContactInfoMixin
 from briefy.leica.db import Base
@@ -67,6 +68,10 @@ class OrderLocation(ContactInfoMixin, AddressMixin,
     @sautils.observes('_coordinates')
     def _update_timezone(self, _coordinates):
         """Update timezone when coordinates change."""
+        # avoid update timezone when import data
+        if IMPORT_KNACK:
+            return
+
         lat = None
         lng = None
         value = json.loads(_coordinates)

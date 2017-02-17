@@ -2,6 +2,12 @@
 History
 =======
 
+2.0.7 (2017-02-17)
+------------------
+
+  * Script to update all Agoda orders with original latitude and longitude from Agoda spreadsheets (rudaporto).
+
+
 2.0.6 (2017-02-16)
 ------------------
 
