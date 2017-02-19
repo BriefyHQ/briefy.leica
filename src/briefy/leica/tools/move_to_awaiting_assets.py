@@ -1,3 +1,4 @@
+"""Move Assignments to awaiting assets."""
 from briefy.common.db import datetime_utcnow
 from briefy.common.users import SystemUser
 from briefy.leica import logger
@@ -10,7 +11,6 @@ import transaction
 
 def main(session):
     """Move Assignments from scheduled to awaiting_assets."""
-
     now = datetime_utcnow()
 
     assignments = session.query(Assignment).filter(
