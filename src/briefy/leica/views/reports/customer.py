@@ -1,6 +1,7 @@
 """Views to handle Customer Dashboards."""
 from briefy.leica.models.reports.customer import OrdersByProjectReport
 from briefy.leica.views.reports import BaseReport
+from briefy.ws import CORS_POLICY
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
 from pyramid.security import Allow
@@ -29,7 +30,11 @@ class ReportCustomerFactory(BaseFactory):
     ]
 
 
-@resource(path='/reports/customer/projects/{id}', factory=ReportCustomerFactory)
+@resource(
+    path='/reports/customer/projects/{id}',
+    cors_policy=CORS_POLICY,
+    factory=ReportCustomerFactory
+)
 class CustomerReports(BaseReport):
     """Reports for Customer."""
 
