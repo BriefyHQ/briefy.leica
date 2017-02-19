@@ -5,10 +5,16 @@ History
 2.0.7 (2017-02-17)
 ------------------
 
-  * Script to update all Agoda orders with original latitude and longitude from Agoda spreadsheets (rudaporto).
+   * Script to update all Agoda orders with original latitude and longitude from Agoda spreadsheets (rudaporto).
+   * Assignment: Add timezone attribute (ericof).
+   * Order: Add timezone attribute (ericof).
+   * Order: Add scheduled_datetime, deliver_date, last_deliver_date, accept_date (ericof).
+   * Order: Add script to update computed dates (ericof).
+   * Add project pool_id attribute (ericof).
+   * Add project delivery info attribute (ericof).
   * Script to move assignments from scheduled to awaiting assets (rudaporto).
   * Script to move assignments to the Pool (rudaporto).
-  * Update worker approve_assignment action to execute the Order workflow delivery transition (rudaporto).
+  * Update worker approve_assignment action to execute the Order workflow delivery transition (rudaporto)
 
 
 2.0.6 (2017-02-16)
