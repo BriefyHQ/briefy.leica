@@ -2,32 +2,36 @@
 History
 =======
 
+2.0.8 (2017-02-19)
+------------------
+
+    * Order: Add timezone attribute (ericof).
+    * Order: Add scheduled_datetime, deliver_date, last_deliver_date, accept_date (ericof).
+    * Order: Add script to update computed dates (ericof).
+    * Add project pool_id attribute (ericof).
+    * Add project delivery info attribute (ericof).
+    * Script to move assignments from scheduled to awaiting assets (rudaporto).
+    * Script to move assignments to the Pool (rudaporto).
+    * Update worker approve_assignment action to execute the Order workflow delivery transition (rudaporto)
+    * Add Orders by Project report to customers (ericof).
+
 2.0.7 (2017-02-17)
 ------------------
 
-   * Script to update all Agoda orders with original latitude and longitude from Agoda spreadsheets (rudaporto).
-   * Assignment: Add timezone attribute (ericof).
-   * Order: Add timezone attribute (ericof).
-   * Order: Add scheduled_datetime, deliver_date, last_deliver_date, accept_date (ericof).
-   * Order: Add script to update computed dates (ericof).
-   * Add project pool_id attribute (ericof).
-   * Add project delivery info attribute (ericof).
-  * Script to move assignments from scheduled to awaiting assets (rudaporto).
-  * Script to move assignments to the Pool (rudaporto).
-  * Update worker approve_assignment action to execute the Order workflow delivery transition (rudaporto)
+    * Script to update all Agoda orders with original latitude and longitude from Agoda spreadsheets (rudaporto).
 
 
 2.0.6 (2017-02-16)
 ------------------
 
-   * Fix Order.to_dict to avoid failure when there is no active Assignment (rudaporto).
-   * Leica Worker: Support handling ignored assignments (ericof).
-   * Improve new assignment creation function to also receive the old assignment (rudaporto).
-   * Change unassign and reshoot transition create a new assignment before cancel or complete the old one (rudaporto).
-   * Cancel an Assignment will always set payout_value to zero (rudaporto).
-   * Change newrelic config to ignore pyramid.httpexceptions:HTTPForbidden exceptions (rudaporto).
-   * Change can_cancel logic for Order and Assignment (rudaporto).
-   * Remove Assignment.scheduled_datetime when it's cancelled (rudaporto).
+    * Fix Order.to_dict to avoid failure when there is no active Assignment (rudaporto).
+    * Leica Worker: Support handling ignored assignments (ericof).
+    * Improve new assignment creation function to also receive the old assignment (rudaporto).
+    * Change unassign and reshoot transition create a new assignment before cancel or complete the old one (rudaporto).
+    * Cancel an Assignment will always set payout_value to zero (rudaporto).
+    * Change newrelic config to ignore pyramid.httpexceptions:HTTPForbidden exceptions (rudaporto).
+    * Change can_cancel logic for Order and Assignment (rudaporto).
+    * Remove Assignment.scheduled_datetime when it's cancelled (rudaporto).
 
 
 2.0.5 (2017-02-15)
