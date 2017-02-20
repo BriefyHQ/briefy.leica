@@ -369,7 +369,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         secondary="join(Order, OrderLocation, Order.id == OrderLocation.order_id)",
         secondaryjoin="Order.id == OrderLocation.order_id",
         primaryjoin="Order.id == Assignment.order_id",
-        backref=orm.backref('assigments'),
+        backref=orm.backref('assignments'),
         viewonly=True,
         uselist=False
     )

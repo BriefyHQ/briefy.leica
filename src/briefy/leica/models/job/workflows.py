@@ -8,7 +8,7 @@ from briefy.common.workflow import Permission
 from briefy.common.workflow import WorkflowState as WS
 from briefy.common.workflow import WorkflowTransitionException
 from briefy.leica.subscribers.utils import create_new_assignment_from_order
-from briefy.leica.utils.transitions import create_comment_on_assigment_approval
+from briefy.leica.utils.transitions import create_comment_on_assignment_approval
 
 import logging
 
@@ -380,7 +380,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         if customer_message:
             actor = self.context.id
             assignment = self.document
-            create_comment_on_assigment_approval(assignment, actor, customer_message)
+            create_comment_on_assignment_approval(assignment, actor, customer_message)
 
     @in_qa.transition(
         awaiting_assets, 'can_approve',

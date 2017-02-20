@@ -63,7 +63,7 @@ def approve_assets_in_assignment(assignment: Base, context) -> list:
     return assets_ids
 
 
-def create_comment_on_assigment_approval(assignment, actor, message):
+def create_comment_on_assignment_approval(assignment, actor, message):
     """Create a new Comment instance from the last workflow transition."""
     from briefy.leica.models import Comment
 
