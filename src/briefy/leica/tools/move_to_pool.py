@@ -46,6 +46,11 @@ POOLS_CONFIG = (
         '009e2b7c-cc61-4f7b-ac34-7ced9a6bc0f5',
         '1dafb433-9431-4295-a349-92c4ad61c59e'
     ),
+    (
+        'Wolt Pilot',
+        '1b8c769f-0e1f-4618-aeaf-f399a91055b7',
+        'd347be4c-eddc-4d9d-9fd8-4bbd24d3e13b'
+    ),
 )
 
 
