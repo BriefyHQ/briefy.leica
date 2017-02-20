@@ -116,6 +116,25 @@ import_knack:
 	IMPORT_KNACK=True python src/briefy/leica/tools/import_all.py
 	unset IMPORT_KNACK
 
+dumpdb_prod:
+	pg_dump -Fc -h briefy-services.cbpyycv8xvtn.eu-central-1.rds.amazonaws.com \
+	-p 5432 -U leica_usr --exclude-schema=tiger --exclude-schema=topology \
+	-d leica > /tmp/production-leica.dump
+	sudo chmod 0644 /tmp/production-leica.dump
+
+dumpdb_stg:
+	pg_dump -Fc -h briefy-services.c2q3x2i4qnm7.us-east-1.rds.amazonaws.com \
+	-p 5432 -U leica_usr --exclude-schema=tiger --exclude-schema=topology \
+	-d leica > /tmp/staging-leica.dump
+	sudo chmod 0644 /tmp/staging-leica.dump
+
+restoredb_prod_local: clean_dockers create_dockers
+	scp live:/tmp/production-leica.dump /tmp/production-leica.dump
+q
+restoredb_stg_local: clean_dockers create_dockers
+	scp stg:/tmp/staging-leica.dump /tmp/staging-leica.dump
+	pg_restore --no-owner -x -h localhost -p 9999 -U briefy -W -d briefy-leica /tmp/staging-leica.dump
+
 start_dockers:
 	docker start sqs
 	docker start briefy-leica-test
@@ -143,5 +162,3 @@ create_dockers: export_db_env
 	docker run -d -p 127.0.0.1:9998:5432 -e POSTGRES_PASSWORD=briefy -e POSTGRES_USER=briefy -e POSTGRES_DB=briefy-leica-unit_test --name briefy-leica-unit_test mdillon/postgis:9.5
 	echo "Waiting Posgtres to start"
 	sleep 40s
-	alembic upgrade head
-

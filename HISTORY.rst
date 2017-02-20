@@ -2,6 +2,11 @@
 History
 =======
 
+2.0.9 (2017-02-20)
+------------------
+    * Create leica_tasks main script and two tasks: publish to pool and move to awainting assets (rudaporto).
+
+
 2.0.8 (2017-02-20)
 ------------------
 
