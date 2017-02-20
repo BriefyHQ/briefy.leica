@@ -1,7 +1,7 @@
 """Move Assignment to Pool."""
 from briefy.common.db import datetime_utcnow
 from briefy.common.users import SystemUser
-from briefy.leica import logger
+from briefy.leica.log import tasks_logger as logger
 from briefy.leica.models import Order
 from briefy.leica.models import Project
 from dateutil.parser import parse

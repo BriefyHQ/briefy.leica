@@ -1,10 +1,10 @@
 """Package handling tasks on Leica."""
 from apscheduler.schedulers.blocking import BlockingScheduler
-from briefy.leica import logger
-from briefy.leica.tasks.assignment import move_assignments_awaiting_assets
-from briefy.leica.tasks.pool import move_assignment_to_pool
 from briefy.leica.config import CRON_HOUR_JOB_TASKS
 from briefy.leica.config import CRON_MINUTE_JOB_TASKS
+from briefy.leica.log import tasks_logger as logger
+from briefy.leica.tasks.assignment import move_assignments_awaiting_assets
+from briefy.leica.tasks.pool import move_assignment_to_pool
 
 
 def main():
