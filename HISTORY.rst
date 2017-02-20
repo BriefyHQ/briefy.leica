@@ -2,7 +2,7 @@
 History
 =======
 
-2.0.8 (2017-02-19)
+2.0.8 (2017-02-20)
 ------------------
 
     * Order: Add timezone attribute (ericof).
