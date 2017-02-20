@@ -14,6 +14,7 @@ History
     * Script to move assignments to the Pool (rudaporto).
     * Update worker approve_assignment action to execute the Order workflow delivery transition (rudaporto)
     * Add Orders by Project report to customers (ericof).
+    * Return scheduled_datetime in order listings (ericof).
 
 2.0.7 (2017-02-17)
 ------------------
