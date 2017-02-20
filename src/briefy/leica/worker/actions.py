@@ -1,6 +1,6 @@
 """Briefy Leica worker."""
 from briefy.common.users import SystemUser
-from briefy.leica.worker import logger
+from briefy.leica.log import worker_logger as logger
 from briefy.leica.models import Assignment
 from briefy.leica.models import Comment
 
