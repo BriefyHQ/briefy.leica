@@ -98,6 +98,7 @@ UPDATE PROJECTS SET pool_id='cddc09d1-cd92-4fde-be42-11e3cdd34e19' WHERE id='4e7
 UPDATE PROJECTS SET pool_id='04b71171-f032-452a-b31f-2ba179b2c360' WHERE id='78246086-ae6d-424c-b77e-aa7a8cb81035';
 UPDATE PROJECTS SET pool_id='92032655-8c85-4480-a241-b3eb68d7d490' WHERE id='51549a8e-918e-4cc3-ad21-ffd4ead0a74e';
 UPDATE PROJECTS SET pool_id='37e433e0-a472-417c-a236-0eec96f64376' WHERE id='0e0dd21a-d948-4212-aaae-dedb5f8efb8d';
+UPDATE PROJECTS SET pool_id='1b8c769f-0e1f-4618-aeaf-f399a91055b7' WHERE id='d347be4c-eddc-4d9d-9fd8-4bbd24d3e13b';
 """  #  noQA
 
 
