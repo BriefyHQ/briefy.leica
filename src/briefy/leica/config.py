@@ -44,3 +44,7 @@ LOGIN_ENDPOINT = config('LOGIN_ENDPOINT', default=API_BASE + '/login/email')
 ROSETTA_ENDPOINT = config('ROSETTA_ENDPOINT', default=API_BASE + '/internal/rosetta')
 
 FILES_BASE = 'https://files.briefy.co' if _queue_suffix == 'live' else 'https://files.stg.briefy.co'
+
+# job tasks: cron hour and minute setting
+CRON_HOUR_JOB_TASKS = config('CRON_HOUR_JOB_TASKS', default='*')
+CRON_MINUTE_JOB_TASKS = config('CRON_HOUR_JOB_TASKS', default='*/30')

@@ -11,6 +11,7 @@ with open(os.path.join(here, 'HISTORY.rst')) as f:
     CHANGES = f.read()
 
 requires = [
+    'apscheduler',
     'boto3',
     'briefy.common',
     'briefy.ws',
@@ -65,5 +66,6 @@ setup(
      main = briefy.leica:main
     [console_scripts]
      worker = briefy.leica.worker:main
+     leica_tasks = briefy.leica.tasks:main
     """,
 )
