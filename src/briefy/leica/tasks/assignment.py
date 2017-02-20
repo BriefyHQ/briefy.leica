@@ -23,4 +23,3 @@ def move_assignments_awaiting_assets():
         msg = 'Assignment {id} moved to awaiting_assets. Shoot time: {shoot_time}'
         msg = msg.format(id=assignment.id, shoot_time=assignment.scheduled_datetime)
         logger.info(msg)
-
