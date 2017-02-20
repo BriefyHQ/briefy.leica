@@ -125,6 +125,16 @@ class Pool(mixins.KLeicaVersionedMixin, Base):
         back_populates='pools'
     )
 
+    # Projects
+    projects = orm.relationship(
+        'Project',
+        backref=orm.backref('pool')
+    )
+    """Projects.
+
+    Relationship with :class:`briefy.leica.models.project.Project`.
+    """
+
     @declared_attr
     def total_assignments(cls) -> int:
         """Return the total number of Assignments in the Pool."""

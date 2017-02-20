@@ -1,17 +1,19 @@
 """Briefy Leica Order to a Job."""
+from briefy.common.db.types import AwareDateTime
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.descriptors import UnaryRelationshipWrapper
 from briefy.leica.models.job import workflows
-from briefy.leica.models.project import Project
-from briefy.leica.utils.transitions import get_transition_date
 from briefy.leica.models.job.location import OrderLocation
-from briefy.leica.vocabularies import OrderInputSource
+from briefy.leica.models.project import Project
+from briefy.leica.utils.transitions import get_transition_date_from_history
 from briefy.leica.utils.user import add_user_info_to_state_history
+from briefy.leica.vocabularies import OrderInputSource
 from datetime import datetime
 from sqlalchemy import orm
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy_utils import TimezoneType
 
 import colander
 import copy
@@ -22,12 +24,12 @@ import string
 
 __summary_attributes__ = [
     'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
-    'price', 'number_required_assets', 'location', 'category'
+    'price', 'number_required_assets', 'location', 'category', 'timezone', 'scheduled_datetime'
 ]
 
 __listing_attributes__ = __summary_attributes__ + [
     'customer_order_id', 'deliver_date', 'accept_date', 'availability', 'assignment',
-    'requirements', 'delivery', 'project', 'customer', 'timezone'
+    'requirements', 'delivery', 'project', 'customer'
 ]
 
 __colander_alchemy_config_overrides__ = \
@@ -115,6 +117,14 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         'overrides': __colander_alchemy_config_overrides__
 
     }
+
+    __versioned__ = {
+        'exclude': ['state_history', '_state_history', 'scheduled_datetime', 'timezone']
+    }
+    """SQLAlchemy Continuum settings.
+
+    By default we do not keep track of state_history and helper columns.
+    """
 
     _slug = sa.Column('slug',
                       sa.String(255),
@@ -290,6 +300,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         uselist=False,
         viewonly=True,
         order_by='desc(Assignment.created_at)',
+        backref=orm.backref('active_order'),
         primaryjoin='''and_(
             Order.id == Assignment.order_id,
             not_(Assignment.state.in_(('cancelled', 'perm_reject')))
@@ -345,6 +356,62 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     Collection of :class:`briefy.leica.models.comment.Comment`.
     """
+
+    scheduled_datetime = sa.Column(
+        AwareDateTime(),
+        nullable=True,
+        index=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Scheduled date for shooting',
+                'missing': colander.drop,
+                'typ': colander.DateTime
+            }
+        }
+    )
+    """Scheduled date time of shooting."""
+
+    deliver_date = sa.Column(
+        AwareDateTime(),
+        nullable=True,
+        index=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Delivery date',
+                'missing': colander.drop,
+                'typ': colander.DateTime
+            }
+        }
+    )
+    """Delivery date of this Order."""
+
+    last_deliver_date = sa.Column(
+        AwareDateTime(),
+        nullable=True,
+        index=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Delivery date',
+                'missing': colander.drop,
+                'typ': colander.DateTime
+            }
+        }
+    )
+    """Last delivery date of this Order."""
+
+    accept_date = sa.Column(
+        AwareDateTime(),
+        nullable=True,
+        index=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Acceptance date',
+                'missing': colander.drop,
+                'typ': colander.DateTime
+            }
+        }
+    )
+    """Acceptance date of this Order."""
 
     @hybrid_property
     def availability(self) -> list:
@@ -448,35 +515,61 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         }
         return all_requirements
 
-    @hybrid_property
-    def timezone(self) -> str:
-        """Return Timezone for this order.
+    timezone = sa.Column(TimezoneType(backend='pytz'), default='UTC')
+    """Timezone in which this address is located.
 
-        Information will be obtained from main location.
-        """
-        location = self.location
-        timezone = 'UTC'
-        if location:
-            timezone = location.timezone
-        return timezone
+    i.e.: UTC, Europe/Berlin
+    """
+    # Deal with timezone changes
+    @sautils.observes('_location.timezone')
+    def _timezone_observer(self, timezone):
+        """Update timezone on this object."""
+        if timezone:
+            self.timezone = timezone
 
-    @hybrid_property
-    def deliver_date(self) -> datetime:
-        """Return last deliver date for this Orders.
+    def _update_dates_from_history(self, keep_updated_at: bool = False):
+        """Update dates from history."""
+        updated_at = self.updated_at
+        state_history = self.state_history
 
-        Information will be extracted from state history field.
-        """
+        def updated_if_changed(attr, t_list, first=False):
+            """Update only if changed."""
+            existing = getattr(self, attr)
+            new = get_transition_date_from_history(
+                t_list, state_history, first=first
+            )
+            if new != existing:
+                setattr(self, attr, new)
+
+        # Set first deliver date
         transitions = ('deliver',)
-        return get_transition_date(transitions, self, first=False)
+        updated_if_changed('deliver_date', transitions, True)
 
-    @hybrid_property
-    def accept_date(self) -> datetime:
-        """Return first accepted or refused date for this Order.
+        # Set last deliver date
+        transitions = ('deliver',)
+        updated_if_changed('last_deliver_date', transitions, False)
 
-        Information will be extracted from state history field.
-        """
+        # Set acceptance date
         transitions = ('accept', 'refuse')
-        return get_transition_date(transitions, self, first=True)
+        updated_if_changed('accept_date', transitions, False)
+
+        if keep_updated_at:
+            self.updated_at = updated_at
+
+    # Deal with assignment changes
+    @sautils.observes('assignment.scheduled_datetime')
+    def _scheduled_datetime_observer(self, scheduled_datetime):
+        """Update scheduled_datetime on this object."""
+        existing = self.scheduled_datetime
+        if scheduled_datetime != existing:
+            self.scheduled_datetime = scheduled_datetime
+
+    # Relevant dates
+    @sautils.observes('state')
+    def _dates_observer(self, state):
+        """Calculate dates on a change of a state."""
+        # Update all dates
+        self._update_dates_from_history()
 
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
@@ -504,6 +597,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data['price'] = self.price
         data['slug'] = self.slug
         data['deliver_date'] = self.deliver_date
+        data['scheduled_datetime'] = self.deliver_date
         data['delivery'] = self.delivery
         data['location'] = self.location
         data['timezone'] = self.timezone
