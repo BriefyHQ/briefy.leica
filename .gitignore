@@ -63,3 +63,8 @@ docs/codebase/briefy.*
 
 # PyBuilder
 target/
+
+# travis deplo
+.dpl/
+deis
+
