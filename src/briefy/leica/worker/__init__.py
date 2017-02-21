@@ -36,6 +36,12 @@ MESSAGE_DISPATCH = {
         'success_notification': None,
         'failure_notification': None,
     },
+    'laure.assignment.ignored_copy': {
+        'name': 'resolving not-copied assets',
+        'action': actions.approve_previously_refused_assignment,
+        'success_notification': None,
+        'failure_notification': None,
+    },
     'laure.assignment.copy_failure': {
         'name': 'handling asset copy failure',
         'action': actions.asset_copy_malfunction,
