@@ -12,7 +12,6 @@ History
 
     * Added new log module to handle special loggers creation and adjust worker and tasks to use new loggers (rudaporto).
 
-
 2.0.9 (2017-02-20)
 ------------------
     * Create leica_tasks main script and two tasks: publish to pool and move to awainting assets (rudaporto).
