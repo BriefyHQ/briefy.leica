@@ -138,10 +138,15 @@ def invalidate_assignment(laure_data: object, session: object) -> (bool, dict):
         return True, {}
 
 
-def approve_assignment(laure_data: object, session: object) -> (bool, dict):
+def approve_assignment(
+    laure_data: object,
+    session: object,
+    copy_ignored: bool=False
+) -> (bool, dict):
     """Perform necessary updates after set was copied to destination folders.
 
     :param laure_data: Python object representing Laure data after assignment approval
+    :param copy_ignored: Set when copying assets was ignored on ms.laure
     :return: Flag indicating wether operation was successfull, empty dict
     """
     with transaction.manager:
@@ -152,12 +157,15 @@ def approve_assignment(laure_data: object, session: object) -> (bool, dict):
                 assignment_id))
             return False, {}
 
-        # Ensure the correct key is updated and object is set as dirty
-        delivery_info = assignment.order.delivery.copy() if assignment.order.delivery else {}
-        delivery_info['gdrive'] = laure_data.delivery_url
-        delivery_info['archive'] = laure_data.archive_url
+        if not copy_ignored:
+            # Ensure the correct key is updated and object is set as dirty
+            delivery_info = assignment.order.delivery.copy() if assignment.order.delivery else {}
+            delivery_info['gdrive'] = laure_data.delivery_url
+            delivery_info['archive'] = laure_data.archive_url
 
-        msg = '''Assets copied over on laure - committing delivery URL to order '{order_id}' '''
+            msg = '''Assets copied over on laure - committing delivery URL to order '{order_id}' '''
+        else:
+            msg = '''Assets were a result of previous manual review and were not touched on ms.laure. Order '{order_id} ' unchanged!'''  # noQA
         logger.info(
             msg.format(
                 order_id=assignment.order.id
@@ -175,7 +183,7 @@ def approve_assignment(laure_data: object, session: object) -> (bool, dict):
         elif order.state == 'delivered':
             order.delivery = delivery_info
         else:
-            msg = 'Order in wrong state: {state}'.format(state=order.state)
+            msg = 'Order in incorrect state: {state}'.format(state=order.state)
             logger.error(msg)
             raise Exception(msg)
 
@@ -189,6 +197,16 @@ def approve_assignment(laure_data: object, session: object) -> (bool, dict):
         )
 
     return True, {}
+
+
+def approve_previously_refused_assignment(laure_data: object, session: object,) -> (bool, dict):
+    """Change assignment state, without updating folder information.
+
+    Called when copyng assets have been ignored on ms.laure
+    :param laure_data: Python object representing Laure data after assignment approval
+    :return: Flag indicating wether operation was successfull, empty dict
+    """
+    return approve_assignment(laure_data, session, copy_ignored=True)
 
 
 def asset_copy_malfunction(laure_data: object, session: object) -> (bool, dict):
