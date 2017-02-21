@@ -2,6 +2,11 @@
 History
 =======
 
+2.0.13 (2017-02-21)
+-------------------
+
+    * Added pool (summary) attribute to the Assignment listing (rudaporto).
+
 2.0.12 (2017-02-21)
 -------------------
 
