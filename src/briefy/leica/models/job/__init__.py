@@ -366,7 +366,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
 
     location = orm.relationship(
         'OrderLocation',
-        secondary="join(Order, OrderLocation, Order.id == OrderLocation.order_id)",
+        secondary='orders',
         secondaryjoin="Order.id == OrderLocation.order_id",
         primaryjoin="Order.id == Assignment.order_id",
         backref=orm.backref('assignments'),
@@ -591,7 +591,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
 
     def to_dict(self):
         """Return a dict representation of this object."""
-        data = super().to_dict()
+        data = super().to_dict(excludes=['active_order'])
         data['title'] = self.title
         data['description'] = self.description
         data['briefing'] = self.briefing
