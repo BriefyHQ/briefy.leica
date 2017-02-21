@@ -2,6 +2,15 @@
 History
 =======
 
+2.0.13 (2017-02-21)
+-------------------
+
+    * Improve Assignment.location relationshi: simplify secondary parameter (rudaporto).
+    * Excludes from colander schema generation OrderLocation.assignments attribute (rudaporto).
+    * Excludes from to_dict serialisation Assignment.active_order attribute (rudaporto).
+    * Update .gitignore to avoid deploy failures (rudaporto).
+    * Added pool (summary) attribute to the Assignment listing (rudaporto).
+
 2.0.12 (2017-02-21)
 -------------------
 

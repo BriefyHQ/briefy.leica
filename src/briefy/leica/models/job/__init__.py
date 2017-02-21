@@ -31,8 +31,8 @@ __summary_attributes__ = [
 __listing_attributes__ = __summary_attributes__ + [
     'assignment_date', 'last_approval_date', 'submission_date', 'last_submission_date',
     'set_type', 'number_required_assets', 'category', 'availability', 'additional_compensation',
-    'reason_additional_compensation', 'qa_manager', 'state_history',
-    'requirements', 'pool_id', 'location', 'project', 'closed_on_date'
+    'reason_additional_compensation', 'qa_manager', 'state_history', 'requirements', 'pool_id',
+    'location', 'project', 'closed_on_date', 'pool'
 ]
 
 overrides = mixins.AssignmentBriefyRoles.__colanderalchemy_config__['overrides']
@@ -366,7 +366,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
 
     location = orm.relationship(
         'OrderLocation',
-        secondary="join(Order, OrderLocation, Order.id == OrderLocation.order_id)",
+        secondary='orders',
         secondaryjoin="Order.id == OrderLocation.order_id",
         primaryjoin="Order.id == Assignment.order_id",
         backref=orm.backref('assignments'),
@@ -591,7 +591,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
 
     def to_dict(self):
         """Return a dict representation of this object."""
-        data = super().to_dict()
+        data = super().to_dict(excludes=['active_order'])
         data['title'] = self.title
         data['description'] = self.description
         data['briefing'] = self.briefing

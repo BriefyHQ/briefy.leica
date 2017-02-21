@@ -33,7 +33,7 @@ class OrderLocation(ContactInfoMixin, AddressMixin,
         'excludes': [
             'state_history', 'state', 'timezone', 'versions',
             'can_create_roles', 'can_view_roles', 'can_edit_roles', 'can_delete_roles',
-            'can_list_roles', 'local_roles'
+            'can_list_roles', 'local_roles', 'assignments'
         ],
         'overrides': {
             'mobile': {
