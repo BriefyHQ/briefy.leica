@@ -6,6 +6,7 @@ History
 -------------------
 
     * Fix: Order tech requirement was reporting incorrect values from project (ericof).
+    * Fix transaction and database configuration on tasks worker (rudaporto).
 
 2.0.10 (2017-02-20)
 -------------------
