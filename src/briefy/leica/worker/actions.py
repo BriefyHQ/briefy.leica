@@ -206,7 +206,6 @@ def approve_previously_refused_assignment(laure_data: object, session: object,) 
     :param laure_data: Python object representing Laure data after assignment approval
     :return: Flag indicating wether operation was successfull, empty dict
     """
-
     return approve_assignment(laure_data, session, copy_ignored=True)
 
 
