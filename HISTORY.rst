@@ -2,10 +2,16 @@
 History
 =======
 
-2.0.10 (2017-02-20)
-------------------
-    * Added new log module to handle special loggers creation and adjust worker and tasks to use new loggers (rudaporto).
+2.0.11 (2017-02-21)
+-------------------
 
+    * Fix: Order tech requirement was reporting incorrect values from project (ericof).
+    * Fix transaction and database configuration on tasks worker (rudaporto).
+
+2.0.10 (2017-02-20)
+-------------------
+
+    * Added new log module to handle special loggers creation and adjust worker and tasks to use new loggers (rudaporto).
 
 2.0.9 (2017-02-20)
 ------------------

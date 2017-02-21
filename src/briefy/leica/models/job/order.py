@@ -493,27 +493,9 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
         :return: A dictionary with technical requirements for an Order.
         """
-        # TODO: enable this:
-        # if self._tech_requirements:
-        #     requirements = self._tech_requirements
-        # else:
-        #     requirements = self.project.tech_requirements
         project = self.project
-        requirements = self.project.tech_requirements or {}
-
-        # The tech requirements is composed with the required
-        # number of photos pr project or per order:
-        all_requirements = {
-            'set': {
-                'minimum_number_of_photos': project.number_required_assets
-                # TODO: this is due to development time (live) project constraints.
-                # In the future this should come from
-                # self.number_required_assets
-            },
-            'asset': requirements
-            # Tech requirements at Project are actually per asset requirements
-        }
-        return all_requirements
+        requirements = project.tech_requirements or {}
+        return requirements
 
     timezone = sa.Column(TimezoneType(backend='pytz'), default='UTC')
     """Timezone in which this address is located.
