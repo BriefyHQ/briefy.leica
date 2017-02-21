@@ -164,13 +164,20 @@ def approve_assignment(laure_data: object, session: object) -> (bool, dict):
             )
         )
         order = assignment.order
-        fields = dict(delivery=delivery_info)
-        wf = order.workflow
-        wf.context = SystemUser
-        wf.deliver(
-            fields=fields,
-            message='Assets automatic delivered.'
-        )
+        if order.state == 'in_qa':
+            fields = dict(delivery=delivery_info)
+            wf = order.workflow
+            wf.context = SystemUser
+            wf.deliver(
+                fields=fields,
+                message='Assets automatic delivered.'
+            )
+        elif order.state == 'delivered':
+            order.delivery = delivery_info
+        else:
+            msg = 'Order in wrong state: {state}'.format(state=order.state)
+            logger.error(msg)
+            raise Exception(msg)
 
         # TODO: Unless google drive is phased out soon, this URL should be
         # stored on the model.

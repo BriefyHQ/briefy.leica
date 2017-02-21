@@ -2,6 +2,11 @@
 History
 =======
 
+2.0.12 (2017-02-21)
+-------------------
+
+    * Fix: Avoid try to do the delivery transition if Order already delivered (rudaporto).
+
 2.0.11 (2017-02-21)
 -------------------
 
