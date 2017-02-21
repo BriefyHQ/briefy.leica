@@ -5,7 +5,7 @@ from briefy.common.log import logstash
 import logging
 
 
-def create_logger(name:str, tags:list):
+def create_logger(name: str, tags: list):
     """Create a new logger."""
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
