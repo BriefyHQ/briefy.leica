@@ -2,6 +2,11 @@
 History
 =======
 
+2.0.15 (2017-02-22)
+-------------------
+
+    * Fix Order.location edit: added order_id to OrderLocation summary fields (rudaporto).
+
 2.0.14 (2017-02-22)
 -------------------
 
