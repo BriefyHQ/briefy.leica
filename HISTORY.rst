@@ -11,6 +11,8 @@ History
     * Fix circular serialization: Order.location will be serialized as summary in the Order and Assignment (rudaporto).
     * Improve Assignment serialization: Assignment.order will ber serialized as summary (rudaporto).
     * Fix OrderLocation edit. Fixed by Removing Assignment._timezone_observer and fix Order.location circular serialization (rudaporto).
+    * Set Scout Manager on Order and Assignment (ericof).
+    * Add assign_pool transition to the list of transitions to be considered when updating the assignment_date (ericof).
 
 2.0.13 (2017-02-21)
 -------------------
