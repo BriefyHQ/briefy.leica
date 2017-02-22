@@ -211,7 +211,7 @@ def assignment_upload(event):
     #    workflow.validate_assets(message='Stub machine validation for test only! :)')
 
 
-def assignment_validate_or_invalidate_assets(event):
+def assignment_invalidate_assets(event):
     """Handle Assignment validate or invalidate assets workflow event."""
     assignment = event.obj
     author_role = 'qa_manager'
@@ -252,8 +252,7 @@ def transition_handler(event):
         'assignment.workflow.cancel': assignment_cancel,
         'assignment.workflow.reject': assignment_reject,
         'assignment.workflow.upload': assignment_upload,
-        'assignment.workflow.invalidate_assets': assignment_validate_or_invalidate_assets,
-        'assignment.workflow.validate_assets': assignment_validate_or_invalidate_assets,
+        'assignment.workflow.invalidate_assets': assignment_invalidate_assets,
         'assignment.workflow.return_to_qa': assignment_return_to_qa,
         'assignment.workflow.remove_schedule': assignment_remove_schedule,
         'assignment.workflow.reschedule': assignment_reschedule,

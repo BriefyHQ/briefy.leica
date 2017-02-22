@@ -2,6 +2,12 @@
 History
 =======
 
+2.0.14 (2017-02-22)
+-------------------
+
+    * Machine validation: Create comment only when the set is invalidated (ericof).
+    * Machine validation: Transition/Comment on invalidation should use complete feedback (ericof).
+
 2.0.13 (2017-02-21)
 -------------------
 

@@ -102,22 +102,9 @@ def invalidate_assignment(laure_data: object, session: object) -> (bool, dict):
             ))
             return False, {}
 
-        feedback_text = '{0}\n\n{1}'.format(
-            laure_data.validation.feedback,
+        feedback_text = '{0}'.format(
             laure_data.validation.complete_feedback
         )
-
-        feedback_comment = Comment(
-            entity_id=assignment_id,
-            entity_type=assignment.__class__.__name__,
-            author_id=SystemUser.id,
-            author_role='qa_manager',
-            to_role='professional_user',
-            content=feedback_text,
-            internal=False,
-
-        )
-        session.add(feedback_comment)
 
         logger.info(
             '''Assignment '{0}' assets reported as not sufficient. Transitioning back '''
@@ -126,12 +113,10 @@ def invalidate_assignment(laure_data: object, session: object) -> (bool, dict):
             )
         )
 
-        feedback_comment.workflow_context = SystemUser
         assignment.workflow_context = SystemUser
 
-        assignment.comments.append(feedback_comment)
         assignment.workflow.invalidate_assets(
-            message='Invalidated submission.'
+            message=feedback_text
         )
         logger.info('''Assignment {0} state set to {1}'''.format(assignment.slug, assignment.state))
 
