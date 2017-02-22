@@ -85,6 +85,7 @@ class TestAssignmentModel(BaseModelTest):
         wf.assign(
             fields=fields_payload
         )
+
         assert assignment.state == 'assigned'
         for key, value in fields_payload.items():
             assert getattr(assignment, key) == value

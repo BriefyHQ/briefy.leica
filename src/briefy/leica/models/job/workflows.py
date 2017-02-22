@@ -15,6 +15,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+SELF_ASSIGN_SCOUT_ID = 'f1233fb7-c482-454f-a12d-8f9305755774'
 
 SHOOT_TIME_FUTURE_MSG = 'Shoot time should be at least one day in the future.'
 ASSIGN_AFTER_RENEWSHOOT = 'Creative automatically assigned due to a re  shoot.'
@@ -128,11 +129,16 @@ class AssignmentWorkflow(BriefyWorkflow):
     def assign(self, **kwargs):
         """Define a Professional to the Assignment."""
         fields = kwargs['fields']
+        user_id = str(self.context.id)
         assignment = self.document
         order = assignment.order
         if order.state == 'received':
-            order.workflow.assign()
-        # set local role
+            fields = {
+                'scout_manager': user_id
+            }
+            order.workflow.assign(fields=fields)
+        # set local roles
+        assignment.scout_manager = user_id
         professional_id = fields.get('professional_id')
         if professional_id:
             assignment.professional_user = professional_id
@@ -182,8 +188,12 @@ class AssignmentWorkflow(BriefyWorkflow):
         order = assignment.order
         if order.state == 'received':
             order.workflow.context = SystemUser
-            order.workflow.assign()
-        # set local role
+            fields = {
+                'scout_manager': SELF_ASSIGN_SCOUT_ID
+            }
+            order.workflow.assign(fields=fields)
+        # set local roles
+        assignment.scout_manager = SELF_ASSIGN_SCOUT_ID
         professional_id = self.context.id
         assignment.professional_user = professional_id
 
@@ -203,9 +213,14 @@ class AssignmentWorkflow(BriefyWorkflow):
         # workflow event subscriber will move to schedule after
         assignment = self.document
         order = assignment.order
+        user_id = str(self.context.id)
         if order.state == 'received':
-            order.workflow.assign()
+            fields = {
+                'scout_manager': user_id
+            }
+            order.workflow.assign(fields=fields)
         # set local role
+        assignment.scout_manager = user_id
         fields = kwargs['fields']
         professional_id = fields.get('professional_id')
         assignment.professional_user = professional_id
@@ -708,7 +723,11 @@ class OrderWorkflow(BriefyWorkflow):
         """Validate if user can set availability dates of an Order."""
         return True
 
-    @received.transition(assigned, 'can_assign')
+    @received.transition(
+        assigned,
+        'can_assign',
+        required_fields=('scout_manager', )
+    )
     def assign(self, **kwargs):
         """Transition: Assign a Professional to an Order."""
         # should be only used by the Assignment workflow
