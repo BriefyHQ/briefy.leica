@@ -508,6 +508,8 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         """Update timezone on this object."""
         if timezone:
             self.timezone = timezone
+            for assignment in self.assignments:
+                assignment.timezone = timezone
 
     def _update_dates_from_history(self, keep_updated_at: bool = False):
         """Update dates from history."""
@@ -581,7 +583,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data['deliver_date'] = self.deliver_date
         data['scheduled_datetime'] = self.deliver_date
         data['delivery'] = self.delivery
-        data['location'] = self.location
+        data['location'] = self.location.to_summary_dict() if self.location else None
         data['timezone'] = self.timezone
         data['assignment'] = assignment_data
         data['assignments'] = [item.to_summary_dict() for item in self.assignments]

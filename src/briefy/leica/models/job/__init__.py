@@ -395,14 +395,8 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     """Timezone in which this address is located.
 
     i.e.: UTC, Europe/Berlin
+    Important: this will be updated by the Order timezone observer.
     """
-    # Deal with timezone changes
-    @sautils.observes('location')
-    def _timezone_observer(self, location):
-        """Update timezone on this object."""
-        if location and location.timezone:
-            timezone = location.timezone
-            self.timezone = timezone
 
     @sautils.aggregated('assets', sa.Column(sa.Integer, default=0))
     def total_assets(self):
@@ -604,6 +598,8 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         data['tech_requirements'] = self.order.tech_requirements
         data['availability'] = self.availability
         data['category'] = self.category
+        data['order'] = self.order.to_summary_dict() if self.order else None
+        data['location'] = self.location.to_summary_dict() if self.location else None
 
         # Workflow history
         add_user_info_to_state_history(self.state_history)
