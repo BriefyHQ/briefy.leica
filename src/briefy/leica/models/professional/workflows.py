@@ -140,7 +140,7 @@ class ProfessionalWorkflow(BriefyWorkflow):
         """Validate if user can reject this professional application."""
         return True
 
-    @Permission(groups=[LR['owner'], G['qa'], ])
+    @Permission(groups=[LR['owner'], G['qa'], G['scout']])
     def can_approve(self):
         """Validate if user can approve this professional application."""
         return True
