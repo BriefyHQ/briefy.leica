@@ -21,3 +21,4 @@ sphinxcontrib-sadisplay
 tox==2.3.1
 virtualenv==15.0.3
 WebTest==2.0.20
+appdirs==1.4.0

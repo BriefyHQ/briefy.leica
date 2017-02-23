@@ -1,3 +1,4 @@
+"""Script to setup a new environment for demo purpose."""
 from briefy.common.types import BaseUser
 from briefy.common.utils.data import generate_slug
 from briefy.leica.db import Session
@@ -15,6 +16,7 @@ CUSTOMER_USER = '4111d75b-19be-4a43-ad8a-3cd0fe854228'
 
 
 class SetupDemo:
+    """Manage the demo creation."""
 
     def __init__(self, session):
         """Create new demo."""
@@ -104,18 +106,25 @@ class SetupDemo:
             last_name='Savenije',
             company_name='Booking.com',
             customer_roles=self.customer.id,
-            state='active'
+            owner=CUSTOMER_USER,
         )
+        savepoint = transaction.savepoint()
         try:
-            with transaction.savepoint:
-                profile = CustomerUserProfile(**payload)
-                self.session.add(profile)
-                self.session.flush()
+            profile = CustomerUserProfile(**payload)
+            self.session.add(profile)
+            self.session.flush()
+        except Exception as exc:
+            savepoint.rollback()
+            self.customer_user = CustomerUserProfile.get(CUSTOMER_USER)
+        else:
+            self.customer_user = profile
+            try:
                 wf = profile.workflow
                 wf.context = self.user
-                self.customer_user = profile
-        except Exception as exc:
-            self.customer_user = CustomerUserProfile.get(CUSTOMER_USER)
+                wf.activate()
+            except Exception as exc:
+                savepoint.rollback()
+                profile.state = 'active'
 
     def add_projects(self):
         """Add all projects."""
@@ -204,10 +213,10 @@ class SetupDemo:
         if location:
             location.order_id = order.id
         from briefy.leica.subscribers.utils import create_new_assignment_from_order
-        create_new_assignment_from_order(order, None, session=self.session)
+        create_new_assignment_from_order(order, None)
 
     def create_all_orders(self):
-        """Create new orders in the project"""
+        """Create new orders in the project."""
         bali_orders = Order.query().join(Project).filter(
             Project.id == '1dafb433-9431-4295-a349-92c4ad61c59e',
             Order.state == 'received',
@@ -232,6 +241,7 @@ class SetupDemo:
         self.add_customer_user()
         self.add_projects()
         self.create_all_orders()
+
 
 if __name__ == '__main__':
     session = db.configure(Session)
