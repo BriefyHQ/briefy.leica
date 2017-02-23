@@ -6,6 +6,8 @@ History
 -------------------
 
     * Created new script to setup demo data for Booking.com visit (rudaporto).
+    * Make ProfileUser email unique field (rudaporto).
+    * Added new validator to check if UserProfile or CustomerUserProfile email already in use (rudaporto).
 
 
 2.0.16 (2017-02-22)

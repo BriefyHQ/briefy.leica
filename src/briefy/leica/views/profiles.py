@@ -11,6 +11,22 @@ from pyramid.security import Allow
 COLLECTION_PATH = '/profiles/me'
 PATH = COLLECTION_PATH + '/{id}'
 
+EMAIL_IN_USE_MESSAGE = 'This email is already associated with another user.'
+
+
+def email_in_use(request):
+    """Validate if email is used by another user.
+
+    :param request: pyramid request.
+    """
+    email = request.json.get('email')
+    user_id = request.json.get('id')
+    db_user = UserProfile.query().filter_by(email=email).one_or_none()
+    if db_user and not str(db_user.id) == user_id:
+        return False
+    else:
+        return True
+
 
 class ProfileFactory(BaseFactory):
     """UserProfile context factory."""
@@ -48,12 +64,23 @@ class ProfileService(RESTService):
     default_order_by = 'title'
     filter_related_fields = ['title']
 
+    _validators = (
+        ('GET', ('validate_id', )),
+        ('PUT', ('validate_id', )),
+        ('POST', ('email_in_use', ))
+    )
+
     _default_notify_events = {
         'POST': events.UserProfileCreatedEvent,
         'PUT': events.UserProfileUpdatedEvent,
         'GET': events.UserProfileLoadedEvent,
         'DELETE': events.UserProfileDeletedEvent,
     }
+
+    def email_in_use(self, request):
+        """Email validation."""
+        if not email_in_use(request):
+            self.raise_invalid(name='email', description=EMAIL_IN_USE_MESSAGE)
 
 
 class CustomerProfileFactory(BaseFactory):
@@ -96,9 +123,20 @@ class CustomerProfileService(RESTService):
     default_order_by = 'title'
     filter_related_fields = ['title']
 
+    _validators = (
+        ('GET', ('validate_id', )),
+        ('PUT', ('validate_id', )),
+        ('POST', ('email_in_use', ))
+    )
+
     _default_notify_events = {
         'POST': events.UserProfileCreatedEvent,
         'PUT': events.UserProfileUpdatedEvent,
         'GET': events.UserProfileLoadedEvent,
         'DELETE': events.UserProfileDeletedEvent,
     }
+
+    def email_in_use(self, request):
+        """Email validation."""
+        if not email_in_use(request):
+            self.raise_invalid(name='email', description=EMAIL_IN_USE_MESSAGE)
