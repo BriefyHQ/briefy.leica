@@ -49,10 +49,11 @@ def create_comment_from_wf_transition(obj, author_role, to_role, internal=False)
         session.add(comment)
 
 
-def create_new_assignment_from_order(order, request, copy_payout=False, old_assignment=None):
+def create_new_assignment_from_order(order, request, copy_payout=False, old_assignment=None, session=None):
     """Create a new Assignment object from Order."""
     from briefy.leica.models import Assignment
-    session = object_session(order)
+    if not session:
+        session = object_session(order)
     payload = {
         'order_id': order.id,
     }
@@ -67,9 +68,10 @@ def create_new_assignment_from_order(order, request, copy_payout=False, old_assi
     session.add(assignment)
     session.flush()
 
-    # event dispatch: pyramid event
-    assignment_event = AssignmentCreatedEvent(assignment, request)
-    request.registry.notify(assignment_event)
-    # event dispatch: sqs event
-    assignment_event()
-    return assignment
+    if request:
+        # event dispatch: pyramid event
+        assignment_event = AssignmentCreatedEvent(assignment, request)
+        request.registry.notify(assignment_event)
+        # event dispatch: sqs event
+        assignment_event()
+        return assignment

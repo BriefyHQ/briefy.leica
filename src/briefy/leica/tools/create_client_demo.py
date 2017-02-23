@@ -104,14 +104,18 @@ class SetupDemo:
             last_name='Savenije',
             company_name='Booking.com',
             customer_roles=self.customer.id,
+            state='active'
         )
-        profile = CustomerUserProfile(**payload)
-        self.session.add(profile)
-        self.session.flush()
-        wf = profile.workflow
-        wf.context = self.user
-        wf.activate()
-        self.customer_user = profile
+        try:
+            with transaction.savepoint:
+                profile = CustomerUserProfile(**payload)
+                self.session.add(profile)
+                self.session.flush()
+                wf = profile.workflow
+                wf.context = self.user
+                self.customer_user = profile
+        except Exception as exc:
+            self.customer_user = CustomerUserProfile.get(CUSTOMER_USER)
 
     def add_projects(self):
         """Add all projects."""
@@ -196,6 +200,11 @@ class SetupDemo:
         wf = order.workflow
         wf.context = self.user
         wf.submit()
+        location = other.location
+        if location:
+            location.order_id = order.id
+        from briefy.leica.subscribers.utils import create_new_assignment_from_order
+        create_new_assignment_from_order(order, None, session=self.session)
 
     def create_all_orders(self):
         """Create new orders in the project"""
