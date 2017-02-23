@@ -104,7 +104,6 @@ class SetupDemo:
             last_name='Savenije',
             company_name='Booking.com',
             customer_roles=self.customer.id,
-            project_roles=[item.id for item in self.projects]
         )
         profile = CustomerUserProfile(**payload)
         self.session.add(profile)
@@ -140,7 +139,8 @@ class SetupDemo:
                 price_currency=currency,
                 release_template=None,
                 tech_requirements=None,
-                project_manager=PROJECT_MANAGER
+                project_manager=PROJECT_MANAGER,
+                customer_user=CUSTOMER_USER
             ),
             dict(
                 slug=generate_slug(title_bangkok),
@@ -161,7 +161,8 @@ class SetupDemo:
                 price_currency=currency,
                 release_template=None,
                 tech_requirements=None,
-                project_manager=PROJECT_MANAGER
+                project_manager=PROJECT_MANAGER,
+                customer_user=CUSTOMER_USER
             ),
         ]
         for item in projects:
@@ -219,8 +220,8 @@ class SetupDemo:
         """Run the setup."""
         self.add_customer()
         self.add_customer_address()
-        self.add_projects()
         self.add_customer_user()
+        self.add_projects()
         self.create_all_orders()
 
 if __name__ == '__main__':
