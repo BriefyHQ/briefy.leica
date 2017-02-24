@@ -2,7 +2,7 @@
 History
 =======
 
-2.0.17 (2017-02-23)
+2.0.17 (2017-02-24)
 -------------------
 
     * Created new script to setup demo data for Booking.com visit (rudaporto).
