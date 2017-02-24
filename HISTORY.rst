@@ -2,6 +2,11 @@
 History
 =======
 
+2.0.18 (2017-02-24)
+-------------------
+
+    * Added Order.customer_order_id to summary attributes, ms.laure needs on the payload of Assignment (rudaporto).
+
 2.0.17 (2017-02-24)
 -------------------
 
