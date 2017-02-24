@@ -1025,4 +1025,16 @@ class PolaroidMixin:
 class UserProfileMixin(ContactInfoMixin, PersonalInfoMixin, OptIn, KLeicaVersionedMixin):
     """A user profile on our system."""
 
-    pass
+    email = sa.Column(
+        sautils.types.EmailType(),
+        nullable=True,
+        unique=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Email',
+                'default': '',
+                'typ': colander.String
+            }
+        }
+    )
+    """Email of the contact person."""

@@ -24,12 +24,13 @@ import string
 
 __summary_attributes__ = [
     'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
-    'price', 'number_required_assets', 'location', 'category', 'timezone', 'scheduled_datetime'
+    'price', 'number_required_assets', 'location', 'category', 'timezone',
+    'scheduled_datetime', 'delivery', 'deliver_date'
 ]
 
 __listing_attributes__ = __summary_attributes__ + [
-    'customer_order_id', 'deliver_date', 'accept_date', 'availability', 'assignment',
-    'requirements', 'delivery', 'project', 'customer'
+    'customer_order_id', 'accept_date', 'availability', 'assignment',
+    'requirements', 'project', 'customer'
 ]
 
 __colander_alchemy_config_overrides__ = \

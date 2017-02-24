@@ -3,6 +3,7 @@ from briefy.leica.events.assignment import AssignmentCreatedEvent
 from briefy.leica.models import Comment
 from sqlalchemy.orm.session import object_session
 from sqlalchemy.ext.associationproxy import _AssociationList
+from zope.event import notify
 
 
 def apply_local_roles_from_parent(obj, parent, add_roles=()):
@@ -69,7 +70,10 @@ def create_new_assignment_from_order(order, request, copy_payout=False, old_assi
 
     # event dispatch: pyramid event
     assignment_event = AssignmentCreatedEvent(assignment, request)
-    request.registry.notify(assignment_event)
+    if request:
+        request.registry.notify(assignment_event)
+    else:
+        notify(assignment_event)
     # event dispatch: sqs event
     assignment_event()
     return assignment
