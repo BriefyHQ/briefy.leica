@@ -43,7 +43,7 @@ test_requirements = [
 
 setup(
     name='briefy.leica',
-    version='2.0.18',
+    version='2.0.19',
     description='Image Handling System',
     long_description=README + '\n\n' + CHANGES,
     classifiers=[

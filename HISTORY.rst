@@ -2,6 +2,12 @@
 History
 =======
 
+2.0.19 (2017-02-24)
+-------------------
+
+    * New release to update briefy.common (rudaporto).
+
+
 2.0.18 (2017-02-24)
 -------------------
 
