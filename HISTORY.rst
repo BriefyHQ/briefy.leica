@@ -2,6 +2,13 @@
 History
 =======
 
+
+2.0.20 (2017-02-25)
+-------------------
+
+    * Added Assignment.delivery as a listing attribute (rudaporto).
+
+
 2.0.19 (2017-02-24)
 -------------------
 
