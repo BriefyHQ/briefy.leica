@@ -152,7 +152,7 @@ def export_assignment():
         street, locality, country = export_location(item.location)
         last_approval_date = convert_json_datetime(item, ('approve',), first=False)
         last_refusal_date = convert_json_datetime(item, ('refuse',), first=False)
-        accept_date = convert_json_datetime(item, ('accept',), first=True)
+        complete_date = convert_json_datetime(item, ('complete',), first=True)
 
         payload = dict(
             project_name=item.order.project.title,
@@ -172,7 +172,7 @@ def export_assignment():
             submission_path=item.submission_path,
             last_approval_date=last_approval_date,
             last_refusal_date=last_refusal_date,
-            accept_date=accept_date,
+            accept_date=complete_date,
             payout_currency=item.payout_currency,
             payout_value=export_integer(item.payout_value),
             travel_expenses=export_integer(item.travel_expenses),
@@ -200,7 +200,7 @@ def export_assignment():
         'submission_path',
         'last_approval_date',
         'last_refusal_date',
-        'accept_date',
+        'complete_date',
         'payout_currency',
         'payout_value',
         'travel_expenses',
