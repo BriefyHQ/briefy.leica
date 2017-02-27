@@ -129,16 +129,13 @@ class AssignmentWorkflow(BriefyWorkflow):
     def assign(self, **kwargs):
         """Define a Professional to the Assignment."""
         user_id = str(self.context.id)
-        fields = kwargs['fields']
         assignment = self.document
         order = assignment.order
         if order.state == 'received':
-            fields.update({
-                'scout_manager': user_id
-            })
+            fields = {'scout_manager': user_id}
             order.workflow.assign(fields=fields)
         # set local roles
-        assignment.scout_manager = user_id
+        fields = kwargs['fields']
         professional_id = fields.get('professional_id')
         assignment.professional_user = professional_id
         # force explicit here but it will also be set by the workflow engine
