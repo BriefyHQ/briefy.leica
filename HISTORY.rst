@@ -5,7 +5,7 @@ History
 2.0.21 (2017-02-27)
 -------------------
 
-    * Fix: Assignment.assign should always set professional_user and fail if professional_id is missing (rudaporto).
+    * Fix: fields map overwrite cause Assignment.professional_user not being set. (rudaporto).
 
 2.0.20 (2017-02-25)
 -------------------
