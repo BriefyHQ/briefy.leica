@@ -7,6 +7,7 @@ from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import Permission
 from briefy.common.workflow import WorkflowState as WS
 from briefy.common.workflow import WorkflowTransitionException
+from briefy.leica.config import SCHEDULE_DAYS_LIMIT
 from briefy.leica.subscribers.utils import create_new_assignment_from_order
 from briefy.leica.utils.transitions import create_comment_on_assignment_approval
 
@@ -241,7 +242,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         fields = kwargs.get('fields')
         now = datetime_utcnow()
         date_diff = fields.get('scheduled_datetime') - now
-        if date_diff.days < 1:
+        if date_diff.days < int(SCHEDULE_DAYS_LIMIT):
             msg = SHOOT_TIME_FUTURE_MSG
             raise WorkflowTransitionException(msg)
         else:

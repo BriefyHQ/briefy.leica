@@ -48,3 +48,6 @@ FILES_BASE = 'https://files.briefy.co' if _queue_suffix == 'live' else 'https://
 # job tasks: cron hour and minute setting
 CRON_HOUR_JOB_TASKS = config('CRON_HOUR_JOB_TASKS', default='*')
 CRON_MINUTE_JOB_TASKS = config('CRON_MINUTE_JOB_TASKS', default='*/1')
+
+# number of days before scheduled date to schedule
+SCHEDULE_DAYS_LIMIT = config('SCHEDULE_DAYS_LIMIT', default=1)
