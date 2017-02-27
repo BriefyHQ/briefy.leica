@@ -2,6 +2,12 @@
 History
 =======
 
+2.0.22 (2017-02-27)
+-------------------
+
+   * New script (finance_csv_export.py) in tools to export all orders and assignments to the invoice system (rudaporto).
+
+
 2.0.21 (2017-02-27)
 -------------------
 
