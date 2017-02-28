@@ -3,6 +3,12 @@ History
 =======
 
 
+2.0.23 (2017-02-28)
+-------------------
+
+    * Fix: when new assignment is created also copy project_managers local role from the order (rudaporto).
+    * Fix: when new assignment is created make sure set type will be 'new' (rudaporto).
+
 2.0.22 (2017-02-28)
 -------------------
 

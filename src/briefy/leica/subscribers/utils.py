@@ -56,6 +56,7 @@ def create_new_assignment_from_order(order, request, copy_payout=False, old_assi
     session = object_session(order)
     payload = {
         'order_id': order.id,
+        'set_type': 'new',
     }
 
     if copy_payout:
@@ -65,6 +66,11 @@ def create_new_assignment_from_order(order, request, copy_payout=False, old_assi
             payload[key] = getattr(old_assignment, key)
 
     assignment = Assignment(**payload)
+    apply_local_roles_from_parent(
+        assignment,
+        order,
+        add_roles=('project_managers',)
+    )
     session.add(assignment)
     session.flush()
 

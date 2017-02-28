@@ -208,7 +208,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     set_type = sa.Column(
         sautils.ChoiceType(TypesOfSetChoices, impl=sa.String()),
         nullable=True,
-        default=None,
+        default='new',
         info={
             'colanderalchemy': {
                 'title': 'Type of Set',
