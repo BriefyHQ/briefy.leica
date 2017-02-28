@@ -991,7 +991,8 @@ class OrderWorkflow(BriefyWorkflow):
                 # necessary when executing from the task
                 if not assignment.workflow.context:
                     assignment.workflow.context = self.context
-                assignment.workflow.complete(message='Assignment complete by Order accept transition.')
+                message = 'Assignment complete by Order accept transition.'
+                assignment.workflow.complete(message=message)
 
     @Permission(
         groups=[G['pm'], G['customers'], G['system'], ]

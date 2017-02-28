@@ -199,8 +199,9 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     """
 
     approval_window = sa.Column(sa.Integer, default=5)
-    """Period, in business days, after the delivery, an Order has to be approved or rejected by the customer.
+    """Period (business days), after the delivery, an Order has will be automatic accepted.
 
+    If an Order is delivered and not rejected by customer it will be automatic accepted by a task.
     i.e.: 10 would mean an Order in this project could be approved up to 10 days after its delivery.
     Zero means a Order will be automatically approved.
     """
