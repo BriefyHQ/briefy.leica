@@ -2,10 +2,20 @@
 History
 =======
 
+
+2.0.23 (2017-02-28)
+-------------------
+
+    * New task to move orders from delivery do completed (rudaporto).
+    * Review Order accept workflow transition and guard (rudaporto).
+    * Change Order cancel workflow transition to use the cancellation window from Project (rudaporto).
+    * Update default values for new Project: cancellation_window=1, availability_window=7, approval_window=5 (rudaporto).
+    * Update Project.approval_windows docs: value should be business days (rudaporto).
+
 2.0.22 (2017-02-27)
 -------------------
 
-   * New script (finance_csv_export.py) in tools to export all orders and assignments to the invoice system (rudaporto).
+    * New script (finance_csv_export.py) in tools to export all orders and assignments to the invoice system (rudaporto).
 
 
 2.0.21 (2017-02-27)

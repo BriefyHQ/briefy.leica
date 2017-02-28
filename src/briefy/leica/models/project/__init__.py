@@ -184,22 +184,22 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
 
     """
 
-    cancellation_window = sa.Column(sa.Integer, default=0)
+    cancellation_window = sa.Column(sa.Integer, default=1)
     """Period, in hours, before the shooting, an Assignment can be cancelled.
 
     i.e.: 24 would mean an Assignment in this project could be cancelled with
     at least 24 hour notice. Zero means no cancellation is possible.
     """
 
-    availability_window = sa.Column(sa.Integer, default=0)
+    availability_window = sa.Column(sa.Integer, default=7)
     """Period, in days, an availability date can be inputed.
 
     i.e.: 10 would mean an Order would have availability dates for, at least, 10 days in the future.
     Zero means no check is done.
     """
 
-    approval_window = sa.Column(sa.Integer, default=0)
-    """Period, in days, after the delivery, an Order could be approved or rejected by the customer.
+    approval_window = sa.Column(sa.Integer, default=5)
+    """Period, in business days, after the delivery, an Order has to be approved or rejected by the customer.
 
     i.e.: 10 would mean an Order in this project could be approved up to 10 days after its delivery.
     Zero means a Order will be automatically approved.

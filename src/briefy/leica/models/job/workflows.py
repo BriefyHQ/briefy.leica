@@ -845,6 +845,7 @@ class OrderWorkflow(BriefyWorkflow):
         Groups: g:pm, g:customers, r:project_manager, r:customer_user
         """
         order = self.document
+        project = order.project
         assignment = order.assignment
         user = self.context
         allowed = True
@@ -857,7 +858,7 @@ class OrderWorkflow(BriefyWorkflow):
                 scheduled_datetime = assignment.scheduled_datetime
                 if scheduled_datetime:
                     date_diff = scheduled_datetime - now
-                    if date_diff.days <= 1:
+                    if date_diff.days <= project.cancellation_window:
                         allowed = False
 
         return allowed and not uploaded
@@ -985,21 +986,26 @@ class OrderWorkflow(BriefyWorkflow):
     def accept(self, **kwargs):
         """Transition: Customer or PM accept an Order."""
         order = self.document
-        final_states = ('cancelled', 'perm_rejected', 'completed')
         for assignment in order.assignments:
             if assignment.state in ('approved', 'refused'):
-                assignment.workflow.complete()
-            elif assignment.state not in final_states:
-                return False
+                # necessary when executing from the task
+                if not assignment.workflow.context:
+                    assignment.workflow.context = self.context
+                assignment.workflow.complete(message='Assignment complete by Order accept transition.')
 
     @Permission(
-        groups=[G['pm'], G['customers'], G['system'], LR['project_manager'], LR['customer_user'], ]
+        groups=[G['pm'], G['customers'], G['system'], ]
     )
     def can_accept(self):
         """Permission: Validate if user can accept an Order.
 
         Groups: g:pm, g:customers, g:system, r:customer_user, r:project_manager
         """
+        order = self.document
+        states = ('cancelled', 'perm_rejected', 'completed', 'approved', 'refused')
+        for assignment in order.assignments:
+            if assignment.state not in states:
+                return False
         return True
 
     @refused.transition(perm_refused, 'can_perm_refuse', message_required=True)
