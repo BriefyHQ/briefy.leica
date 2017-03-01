@@ -437,7 +437,12 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         """Set availabilities for an Order."""
         project = self.project
         timezone = self.timezone
-        if timezone and project:
+
+        if value and value[0] == value[1]:
+            msg = 'Availability dates should be different.'
+            raise ValueError(msg)
+
+        if value and timezone and project:
             availability_window = project.availability_window
             now = datetime.now(tz=timezone)
             for availability in value:
