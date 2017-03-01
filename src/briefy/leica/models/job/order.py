@@ -438,7 +438,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         project = self.project
         timezone = self.timezone
 
-        if value and value[0] == value[1]:
+        if value and len(value) != len(set(value)):
             msg = 'Availability dates should be different.'
             raise ValueError(msg)
 
@@ -454,7 +454,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
                     msg = msg.format(window=availability_window)
                     raise ValueError(msg)
         elif value:
-            logger.warn('Could not check availability dates. Order {id}'.format(self.id))
+            logger.warn('Could not check availability dates. Order {id}'.format(id=self.id))
 
         self._availability = value
 
