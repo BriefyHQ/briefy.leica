@@ -715,6 +715,11 @@ class OrderWorkflow(BriefyWorkflow):
         'can_set_availability',
         required_fields=('availability', )
     )
+    @received.transition(
+        assigned,
+        'can_set_availability',
+        required_fields=('availability', )
+    )
     def set_availability(self, **kwargs):
         """Set order availability dates in the Order."""
         pass
