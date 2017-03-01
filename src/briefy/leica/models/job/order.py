@@ -1,6 +1,7 @@
 """Briefy Leica Order to a Job."""
 from briefy.common.db.types import AwareDateTime
 from briefy.common.vocabularies.categories import CategoryChoices
+from briefy.leica import logger
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.descriptors import UnaryRelationshipWrapper
@@ -11,6 +12,7 @@ from briefy.leica.utils.transitions import get_transition_date_from_history
 from briefy.leica.utils.user import add_user_info_to_state_history
 from briefy.leica.vocabularies import OrderInputSource
 from datetime import datetime
+from dateutil.parser import parse
 from sqlalchemy import orm
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import TimezoneType
@@ -433,6 +435,27 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     @availability.setter
     def availability(self, value: list):
         """Set availabilities for an Order."""
+        project = self.project
+        timezone = self.timezone
+
+        if value and value[0] == value[1]:
+            msg = 'Availability dates should be different.'
+            raise ValueError(msg)
+
+        if value and timezone and project:
+            availability_window = project.availability_window
+            now = datetime.now(tz=timezone)
+            for availability in value:
+                availability = parse(availability)
+                availability = availability.astimezone(timezone)
+                date_diff = availability - now
+                if date_diff.days < availability_window:
+                    msg = 'Both availability dates must be at least {window} days from now.'
+                    msg = msg.format(window=availability_window)
+                    raise ValueError(msg)
+        elif value:
+            logger.warn('Could not check availability dates. Order {id}'.format(self.id))
+
         self._availability = value
 
     _delivery = sa.Column(
