@@ -2,6 +2,10 @@
 History
 =======
 
+2.0.24 (2017-03-01)
+-------------------
+
+    * Validate availability dates using Project.availability_window (days) value (rudaporto).
 
 2.0.23 (2017-02-28)
 -------------------

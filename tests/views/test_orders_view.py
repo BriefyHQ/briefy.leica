@@ -1,8 +1,11 @@
 """Test Orders view."""
 from briefy.leica import models
 from conftest import BaseVersionedTestView
+from datetime import datetime
+from datetime import timedelta
 
 import pytest
+import pytz
 
 
 @pytest.mark.usefixtures('create_dependencies')
@@ -29,6 +32,8 @@ class TestOrderView(BaseVersionedTestView):
         'title': 'New Order Title changed!',
         'price': 10000,
         'price_currency': 'USD',
-        'availability': ["2017-01-18T18:55:25.930638+00:00",
-                         "2017-01-19T18:55:25.930638+00:00"]
+        'availability': [
+            str(datetime.now(tz=pytz.utc) + timedelta(days=14)),
+            str(datetime.now(tz=pytz.utc) + timedelta(days=21))
+        ]
     }
