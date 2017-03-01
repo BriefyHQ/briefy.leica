@@ -453,8 +453,8 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
                     msg = 'Both availability dates must be at least {window} days from now.'
                     msg = msg.format(window=availability_window)
                     raise ValueError(msg)
-        else:
-            logger.warn('Could not check availability dates.')
+        elif value:
+            logger.warn('Could not check availability dates. Order {id}'.format(self.id))
 
         self._availability = value
 
