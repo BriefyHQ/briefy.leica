@@ -42,6 +42,7 @@ def make_changes():
         if order.source != new_source:
             changed_count += 1
             order.source = new_source
+            session.add(order)
         else:
             unchanged_count += 1
 
@@ -51,25 +52,13 @@ def make_changes():
 def main():
     """Coordinate everything."""
     init()
-    try:
-        with transaction.manager:
-            changed, unchanged, ignored = make_changes()
-            if __dryrun__:
-                raise RuntimeError
-
-    except RuntimeError:
-        pass
+    with transaction.manager:
+        changed, unchanged, ignored = make_changes()
     print('changed: {0}, unchanged: {1}, ignored: {2} order input sources'.format(
         changed, unchanged, ignored
     ))
 
 
-__dryrun__ = False
-
 if __name__ == '__main__':
-    import sys
-    if len(sys.argv) >= 2 and sys.argv[1].replace('-', '').lower() in {'dryrun', 'debug'}:
-        __dryrun__ = True
-
     session = configure(Session)
     main()
