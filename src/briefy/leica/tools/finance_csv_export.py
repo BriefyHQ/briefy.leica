@@ -59,9 +59,38 @@ def export_location(location: object) -> tuple:
     return street, locality, country
 
 
-def export_order():
+def export_order(state=None, customer_comments=False):
     """Export all orders to csv file."""
-    all_orders = Order.query().all()
+    fieldnames = [
+        'project_name',
+        'category',
+        'input_date',
+        'source',
+        'uid',
+        'briefy_id',
+        'customer_order_id',
+        'order_name',
+        'street',
+        'locality',
+        'country',
+        'number_required_assets',
+        'scheduled_datetime',
+        'submission_date',
+        'submission_path',
+        'order_status',
+        'first_delivery_date',
+        'last_deliver_date',
+        'delivery_link',
+        'last_refusal_date',
+        'accept_date',
+        'price_currency',
+        'price',
+    ]
+
+    query = Order.query()
+    if state:
+        query = query.filter_by(state=state)
+    all_orders = query.all()
     results = []
     for item in all_orders:
         last_refusal_date = convert_json_datetime(item, ('refuse',), first=False)
@@ -106,36 +135,21 @@ def export_order():
             last_refusal_date=export_datetime(last_refusal_date),
             accept_date=export_datetime(accept_date),
             price_currency=item.price_currency,
-            price=export_integer(item.price)
+            price=export_integer(item.price),
         )
+
+        if customer_comments:
+            customer_comments = ''
+            for comment in item.comments:
+                if comment.author_role == 'customer_user':
+                    customer_comments += comment.content + '\n'
+            payload['customer_comments'] = customer_comments
+            fieldnames.append('customer_comments')
+
         results.append(payload)
         print('Order appended: {id}'.format(id=item.id))
+
     file_out = open(ORDER_CSV, 'w')
-    fieldnames = [
-        'project_name',
-        'category',
-        'input_date',
-        'source',
-        'uid',
-        'briefy_id',
-        'customer_order_id',
-        'order_name',
-        'street',
-        'locality',
-        'country',
-        'number_required_assets',
-        'scheduled_datetime',
-        'submission_date',
-        'submission_path',
-        'order_status',
-        'first_delivery_date',
-        'last_deliver_date',
-        'delivery_link',
-        'last_refusal_date',
-        'accept_date',
-        'price_currency',
-        'price'
-    ]
     writer = csv.DictWriter(file_out, fieldnames=fieldnames)
     writer.writeheader()
     for data in results:
@@ -145,6 +159,32 @@ def export_order():
 
 def export_assignment():
     """Export all assignment to csv file."""
+    fieldnames = [
+        'project_name',
+        'category',
+        'uid',
+        'briefy_id',
+        'customer_order_id',
+        'assignment_name',
+        'locality',
+        'country',
+        'number_required_assets',
+        'responsible_professional',
+        'assignment_status',
+        'set_type',
+        'scheduled_datetime',
+        'last_submission_date',
+        'submission_path',
+        'last_approval_date',
+        'last_refusal_date',
+        'complete_date',
+        'payout_currency',
+        'payout_value',
+        'travel_expenses',
+        'additional_compensation',
+        'reason_additional_compensation',
+    ]
+
     all_assignments = Assignment.query().all()
     results = []
     file_out = open(ASSIGNMENT_CSV, 'w')
@@ -182,31 +222,6 @@ def export_assignment():
         results.append(payload)
         print('Assignment appended: {id}'.format(id=item.id))
 
-    fieldnames = [
-        'project_name',
-        'category',
-        'uid',
-        'briefy_id',
-        'customer_order_id',
-        'assignment_name',
-        'locality',
-        'country',
-        'number_required_assets',
-        'responsible_professional',
-        'assignment_status',
-        'set_type',
-        'scheduled_datetime',
-        'last_submission_date',
-        'submission_path',
-        'last_approval_date',
-        'last_refusal_date',
-        'complete_date',
-        'payout_currency',
-        'payout_value',
-        'travel_expenses',
-        'additional_compensation',
-        'reason_additional_compensation',
-    ]
     writer = csv.DictWriter(file_out, fieldnames=fieldnames)
     writer.writeheader()
     for data in results:
@@ -217,4 +232,4 @@ def export_assignment():
 if __name__ == '__main__':
     db.configure(Session)
     export_assignment()
-    export_order()
+    export_order(customer_comments=False)

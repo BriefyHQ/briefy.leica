@@ -2,6 +2,12 @@
 History
 =======
 
+2.0.25 (2017-03-06)
+-------------------
+
+    * Change the default Project.availability_window to 6 days (rudaporto).
+    * Update finance report to have the option to export Order customer comments (rudaporto).
+
 2.0.24 (2017-03-01)
 -------------------
 
