@@ -191,10 +191,10 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     at least 24 hour notice. Zero means no cancellation is possible.
     """
 
-    availability_window = sa.Column(sa.Integer, default=7)
+    availability_window = sa.Column(sa.Integer, default=6)
     """Period, in days, an availability date can be inputed.
 
-    i.e.: 10 would mean an Order would have availability dates for, at least, 10 days in the future.
+    i.e.: 6 would mean an Order would have availability dates for, at least, 6 days in the future.
     Zero means no check is done.
     """
 
