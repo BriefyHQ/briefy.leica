@@ -437,13 +437,19 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         """Set availabilities for an Order."""
         project = self.project
         timezone = self.timezone
+        user = self.workflow.context
+        not_pm = 'g:briefy_pm' not in user.groups
 
         if value and len(value) != len(set(value)):
             msg = 'Availability dates should be different.'
             raise ValueError(msg)
 
         if value and timezone and project:
-            availability_window = project.availability_window
+            if not_pm:
+                availability_window = project.availability_window
+            else:
+                # allow less than 24hs for PMs but not in the past
+                availability_window = 0
             now = datetime.now(tz=timezone)
             for availability in value:
                 availability = parse(availability)

@@ -7,6 +7,10 @@ History
 
     * Change the default Project.availability_window to 6 days (rudaporto).
     * Update finance report to have the option to export Order customer comments (rudaporto).
+    * When remove availability dates, keep copy the payout from the old assignment to the new (rudaporto).
+    * Fix: Order transition set_availability from assigned to assigned was wrong defined (rudaporto).
+    * Update availability dates validation to be change the availability window to zero when the user is PM (rudaporto).
+
 
 2.0.24 (2017-03-01)
 -------------------

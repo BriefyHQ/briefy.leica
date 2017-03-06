@@ -715,7 +715,7 @@ class OrderWorkflow(BriefyWorkflow):
         'can_set_availability',
         required_fields=('availability', )
     )
-    @received.transition(
+    @assigned.transition(
         assigned,
         'can_set_availability',
         required_fields=('availability', )
@@ -780,7 +780,7 @@ class OrderWorkflow(BriefyWorkflow):
         # this will handle the creation of a new Assignment
         message = kwargs.get('message', '')
         order.assignment.workflow.cancel(message=message)
-        create_new_assignment_from_order(order, order.request)
+        create_new_assignment_from_order(order, order.request, copy_payout=True)
         return True
 
     @Permission(groups=[LR['project_manager'], G['pm'], LR['customer_user'], G['customers'], ])
