@@ -438,7 +438,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         project = self.project
         timezone = self.timezone
         user = self.workflow.context
-        not_pm = 'g:briefy_pm' not in user.groups
+        not_pm = 'g:briefy_pm' not in user.groups if user else True
 
         if value and len(value) != len(set(value)):
             msg = 'Availability dates should be different.'
