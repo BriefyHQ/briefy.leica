@@ -150,7 +150,7 @@ def export_order(state=None, customer_comments=False):
         print('Order appended: {id}'.format(id=item.id))
 
     file_out = open(ORDER_CSV, 'w')
-    writer = csv.DictWriter(file_out, fieldnames=fieldnames)
+    writer = csv.DictWriter(file_out, fieldnames=fieldnames, delimiter='\t')
     writer.writeheader()
     for data in results:
         writer.writerow(data)
@@ -173,6 +173,7 @@ def export_assignment():
         'assignment_status',
         'set_type',
         'scheduled_datetime',
+        'submission_date',
         'last_submission_date',
         'submission_path',
         'last_approval_date',
@@ -208,6 +209,7 @@ def export_assignment():
             assignment_status=item.state,
             set_type=item.set_type.value if item.set_type else None,
             scheduled_datetime=export_datetime(item.scheduled_datetime),
+            submission_date=export_datetime(item.submission_date),
             last_submission_date=export_datetime(item.last_submission_date),
             submission_path=item.submission_path,
             last_approval_date=export_datetime(last_approval_date),
@@ -222,7 +224,7 @@ def export_assignment():
         results.append(payload)
         print('Assignment appended: {id}'.format(id=item.id))
 
-    writer = csv.DictWriter(file_out, fieldnames=fieldnames)
+    writer = csv.DictWriter(file_out, fieldnames=fieldnames, delimiter='\t')
     writer.writeheader()
     for data in results:
         writer.writerow(data)
