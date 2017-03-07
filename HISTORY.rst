@@ -2,6 +2,13 @@
 History
 =======
 
+2.0.26 (Unreleased)
+-------------------
+
+    * Finance export: Added submission date (first) column to Assignment export (rudaporto).
+    * Finaance export: change file format of Order and Assignment to use tab delimiter (rudaporto).
+
+
 2.0.25 (2017-03-06)
 -------------------
 
