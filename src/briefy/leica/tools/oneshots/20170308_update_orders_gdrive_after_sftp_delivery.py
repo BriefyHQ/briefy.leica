@@ -27,7 +27,7 @@ def main():
             delivery['gdrive'] = slack_gdrive
             order.delivery = delivery
         elif id_gdrive != id_slack_gdrive:
-            print('{0}\t{1}\t{2}\t{3}'.format(order.id, order.title, id_gdrive, id_slack_gdrive))
+            print('{0}\t{1}\t{2}\t{3}'.format(order.slug, order.title, gdrive, slack_gdrive))
         else:
             pass
 
