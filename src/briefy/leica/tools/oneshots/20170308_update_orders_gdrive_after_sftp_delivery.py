@@ -11,7 +11,7 @@ FNAME = 'src/briefy/leica/tools/oneshots/data/history_delivery_sftp_agoda.txt'
 
 
 def main():
-    """Update gdrive client delivery link in """
+    """Update gdrive client delivery link."""
     infile = open(FNAME, 'r')
     reader = csv.DictReader(infile, delimiter='\t')
     for item in reader:
