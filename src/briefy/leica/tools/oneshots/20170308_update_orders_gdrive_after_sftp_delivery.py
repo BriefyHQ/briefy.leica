@@ -20,7 +20,7 @@ def main():
         delivery = order.delivery
         gdrive = delivery.get('gdrive') if delivery else None
         slack_gdrive = item.get('delivery')
-        id_gdrive = urlparse(gdrive).path.split('/')[-1]
+        id_gdrive = urlparse(gdrive).path.split('/')[-1] if gdrive else None
         id_slack_gdrive = urlparse(slack_gdrive).path.split('/')[-1]
         if not gdrive:
             delivery = delivery.copy()
