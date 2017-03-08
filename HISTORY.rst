@@ -7,6 +7,7 @@ History
 
     * Finance export: Added submission date (first) column to Assignment export (rudaporto).
     * Finaance export: change file format of Order and Assignment to use tab delimiter (rudaporto).
+    * Added oneshot script to update gdrive delivery links for Agoda orders using slack history file (rudaporto).
 
 
 2.0.25 (2017-03-06)
