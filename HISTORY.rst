@@ -2,7 +2,14 @@
 History
 =======
 
-2.0.26 (2017-06-08)
+2.0.27 (2017-03-10)
+-------------------
+
+    * Implemented script to fix assginments with shoot time in the past and stucked in the assigned state (rudaporto).
+    * Update documentation with database backup and restore and how to execute agoda delivery sftp procedure (rudaporto).
+
+
+2.0.26 (2017-03-08)
 -------------------
 
     * Finance export: Added submission date (first) column to Assignment export (rudaporto).
