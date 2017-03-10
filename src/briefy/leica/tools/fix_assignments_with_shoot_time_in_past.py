@@ -33,7 +33,6 @@ class AssignmentFix:
         assignment = self.assignment
         if assignment.state == 'assigned':
             assignment.state = 'scheduled'
-            assignment.scheduled_datetime = self.shoot_time
             assignment_state_history = assignment.state_history.copy()
             delta = timedelta(days=1)
             trasition_date = (self.shoot_time - delta).astimezone(tz=pm_tzinfo)
@@ -63,17 +62,24 @@ class AssignmentFix:
             order_state_history.append(new_history)
             order.state_history = order_state_history
 
-    def __call__(self):
-        self._schedule()
+    def __call__(self, shoot_time_only=False):
+        self.assignment.scheduled_datetime = self.shoot_time
+        if not shoot_time_only:
+            self._schedule()
         move_assignments_awaiting_assets()
 
 
 if __name__ == '__main__':
     configure(Session)
     with transaction.manager:
-        slug = '1701-PS6-531_03'
-        fixer = AssignmentFix(
-            slug=slug,
+        fixer01 = AssignmentFix(
+            slug='1701-PS6-531_03',
             shoot_time='2017-03-07 14:00:00'
         )
-        fixer()
+        fixer01()
+
+        fixer02 = AssignmentFix(
+            slug='1701-PS6-347_01',
+            shoot_time='2017-03-02 11:00:00'
+        )
+        fixer02(shoot_time_only=True)
