@@ -13,9 +13,11 @@ import transaction
 pm_tzinfo = pytz.timezone('Europe/Berlin')
 
 
-class AssignmentFix:
+class AssignmentShootTimeFix:
+    """Fix assignment with shoot time wrong or in the past."""
 
     def __init__(self, slug, shoot_time):
+        """Initialize the fix."""
         self.assignment = Assignment.query().filter_by(
             slug=slug
         ).one()
@@ -63,6 +65,7 @@ class AssignmentFix:
             order.state_history = order_state_history
 
     def __call__(self, shoot_time_only=False):
+        """Execute the fix."""
         self.assignment.scheduled_datetime = self.shoot_time
         if not shoot_time_only:
             self._schedule()
@@ -72,13 +75,13 @@ class AssignmentFix:
 if __name__ == '__main__':
     configure(Session)
     with transaction.manager:
-        fixer01 = AssignmentFix(
+        fixer01 = AssignmentShootTimeFix(
             slug='1701-PS6-531_03',
             shoot_time='2017-03-07 14:00:00'
         )
         fixer01()
 
-        fixer02 = AssignmentFix(
+        fixer02 = AssignmentShootTimeFix(
             slug='1701-PS6-347_01',
             shoot_time='2017-03-02 11:00:00'
         )
