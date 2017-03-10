@@ -81,8 +81,8 @@ if __name__ == '__main__':
         )
         fixer01()
 
-        fixer02 = AssignmentShootTimeFix(
-            slug='1701-PS6-347_01',
-            shoot_time='2017-03-02 11:00:00'
-        )
-        fixer02(shoot_time_only=True)
+        # fixer02 = AssignmentShootTimeFix(
+        #    slug='1701-PS6-347_01',
+        #    shoot_time='2017-03-02 11:00:00'
+        # )
+        # fixer02(shoot_time_only=True)
