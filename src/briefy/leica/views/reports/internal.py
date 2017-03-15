@@ -18,7 +18,7 @@ class InternalReportFactory(BaseFactory):
 
 
 @resource(
-    path='/ms.ophelie/assignments',
+    path='/ms-ophelie/assignments',
     cors_policy=CORS_POLICY,
     factory=InternalReportFactory
 )
@@ -36,7 +36,7 @@ class MsOphelieAssignments(BaseReport):
 
 
 @resource(
-    path='/ms.ophelie/orders',
+    path='/ms-ophelie/orders',
     cors_policy=CORS_POLICY,
     factory=InternalReportFactory
 )
