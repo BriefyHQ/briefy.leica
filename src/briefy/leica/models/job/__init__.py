@@ -543,7 +543,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         updated_if_changed('submission_date', transitions, True)
         updated_if_changed('last_submission_date', transitions, False)
 
-        transitions = ('accept', 'refuse')
+        transitions = ('approve', 'refuse')
         updated_if_changed('customer_approval_date', transitions, False)
 
         if keep_updated_at:
