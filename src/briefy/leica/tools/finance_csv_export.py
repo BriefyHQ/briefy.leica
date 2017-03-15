@@ -6,6 +6,7 @@ from briefy.leica.sync import db
 from briefy.leica.utils.transitions import get_transition_date_from_history
 from datetime import datetime
 from decimal import Decimal
+from io import StringIO
 
 import csv
 
@@ -147,14 +148,13 @@ def export_order(state=None, customer_comments=False):
             fieldnames.append('customer_comments')
 
         results.append(payload)
-        print('Order appended: {id}'.format(id=item.id))
 
-    file_out = open(ORDER_CSV, 'w')
-    writer = csv.DictWriter(file_out, fieldnames=fieldnames, delimiter='\t')
+    fout = StringIO()
+    writer = csv.DictWriter(fout, fieldnames=fieldnames, delimiter='\t')
     writer.writeheader()
     for data in results:
         writer.writerow(data)
-    file_out.close()
+    return fout
 
 
 def export_assignment():
@@ -188,7 +188,6 @@ def export_assignment():
 
     all_assignments = Assignment.query().all()
     results = []
-    file_out = open(ASSIGNMENT_CSV, 'w')
     for item in all_assignments:
         street, locality, country = export_location(item.location)
         last_approval_date = convert_json_datetime(item, ('approve',), first=False)
@@ -222,16 +221,29 @@ def export_assignment():
             reason_additional_compensation=item.reason_additional_compensation
         )
         results.append(payload)
-        print('Assignment appended: {id}'.format(id=item.id))
 
-    writer = csv.DictWriter(file_out, fieldnames=fieldnames, delimiter='\t')
+    fout = StringIO()
+    writer = csv.DictWriter(fout, fieldnames=fieldnames, delimiter='\t')
     writer.writeheader()
     for data in results:
         writer.writerow(data)
-    file_out.close()
+    return fout
+
+
+def save_data_to_file(buffer: StringIO, filename: str) -> bool:
+    """Save the contents of a StringIO buffer to a real file."""
+    with open(filename, 'w') as fout:
+        buffer.seek(0)
+        fout.write(buffer.read())
+    return True
 
 
 if __name__ == '__main__':
     db.configure(Session)
-    export_assignment()
-    export_order(customer_comments=False)
+    # Assignment
+    assignment_data = export_assignment()
+    save_data_to_file(assignment_data, ASSIGNMENT_CSV)
+
+    # Order
+    order_data = export_order(customer_comments=False)
+    save_data_to_file(order_data, ORDER_CSV)
