@@ -2,6 +2,13 @@
 History
 =======
 
+2.0.28 (2017-03-15)
+-------------------
+
+    * Fix: Assignment was ignoring approve transition when updating customer_approval_date (ericof).
+    * Feature: Internal endpoints /ms.ophelie/orders /ms.ophelie/assignments return the CSV report to be consumed by ms.ophelie (ericof).
+
+
 2.0.27 (2017-03-10)
 -------------------
 

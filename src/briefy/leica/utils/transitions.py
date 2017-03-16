@@ -29,11 +29,25 @@ def get_transition_date_from_history(
     :param history: Workflow history.
     :param first: Return the first occurrence of this transition.
     """
+    valid = get_transition_info_from_history(transitions, history, first)
+    return valid['date'] if valid else None
+
+
+def get_transition_info_from_history(
+        transitions: tuple, history: list, first: bool=False
+) -> dict:
+    """Return information for a named transition.
+
+    Return None if transition never occurred.
+    :param transitions: List of Transitions names.
+    :param history: Workflow history.
+    :param first: Return the first occurrence of this transition.
+    """
     order = 0 if first else -1
     valid_history_attr = history and isinstance(history, list)
     history = history if valid_history_attr else []
     valid = [t for t in history if t['transition'] in transitions]
-    return valid[order]['date'] if valid else None
+    return valid[order] if valid else None
 
 
 def approve_assets_in_assignment(assignment: Base, context) -> list:
