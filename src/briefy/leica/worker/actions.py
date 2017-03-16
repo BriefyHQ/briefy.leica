@@ -142,21 +142,32 @@ def approve_assignment(
                 assignment_id))
             return False, {}
 
+        order = assignment.order
+        delivery_info = order.delivery.copy() if order.delivery else {}
         if not copy_ignored:
             # Ensure the correct key is updated and object is set as dirty
-            delivery_info = assignment.order.delivery.copy() if assignment.order.delivery else {}
             delivery_info['gdrive'] = laure_data.delivery_url
             delivery_info['archive'] = laure_data.archive_url
 
+            # TODO: Unless google drive is phased out soon, this URL should be
+            # stored on the model.
+            logger.info(
+                '''Assets for assignment '{0}' are archived at '{1}' '''.format(
+                    assignment_id,
+                    delivery_info['archive']
+                )
+            )
+
             msg = '''Assets copied over on laure - committing delivery URL to order '{order_id}' '''
         else:
+            # We need to get the existing delivery to execute the proper transition
             msg = '''Assets were a result of previous manual review and were not touched on ms.laure. Order '{order_id} ' unchanged!'''  # noQA
+
         logger.info(
             msg.format(
                 order_id=assignment.order.id
             )
         )
-        order = assignment.order
         if order.state == 'in_qa':
             fields = dict(delivery=delivery_info)
             wf = order.workflow
@@ -171,15 +182,6 @@ def approve_assignment(
             msg = 'Order in incorrect state: {state}'.format(state=order.state)
             logger.error(msg)
             raise Exception(msg)
-
-        # TODO: Unless google drive is phased out soon, this URL should be
-        # stored on the model.
-        logger.info(
-            '''Assets for assignment '{0}' are archived at '{1}' '''.format(
-                assignment_id,
-                laure_data.archive_url
-            )
-        )
 
     return True, {}
 

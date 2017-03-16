@@ -2,6 +2,12 @@
 History
 =======
 
+2.0.29 (2017-03-16)
+-------------------
+
+    * Fix: Worker, on approve_assignment action, was not transitioning Orders that were nt copied on Ms.Laure (ericof).
+
+
 2.0.28 (2017-03-15)
 -------------------
 
