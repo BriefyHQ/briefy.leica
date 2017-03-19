@@ -2,6 +2,13 @@
 History
 =======
 
+2.0.30 (2017-03-19)
+-------------------
+
+    * New endpoint to manage BriefyUserProfile (ericof).
+    * Return internal and company name on listings for UserProfile classes (ericof).
+    * Fix: Bug when activating a BriefyUserProfile (ericof).
+
 2.0.29 (2017-03-16)
 -------------------
 

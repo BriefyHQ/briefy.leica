@@ -48,7 +48,7 @@ class UserProfile(mixins.UserProfileMixin, mixins.UserProfileBriefyRoles, Base):
 
     __summary_attributes_relations__ = []
 
-    __listing_attributes__ = __summary_attributes__
+    __listing_attributes__ = __summary_attributes__ + ['internal', 'company_name']
 
     __colanderalchemy_config__ = {
         'excludes': [
