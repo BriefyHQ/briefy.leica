@@ -40,8 +40,11 @@ class UserProfileWorkflow(BriefyWorkflow):
     def activate(self):
         """Activate the UserProfile."""
         profile = self.document
+        groups = ()
         if profile.type == 'customeruserprofile':
             groups = ('g:customers', )
+        elif profile.type == 'briefyuserprofile':
+            groups = ('g:briefy',)
         create_rolleiflex_user(self.document, groups=groups)
 
     @Permission(groups=[G['system'], G['pm'], G['scout'], G['bizdev'], G['finance']])
