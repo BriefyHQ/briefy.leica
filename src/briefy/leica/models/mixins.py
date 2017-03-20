@@ -8,11 +8,13 @@ from briefy.common.db.mixins import Mixin
 from briefy.common.db.mixins import OptIn
 from briefy.common.db.mixins import PersonalInfoMixin
 from briefy.common.db.models.roles import LocalRole
+from briefy.common.utils import schema
 from briefy.common.vocabularies.roles import LocalRolesChoices
 from briefy.common.users import SystemUser
 from briefy.common.utils.cache import timeout_cache
 from briefy.leica.models.descriptors import LocalRolesGetSetFactory
 from briefy.leica.db import Session
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -1038,3 +1040,87 @@ class UserProfileMixin(ContactInfoMixin, PersonalInfoMixin, OptIn, KLeicaVersion
         }
     )
     """Email of the contact person."""
+
+
+class TaxInfo:
+    """Tax information."""
+
+    tax_id = sa.Column(
+        sa.String(50), nullable=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Tax ID',
+                'missing': None,
+                'typ': colander.String
+            }
+        }
+    )
+    """Tax ID for this customer.
+
+    i.e.: 256.018.208-49
+    """
+
+    tax_id_type = sa.Column(
+        sa.String(50), nullable=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Tax ID type',
+                'missing': colander.drop,
+                'typ': colander.String
+            }
+        }
+    )
+    """Tax ID type.
+
+    i.e.: CPF
+    """
+
+    tax_country = sa.Column(
+        sautils.CountryType, nullable=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Tax Country',
+                'missing': colander.drop,
+                'typ': colander.String
+            }
+        }
+    )
+    """Tax Country
+
+    i.e.: BR
+    """
+
+
+class BillingAddress:
+    """BillingAddress information.
+
+    This mixin provides a simplified structure to deal with billing addresses
+    """
+
+    billing_address = sa.Column(
+        JSONB,
+        info={
+            'colanderalchemy': {
+                'typ': schema.JSONType
+            }
+        }
+    )
+    """Structure containing address information.
+
+    Info expected schema::
+
+        {
+          'additional_info': 'House 3, Entry C, 1st. floor, c/o GLG',
+          'formatted_address': 'Schlesische Straße 27, Kreuzberg, Berlin, 10997, DE',
+          'place_id': 'ChIJ8-exwVNOqEcR8hBPr-VUmdQ',
+          'province': 'Berlin',
+          'locality': 'Berlin',
+          'sublocality': 'Kreuzberg',
+          'route': 'Schlesische Straße',
+          'street_number': '27',
+          'country': 'DE',
+          'postal_code': '10997'
+        }
+
+    Ref: https://maps-apis.googleblog.com/2016/11/address-geocoding-in-google-maps-apis.html
+    """

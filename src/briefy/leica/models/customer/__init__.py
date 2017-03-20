@@ -17,57 +17,8 @@ class ICustomer(Interface):
     """Marker interface for a Customer."""
 
 
-class TaxInfo:
-    """Tax information."""
-
-    tax_id = sa.Column(
-        sa.String(50), nullable=True,
-        info={
-            'colanderalchemy': {
-                'title': 'Tax ID',
-                'missing': None,
-                'typ': colander.String
-            }
-        }
-    )
-    """Tax ID for this customer.
-
-    i.e.: 256.018.208-49
-    """
-
-    tax_id_type = sa.Column(
-        sa.String(50), nullable=True,
-        info={
-            'colanderalchemy': {
-                'title': 'Tax ID type',
-                'missing': colander.drop,
-                'typ': colander.String
-            }
-        }
-    )
-    """Tax ID type.
-
-    i.e.: CPF
-    """
-
-    tax_country = sa.Column(
-        sautils.CountryType, nullable=True,
-        info={
-            'colanderalchemy': {
-                'title': 'Tax Country',
-                'missing': colander.drop,
-                'typ': colander.String
-            }
-        }
-    )
-    """Tax Country
-
-    i.e.: BR
-    """
-
-
 @implementer(ICustomer)
-class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
+class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
                mixins.KLeicaVersionedMixin, Base):
     """A Customer for Briefy."""
 

@@ -2,6 +2,13 @@
 History
 =======
 
+2.1.0 (unreleased)
+------------------
+
+    * New model: ProfessionalBillingInfo (ericof).
+    * New endpoint: /professionals/{professional_id}/billing (ericof).
+
+
 2.0.30 (2017-03-19)
 -------------------
 
