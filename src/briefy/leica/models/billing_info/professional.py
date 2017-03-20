@@ -2,6 +2,7 @@
 from briefy.common.utils import schema
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
+from briefy.leica.models.billing_info import methods
 from briefy.leica.models.billing_info import workflows
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declared_attr
@@ -115,48 +116,47 @@ class ProfessionalBillingInfo(
     )
     """Email of the contact person."""
 
-    primary_payment_info = sa.Column(
-        'primary_payment_info',
+    _payment_info = sa.Column(
+        'payment_info',
         JSONB,
         info={
             'colanderalchemy': {
-                'title': 'Primary payment method',
+                'title': 'Payment information',
                 'missing': colander.drop,
-                'typ': schema.JSONType
+                'typ': colander.List
             }
         }
     )
-    """Primary payment method used for this professional."""
+    """Payment information used for this professional."""
 
     @hybrid_property
-    def primary_payment_method(self) -> str:
-        """Return the type of the payment method used."""
-        method_name = ''
-        info = self.primary_payment_info
-        if info:
-            method_name = info.get('type_')
-        return method_name
+    def payment_info(self) -> list:
+        """Return list of payment information."""
+        info = self._payment_info
+        info = info if info else []
+        return info
 
-    secondary_payment_info = sa.Column(
-        'secondary_payment_info',
-        JSONB,
-        info={
-            'colanderalchemy': {
-                'title': 'Secondary payment method',
-                'missing': colander.drop,
-                'typ': schema.JSONType
-            }
-        }
-    )
-    """Secondary payment method used for this professional."""
+    @payment_info.setter
+    def payment_info(self, value: list):
+        """Set payment information for a professional."""
+        self._payment_info = value
+
+    @hybrid_property
+    def default_payment_method(self) -> str:
+        """Return the type of the preferred payment method used."""
+        method_name = ''
+        info = self.payment_info
+        if info and len(info) > 0:
+            method_name = info[0].get('type_')
+        return method_name
 
     @hybrid_property
     def secondary_payment_method(self) -> str:
         """Return the type of the payment method used."""
         method_name = ''
-        info = self.secondary_payment_info
-        if info:
-            method_name = info.get('type_')
+        info = self.payment_info
+        if info and len(info) > 1:
+            method_name = info[1].get('type_')
         return method_name
 
     @declared_attr
@@ -173,6 +173,7 @@ class ProfessionalBillingInfo(
         """Return a dict representation of this object."""
         data = super().to_dict()
         data['slug'] = self.slug
-        data['primary_payment_method'] = self.primary_payment_method
+        data['payment_info'] = self.payment_info
+        data['default_payment_method'] = self.default_payment_method
         data['secondary_payment_method'] = self.secondary_payment_method
         return data

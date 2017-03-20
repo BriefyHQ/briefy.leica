@@ -15,20 +15,24 @@ class TestProfessionalBillingInfoModel(BaseModelTest):
     file_path = 'data/professional_billing_infos.json'
     model = models.ProfessionalBillingInfo
 
-    def test_primary_payment_method(self, instance_obj):
-        """Check if primary_payment_method is correctly retrieved."""
-        primary_payment_method = instance_obj.primary_payment_method
-        assert primary_payment_method == 'paypal'
+    def test_default_payment_method(self, instance_obj):
+        """Check if default_payment_method is correctly retrieved."""
+        base_info = instance_obj.payment_info
+        default_payment_method = instance_obj.default_payment_method
+        assert default_payment_method == 'paypal'
 
-        instance_obj.primary_payment_info = None
-        primary_payment_method = instance_obj.primary_payment_method
-        assert primary_payment_method == ''
+        instance_obj.payment_info = None
+        default_payment_method = instance_obj.default_payment_method
+        assert default_payment_method == ''
+        instance_obj.payment_info = base_info
 
     def test_secondary_payment_method(self, instance_obj):
         """Check if secondary_payment_method is correctly retrieved."""
+        base_info = instance_obj.payment_info
         secondary_payment_method = instance_obj.secondary_payment_method
         assert secondary_payment_method == 'bank_account'
 
-        instance_obj.secondary_payment_info = None
+        instance_obj.payment_info = None
         secondary_payment_method = instance_obj.secondary_payment_method
         assert secondary_payment_method == ''
+        instance_obj.payment_info = base_info

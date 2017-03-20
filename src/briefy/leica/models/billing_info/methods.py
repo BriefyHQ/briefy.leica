@@ -19,7 +19,8 @@ class PayPal(PaymentMethod):
     )
 
     email = colander.SchemaNode(
-        colander.String()
+        colander.String(),
+        validator=colander.Email(),
     )
 
 
@@ -32,7 +33,8 @@ class Skrill(PaymentMethod):
     )
 
     email = colander.SchemaNode(
-        colander.String()
+        colander.String(),
+        validator=colander.Email(),
     )
 
 
@@ -43,11 +45,28 @@ class BankAccount(PaymentMethod):
         colander.String(),
         default='bank_account'
     )
-    holder_name = colander.SchemaNode(colander.String())
-    iban = colander.SchemaNode(colander.String())
-    account_number = colander.SchemaNode(colander.String())
-    swift = colander.SchemaNode(colander.String())
-    bank_name = colander.SchemaNode(colander.String())
-    bank_street_address = colander.SchemaNode(colander.String())
-    bank_city = colander.SchemaNode(colander.String())
-    bank_country = colander.SchemaNode(colander.String())
+    holder_name = colander.SchemaNode(
+        colander.String()
+    )
+    iban = colander.SchemaNode(
+        colander.String()
+    )
+    account_number = colander.SchemaNode(
+        colander.String()
+    )
+    swift = colander.SchemaNode(
+        colander.String(),
+        missing=''
+    )
+    bank_name = colander.SchemaNode(
+        colander.String()
+    )
+    bank_street_address = colander.SchemaNode(
+        colander.String()
+    )
+    bank_city = colander.SchemaNode(
+        colander.String()
+    )
+    bank_country = colander.SchemaNode(
+        colander.String()
+    )

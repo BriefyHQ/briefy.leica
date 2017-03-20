@@ -40,13 +40,7 @@ def upgrade():
         sa.Column('last_name', sa.String(length=255), autoincrement=False, nullable=True),
         sa.Column('email', types.EmailType(length=255), autoincrement=False, nullable=True),
         sa.Column(
-            'primary_payment_info',
-            postgresql.JSONB(astext_type=sa.Text()),
-            autoincrement=False,
-            nullable=True
-        ),
-        sa.Column(
-            'secondary_payment_info',
+            'payment_info',
             postgresql.JSONB(astext_type=sa.Text()),
             autoincrement=False,
             nullable=True
@@ -104,8 +98,7 @@ def upgrade():
         sa.Column('first_name', sa.String(length=255), nullable=False),
         sa.Column('last_name', sa.String(length=255), nullable=False),
         sa.Column('email', types.EmailType(length=255), nullable=True),
-        sa.Column('primary_payment_info', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
-        sa.Column('secondary_payment_info', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+        sa.Column('payment_info', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
         sa.Column('updated_at', AwareDateTime(), nullable=True),
         sa.ForeignKeyConstraint(['professional_id'], ['professionals.id'], ),
         sa.PrimaryKeyConstraint('id'),

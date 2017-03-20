@@ -32,20 +32,22 @@
       "country": "BR",
       "postal_code": "05497-001"
     },
-    "primary_payment_info": {
-      "type_": "paypal",
-      "email": "salgado@professional.briefy.co"
-    },
-    "secondary_payment_info": {
-      "type_": "bank_account",
-      "holder_name": "Sebastião Salgado",
-      "iban": "DE89 3704 0044 0532 0130 00",
-      "account_number": "0532013000",
-      "swift": "",
-      "bank_name": "Bank Name",
-      "bank_street_address": "Alexander Platz 123",
-      "bank_city": "Berlin",
-      "bank_country": "DE"
-    }
+    "payment_info": [
+      {
+        "type_": "paypal",
+        "email": "salgado@professional.briefy.co"
+      },
+      {
+        "type_": "bank_account",
+        "holder_name": "Sebastião Salgado",
+        "iban": "DE89 3704 0044 0532 0130 00",
+        "account_number": "0532013000",
+        "swift": "",
+        "bank_name": "Bank Name",
+        "bank_street_address": "Alexander Platz 123",
+        "bank_city": "Berlin",
+        "bank_country": "DE"
+      }
+    ]
   }
 ]

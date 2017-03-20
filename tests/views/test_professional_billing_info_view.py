@@ -21,5 +21,10 @@ class TestProfessionalBillingInfo(BaseTestView):
     NOT_FOUND_MESSAGE = ''
     update_map = {
         'email': 'salgado@professional.briefy.co',
-        'primary_payment_info': {'email': 'paypal@professional.briefy.co'}
+        'payment_info': [
+            {
+                'type_': 'paypal',
+                'email': 'paypal@professional.briefy.co'
+            }
+        ]
     }
