@@ -1,11 +1,8 @@
 """Billing information for a professional."""
-from briefy.common.utils import schema
-from briefy.leica.db import Base
-from briefy.leica.models import mixins
-from briefy.leica.models.billing_info import methods
+from briefy.leica.models.billing_info import BillingInfo
 from briefy.leica.models.billing_info import workflows
+from briefy.leica.vocabularies import TaxIdStatusProfessionals
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import UUIDType
 
@@ -14,11 +11,10 @@ import sqlalchemy as sa
 import sqlalchemy_utils as sautils
 
 
-class ProfessionalBillingInfo(
-    mixins.TaxInfo, mixins.BillingAddress, mixins.LeicaVersionedMixin, Base
-):
+class ProfessionalBillingInfo(BillingInfo):
     """Billing information for a Professional."""
 
+    __tablename__ = 'professional_billing_infos'
     _workflow = workflows.ProfessionalBillingInfoWorkflow
 
     __raw_acl__ = (
@@ -37,11 +33,18 @@ class ProfessionalBillingInfo(
 
     __listing_attributes__ = __summary_attributes__
 
-    __colanderalchemy_config__ = {
-        'excludes': [
-            'state_history', 'state'
-        ]
-    }
+    id = sa.Column(
+        UUIDType(),
+        sa.ForeignKey('billing_infos.id'),
+        index=True,
+        unique=True,
+        primary_key=True,
+        info={'colanderalchemy': {
+              'title': 'Billing Info id',
+              'validator': colander.uuid,
+              'missing': colander.drop,
+              'typ': colander.String}}
+    )
 
     professional_id = sa.Column(
         UUIDType(),
@@ -57,22 +60,6 @@ class ProfessionalBillingInfo(
             }
         }
     )
-
-    legal_name = sa.Column(
-        sa.String(255),
-        nullable=True,
-        info={
-            'colanderalchemy': {
-                'title': 'Company Legal name',
-                'missing': '',
-                'typ': colander.String
-            }
-        }
-    )
-    """Legal name of the company.
-
-    i.e.: Insta Stock GmbH
-    """
 
     first_name = sa.Column(
         sa.String(255),
@@ -102,19 +89,21 @@ class ProfessionalBillingInfo(
     )
     """Last name of a person."""
 
-    email = sa.Column(
-        sautils.types.EmailType(),
+    tax_id_status = sa.Column(
+        sautils.ChoiceType(TaxIdStatusProfessionals, impl=sa.String(3)),
         nullable=True,
-        unique=True,
         info={
             'colanderalchemy': {
-                'title': 'Email',
-                'default': '',
+                'title': 'Tax ID Status',
+                'missing': colander.drop,
                 'typ': colander.String
             }
         }
     )
-    """Email of the contact person."""
+    """Tax ID Status.
+
+    Internal codes used by Finance to determine tax rates to be applied to this customer.
+    """
 
     _payment_info = sa.Column(
         'payment_info',
@@ -158,16 +147,6 @@ class ProfessionalBillingInfo(
         if info and len(info) > 1:
             method_name = info[1].get('type_')
         return method_name
-
-    @declared_attr
-    def title(cls):
-        """Return the User fullname."""
-        return sa.orm.column_property(cls.first_name + " " + cls.last_name)
-
-    @declared_attr
-    def __tablename__(self):
-        """Define tablename."""
-        return 'professional_billing_infos'
 
     def to_dict(self):
         """Return a dict representation of this object."""

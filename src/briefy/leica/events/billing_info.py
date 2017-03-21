@@ -3,6 +3,28 @@ from briefy.leica import logger
 from briefy.ws.resources import events
 
 
+class CustomerBillingInfoCreatedEvent(events.ObjectCreatedEvent):
+    """Event to notify CustomerBillingInfo creation."""
+
+    event_name = 'customerbillinginfo.created'
+    logger = logger
+
+
+class CustomerBillingInfoUpdatedEvent(events.ObjectUpdatedEvent):
+    """Event to notify customerBillingInfo update."""
+
+    event_name = 'customerbillinginfo.updated'
+    logger = logger
+
+
+class CustomerBillingInfoDeletedEvent(events.ObjectDeletedEvent):
+    """Event to notify customerBillingInfo delete."""
+
+
+class CustomerBillingInfoLoadedEvent(events.ObjectLoadedEvent):
+    """Event to notify customerBillingInfo load."""
+
+
 class ProfessionalBillingInfoCreatedEvent(events.ObjectCreatedEvent):
     """Event to notify ProfessionalBillingInfo creation."""
 

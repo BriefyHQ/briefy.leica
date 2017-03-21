@@ -19,8 +19,9 @@
     "state": "created",
     "email": "salgado@professional.briefy.co",
     "tax_id": "256.018.208-48",
-    "tax_id_type": "CPF",
-    "tax_country": "BR",
+    "tax_id_name": "CPF",
+    "tax_id_type": "2",
+    "tax_id_status": "32",
     "billing_address": {
       "additional_info": "Sala 2",
       "formatted_address": "Rua dos Pinheiros 836",

@@ -1043,7 +1043,7 @@ class UserProfileMixin(ContactInfoMixin, PersonalInfoMixin, OptIn, KLeicaVersion
 
 
 class TaxInfo:
-    """Tax information."""
+    """Tax information (DEPRECATED)."""
 
     tax_id = sa.Column(
         sa.String(50), nullable=True,

@@ -6,10 +6,10 @@ from briefy.common.workflow import Permission
 from briefy.common.workflow import WorkflowState as WS
 
 
-class ProfessionalBillingInfoWorkflow(BriefyWorkflow):
-    """Workflow for a ProfessionalBillingInfo."""
+class BillingInfoWorkflow(BriefyWorkflow):
+    """Workflow for a BillingInfo."""
 
-    entity = 'professionalbillinginfo'
+    entity = 'billinginfo'
     initial_state = 'created'
 
     # States
@@ -33,3 +33,15 @@ class ProfessionalBillingInfoWorkflow(BriefyWorkflow):
     def can_delete(self):
         """Validate if user can delete this info."""
         return True
+
+
+class CustomerBillingInfoWorkflow(BillingInfoWorkflow):
+    """Workflow for a CustomerBillingInfoWorkflow."""
+
+    entity = 'customerbillinginfo'
+
+
+class ProfessionalBillingInfoWorkflow(BillingInfoWorkflow):
+    """Workflow for a ProfessionalBillingInfoWorkflow."""
+
+    entity = 'professionalbillinginfo'

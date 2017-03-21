@@ -48,25 +48,36 @@ class BankAccount(PaymentMethod):
     holder_name = colander.SchemaNode(
         colander.String()
     )
+    # Only needed if first digit is 1 or 2
     iban = colander.SchemaNode(
         colander.String()
     )
+    # Only needed if first digit 3
     account_number = colander.SchemaNode(
         colander.String()
     )
+    # Only needed if first digit 3
     swift = colander.SchemaNode(
         colander.String(),
         missing=''
     )
+    # Only needed if first digit 3
     bank_name = colander.SchemaNode(
-        colander.String()
+        colander.String(),
+        missing=''
     )
+    # Only needed if first digit 3
     bank_street_address = colander.SchemaNode(
-        colander.String()
+        colander.String(),
+        missing=''
     )
+    # Only needed if first digit 3
     bank_city = colander.SchemaNode(
-        colander.String()
+        colander.String(),
+        missing=''
     )
+    # Only needed if first digit 3
     bank_country = colander.SchemaNode(
-        colander.String()
+        colander.String(),
+        missing=''
     )
