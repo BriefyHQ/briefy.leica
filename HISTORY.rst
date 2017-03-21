@@ -10,6 +10,7 @@ History
     * New model: CustomerBillingInfo (ericof).
     * New endpoint: /customers/{customer_id}/billing (ericof).
     * On Order creation set order price based on project default value (ericof).
+    * UserProfile: Add field to handle messenger info (ericof).
 
 
 2.0.30 (2017-03-19)
