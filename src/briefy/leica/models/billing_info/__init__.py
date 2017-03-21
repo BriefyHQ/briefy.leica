@@ -70,6 +70,7 @@ class BillingInfo(TaxInfo, mixins.BillingAddress, mixins.LeicaVersionedMixin, Ba
     }
 
     legal_name = sa.Column(
+        'title',
         sa.String(255),
         nullable=True,
         default='',

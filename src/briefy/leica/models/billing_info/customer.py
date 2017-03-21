@@ -17,6 +17,12 @@ class CustomerBillingInfo(BillingInfo):
     __tablename__ = 'customer_billing_infos'
     _workflow = workflows.CustomerBillingInfoWorkflow
 
+    __colanderalchemy_config__ = {
+        'excludes': [
+            'state_history', 'state', 'type', 'customer'
+        ]
+    }
+
     __raw_acl__ = (
         ('create', ('g:briefy_bizdev', 'g:briefy_finance', 'g:system')),
         ('list', ('g:briefy', 'g:system')),
@@ -60,13 +66,7 @@ class CustomerBillingInfo(BillingInfo):
         }
     )
 
-    customer = orm.relationship(
-        'Customer',
-        backref=orm.backref(
-            'billing_info',
-            uselist=False
-        )
-    )
+    customer = orm.relationship('Customer')
 
     tax_id_status = sa.Column(
         sautils.ChoiceType(TaxIdStatusCustomers, impl=sa.String(3)),

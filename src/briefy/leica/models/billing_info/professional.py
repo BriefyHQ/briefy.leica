@@ -19,6 +19,12 @@ class ProfessionalBillingInfo(BillingInfo):
     __tablename__ = 'professional_billing_infos'
     _workflow = workflows.ProfessionalBillingInfoWorkflow
 
+    __colanderalchemy_config__ = {
+        'excludes': [
+            'state_history', 'state', 'type', 'professional'
+        ]
+    }
+
     __raw_acl__ = (
         ('create', ('g:briefy_scout', 'g:briefy_finance', 'g:system')),
         ('list', ('g:briefy', 'g:system')),
@@ -63,13 +69,7 @@ class ProfessionalBillingInfo(BillingInfo):
         }
     )
 
-    professional = orm.relationship(
-        'Professional',
-        backref=orm.backref(
-            'billing_info',
-            uselist=False
-        )
-    )
+    professional = orm.relationship('Professional')
 
     first_name = sa.Column(
         sa.String(255),
