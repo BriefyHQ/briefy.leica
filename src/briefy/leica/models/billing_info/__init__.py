@@ -115,11 +115,6 @@ class BillingInfo(TaxInfo, mixins.BillingAddress, mixins.LeicaVersionedMixin, Ba
             args['polymorphic_on'] = cls.type
         return args
 
-    @declared_attr
-    def title(cls):
-        """Return the legal name of the company."""
-        return cls.legal_name
-
     def to_dict(self):
         """Return a dict representation of this object."""
         data = super().to_dict()

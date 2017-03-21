@@ -3,8 +3,9 @@ from briefy.leica.models.billing_info import BillingInfo
 from briefy.leica.models.billing_info import workflows
 from briefy.leica.vocabularies import TaxIdStatusProfessionals
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy import orm
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import UUIDType
 
 import colander
@@ -156,6 +157,11 @@ class ProfessionalBillingInfo(BillingInfo):
         if info and len(info) > 1:
             method_name = info[1].get('type_')
         return method_name
+
+    @declared_attr
+    def title(cls):
+        """Return first and last name as title."""
+        return cls.first_name + ' ' + cls.last_name
 
     def to_dict(self):
         """Return a dict representation of this object."""
