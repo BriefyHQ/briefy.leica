@@ -7,6 +7,7 @@ History
 
     * New model: ProfessionalBillingInfo (ericof).
     * New endpoint: /professionals/{professional_id}/billing (ericof).
+    * On Order creation set order price based on project default value (ericof).
 
 
 2.0.30 (2017-03-19)

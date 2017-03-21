@@ -14,6 +14,12 @@ def order_created_handler(event):
     order = event.obj
     request = event.request
     project = order.project
+    # First set price and price_currency based on the project
+    price = project.price
+    order.price = price
+    price_currency = project.price_currency
+    order.price_currency = price_currency
+
     add_roles = ('customer_users', 'project_managers')
     apply_local_roles_from_parent(order, project, add_roles)
     location = request.validated.get('location', None)
