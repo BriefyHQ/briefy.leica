@@ -21,7 +21,6 @@ def upgrade():
         'userprofiles',
         sa.Column('messengers', postgresql.JSONB(astext_type=sa.Text()), nullable=True)
     )
-    op.create_unique_constraint(None, 'userprofiles', ['email'])
     op.add_column(
         'userprofiles_version',
         sa.Column(
