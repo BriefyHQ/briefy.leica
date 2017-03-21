@@ -4,6 +4,7 @@ from briefy.leica.models.billing_info import workflows
 from briefy.leica.vocabularies import TaxIdStatusProfessionals
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy import orm
 from sqlalchemy_utils import UUIDType
 
 import colander
@@ -59,6 +60,14 @@ class ProfessionalBillingInfo(BillingInfo):
                 'typ': colander.String
             }
         }
+    )
+
+    professional = orm.relationship(
+        'Professional',
+        backref=orm.backref(
+            'billing_info',
+            uselist=False
+        )
     )
 
     first_name = sa.Column(

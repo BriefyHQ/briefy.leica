@@ -36,3 +36,8 @@ class TestProfessionalBillingInfoModel(BaseModelTest):
         secondary_payment_method = instance_obj.secondary_payment_method
         assert secondary_payment_method == ''
         instance_obj.payment_info = base_info
+
+    def test_relationship(self, instance_obj):
+        """Test relationship with professional."""
+        assert instance_obj.professional is not None
+        assert isinstance(instance_obj.professional, models.Professional)

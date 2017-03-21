@@ -14,3 +14,8 @@ class TestCustomerBillingInfoModel(BaseModelTest):
     ]
     file_path = 'data/customer_billing_infos.json'
     model = models.CustomerBillingInfo
+
+    def test_relationship(self, instance_obj):
+        """Test relationship with customer."""
+        assert instance_obj.customer is not None
+        assert isinstance(instance_obj.customer, models.Customer)

@@ -2,6 +2,7 @@
 from briefy.leica.models.billing_info import BillingInfo
 from briefy.leica.models.billing_info import workflows
 from briefy.leica.vocabularies import TaxIdStatusCustomers
+from sqlalchemy import orm
 from sqlalchemy_utils import UUIDType
 
 import colander
@@ -56,6 +57,14 @@ class CustomerBillingInfo(BillingInfo):
                 'typ': colander.String
             }
         }
+    )
+
+    customer = orm.relationship(
+        'Customer',
+        backref=orm.backref(
+            'billing_info',
+            uselist=False
+        )
     )
 
     tax_id_status = sa.Column(
