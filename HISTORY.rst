@@ -13,6 +13,12 @@ History
     * UserProfile: Add field to handle messenger info (ericof).
 
 
+2.0.31 (2017-03-22)
+-------------------
+
+    * Assignment: PM and Scouters can schedule and re-schedule assignments in the past (ericof).
+
+
 2.0.30 (2017-03-19)
 -------------------
 
