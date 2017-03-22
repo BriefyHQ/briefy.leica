@@ -241,8 +241,9 @@ class AssignmentWorkflow(BriefyWorkflow):
         """Professional, Scout or PM schedule the Assignment."""
         fields = kwargs.get('fields')
         now = datetime_utcnow()
+        is_internal = 'g:briefy' in self.context.groups
         date_diff = fields.get('scheduled_datetime') - now
-        if date_diff.days < int(SCHEDULE_DAYS_LIMIT):
+        if date_diff.days < int(SCHEDULE_DAYS_LIMIT) and not is_internal:
             msg = SHOOT_TIME_FUTURE_MSG
             raise WorkflowTransitionException(msg)
         else:
@@ -272,8 +273,9 @@ class AssignmentWorkflow(BriefyWorkflow):
         """Professional or PM reschedule an Assignment."""
         fields = kwargs.get('fields')
         now = datetime_utcnow()
+        is_internal = 'g:briefy' in self.context.groups
         date_diff = fields.get('scheduled_datetime') - now
-        if date_diff.days < 1:
+        if date_diff.days < int(SCHEDULE_DAYS_LIMIT) and not is_internal:
             msg = SHOOT_TIME_FUTURE_MSG
             raise WorkflowTransitionException(msg)
 
