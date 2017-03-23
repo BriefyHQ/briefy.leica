@@ -17,57 +17,8 @@ class ICustomer(Interface):
     """Marker interface for a Customer."""
 
 
-class TaxInfo:
-    """Tax information."""
-
-    tax_id = sa.Column(
-        sa.String(50), nullable=True,
-        info={
-            'colanderalchemy': {
-                'title': 'Tax ID',
-                'missing': None,
-                'typ': colander.String
-            }
-        }
-    )
-    """Tax ID for this customer.
-
-    i.e.: 256.018.208-49
-    """
-
-    tax_id_type = sa.Column(
-        sa.String(50), nullable=True,
-        info={
-            'colanderalchemy': {
-                'title': 'Tax ID type',
-                'missing': colander.drop,
-                'typ': colander.String
-            }
-        }
-    )
-    """Tax ID type.
-
-    i.e.: CPF
-    """
-
-    tax_country = sa.Column(
-        sautils.CountryType, nullable=True,
-        info={
-            'colanderalchemy': {
-                'title': 'Tax Country',
-                'missing': colander.drop,
-                'typ': colander.String
-            }
-        }
-    )
-    """Tax Country
-
-    i.e.: BR
-    """
-
-
 @implementer(ICustomer)
-class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
+class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
                mixins.KLeicaVersionedMixin, Base):
     """A Customer for Briefy."""
 
@@ -86,7 +37,7 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
         'excludes': [
             'state_history', 'state', '_customer_user', '_account_manager',
             '_customer_users', '_account_managers', 'business_contact',
-            'billing_contact', 'external_id'
+            'billing_contact', 'external_id', 'billing_info'
         ],
         'overrides': mixins.CustomerBriefyRoles.__colanderalchemy_config__['overrides']
     }
@@ -132,6 +83,8 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
 
     i.e.: Insta Stock GmbH
     """
+
+    billing_info = orm.relationship('CustomerBillingInfo', uselist=False)
 
     addresses = orm.relationship(
         'CustomerBillingAddress',
@@ -259,6 +212,7 @@ class Customer(TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
         data = super().to_dict()
         data['slug'] = self.slug
         data['projects'] = [p.to_summary_dict() for p in self.projects]
+        data['billing_info_id'] = self.billing_info.id if self.billing_info else ''
         add_user_info_to_state_history(self.state_history)
         # Apply actor information to data
         data = self._apply_actors_info(data)

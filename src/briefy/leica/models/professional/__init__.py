@@ -37,7 +37,7 @@ class Professional(UserProfile, Base):
 
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', 'profiles', 'type', 'external_id', '_owner'
+            'state_history', 'state', 'profiles', 'type', 'external_id', '_owner', 'billing_info'
         ],
         'overrides': {
             'pools_ids': {
@@ -174,6 +174,8 @@ class Professional(UserProfile, Base):
         back_populates='professionals'
     )
 
+    billing_info = orm.relationship('ProfessionalBillingInfo', uselist=False)
+
     @declared_attr
     def _external_model_(cls):
         """Name of the model on Knack."""
@@ -185,6 +187,7 @@ class Professional(UserProfile, Base):
         data['slug'] = self.slug
         data['locations'] = self.locations
         data['links'] = self.links
+        data['billing_info_id'] = self.billing_info.id if self.billing_info else ''
         data['intercom'] = intercom_payload_professional(self)
 
         # Workflow history

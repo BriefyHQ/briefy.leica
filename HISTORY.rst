@@ -2,6 +2,17 @@
 History
 =======
 
+2.1.0 (unreleased)
+------------------
+
+    * New model: ProfessionalBillingInfo (ericof).
+    * New endpoint: /billing_info/professionals/{id} (ericof).
+    * New model: CustomerBillingInfo (ericof).
+    * New endpoint: /billing_info/customers/{id} (ericof).
+    * On Order creation set order price based on project default value (ericof).
+    * UserProfile: Add field to handle messenger info (ericof).
+
+
 2.0.31 (2017-03-22)
 -------------------
 

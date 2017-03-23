@@ -20,6 +20,9 @@ class TestProfessionalView(BaseTestView):
     NOT_FOUND_MESSAGE = ''
     update_map = {
         'description': 'Just another photographer',
+        'messengers': {
+            'skype': 'foo@bar.com'
+        },
     }
 
     main_location_map = {

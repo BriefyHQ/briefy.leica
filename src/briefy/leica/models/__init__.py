@@ -8,6 +8,8 @@ from briefy.leica.models.asset import Asset
 from briefy.leica.models.asset import Image
 from briefy.leica.models.asset import ThreeSixtyImage
 from briefy.leica.models.asset import Video
+from briefy.leica.models.billing_info.customer import CustomerBillingInfo
+from briefy.leica.models.billing_info.professional import ProfessionalBillingInfo
 from briefy.leica.models.comment import Comment
 from briefy.leica.models.customer import Customer
 from briefy.leica.models.customer.address import CustomerBillingAddress
@@ -51,6 +53,7 @@ ALL_MODELS = [
     Customer,
     CustomerUserProfile,
     CustomerBillingAddress,
+    CustomerBillingInfo,
     CustomerContact,
     Image,
     Facebook,
@@ -67,6 +70,7 @@ ALL_MODELS = [
     Photographer,
     Pool,
     Professional,
+    ProfessionalBillingInfo,
     ProfessionalsInPool,
     Project,
     Portfolio,

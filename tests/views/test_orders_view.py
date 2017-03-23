@@ -21,7 +21,7 @@ class TestOrderView(BaseVersionedTestView):
     ignore_validation_fields = [
         'state_history', 'state', 'updated_at', 'customer', 'project', 'timezone',
         'customer_user', 'project_manager', 'scout_manager', 'location',
-        'external_id', 'assignment', 'assignments'
+        'external_id', 'assignment', 'assignments', 'price'
     ]
     file_path = 'data/orders.json'
     model = models.Order
