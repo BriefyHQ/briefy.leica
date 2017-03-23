@@ -37,7 +37,7 @@ class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
         'excludes': [
             'state_history', 'state', '_customer_user', '_account_manager',
             '_customer_users', '_account_managers', 'business_contact',
-            'billing_contact', 'external_id'
+            'billing_contact', 'external_id', 'billing_info'
         ],
         'overrides': mixins.CustomerBriefyRoles.__colanderalchemy_config__['overrides']
     }
@@ -83,6 +83,8 @@ class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
 
     i.e.: Insta Stock GmbH
     """
+
+    billing_info = orm.relationship('CustomerBillingInfo', uselist=False)
 
     addresses = orm.relationship(
         'CustomerBillingAddress',
@@ -210,6 +212,7 @@ class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
         data = super().to_dict()
         data['slug'] = self.slug
         data['projects'] = [p.to_summary_dict() for p in self.projects]
+        data['billing_info_id'] = self.billing_info.id if self.billing_info else ''
         add_user_info_to_state_history(self.state_history)
         # Apply actor information to data
         data = self._apply_actors_info(data)

@@ -3,7 +3,6 @@ from briefy.leica.models.billing_info import BillingInfo
 from briefy.leica.models.billing_info import workflows
 from briefy.leica.vocabularies import TaxIdStatusCustomers
 from sqlalchemy import orm
-from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy_utils import UUIDType
 
 import colander
@@ -84,7 +83,8 @@ class CustomerBillingInfo(BillingInfo):
     Internal codes used by Finance to determine tax rates to be applied to this customer.
     """
 
-    @declared_attr
-    def title(cls):
-        """Return legal_name as title."""
-        return cls.legal_name
+    def to_dict(self):
+        """Return a dict representation of this object."""
+        data = super().to_dict()
+        data['customer'] = self.customer.to_summary_dict()
+        return data

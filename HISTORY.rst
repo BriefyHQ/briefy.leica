@@ -6,9 +6,9 @@ History
 ------------------
 
     * New model: ProfessionalBillingInfo (ericof).
-    * New endpoint: /professionals/{professional_id}/billing (ericof).
+    * New endpoint: /billing_info/professionals/{id} (ericof).
     * New model: CustomerBillingInfo (ericof).
-    * New endpoint: /customers/{customer_id}/billing (ericof).
+    * New endpoint: /billing_info/customers/{id} (ericof).
     * On Order creation set order price based on project default value (ericof).
     * UserProfile: Add field to handle messenger info (ericof).
 

@@ -10,12 +10,13 @@ class TestProfessionalBillingInfo(BaseTestView):
     """Test Billing Info for an Asset."""
 
     base_path = (
-        '/professionals/23d94a43-3947-42fc-958c-09245ecca5f2/billing'
+        '/billing_info/professionals'
     )
     dependencies = [
         (models.Professional, 'data/professionals.json'),
     ]
     file_path = 'data/professional_billing_infos.json'
+    ignore_validation_fields = ['professional', 'state_history']
     model = models.ProfessionalBillingInfo
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''

@@ -37,7 +37,7 @@ class Professional(UserProfile, Base):
 
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', 'profiles', 'type', 'external_id', '_owner'
+            'state_history', 'state', 'profiles', 'type', 'external_id', '_owner', 'billing_info'
         ],
         'overrides': {
             'pools_ids': {
@@ -173,6 +173,8 @@ class Professional(UserProfile, Base):
         secondary='professionals_in_pool',
         back_populates='professionals'
     )
+
+    billing_info = orm.relationship('ProfessionalBillingInfo', uselist=False)
 
     @declared_attr
     def _external_model_(cls):

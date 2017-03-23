@@ -71,34 +71,6 @@ class ProfessionalBillingInfo(BillingInfo):
 
     professional = orm.relationship('Professional')
 
-    first_name = sa.Column(
-        sa.String(255),
-        index=True,
-        nullable=False,
-        unique=False,
-        info={
-            'colanderalchemy': {
-                'title': 'Creative First Name',
-                'typ': colander.String
-            }
-        }
-    )
-    """First name of a person."""
-
-    last_name = sa.Column(
-        sa.String(255),
-        index=True,
-        nullable=False,
-        unique=False,
-        info={
-            'colanderalchemy': {
-                'title': 'Creative First Name',
-                'typ': colander.String
-            }
-        }
-    )
-    """Last name of a person."""
-
     tax_id_status = sa.Column(
         sautils.ChoiceType(TaxIdStatusProfessionals, impl=sa.String(3)),
         nullable=True,
@@ -170,4 +142,5 @@ class ProfessionalBillingInfo(BillingInfo):
         data['payment_info'] = self.payment_info
         data['default_payment_method'] = self.default_payment_method
         data['secondary_payment_method'] = self.secondary_payment_method
+        data['professional'] = self.professional.to_summary_dict()
         return data

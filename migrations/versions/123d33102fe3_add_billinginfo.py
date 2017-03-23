@@ -32,6 +32,8 @@ def upgrade():
         sa.Column('created_at', AwareDateTime(), nullable=True),
         sa.Column('state', sa.String(length=100), nullable=True),
         sa.Column('state_history', sqlalchemy_utils.types.json.JSONType(), nullable=True),
+        sa.Column('first_name', sa.String(length=255), nullable=False),
+        sa.Column('last_name', sa.String(length=255), nullable=False),
         sa.Column('billing_address', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
         sa.Column('tax_id_type', types.ChoiceType(choices=TaxIdTypes, impl=sa.String(length=3)),
                   nullable=False),
@@ -41,7 +43,6 @@ def upgrade():
         sa.Column('type', sa.String(length=50), nullable=True),
         sa.Column('updated_at', AwareDateTime(), nullable=True),
         sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('email'),
         sa.UniqueConstraint('id')
     )
     op.create_index(op.f('ix_billing_infos_created_at'), 'billing_infos', ['created_at'],
@@ -58,6 +59,8 @@ def upgrade():
         sa.Column('slug', sa.String(length=255), autoincrement=False, nullable=True),
         sa.Column('created_at', AwareDateTime(), autoincrement=False, nullable=True),
         sa.Column('state', sa.String(length=100), autoincrement=False, nullable=True),
+        sa.Column('first_name', sa.String(length=255), autoincrement=False, nullable=True),
+        sa.Column('last_name', sa.String(length=255), autoincrement=False, nullable=True),
         sa.Column('billing_address', postgresql.JSONB(astext_type=sa.Text()), autoincrement=False,
                   nullable=True),
         sa.Column('tax_id_type', types.ChoiceType(choices=TaxIdTypes, impl=sa.String(length=3)),
@@ -113,8 +116,6 @@ def upgrade():
         'professional_billing_infos_version',
         sa.Column('id', types.UUIDType(), autoincrement=False, nullable=False),
         sa.Column('professional_id', types.UUIDType(), autoincrement=False, nullable=True),
-        sa.Column('first_name', sa.String(length=255), autoincrement=False, nullable=True),
-        sa.Column('last_name', sa.String(length=255), autoincrement=False, nullable=True),
         sa.Column('tax_id_status',
                   types.ChoiceType(choices=TaxIdStatusProfessionals, impl=sa.String(length=3)),
                   autoincrement=False, nullable=True),
@@ -127,12 +128,8 @@ def upgrade():
     )
     op.create_index(op.f('ix_professional_billing_infos_version_end_transaction_id'),
                     'professional_billing_infos_version', ['end_transaction_id'], unique=False)
-    op.create_index(op.f('ix_professional_billing_infos_version_first_name'),
-                    'professional_billing_infos_version', ['first_name'], unique=False)
     op.create_index(op.f('ix_professional_billing_infos_version_id'),
                     'professional_billing_infos_version', ['id'], unique=False)
-    op.create_index(op.f('ix_professional_billing_infos_version_last_name'),
-                    'professional_billing_infos_version', ['last_name'], unique=False)
     op.create_index(op.f('ix_professional_billing_infos_version_operation_type'),
                     'professional_billing_infos_version', ['operation_type'], unique=False)
     op.create_index(op.f('ix_professional_billing_infos_version_professional_id'),
@@ -158,8 +155,6 @@ def upgrade():
         'professional_billing_infos',
         sa.Column('id', types.UUIDType(), nullable=False),
         sa.Column('professional_id', types.UUIDType(), nullable=True),
-        sa.Column('first_name', sa.String(length=255), nullable=False),
-        sa.Column('last_name', sa.String(length=255), nullable=False),
         sa.Column('tax_id_status',
                   types.ChoiceType(choices=TaxIdStatusProfessionals, impl=sa.String(length=3)),
                   nullable=True),
@@ -168,12 +163,8 @@ def upgrade():
         sa.ForeignKeyConstraint(['professional_id'], ['professionals.id'], ),
         sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_professional_billing_infos_first_name'), 'professional_billing_infos',
-                    ['first_name'], unique=False)
     op.create_index(op.f('ix_professional_billing_infos_id'), 'professional_billing_infos', ['id'],
                     unique=True)
-    op.create_index(op.f('ix_professional_billing_infos_last_name'), 'professional_billing_infos',
-                    ['last_name'], unique=False)
     op.create_index(op.f('ix_professional_billing_infos_professional_id'),
                     'professional_billing_infos', ['professional_id'], unique=True)
 
@@ -182,11 +173,7 @@ def downgrade():
     """Downgrade database model."""
     op.drop_index(op.f('ix_professional_billing_infos_professional_id'),
                   table_name='professional_billing_infos')
-    op.drop_index(op.f('ix_professional_billing_infos_last_name'),
-                  table_name='professional_billing_infos')
     op.drop_index(op.f('ix_professional_billing_infos_id'), table_name='professional_billing_infos')
-    op.drop_index(op.f('ix_professional_billing_infos_first_name'),
-                  table_name='professional_billing_infos')
     op.drop_table('professional_billing_infos')
     op.drop_index(op.f('ix_customer_billing_infos_id'), table_name='customer_billing_infos')
     op.drop_index(op.f('ix_customer_billing_infos_customer_id'),
@@ -198,11 +185,7 @@ def downgrade():
                   table_name='professional_billing_infos_version')
     op.drop_index(op.f('ix_professional_billing_infos_version_operation_type'),
                   table_name='professional_billing_infos_version')
-    op.drop_index(op.f('ix_professional_billing_infos_version_last_name'),
-                  table_name='professional_billing_infos_version')
     op.drop_index(op.f('ix_professional_billing_infos_version_id'),
-                  table_name='professional_billing_infos_version')
-    op.drop_index(op.f('ix_professional_billing_infos_version_first_name'),
                   table_name='professional_billing_infos_version')
     op.drop_index(op.f('ix_professional_billing_infos_version_end_transaction_id'),
                   table_name='professional_billing_infos_version')

@@ -69,7 +69,7 @@ class BillingInfo(TaxInfo, mixins.BillingAddress, mixins.LeicaVersionedMixin, Ba
         ]
     }
 
-    legal_name = sa.Column(
+    title = sa.Column(
         'title',
         sa.String(255),
         nullable=True,
@@ -87,10 +87,36 @@ class BillingInfo(TaxInfo, mixins.BillingAddress, mixins.LeicaVersionedMixin, Ba
     i.e.: Insta Stock GmbH
     """
 
+    first_name = sa.Column(
+        sa.String(255),
+        nullable=False,
+        unique=False,
+        info={
+            'colanderalchemy': {
+                'title': 'Creative First Name',
+                'typ': colander.String
+            }
+        }
+    )
+    """First name of a person."""
+
+    last_name = sa.Column(
+        sa.String(255),
+        nullable=False,
+        unique=False,
+        info={
+            'colanderalchemy': {
+                'title': 'Creative First Name',
+                'typ': colander.String
+            }
+        }
+    )
+    """Last name of a person."""
+
     email = sa.Column(
         sautils.types.EmailType(),
         nullable=True,
-        unique=True,
+        unique=False,
         info={
             'colanderalchemy': {
                 'title': 'Email',
