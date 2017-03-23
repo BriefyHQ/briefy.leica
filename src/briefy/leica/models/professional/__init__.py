@@ -187,6 +187,7 @@ class Professional(UserProfile, Base):
         data['slug'] = self.slug
         data['locations'] = self.locations
         data['links'] = self.links
+        data['billing_info_id'] = self.billing_info.id if self.billing_info else ''
         data['intercom'] = intercom_payload_professional(self)
 
         # Workflow history
