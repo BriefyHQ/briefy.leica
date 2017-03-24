@@ -2,6 +2,11 @@
 History
 =======
 
+2.0.32
+-------------------
+    * Assignment: to_dict serialization includes Project delivery information
+
+
 2.0.31 (2017-03-22)
 -------------------
 
