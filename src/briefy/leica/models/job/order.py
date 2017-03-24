@@ -491,7 +491,8 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
                 'sftp': 'sftp://agoda@delivery.briefy.co/bali/3456/',
                 'gdrive': 'https://drive.google.com/foo/bar',
             }
-
+        (Do not confuse this attribute with project.delivery which contains information on
+        how to deliver the assets)
         """
         delivery = self._delivery
         return delivery
@@ -500,6 +501,11 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     def delivery(self, value: dict):
         """Set delivery information for an Order."""
         self._delivery = value
+
+    # TODO: If on the future there is the need to override project.delivery
+    # for specific orders, create an order.delivery_info JSON field
+    # which will override the information on project.delivery
+    # There is partial support for an eventual order.delivery.info attribute on ms.laure
 
     @property
     def assets(self):
