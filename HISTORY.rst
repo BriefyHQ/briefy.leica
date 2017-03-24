@@ -2,6 +2,12 @@
 History
 =======
 
+2.0.32 (2017-03-24)
+-------------------
+
+    * Assignment: to_dict serialization includes Project delivery information (jsbueno)
+
+
 2.0.31 (2017-03-22)
 -------------------
 

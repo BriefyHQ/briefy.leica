@@ -600,6 +600,11 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         data['category'] = self.category
         data['order'] = self.order.to_summary_dict() if self.order else None
         data['location'] = self.location.to_summary_dict() if self.location else None
+        if data['project']:
+            # Project delivery data used on the 'approve' transition
+            # to deliver assets. (copying over and renaming - takes place
+            # on ms.laure)
+            data['project']['delivery'] = self.project.delivery
 
         # Workflow history
         add_user_info_to_state_history(self.state_history)
