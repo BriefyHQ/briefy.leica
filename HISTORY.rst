@@ -11,6 +11,7 @@ History
     * New endpoint: /billing_info/customers/{id} (ericof).
     * On Order creation set order price based on project default value (ericof).
     * UserProfile: Add field to handle messenger info (ericof).
+    * Project: Change colander typ of tech_requirements and delivery to JSONType, thus allowing update from the frontend (ericof).
 
 
 2.0.31 (2017-03-22)

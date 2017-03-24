@@ -1,6 +1,7 @@
 """Briefy Leica Project model."""
 from briefy.common.db.mixins import BriefyRoles
 from briefy.common.vocabularies.categories import CategoryChoices
+from briefy.common.utils import schema
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.project import workflows
@@ -123,7 +124,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
             'colanderalchemy': {
                 'title': 'Technical Requirements for this project.',
                 'missing': colander.drop,
-                'typ': colander.String
+                'typ': schema.JSONType
             }
         }
     )
@@ -138,7 +139,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
             'colanderalchemy': {
                 'title': 'Delivery information for this project.',
                 'missing': colander.drop,
-                'typ': colander.String
+                'typ': schema.JSONType
             }
         }
     )
