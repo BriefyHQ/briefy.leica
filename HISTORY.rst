@@ -2,7 +2,7 @@
 History
 =======
 
-2.1.0 (2017-03-24)
+2.1.0 (2017-03-26)
 ------------------
 
     * New model: ProfessionalBillingInfo (ericof).
