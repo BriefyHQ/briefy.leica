@@ -27,7 +27,7 @@ source_encoding = 'utf-8'
 master_doc = 'index'
 
 project = 'Leica'
-copyright = '2016, Briefy'
+copyright = '2016-2017, Briefy'
 author = 'Briefy Tech Team'
 
 version = '{0}.{1}'.format(major_version, minor_version)

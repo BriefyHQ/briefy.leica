@@ -12,7 +12,8 @@ History
     * On Order creation set order price based on project default value (ericof).
     * UserProfile: Add field to handle messenger info (ericof).
     * Project: Change colander typ of tech_requirements and delivery to JSONType, thus allowing update from the frontend (ericof).
-    * Assignment: to_dict serialization includes Project delivery information (jsbueno)
+    * Assignment: to_dict serialization includes Project delivery information (jsbueno).
+    * Documentation: Add new models, split database into 3 topics (ericof).
 
 
 2.0.31 (2017-03-22)
