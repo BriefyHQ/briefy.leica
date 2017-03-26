@@ -755,6 +755,19 @@ class OrderWorkflow(BriefyWorkflow):
         """Transition: Un-assign the Order by cancel the Assignment and create a new one."""
         order = self.document
         old_assignment = order.assignment
+        if not old_assignment.workflow.can_cancel:
+            upload = True if old_assignment.submission_path else False
+            if upload:
+                msg = (
+                    '''It is not possible to unassign this order because the '''
+                    '''assignment already have a submission.'''
+                )
+            else:
+                msg = (
+                    '''It is not possible to unassign this order because the '''
+                    '''current assignment does not support a cancellation.'''
+                )
+            raise WorkflowTransitionException(msg)
         message = kwargs.get('message', '')
         create_new_assignment_from_order(
             order,

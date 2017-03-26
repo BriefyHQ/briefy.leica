@@ -22,10 +22,10 @@ install:
 - pip install -r requirements/dev.txt
 - pip install flake8
 script:
-- tox -e ${TOXENV}
-- make lint
+- make test
 after_success:
 - make docs
+- git fetch --unshallow
 notifications:
   slack: briefy:qxjOPwcrGEtVx3aCQBr812t9
 deploy:

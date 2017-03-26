@@ -8,9 +8,11 @@ Objects defined in this package.
 
    user_profile
    professional
+   professional_billing_info
    working_location
    link
    customer
+   customer_billing_info
    project
    order
    order_location

@@ -15,7 +15,8 @@ Table of Contents
    contributing
    objects/index
    database
-   sync
+   reports
+   tasks
    history
 
 Indices and tables

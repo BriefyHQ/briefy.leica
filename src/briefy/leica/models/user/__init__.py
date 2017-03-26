@@ -1,9 +1,11 @@
 """User profile information."""
+from briefy.common.utils import schema
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models import Customer
 from briefy.leica.models.user import workflows
 from briefy.leica.utils.user import add_user_info_to_state_history
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -69,6 +71,20 @@ class UserProfile(mixins.UserProfileMixin, mixins.UserProfileBriefyRoles, Base):
               'missing': colander.drop,
               'typ': colander.String}}
     )
+
+    messengers = sa.Column(
+        'messengers',
+        JSONB,
+        default=None,
+        info={
+            'colanderalchemy': {
+                'title': 'Messenger contact information',
+                'missing': colander.drop,
+                'typ': schema.JSONType
+            }
+        }
+    )
+    """Messenger applications used by this person."""
 
     type = sa.Column(sa.String(50))
     """Polymorphic type."""

@@ -1,0 +1,54 @@
+[
+  {
+    "state_history": [
+      {
+        "transition": "",
+        "actor": null,
+        "to": "created",
+        "date": "2016-09-08T15:36:28.082599+00:00",
+        "from": ""
+      }
+    ],
+    "slug": "d9fc4d9a",
+    "last_name": "Salgado",
+    "first_name": "Sebastião",
+    "title": "",
+    "professional_id": "23d94a43-3947-42fc-958c-09245ecca5f2",
+    "id": "d9fc4d9a-b623-495b-9a07-ba7bd0c2789e",
+    "created_at": "2016-09-08T15:36:28.087112+00:00",
+    "state": "created",
+    "email": "salgado@professional.briefy.co",
+    "tax_id": "256.018.208-48",
+    "tax_id_name": "CPF",
+    "tax_id_type": "2",
+    "tax_id_status": "32",
+    "billing_address": {
+      "additional_info": "Sala 2",
+      "formatted_address": "Rua dos Pinheiros 836",
+      "province": "São Paulo",
+      "locality": "São Paulo",
+      "sublocality": "Pinheiros",
+      "route": "Rua dos Pinheiros",
+      "street_number": "836",
+      "country": "BR",
+      "postal_code": "05497-001"
+    },
+    "payment_info": [
+      {
+        "type_": "paypal",
+        "email": "salgado@professional.briefy.co"
+      },
+      {
+        "type_": "bank_account",
+        "holder_name": "Sebastião Salgado",
+        "iban": "DE89 3704 0044 0532 0130 00",
+        "account_number": "0532013000",
+        "swift": "",
+        "bank_name": "Bank Name",
+        "bank_street_address": "Alexander Platz 123",
+        "bank_city": "Berlin",
+        "bank_country": "DE"
+      }
+    ]
+  }
+]

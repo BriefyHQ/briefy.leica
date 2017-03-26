@@ -2,10 +2,18 @@
 History
 =======
 
-2.0.32 (2017-03-24)
--------------------
+2.1.0 (2017-03-24)
+------------------
 
-    * Assignment: to_dict serialization includes Project delivery information (jsbueno)
+    * New model: ProfessionalBillingInfo (ericof).
+    * New endpoint: /billing_info/professionals/{id} (ericof).
+    * New model: CustomerBillingInfo (ericof).
+    * New endpoint: /billing_info/customers/{id} (ericof).
+    * On Order creation set order price based on project default value (ericof).
+    * UserProfile: Add field to handle messenger info (ericof).
+    * Project: Change colander typ of tech_requirements and delivery to JSONType, thus allowing update from the frontend (ericof).
+    * Assignment: to_dict serialization includes Project delivery information (jsbueno).
+    * Documentation: Add new models, split database into 3 topics (ericof).
 
 
 2.0.31 (2017-03-22)
