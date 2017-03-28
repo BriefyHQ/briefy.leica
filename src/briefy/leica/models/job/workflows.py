@@ -794,8 +794,8 @@ class OrderWorkflow(BriefyWorkflow):
         order.availability = []
         # this will handle the creation of a new Assignment
         message = kwargs.get('message', '')
-        order.assignment.workflow.cancel(message=message)
         create_new_assignment_from_order(order, order.request, copy_payout=True)
+        order.assignment.workflow.cancel(message=message)
         return True
 
     @Permission(groups=[LR['project_manager'], G['pm'], LR['customer_user'], G['customers'], ])
