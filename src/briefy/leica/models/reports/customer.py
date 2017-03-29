@@ -18,6 +18,7 @@ orders_project = select([
     Order.scheduled_datetime.label('scheduled_datetime'),
     Order.deliver_date.label('deliver_date'),
     Order.timezone.label('timezone'),
+    Order.accept_date.label('accept_date')
 ]).where(
     and_(
         Order.project_id == ':project_id',

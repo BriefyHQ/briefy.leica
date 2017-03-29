@@ -12,12 +12,22 @@ STATES = {
     'assigned': 'Assigned',
     'scheduled': 'Scheduled',
     'cancelled': 'Cancelled',
-    'in_qa': 'In QA Process',
+    'in_qa': 'In Briefy QA',
     'delivered': 'Delivered',
     'accepted': 'Completed',
     'refused': 'In Further Revision',
     'perm_refused': 'Rejected'
 }
+
+
+def get_label_for_order_status(data: OrdersByProjectReport) -> str:
+    """Return the label for the Order state."""
+    state = STATES.get(data.state, data.state)
+    if data.state == 'in_qa' and data.accept_date:
+        state = 'In Further Revision'
+    elif data.state == 'delivered' and data.accept_date:
+        state = 'Re-delivered'
+    return state
 
 
 class ReportCustomerFactory(BaseFactory):
@@ -62,7 +72,7 @@ class CustomerReports(BaseReport):
             'Order ID': data.customer_order_id,
             'Order Name': data.title,
             'Project Name': data.project_title,
-            'Status': STATES.get(data.state, data.state),
+            'Status': get_label_for_order_status(data),
             'Input Date': self._format_datetime(created_at, timezone, False),
             'Shooting Date': self._format_datetime(scheduled_datetime, timezone, True),
             'Delivery Date': self._format_datetime(deliver_date, timezone, False),

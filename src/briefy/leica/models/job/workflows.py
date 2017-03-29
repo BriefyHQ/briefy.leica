@@ -519,7 +519,7 @@ class AssignmentWorkflow(BriefyWorkflow):
     @cancelled.transition(cancelled, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
     @in_qa.transition(in_qa, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
     @perm_rejected.transition(
-        perm_reject, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS
+        perm_rejected, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS
     )
     @approved.transition(approved, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
     @refused.transition(refused, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
@@ -565,7 +565,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         in_qa, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
     )
     @perm_rejected.transition(
-        perm_reject, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
+        perm_rejected, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
     )
     @approved.transition(
         approved, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
@@ -794,8 +794,8 @@ class OrderWorkflow(BriefyWorkflow):
         order.availability = []
         # this will handle the creation of a new Assignment
         message = kwargs.get('message', '')
-        order.assignment.workflow.cancel(message=message)
         create_new_assignment_from_order(order, order.request, copy_payout=True)
+        order.assignment.workflow.cancel(message=message)
         return True
 
     @Permission(groups=[LR['project_manager'], G['pm'], LR['customer_user'], G['customers'], ])
@@ -962,8 +962,8 @@ class OrderWorkflow(BriefyWorkflow):
         order = self.document
         order.availability = []
         old_assignment = order.assignment
-        old_assignment.workflow.complete(message=message)
         new_assignment = create_new_assignment_from_order(order, order.request)
+        old_assignment.workflow.complete(message=message)
         professional_id = old_assignment.professional_id
         kwargs.update(message=ASSIGN_AFTER_RENEWSHOOT)
         kwargs['fields']['professional_id'] = professional_id
