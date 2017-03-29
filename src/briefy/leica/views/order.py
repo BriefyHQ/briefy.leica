@@ -10,6 +10,8 @@ from cornice.resource import resource
 from cornice.resource import view
 from pyramid.httpexceptions import HTTPNotFound as NotFound
 from pyramid.security import Allow
+from sqlalchemy import and_
+from sqlalchemy import or_
 
 COLLECTION_PATH = '/orders'
 PATH = COLLECTION_PATH + '/{id}'
@@ -55,6 +57,26 @@ class OrderService(RESTService):
         'GET': events.OrderLoadedEvent,
         'DELETE': events.OrderDeletedEvent,
     }
+
+    def default_filters(self, query) -> object:
+        """Default filters to be applied to every query.
+
+        This is supposed to be specialized by resource classes.
+        :returns: A tuple of default filters to be applied to queries.
+        """
+        user = self.request.user
+        custom_filter = self.request.params.get('_custom_filter')
+        if 'g:customers' in user.groups and custom_filter == 'customer_deliveries':
+            query = query.filter(
+                or_(
+                    and_(
+                        Order.state.in_(('accepted', 'refused', 'in_qa')),
+                        Order.accept_date.isnot(None)
+                    ),
+                    Order.state == 'delivered'
+                )
+            )
+        return query
 
 
 @resource(

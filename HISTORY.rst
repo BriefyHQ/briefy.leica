@@ -7,6 +7,7 @@ History
 
     * Fix: remove_availability transition now create a new assignment before cancel the old one (rudaporto).
     * Fix: when QA approve a set, creative comment was not being created as a comment in the Assignment (rudaporto).
+    * Card #132: Added new _custom_filter to Orders endpoint to be used by the 'Deliveries' tab in customer interface (rudaporto).
 
 2.1.0 (2017-03-26)
 ------------------
