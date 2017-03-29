@@ -38,3 +38,38 @@ ORDER_PROJECT_COLS = (
         'type': 'integer', 'url': '', 'filter': ''
     }
 )
+
+DELIVERED_ORDERS_COLS = (
+    {
+        'field': 'absolute_url', 'label': 'url',
+        'type': 'hidden', 'url': '', 'filter': ''
+    },
+    {
+        'field': 'title', 'label': 'Project',
+        'type': 'text', 'url': 'absolute_url', 'filter': ''
+    },
+    {
+        'field': 'newly-delivered', 'label': 'Newly Delivered',
+        'type': 'integer', 'url': '', 'filter': ''
+    },
+    {
+        'field': 'further_revision', 'label': 'In Further Revision',
+        'type': 'integer', 'url': '', 'filter': ''
+    },
+    {
+        'field': 're-delivered', 'label': 'Re-delivered',
+        'type': 'integer', 'url': '', 'filter': ''
+    },
+    {
+        'field': 'completed', 'label': 'Completed',
+        'type': 'integer', 'url': '', 'filter': ''
+    },
+    {
+        'field': 'rejected', 'label': 'Rejected',
+        'type': 'integer', 'url': '', 'filter': ''
+    },
+    {
+        'field': 'total', 'label': 'Total',
+        'type': 'integer', 'url': '', 'filter': ''
+    },
+)
