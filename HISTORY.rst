@@ -9,6 +9,7 @@ History
     * Fix: when QA approve a set, creative comment was not being created as a comment in the Assignment (rudaporto).
     * Card #132: Added new _custom_filter to Orders endpoint to be used by the 'Deliveries' tab in customer interface (rudaporto).
     * Card #128: New dashboard for Customer and PM: delivered (rudaporto).
+    * Fix: perm_rejected transitions to edit payout and edit compensation typo in definition (rudaporto).
 
 2.1.0 (2017-03-26)
 ------------------
