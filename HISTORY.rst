@@ -2,10 +2,11 @@
 History
 =======
 
-2.1.1 (2017-03-28)
+2.1.1 (2017-03-29)
 ------------------
 
     * Fix: remove_availability transition now create a new assignment before cancel the old one (rudaporto).
+    * Fix: when QA approve a set, creative comment was not being created as a comment in the Assignment (rudaporto).
 
 2.1.0 (2017-03-26)
 ------------------

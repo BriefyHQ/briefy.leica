@@ -962,8 +962,8 @@ class OrderWorkflow(BriefyWorkflow):
         order = self.document
         order.availability = []
         old_assignment = order.assignment
-        old_assignment.workflow.complete(message=message)
         new_assignment = create_new_assignment_from_order(order, order.request)
+        old_assignment.workflow.complete(message=message)
         professional_id = old_assignment.professional_id
         kwargs.update(message=ASSIGN_AFTER_RENEWSHOOT)
         kwargs['fields']['professional_id'] = professional_id

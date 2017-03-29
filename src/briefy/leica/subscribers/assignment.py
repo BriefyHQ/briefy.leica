@@ -224,6 +224,19 @@ def assignment_invalidate_assets(event):
     )
 
 
+def assignment_approve(event):
+    """Handle Assignment QA approve workflow event."""
+    assignment = event.obj
+    author_role = 'qa_manager'
+    to_role = 'professional_user'
+    create_comment_from_wf_transition(
+        assignment,
+        author_role,
+        to_role,
+        internal=False
+    )
+
+
 def assignment_return_to_qa(event):
     """Handle Assignment return_to_qa workflow event."""
     assignment = event.obj
@@ -257,6 +270,8 @@ def transition_handler(event):
         'assignment.workflow.remove_schedule': assignment_remove_schedule,
         'assignment.workflow.reschedule': assignment_reschedule,
         'assignment.workflow.schedule': assignment_schedule,
+        'assignment.workflow.approve': assignment_approve,
+
     }
     handler = handlers.get(event_name, None)
     if handler:
