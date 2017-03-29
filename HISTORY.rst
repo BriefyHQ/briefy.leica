@@ -11,6 +11,7 @@ History
     * Card #128: New dashboard for Customer and PM: delivered (rudaporto).
     * Fix: perm_rejected transitions to edit payout and edit compensation typo in definition (rudaporto).
     * Card #155: Update All Orders dashboard for PM, Customer and Bizdev (rudaporto).
+    * Card #157: Update Orders export csv with new label for each workflow state (rudaporto).
 
 2.1.0 (2017-03-26)
 ------------------
