@@ -2,7 +2,8 @@
 from briefy.leica.models import Customer
 from briefy.leica.models import Order
 from briefy.leica.models import Project
-from sqlalchemy import and_, or_
+from sqlalchemy import and_
+from sqlalchemy import or_
 from sqlalchemy import case
 from sqlalchemy import distinct
 from sqlalchemy import func
@@ -25,14 +26,25 @@ total_order_project = select([
         case([(Order.state == 'scheduled', 1)], else_=0)
     ).label('scheduled'),
     func.sum(
-        case([(Order.state.in_(('in_qa', 'refused')), 1)], else_=0)
+        case([(
+            and_(
+                Order.state == 'in_qa',
+                Order.accept_date.is_(None)
+            ), 1)], else_=0)
     ).label('in_qa'),
     func.sum(
         case([(Order.state == 'cancelled', 1)], else_=0)
     ).label('cancelled'),
     func.sum(
-        case([(Order.state.in_(('delivered', 'accepted')), 1)], else_=0)
-    ).label('completed'),
+        case([(
+            or_(
+                and_(
+                    Order.state.in_(('accepted', 'refused', 'perm_refused', 'in_qa')),
+                    Order.accept_date.isnot(None)
+                ),
+                Order.state == 'delivered'
+            ), 1)], else_=0)
+    ).label('delivered'),
 ]).group_by(Project.title, Project.id).where(
     and_(
         Order.state.in_(
@@ -44,11 +56,11 @@ total_order_project = select([
                 'delivered',
                 'accepted',
                 'in_qa',
-                'refused'
+                'refused',
+                'perm_refused'
             )
         ),
         Project.id == Order.project_id,
-        Project.state == 'ongoing',
         Project.customer_id == Customer.id,
         or_(
             Project.local_roles.any(user_id=':user_id', can_view=True),

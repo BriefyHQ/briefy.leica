@@ -53,9 +53,6 @@ delivered_orders_pm = select([
     func.sum(
         case([(Order.state == 'accepted', 1)], else_=0)
     ).label('completed'),
-    func.sum(
-        case([(Order.state == 'perm_refused', 1)], else_=0)
-    ).label('rejected'),
 ]).group_by(Project.title, Project.id).where(
     and_(
         or_(

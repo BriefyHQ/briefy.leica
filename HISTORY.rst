@@ -10,6 +10,7 @@ History
     * Card #132: Added new _custom_filter to Orders endpoint to be used by the 'Deliveries' tab in customer interface (rudaporto).
     * Card #128: New dashboard for Customer and PM: delivered (rudaporto).
     * Fix: perm_rejected transitions to edit payout and edit compensation typo in definition (rudaporto).
+    * Card #155: Update All Orders dashboard for PM, Customer and Bizdev (rudaporto).
 
 2.1.0 (2017-03-26)
 ------------------

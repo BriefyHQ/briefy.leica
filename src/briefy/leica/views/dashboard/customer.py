@@ -2,6 +2,7 @@
 from briefy.leica.models.dashboard.customer import DashboardCustomerAllOrders
 from briefy.leica.models.dashboard.customer import DashboardCustomerDeliveredOrders
 from briefy.leica.views.dashboard import DELIVERED_ORDERS_COLS
+from briefy.leica.views.dashboard import ORDER_PROJECT_COLS
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources import RESTService
 from briefy.ws.resources.factory import BaseFactory
@@ -34,44 +35,7 @@ class DashboardCustomerAllOrdersService(RESTService):
     friendly_name = model.__name__
     default_order_by = 'title'
 
-    _columns_map = (
-        {
-            'field': 'absolute_url', 'label': 'url',
-            'type': 'hidden', 'url': '', 'filter': ''
-        },
-        {
-            'field': 'title', 'label': 'Project',
-            'type': 'text', 'url': 'absolute_url', 'filter': ''
-        },
-        {
-            'field': 'total', 'label': 'All Orders',
-            'type': 'integer', 'url': '', 'filter': ''
-        },
-        {
-            'field': 'received', 'label': 'New Orders',
-            'type': 'integer', 'url': '', 'filter': ''
-        },
-        {
-            'field': 'assigned', 'label': 'Assigned Orders',
-            'type': 'integer', 'url': '', 'filter': ''
-        },
-        {
-            'field': 'scheduled', 'label': 'Scheduled Orders',
-            'type': 'integer', 'url': '', 'filter': ''
-        },
-        {
-            'field': 'in_qa', 'label': 'Orders in QA process',
-            'type': 'integer', 'url': '', 'filter': ''
-        },
-        {
-            'field': 'cancelled', 'label': 'Cancelled Orders',
-            'type': 'integer', 'url': '', 'filter': ''
-        },
-        {
-            'field': 'completed', 'label': 'Completed Orders',
-            'type': 'integer', 'url': '', 'filter': ''
-        }
-    )
+    _columns_map = ORDER_PROJECT_COLS
 
     def default_filters(self, query) -> object:
         """Default filters to be applied to every query.

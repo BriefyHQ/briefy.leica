@@ -27,14 +27,25 @@ all_orders_customer = select([
         case([(Order.state == 'scheduled', 1)], else_=0)
     ).label('scheduled'),
     func.sum(
-        case([(Order.state.in_(('in_qa', 'refused')), 1)], else_=0)
+        case([(
+            and_(
+                Order.state == 'in_qa',
+                Order.accept_date.is_(None)
+            ), 1)], else_=0)
     ).label('in_qa'),
     func.sum(
         case([(Order.state == 'cancelled', 1)], else_=0)
     ).label('cancelled'),
     func.sum(
-        case([(Order.state.in_(('delivered', 'accepted')), 1)], else_=0)
-    ).label('completed'),
+        case([(
+            or_(
+                and_(
+                    Order.state.in_(('accepted', 'refused', 'perm_refused', 'in_qa')),
+                    Order.accept_date.isnot(None)
+                ),
+                Order.state == 'delivered'
+            ), 1)], else_=0)
+    ).label('delivered'),
 ]).group_by(Project.title, Project.id).where(
     and_(
         Order.state.in_(
@@ -46,11 +57,12 @@ all_orders_customer = select([
                 'delivered',
                 'accepted',
                 'in_qa',
-                'refused'
+                'refused',
+                'perm_refused'
             )
         ),
         Project.id == Order.project_id,
-        Project.local_roles.any(role_name='customer_user', user_id=':user_id')
+        Project.local_roles.any(role_name='customer_user', user_id=':user_id'),
     )
 ).alias('all_orders_customer')
 
@@ -93,9 +105,6 @@ delivered_orders_customer = select([
     func.sum(
         case([(Order.state == 'accepted', 1)], else_=0)
     ).label('completed'),
-    func.sum(
-        case([(Order.state == 'perm_refused', 1)], else_=0)
-    ).label('rejected'),
 ]).group_by(Project.title, Project.id).where(
     and_(
         or_(

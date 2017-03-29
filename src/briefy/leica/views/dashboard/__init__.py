@@ -10,10 +10,6 @@ ORDER_PROJECT_COLS = (
         'type': 'text', 'url': 'absolute_url', 'filter': ''
     },
     {
-        'field': 'total', 'label': 'All Orders',
-        'type': 'integer', 'url': '', 'filter': ''
-    },
-    {
         'field': 'received', 'label': 'New Orders',
         'type': 'integer', 'url': '', 'filter': ''
     },
@@ -26,7 +22,7 @@ ORDER_PROJECT_COLS = (
         'type': 'integer', 'url': '', 'filter': ''
     },
     {
-        'field': 'in_qa', 'label': 'Orders in QA process',
+        'field': 'in_qa', 'label': 'In Briefy QA',
         'type': 'integer', 'url': '', 'filter': ''
     },
     {
@@ -34,9 +30,13 @@ ORDER_PROJECT_COLS = (
         'type': 'integer', 'url': '', 'filter': ''
     },
     {
-        'field': 'completed', 'label': 'Completed Orders',
+        'field': 'delivered', 'label': 'Delivered Orders',
         'type': 'integer', 'url': '', 'filter': ''
-    }
+    },
+    {
+        'field': 'total', 'label': 'Total',
+        'type': 'integer', 'url': '', 'filter': ''
+    },
 )
 
 DELIVERED_ORDERS_COLS = (
@@ -62,10 +62,6 @@ DELIVERED_ORDERS_COLS = (
     },
     {
         'field': 'completed', 'label': 'Completed',
-        'type': 'integer', 'url': '', 'filter': ''
-    },
-    {
-        'field': 'rejected', 'label': 'Rejected',
         'type': 'integer', 'url': '', 'filter': ''
     },
     {
