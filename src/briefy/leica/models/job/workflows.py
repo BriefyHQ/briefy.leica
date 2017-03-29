@@ -519,7 +519,7 @@ class AssignmentWorkflow(BriefyWorkflow):
     @cancelled.transition(cancelled, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
     @in_qa.transition(in_qa, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
     @perm_rejected.transition(
-        perm_reject, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS
+        perm_rejected, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS
     )
     @approved.transition(approved, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
     @refused.transition(refused, 'can_edit_payout', required_fields=PAYOUT_REQUIRED_FIELDS)
@@ -565,7 +565,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         in_qa, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
     )
     @perm_rejected.transition(
-        perm_reject, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
+        perm_rejected, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
     )
     @approved.transition(
         approved, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
