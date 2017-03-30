@@ -2,6 +2,12 @@
 History
 =======
 
+2.1.1 (2017-03-30)
+------------------
+
+    * Card #62: All Order and Assignment comments for Unassign, Re-assign, New shoot and Re-shoot should be internal only (rudaporto).
+
+
 2.1.1 (2017-03-29)
 ------------------
 

@@ -107,7 +107,7 @@ def order_refuse(event):
 
 
 def order_new_shoot_or_reshoot(event):
-    """Handle Order new_shoot reshoot workflow event."""
+    """Handle Order new_shoot and reshoot workflow event."""
     order = event.obj
     author_role = 'project_manager'
     to_role = 'customer_user'
@@ -119,8 +119,8 @@ def order_new_shoot_or_reshoot(event):
     )
 
 
-def order_unassign(event):
-    """Handle Order unassign workflow event."""
+def order_unassign_reassign(event):
+    """Handle Order unassign and reassign workflow event."""
     order = event.obj
     author_role = 'project_manager'
     to_role = 'customer_user'
@@ -145,7 +145,8 @@ def transition_handler(event):
         'order.workflow.refuse': order_refuse,
         'order.workflow.new_shoot': order_new_shoot_or_reshoot,
         'order.workflow.reshoot': order_new_shoot_or_reshoot,
-        'order.workflow.unassign': order_unassign,
+        'order.workflow.unassign': order_unassign_reassign,
+        'order.workflow.reassign': order_unassign_reassign,
     }
     handler = handlers.get(event_name, None)
     if handler:

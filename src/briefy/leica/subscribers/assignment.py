@@ -77,7 +77,8 @@ def assignment_cancel(event):
         create_comment_from_wf_transition(
             assignment,
             author_role,
-            to_role
+            to_role,
+            internal=True
         )
 
 
