@@ -1,12 +1,10 @@
 """Event subscribers for briefy.leica.models.job.Assignment."""
-# from briefy.common.config import ENV
 from briefy.common.users import SystemUser
 from briefy.common.vocabularies.roles import Groups as G
 from briefy.leica.events.assignment import AssignmentCreatedEvent
 from briefy.leica.models import Professional
 from briefy.leica.subscribers import safe_workflow_trigger_transitions
 from briefy.leica.subscribers.utils import apply_local_roles_from_parent
-from briefy.leica.subscribers.utils import create_new_assignment_from_order
 from briefy.leica.subscribers.utils import create_comment_from_wf_transition
 from pyramid.events import subscriber
 
@@ -34,23 +32,30 @@ def assignment_submit(event):
 
 def assignment_perm_reject(event):
     """Handle Assignment perm_reject workflow event."""
-    request = event.request
     assignment = event.obj
-    order = assignment.order
+    user = assignment.workflow.context
+    if G['pm'].value in user.groups:
+        to_role = 'professional_user'
+        author_role = 'project_manager'
+        create_comment_from_wf_transition(
+            assignment,
+            author_role,
+            to_role
+        )
 
-    # just create a new Assignment if there is no active assignment
-    order_final_states = ('cancelled', 'perm_refused',)
-    assignment_final_states = ('cancelled', 'completed', 'perm_rejected',)
-    if assignment.state in assignment_final_states and order.state not in order_final_states:
-        create_new_assignment_from_order(order, request)
 
-    to_role = 'professional_user'
-    author_role = 'qa_manager'
-    create_comment_from_wf_transition(
-        assignment,
-        author_role,
-        to_role
-    )
+def assignment_complete(event):
+    """Handle Assignment complete workflow event."""
+    assignment = event.obj
+    user = assignment.workflow.context
+    if G['pm'].value in user.groups:
+        to_role = 'professional_user'
+        author_role = 'project_manager'
+        create_comment_from_wf_transition(
+            assignment,
+            author_role,
+            to_role
+        )
 
 
 def assignment_cancel(event):
@@ -77,7 +82,8 @@ def assignment_cancel(event):
         create_comment_from_wf_transition(
             assignment,
             author_role,
-            to_role
+            to_role,
+            internal=True
         )
 
 
@@ -186,6 +192,19 @@ def assignment_reject(event):
     )
 
 
+def assignment_retract_rejection(event):
+    """Handle Assignment retract_rejection workflow event."""
+    assignment = event.obj
+    author_role = 'project_manager'
+    to_role = 'professional_user'
+    create_comment_from_wf_transition(
+        assignment,
+        author_role,
+        to_role,
+        internal=True
+    )
+
+
 def assignment_upload(event):
     """Handle Assignment upload workflow event."""
     assignment = event.obj
@@ -259,6 +278,7 @@ def transition_handler(event):
     handlers = {
         'assignment.workflow.submit': assignment_submit,
         'assignment.workflow.perm_reject': assignment_perm_reject,
+        'assignment.workflow.complete': assignment_complete,
         'assignment.workflow.self_assign': assignment_self_assign,
         'assignment.workflow.assign_pool': assignment_self_assign,
         'assignment.workflow.scheduling_issues': assignment_scheduling_issues,
@@ -271,7 +291,7 @@ def transition_handler(event):
         'assignment.workflow.reschedule': assignment_reschedule,
         'assignment.workflow.schedule': assignment_schedule,
         'assignment.workflow.approve': assignment_approve,
-
+        'assignment.workflow.retract_rejection': assignment_retract_rejection
     }
     handler = handlers.get(event_name, None)
     if handler:

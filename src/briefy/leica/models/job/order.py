@@ -59,6 +59,16 @@ __colander_alchemy_config_overrides__.update(
             'title': 'Travel Expenses',
             'missing': colander.drop,
             'typ': colander.Integer()
+        },
+        additional_compensation={
+            'title': 'Additional Compensation',
+            'missing': colander.drop,
+            'typ': colander.Integer()
+        },
+        reason_additional_compensation={
+            'title': 'Reason Additional Compensation',
+            'missing': colander.drop,
+            'typ': colander.String()
         }
     )
 )

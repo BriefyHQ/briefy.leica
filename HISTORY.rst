@@ -2,6 +2,18 @@
 History
 =======
 
+2.1.2 (2017-03-31)
+------------------
+
+    * Card #62: Order and Assignment comments for Unassign, Re-assign, New shoot and Re-shoot should be internal only (rudaporto).
+    * Card #170: update new_shoot transition adding payout fields to be updated in the old assignment before complete (rudaporto).
+    * Card #41: added new Order transition perm_reject to reject the assignment and create a new shoot for the Order (rudaporto).
+    * Card #171: improve and fix Order reshoot transition do update payout values on the old assignment and copy old values to the new assignment (rudaporto).
+    * Card #167: improve Assignment workflow transition retract_rejection to move from Awaiting Assets to In QA without resubmit (rudaporto).
+    * Card #41: update Assignment perm_reject transition and subscriber since it will be now called only from the Order workflow (rudaporto).
+    * Remove payout_currency from Order transitions new_shoot, perm_reject and reshoot (rudaporto).
+    * When transitioning perm_reject or completed are executed on the Assignment, make sure that only create a comment to the creative if the user id a PM (rudaporto).
+
 2.1.1 (2017-03-29)
 ------------------
 

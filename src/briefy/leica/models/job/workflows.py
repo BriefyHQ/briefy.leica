@@ -33,8 +33,15 @@ ASSIGN_REQUIRED_FIELDS = (
 )
 RESHOOT_REQUIRED_FIELDS = (
     'payout_value',
-    'payout_currency',
     'travel_expenses',
+)
+NEWSHOOT_REQUIRED_FIELDS = (
+    'payout_value',
+    'travel_expenses',
+)
+PERM_REJECT_REQUIRED_FIELDS = (
+    'additional_compensation',
+    'reason_additional_compensation'
 )
 
 
@@ -354,12 +361,21 @@ class AssignmentWorkflow(BriefyWorkflow):
         """Validate if user can move an Assignment from scheduled to waiting for assets."""
         return True
 
-    @awaiting_assets.transition(in_qa, 'can_approve')
+    @awaiting_assets.transition(
+        in_qa,
+        'can_retract_rejection',
+        required_fields=('submission_path', )
+    )
     def retract_rejection(self, **kwargs):
         """QA retract rejection or manually move to QA."""
         assignment = self.document
         last_revision = assignment.versions[-1]
         assignment.set_type = last_revision.set_type
+        return True
+
+    @Permission(groups=[G['qa'], G['pm'], G['system'], ])
+    def can_retract_rejection(self):
+        """Validate if user can retract the rejection of an Assignment Set."""
         return True
 
     @in_qa.transition(
@@ -410,12 +426,22 @@ class AssignmentWorkflow(BriefyWorkflow):
         assignment.set_type = 'returned_photographer'
         return True
 
-    @in_qa.transition(perm_rejected, 'can_approve')
+    @in_qa.transition(
+        perm_rejected,
+        'can_perm_reject',
+        required_fields=PERM_REJECT_REQUIRED_FIELDS
+    )
     def perm_reject(self, **kwargs):
         """QA permanently reject the Assignment Set."""
-        order = self.document.order
-        if order.state == 'in_qa':
-            order.workflow.new_shoot()
+        assignment = self.document
+        assignment.payout_value = 0
+        assignment.travel_expenses = 0
+        return True
+
+    @Permission(groups=[G['qa'], G['pm'], G['system'], ])
+    def can_perm_reject(self):
+        """Validate if user can perm_reject an Assignment Set."""
+        return True
 
     @approved.transition(in_qa, 'can_approve')
     def retract_approval(self, **kwargs):
@@ -962,11 +988,24 @@ class OrderWorkflow(BriefyWorkflow):
         order = self.document
         order.availability = []
         old_assignment = order.assignment
+        # copy payout is not necessary in this case
         new_assignment = create_new_assignment_from_order(order, order.request)
-        old_assignment.workflow.complete(message=message)
-        professional_id = old_assignment.professional_id
+        # prepare kwargs to assign the new assignment
+        # explicit payout values are mandatory to assign transition
+        # save original fields to use it to update old_assignment with posted values
+        post_fields = kwargs['fields']
         kwargs.update(message=ASSIGN_AFTER_RENEWSHOOT)
-        kwargs['fields']['professional_id'] = professional_id
+        kwargs['fields'] = dict(
+            professional_id=old_assignment.professional_id,
+            payout_value=old_assignment.payout_value,
+            payout_currency=old_assignment.payout_currency,
+            travel_expenses=old_assignment.travel_expenses
+        )
+        # update old assignment and complete
+        old_assignment.payout_value = post_fields.get('payout_value')
+        old_assignment.travel_expenses = post_fields.get('travel_expenses')
+        old_assignment.workflow.complete(message=message)
+        # after complete the old assignment the new one can be assigned
         new_assignment.workflow.assign(**kwargs)
 
     @Permission(groups=[LR['project_manager'], G['pm'], G['qa'], ])
@@ -977,8 +1016,46 @@ class OrderWorkflow(BriefyWorkflow):
         """
         return True
 
-    @in_qa.transition(received, 'can_new_shoot')
-    @refused.transition(received, 'can_new_shoot')
+    @in_qa.transition(
+        received,
+        'can_perm_reject',
+        required_fields=PERM_REJECT_REQUIRED_FIELDS
+    )
+    def perm_reject(self, **kwargs):
+        """Transition: Inform the perm rejection of the Assignment.
+
+        Move Order to pending state for a new shoot.
+        """
+        order = self.document
+        order.availability = []
+        old_assignment = order.assignment
+        create_new_assignment_from_order(
+            order,
+            order.request,
+            copy_payout=True,
+            old_assignment=old_assignment
+        )
+        old_assignment.workflow.perm_reject(**kwargs)
+        return True
+
+    @Permission(groups=[LR['project_manager'], G['pm'], G['qa'], ])
+    def can_perm_reject(self):
+        """Permission: Validate if user can perm_reject an Order.
+
+        Groups: g:pm, g:customers, r:project_manager, r:customer_user
+        """
+        return True
+
+    @in_qa.transition(
+        received,
+        'can_new_shoot',
+        required_fields=NEWSHOOT_REQUIRED_FIELDS
+    )
+    @refused.transition(
+        received,
+        'can_new_shoot',
+        required_fields=NEWSHOOT_REQUIRED_FIELDS
+    )
     def new_shoot(self, **kwargs):
         """Transition: Inform the new shoot of an Order the customer."""
         message = kwargs.get('message', '')
@@ -991,7 +1068,11 @@ class OrderWorkflow(BriefyWorkflow):
             copy_payout=True,
             old_assignment=old_assignment
         )
+        fields = kwargs.get('fields')
+        old_assignment.payout_value = fields.get('payout_value')
+        old_assignment.travel_expenses = fields.get('travel_expenses')
         old_assignment.workflow.complete(message=message)
+        return True
 
     @Permission(groups=[LR['project_manager'], G['pm'], G['qa'], ])
     def can_new_shoot(self):
