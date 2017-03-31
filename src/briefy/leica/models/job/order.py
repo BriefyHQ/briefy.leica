@@ -60,7 +60,7 @@ __colander_alchemy_config_overrides__.update(
             'missing': colander.drop,
             'typ': colander.Integer()
         },
-        additional_compensation = {
+        additional_compensation={
             'title': 'Additional Compensation',
             'missing': colander.drop,
             'typ': colander.Integer()

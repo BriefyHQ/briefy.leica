@@ -1026,7 +1026,10 @@ class OrderWorkflow(BriefyWorkflow):
         required_fields=PERM_REJECT_REQUIRED_FIELDS
     )
     def perm_reject(self, **kwargs):
-        """Transition: Inform the perm reject of the Assignment and a new shoot for an Order to the customer."""
+        """Transition: Inform the perm rejection of the Assignment.
+
+        Move Order to pending state for a new shoot.
+        """
         order = self.document
         order.availability = []
         old_assignment = order.assignment
