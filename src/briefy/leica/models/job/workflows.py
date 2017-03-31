@@ -33,16 +33,13 @@ ASSIGN_REQUIRED_FIELDS = (
 )
 RESHOOT_REQUIRED_FIELDS = (
     'payout_value',
-    'payout_currency',
     'travel_expenses',
 )
 NEWSHOOT_REQUIRED_FIELDS = (
     'payout_value',
-    'payout_currency',
     'travel_expenses',
 )
 PERM_REJECT_REQUIRED_FIELDS = (
-    'payout_currency',
     'additional_compensation',
     'reason_additional_compensation'
 )
@@ -1006,7 +1003,6 @@ class OrderWorkflow(BriefyWorkflow):
         )
         # update old assignment and complete
         old_assignment.payout_value = post_fields.get('payout_value')
-        old_assignment.payout_currency = post_fields.get('payout_currency')
         old_assignment.travel_expenses = post_fields.get('travel_expenses')
         old_assignment.workflow.complete(message=message)
         # after complete the old assignment the new one can be assigned
@@ -1074,7 +1070,6 @@ class OrderWorkflow(BriefyWorkflow):
         )
         fields = kwargs.get('fields')
         old_assignment.payout_value = fields.get('payout_value')
-        old_assignment.payout_currency = fields.get('payout_currency')
         old_assignment.travel_expenses = fields.get('travel_expenses')
         old_assignment.workflow.complete(message=message)
         return True
