@@ -12,6 +12,7 @@ History
     * Card #167: improve Assignment workflow transition retract_rejection to move from Awaiting Assets to In QA without resubmit (rudaporto).
     * Card #41: update Assignment perm_reject transition and subscriber since it will be now called only from the Order workflow (rudaporto).
     * Remove payout_currency from Order transitions new_shoot, perm_reject and reshoot (rudaporto).
+    * When transition perm_reject or completed are executed on the Assignment, make sure that only create a comment to the creative if the user id a PM (rudaporto).
 
 2.1.1 (2017-03-29)
 ------------------

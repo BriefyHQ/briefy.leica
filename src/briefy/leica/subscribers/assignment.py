@@ -33,25 +33,29 @@ def assignment_submit(event):
 def assignment_perm_reject(event):
     """Handle Assignment perm_reject workflow event."""
     assignment = event.obj
-    to_role = 'professional_user'
-    author_role = 'project_manager'
-    create_comment_from_wf_transition(
-        assignment,
-        author_role,
-        to_role
-    )
+    user = assignment.workflow.context
+    if G['pm'].value in user.groups:
+        to_role = 'professional_user'
+        author_role = 'project_manager'
+        create_comment_from_wf_transition(
+            assignment,
+            author_role,
+            to_role
+        )
 
 
 def assignment_complete(event):
     """Handle Assignment complete workflow event."""
     assignment = event.obj
-    to_role = 'professional_user'
-    author_role = 'project_manager'
-    create_comment_from_wf_transition(
-        assignment,
-        author_role,
-        to_role
-    )
+    user = assignment.workflow.context
+    if G['pm'].value in user.groups:
+        to_role = 'professional_user'
+        author_role = 'project_manager'
+        create_comment_from_wf_transition(
+            assignment,
+            author_role,
+            to_role
+        )
 
 
 def assignment_cancel(event):
