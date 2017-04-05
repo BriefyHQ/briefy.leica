@@ -52,6 +52,20 @@ ROLE_MAP = {
     'customer': 'customer_user'
 }
 
+ORDER_ASSIGNMENT_TRANSITION = {
+    'deliver': 'approve',
+    'refuse': 'refuse',
+    'require_revision': 'return_to_qa',
+    'accept': 'complete'
+}
+
+ORDER_ASSIGNMENT_STATUS = {
+    'delivered': 'approved',
+    'refused': 'refused',
+    'in_qa': 'in_qa',
+    'accepted': 'completed'
+}
+
 
 def convert_date(date, dayfirst=True, berlin_zone=False):
     if dayfirst:
@@ -89,14 +103,14 @@ def find_user(user_name):
 def find_user_by_role(order, role):
     role = ROLE_MAP.get(role)
     if role == 'qa_manager':
-        return getattr(order.assignment, role)
+        return getattr(order.assignments[0], role)
     else:
         return getattr(order, role)
 
 
-def find_state_position(order, state, date):
+def find_state_position(state_history, state, date):
     position = None
-    for i, item in enumerate(order.state_history):
+    for i, item in enumerate(state_history):
         state_date = convert_date(item.get('date'), dayfirst=False).date()
         if item.get('to') == state and state_date <= date.date():
             position = i + 1
@@ -107,11 +121,27 @@ def get_previous_transition_date(order, position):
     return order.state_history[position].get('date')
 
 
-def insert_transition(order, new_history, insert_position):
+def insert_transition_order(order, item, date):
     state_history = order.state_history
-    if insert_position:
+    previous_status = item.get('previous_order_status')
+    position = find_state_position(state_history, previous_status, date)
+    if position is None:
+        print('Could not find position for Order id: {uid}'.format(uid=order.id))
+
+    last_state = state_history[position - 1]['to']
+    actor = find_user_by_role(order, item.get('user_role'))
+    new_state = item.get('new_order_status')
+    new_history = {
+        'actor': str(actor),
+        'date': date.isoformat(),
+        'from': last_state,
+        'to': new_state,
+        'transition': item.get('transition_name'),
+        'message': 'Inserted after migration: history fixing procedure.'
+    }
+    if position:
         try:
-            current_history = state_history[insert_position]
+            current_history = state_history[position]
         except:
             current_history = None
 
@@ -125,9 +155,50 @@ def insert_transition(order, new_history, insert_position):
             )
             return
 
-    state_history.insert(insert_position, new_history)
+    state_history.insert(position, new_history)
     order.state_history = state_history.copy()
     order._update_dates_from_history()
+
+
+def insert_transition_assignment(order, item, date):
+    assignment = order.assignments[0]
+    state_history = assignment.state_history
+    previous_status = ORDER_ASSIGNMENT_STATUS.get(item.get('previous_order_status'))
+    position = find_state_position(state_history, previous_status, date)
+    if position is None:
+        print('Could not find position for Assignment id: {uid}'.format(uid=assignment.id))
+
+    last_state = state_history[position - 1]['to']
+    actor = find_user_by_role(order, item.get('user_role'))
+    new_state = ORDER_ASSIGNMENT_STATUS.get(item.get('new_order_status'))
+    new_history = {
+        'actor': str(actor),
+        'date': date.isoformat(),
+        'from': last_state,
+        'to': new_state,
+        'transition': ORDER_ASSIGNMENT_TRANSITION.get(item.get('transition_name')),
+        'message': 'Inserted after migration: history fixing procedure.'
+    }
+    if position:
+        try:
+            current_history = state_history[position]
+        except:
+            current_history = None
+
+        if (current_history and
+            new_history['from'] == current_history['from'] and
+            new_history['to'] == current_history['to'] and convert_date(
+                new_history['date'], dayfirst=False).date() == convert_date(
+                current_history['date'], dayfirst=False).date()):
+            print('This transition already exists. \n Assignment: {current_history} : {new_history}'.format(
+                current_history=current_history,
+                new_history=new_history)
+            )
+            return
+
+    state_history.insert(position, new_history)
+    assignment.state_history = state_history.copy()
+    assignment._update_dates_from_history()
 
 
 def main(data):
@@ -135,32 +206,17 @@ def main(data):
         item = {field: line[i] for i, field in enumerate(fieldnames)}
         uid = item.get('uid')
         date = item.get('date_time')
-
         if not date:
             previous_line = data[line_number - 1]
             previous_item = {field: previous_line[i] for i, field in enumerate(fieldnames)}
             date = previous_item.get('date_time')
-
         date = convert_date(date)
         order = Order.get(uid)
-        state_history = order.state_history
-        position = find_state_position(order, item.get('previous_order_status'), date)
-        if position is None:
-            print('Could not find position for Order id: {uid}'.format(uid=uid))
-            import pdb; pdb.set_trace()
-
-        last_state = state_history[position - 1]['to']
-        actor = find_user_by_role(order, item.get('user_role'))
-        new_state = item.get('new_order_status')
-        new_history = {
-            'actor': str(actor),
-            'date': date.isoformat(),
-            'from': last_state,
-            'to': new_state,
-            'transition': item.get('transition_name'),
-            'message': 'Inserted after migration: history fixing procedure.'
-        }
-        insert_transition(order, new_history, position)
+        insert_transition_order(order, item, date)
+        if len(order.assignments) == 1:
+            insert_transition_assignment(order, item, date)
+        else:
+            print('Order has {} assignments.'.format(len(order.assignments)))
 
     transaction.commit()
 
