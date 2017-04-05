@@ -41,16 +41,36 @@ def order_submit(event):
     transitions.append(
         ('validate', 'Machine check approved')
     )
-    # do nothing for while
-    # safe_workflow_trigger_transitions(event, transitions=transitions, state='validation')
 
 
-def order_cancel_or_perm_refuse(event):
-    """Handle Assignment cancel and perm_reject workflow event."""
+def order_cancel(event):
+    """Handle Order cancel workflow event."""
     order = event.obj
-    author_role = 'customer_user'
-    to_role = 'project_manager'
-    create_comment_from_wf_transition(order, author_role, to_role)
+    user = order.workflow.context
+    if G['customers'].value in user.groups:
+        to_role = 'project_manager'
+        author_role = 'customer_user'
+    elif G['pm'].value in user.groups:
+        to_role = 'customer_user'
+        author_role = 'project_manager'
+    create_comment_from_wf_transition(
+        order,
+        author_role,
+        to_role
+    )
+
+
+def order_perm_refuse(event):
+    """Handle Order perm_reject workflow event."""
+    order = event.obj
+    to_role = 'customer_user'
+    author_role = 'project_manager'
+    create_comment_from_wf_transition(
+        order,
+        author_role,
+        to_role,
+        internal=True
+    )
 
 
 def order_remove_schedule(event):
@@ -139,8 +159,8 @@ def transition_handler(event):
         return
     handlers = {
         'order.workflow.submit': order_submit,
-        'order.workflow.cancel': order_cancel_or_perm_refuse,
-        'order.workflow.perm_refuse': order_cancel_or_perm_refuse,
+        'order.workflow.cancel': order_cancel,
+        'order.workflow.perm_refuse': order_perm_refuse,
         'order.workflow.remove_schedule': order_remove_schedule,
         'order.workflow.refuse': order_refuse,
         'order.workflow.new_shoot': order_new_shoot_or_reshoot,
