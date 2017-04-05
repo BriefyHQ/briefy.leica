@@ -1,50 +1,90 @@
-import pytz
+"""Fix Orders and Assignments missing transitions.
+
+Assignments: Approve, Refuse, Return to QA.
+Orders: Deliver, Refuse, Require Revision.
+"""
 from briefy.leica.db import Session
-from briefy.leica.sync.db import configure
 from briefy.leica.models import Order
-from briefy.leica.models import BriefyUserProfile
-from briefy.leica.models import CustomerUserProfile
-from briefy.leica.models import Professional
+from briefy.leica.sync.db import configure
 from dateutil.parser import parse
+
+import pytz
 import transaction
 
-fieldnames = ['uid', 'previous_order_status', 'transition_name', 'new_order_status', 'user_role', 'date_time', 'comment']
-data = [
-    ("fce461fa-c521-4bb7-884c-392dded8d77a", "in_qa", "deliver", "delivered", "qa", "11.01.2017", "first delivery", ),
-    ("fce461fa-c521-4bb7-884c-392dded8d77a", "delivered", "refuse", "refused", "customer", "31.01.2017", "first refusal", ),
-    ("fce461fa-c521-4bb7-884c-392dded8d77a", "refused", "require_revision", "in_qa", "pm", "", "sent back to QA_missing date", ),
-    ("fce461fa-c521-4bb7-884c-392dded8d77a", "in_qa", "deliver", "delivered", "qa", "08.02.2017", "second delivery", ),
-    ("fce461fa-c521-4bb7-884c-392dded8d77a", "delivered", "accept", "accepted", "customer", "14.02.2017", "acceptance", ),
-    ("4d7bdda9-e9ac-44e5-8ce9-3ab619f34441", "in_qa", "deliver", "delivered", "qa", "07.12.2016", "first delivery", ),
-    ("4d7bdda9-e9ac-44e5-8ce9-3ab619f34441", "delivered", "refuse", "refused", "customer", "21.12.2016", "first refusal", ),
-    ("4d7bdda9-e9ac-44e5-8ce9-3ab619f34441", "refused", "require_revision", "in_qa", "pm", "", "sent back to QA_missing date", ),
-    ("4d7bdda9-e9ac-44e5-8ce9-3ab619f34441", "in_qa", "deliver", "delivered", "qa", "10.01.2017", "second delivery", ),
-    ("4d7bdda9-e9ac-44e5-8ce9-3ab619f34441", "delivered", "refuse", "refused", "customer", "16.02.2017", "second refusal", ),
-    ("cd31225b-95c6-4b7d-bcae-67b1e75689bc", "in_qa", "deliver", "delivered", "qa", "02.12.2016", "first delivery", ),
-    ("cd31225b-95c6-4b7d-bcae-67b1e75689bc", "delivered", "refuse", "refused", "customer", "20.12.2016", "first refusal", ),
-    ("cd31225b-95c6-4b7d-bcae-67b1e75689bc", "refused", "require_revision", "in_qa", "pm", "", "sent back to QA_missing date", ),
-    ("cd31225b-95c6-4b7d-bcae-67b1e75689bc", "in_qa", "deliver", "delivered", "qa", "10.02.2017", "second delivery", ),
-    ("b3ea2f22-0b92-4f04-9fa6-a4b915fc74f2", "in_qa", "deliver", "delivered", "qa", "22.12.2016", "first delivery", ),
-    ("b3ea2f22-0b92-4f04-9fa6-a4b915fc74f2", "delivered", "refuse", "refused", "customer", "11.01.2017", "first refusal", ),
-    ("b3ea2f22-0b92-4f04-9fa6-a4b915fc74f2", "refused", "require_revision", "in_qa", "pm", "", "sent back to QA_missing date", ),
-    ("b3ea2f22-0b92-4f04-9fa6-a4b915fc74f2", "in_qa", "deliver", "delivered", "qa", "08.02.2017", "second delivery", ),
-    ("b3ea2f22-0b92-4f04-9fa6-a4b915fc74f2", "delivered", "refuse", "refused", "customer", "20.02.2017", "second refusal", ),
-    ("cf6c20aa-f91a-428a-bb83-ce5e7224c5f8", "in_qa", "deliver", "delivered", "qa", "01.11.2016", "first delivery_in Leica", ),
-    ("cf6c20aa-f91a-428a-bb83-ce5e7224c5f8", "delivered", "refuse", "refused", "customer", "10.01.2017", "first refusal_missing", ),
-    ("cf6c20aa-f91a-428a-bb83-ce5e7224c5f8", "refused", "require_revision", "in_qa", "pm", "", "sent back to QA_missing date", ),
-    ("cf6c20aa-f91a-428a-bb83-ce5e7224c5f8", "in_qa", "deliver", "delivered", "qa", "12.01.2017", "second delivery", ),
-    ("cf6c20aa-f91a-428a-bb83-ce5e7224c5f8", "delivered", "refuse", "refused", "customer", "21.02.2017", "second refusal", ),
-    ("d14d1499-d97f-4833-9697-e451a3ff3498", "in_qa", "deliver", "delivered", "qa", "14.11.2016", "first delivery_in Leica", ),
-    ("d14d1499-d97f-4833-9697-e451a3ff3498", "delivered", "refuse", "refused", "customer", "07.12.2016", "first refusal_missing", ),
-    ("d14d1499-d97f-4833-9697-e451a3ff3498", "refused", "require_revision", "in_qa", "pm", "", "sent back to QA_missing date", ),
-    ("d14d1499-d97f-4833-9697-e451a3ff3498", "in_qa", "deliver", "delivered", "qa", "04.01.2017", "second delivery", ),
-    ("95708c22-146f-4daa-9ddc-f619d704684d", "in_qa", "deliver", "delivered", "qa", "30.12.2016", "first delivery_in Leica", ),
-    ("95708c22-146f-4daa-9ddc-f619d704684d", "delivered", "refuse", "refused", "customer", "05.01.2017", "first refusal_missing", ),
-    ("95708c22-146f-4daa-9ddc-f619d704684d", "refused", "require_revision", "in_qa", "pm", "", "sent back to QA_missing date", ),
-    ("95708c22-146f-4daa-9ddc-f619d704684d", "in_qa", "deliver", "delivered", "qa", "07.02.2017", "second delivery", ),
-    ("95708c22-146f-4daa-9ddc-f619d704684d", "delivered", "refuse", "refused", "customer", "28.02.2017", "second refusal", ),
-]
 
+fieldnames = ['uid', 'previous_order_status', 'transition_name',
+              'new_order_status', 'user_role', 'date_time', 'comment']
+data = [
+    ("fce461fa-c521-4bb7-884c-392dded8d77a", "in_qa", "deliver",
+     "delivered", "qa", "11.01.2017", "first delivery",),
+    ("fce461fa-c521-4bb7-884c-392dded8d77a", "delivered", "refuse",
+     "refused", "customer", "31.01.2017", "first refusal",),
+    ("fce461fa-c521-4bb7-884c-392dded8d77a", "refused", "require_revision", "in_qa", "pm", "",
+     "sent back to QA_missing date",),
+    ("fce461fa-c521-4bb7-884c-392dded8d77a", "in_qa", "deliver",
+     "delivered", "qa", "08.02.2017", "second delivery",),
+    ("fce461fa-c521-4bb7-884c-392dded8d77a", "delivered", "accept",
+     "accepted", "customer", "14.02.2017", "acceptance",),
+    ("4d7bdda9-e9ac-44e5-8ce9-3ab619f34441", "in_qa", "deliver",
+     "delivered", "qa", "07.12.2016", "first delivery",),
+    ("4d7bdda9-e9ac-44e5-8ce9-3ab619f34441", "delivered", "refuse",
+     "refused", "customer", "21.12.2016", "first refusal",),
+    ("4d7bdda9-e9ac-44e5-8ce9-3ab619f34441", "refused", "require_revision", "in_qa", "pm", "",
+     "sent back to QA_missing date",),
+    ("4d7bdda9-e9ac-44e5-8ce9-3ab619f34441", "in_qa", "deliver",
+     "delivered", "qa", "10.01.2017", "second delivery",),
+    ("4d7bdda9-e9ac-44e5-8ce9-3ab619f34441", "delivered", "refuse",
+     "refused", "customer", "16.02.2017", "second refusal",),
+    ("cd31225b-95c6-4b7d-bcae-67b1e75689bc", "in_qa", "deliver",
+     "delivered", "qa", "02.12.2016", "first delivery",),
+    ("cd31225b-95c6-4b7d-bcae-67b1e75689bc", "delivered", "refuse",
+     "refused", "customer", "20.12.2016", "first refusal",),
+    ("cd31225b-95c6-4b7d-bcae-67b1e75689bc", "refused", "require_revision",
+     "in_qa", "pm", "", "sent back to QA_missing date",),
+    ("cd31225b-95c6-4b7d-bcae-67b1e75689bc", "in_qa", "deliver",
+     "delivered", "qa", "10.02.2017", "second delivery",),
+    ("b3ea2f22-0b92-4f04-9fa6-a4b915fc74f2", "in_qa", "deliver",
+     "delivered", "qa", "22.12.2016", "first delivery",),
+    ("b3ea2f22-0b92-4f04-9fa6-a4b915fc74f2", "delivered", "refuse",
+     "refused", "customer", "11.01.2017", "first refusal",),
+    ("b3ea2f22-0b92-4f04-9fa6-a4b915fc74f2", "refused", "require_revision", "in_qa", "pm", "",
+     "sent back to QA_missing date",),
+    ("b3ea2f22-0b92-4f04-9fa6-a4b915fc74f2", "in_qa", "deliver",
+     "delivered", "qa", "08.02.2017", "second delivery",),
+    ("b3ea2f22-0b92-4f04-9fa6-a4b915fc74f2", "delivered", "refuse",
+     "refused", "customer", "20.02.2017", "second refusal",),
+    ("cf6c20aa-f91a-428a-bb83-ce5e7224c5f8", "in_qa", "deliver", "delivered", "qa", "01.11.2016",
+     "first delivery_in Leica",),
+    ("cf6c20aa-f91a-428a-bb83-ce5e7224c5f8", "delivered", "refuse",
+     "refused", "customer", "10.01.2017", "first refusal_missing",),
+    ("cf6c20aa-f91a-428a-bb83-ce5e7224c5f8", "refused", "require_revision", "in_qa", "pm", "",
+     "sent back to QA_missing date",),
+    ("cf6c20aa-f91a-428a-bb83-ce5e7224c5f8", "in_qa", "deliver",
+     "delivered", "qa", "12.01.2017", "second delivery",),
+    ("cf6c20aa-f91a-428a-bb83-ce5e7224c5f8", "delivered", "refuse",
+     "refused", "customer", "21.02.2017",
+     "second refusal",),
+    ("d14d1499-d97f-4833-9697-e451a3ff3498", "in_qa", "deliver", "delivered", "qa", "14.11.2016",
+     "first delivery_in Leica",),
+    ("d14d1499-d97f-4833-9697-e451a3ff3498", "delivered", "refuse",
+     "refused", "customer", "07.12.2016",
+     "first refusal_missing",),
+    ("d14d1499-d97f-4833-9697-e451a3ff3498", "refused", "require_revision", "in_qa", "pm", "",
+     "sent back to QA_missing date",),
+    ("d14d1499-d97f-4833-9697-e451a3ff3498", "in_qa", "deliver",
+     "delivered", "qa", "04.01.2017", "second delivery",),
+    ("95708c22-146f-4daa-9ddc-f619d704684d", "in_qa", "deliver", "delivered", "qa", "30.12.2016",
+     "first delivery_in Leica",),
+    ("95708c22-146f-4daa-9ddc-f619d704684d", "delivered", "refuse",
+     "refused", "customer", "05.01.2017",
+     "first refusal_missing",),
+    ("95708c22-146f-4daa-9ddc-f619d704684d", "refused", "require_revision", "in_qa", "pm", "",
+     "sent back to QA_missing date",),
+    ("95708c22-146f-4daa-9ddc-f619d704684d", "in_qa", "deliver",
+     "delivered", "qa", "07.02.2017", "second delivery",),
+    ("95708c22-146f-4daa-9ddc-f619d704684d", "delivered", "refuse",
+     "refused", "customer", "28.02.2017", "second refusal",),
+]
 
 ROLE_MAP = {
     'pm': 'project_manager',
@@ -68,6 +108,7 @@ ORDER_ASSIGNMENT_STATUS = {
 
 
 def convert_date(date, dayfirst=True, berlin_zone=False):
+    """Convert text date to datetime using mod::dateutil parse."""
     if dayfirst:
         date = parse(date, dayfirst=dayfirst)
     else:
@@ -82,25 +123,8 @@ def convert_date(date, dayfirst=True, berlin_zone=False):
     return date
 
 
-def find_user(user_name):
-    user = BriefyUserProfile.query().filter(
-        BriefyUserProfile.fullname == user_name
-    ).one_or_none()
-    if not user:
-        user = CustomerUserProfile.query().filter(
-            CustomerUserProfile.fullname == user_name
-        ).one_or_none()
-    if not user:
-        user = Professional.query().filter(
-            Professional.fullname == user_name
-        ).one_or_none()
-    if user:
-        return str(user.id)
-    else:
-        return user_name
-
-
 def find_user_by_role(order, role):
+    """Find the user id based on the role name."""
     role = ROLE_MAP.get(role)
     if role == 'qa_manager':
         return getattr(order.assignments[0], role)
@@ -109,6 +133,7 @@ def find_user_by_role(order, role):
 
 
 def find_state_position(state_history, state, date):
+    """Find the position to insert the new history record in the state_history."""
     position = None
     for i, item in enumerate(state_history):
         state_date = convert_date(item.get('date'), dayfirst=False).date()
@@ -117,11 +142,8 @@ def find_state_position(state_history, state, date):
     return position
 
 
-def get_previous_transition_date(order, position):
-    return order.state_history[position].get('date')
-
-
 def insert_transition_order(order, item, date):
+    """Insert new transition in the Order state_history."""
     state_history = order.state_history
     previous_status = item.get('previous_order_status')
     position = find_state_position(state_history, previous_status, date)
@@ -148,10 +170,14 @@ def insert_transition_order(order, item, date):
         if (current_history and
             new_history['from'] == current_history['from'] and
             new_history['to'] == current_history['to'] and
-            convert_date(new_history['date'], dayfirst=False).date() == convert_date(current_history['date'], dayfirst=False).date()):
-            print('This transition already exists. \n Order: {current_history} : {new_history}'.format(
-                current_history=current_history,
-                new_history=new_history)
+            convert_date(
+                new_history['date'], dayfirst=False).date() == convert_date(
+                        current_history['date'], dayfirst=False).date()):
+            message = 'This transition already exists. \n Order: {current} : {new}'
+            print(
+                message.format(
+                    current=current_history,
+                    new=new_history)
             )
             return
 
@@ -161,6 +187,7 @@ def insert_transition_order(order, item, date):
 
 
 def insert_transition_assignment(order, item, date):
+    """Insert new transition in the Assignment state_history."""
     assignment = order.assignments[0]
     state_history = assignment.state_history
     previous_status = ORDER_ASSIGNMENT_STATUS.get(item.get('previous_order_status'))
@@ -190,9 +217,11 @@ def insert_transition_assignment(order, item, date):
             new_history['to'] == current_history['to'] and convert_date(
                 new_history['date'], dayfirst=False).date() == convert_date(
                 current_history['date'], dayfirst=False).date()):
-            print('This transition already exists. \n Assignment: {current_history} : {new_history}'.format(
-                current_history=current_history,
-                new_history=new_history)
+            message = 'This transition already exists. \nAssignment: {current} : {new}'
+            print(
+                message.format(
+                    current=current_history,
+                    new=new_history)
             )
             return
 
@@ -202,6 +231,7 @@ def insert_transition_assignment(order, item, date):
 
 
 def main(data):
+    """Iterate over the data set to fix orders and respective assignments state_history."""
     for line_number, line in enumerate(data):
         item = {field: line[i] for i, field in enumerate(fieldnames)}
         uid = item.get('uid')
