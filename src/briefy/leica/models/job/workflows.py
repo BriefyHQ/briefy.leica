@@ -519,7 +519,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         # this should be only executed only from the order
         pass
 
-    @Permission(groups=[G['customers'], G['pm'], G['system']])
+    @Permission(groups=[G['customers'], G['pm'], G['finance'], G['system']])
     def can_complete(self):
         """Validate if user can move an Assignment to completed."""
         return True
@@ -1113,15 +1113,22 @@ class OrderWorkflow(BriefyWorkflow):
     @refused.transition(perm_refused, 'can_perm_refuse', message_required=True)
     def perm_refuse(self, **kwargs):
         """Transition: PM permanently refuse an Order."""
-        pass
+        order = self.document
+        assignment = order.assignment
+        assignment.workflow.context = self.context
+        assignment.workflow.complete()
 
-    @Permission(groups=[G['pm'], G['bizdev'], LR['project_manager']])
+    @Permission(groups=[G['pm'], G['finance'], G['system']])
     def can_perm_refuse(self):
         """Permission: Validate if user can permanently refuse an Order.
 
-        Groups: g:pm, g:bizdev, r:project_manager
+        Groups: g:pm, g:finance and g:system
         """
-        return True
+        order = self.document
+        result = True
+        if order.assignment.state != 'refused':
+            result = False
+        return result
 
     @refused.transition(in_qa, 'can_require_revision')
     def require_revision(self, **kwargs):

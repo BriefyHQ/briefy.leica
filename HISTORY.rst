@@ -2,6 +2,11 @@
 History
 =======
 
+2.1.3 (2017-04-05)
+------------------
+    * Card #184: new script to add missing transitions to Order and Assignments using Ophelie's data set (rudaporto).
+    * Card #136: improve perm_refuse workflow transition of Order to create an internal note (Order) and complete the Assignment (rudaporto).
+
 2.1.2 (2017-03-31)
 ------------------
 
