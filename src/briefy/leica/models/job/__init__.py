@@ -335,6 +335,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     submission_path = sa.Column(
         sautils.URLType,
         nullable=True,
+        default=None,
         info={
             'colanderalchemy': {
                 'title': 'Path to photographer submission',
