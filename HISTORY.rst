@@ -2,7 +2,7 @@
 History
 =======
 
-2.1.3 (Unreleased)
+2.1.4 (2017-04-06)
 ------------------
     * Card #215: new script to export all transition history of Orders to a tsv file (rudaporto).
     * Card #218: default value for empty submission_path in the Assignment must be None (rudaporto).
