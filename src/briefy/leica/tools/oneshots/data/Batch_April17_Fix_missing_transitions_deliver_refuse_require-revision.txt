@@ -1,0 +1,487 @@
+order_uid	previous_order_status	transition_name	new_order_status	user_role	date_time	comment
+00ade521-d0e3-4159-b3f7-a55c3d654347	in_qa	deliver	delivered	qa	2017-01-24 10:08:00	first delivery
+00ade521-d0e3-4159-b3f7-a55c3d654347	delivered	refuse	refused	customer	2017-02-02 10:53:00	last_refusal_date
+00ade521-d0e3-4159-b3f7-a55c3d654347	refused	require_revision	in_qa	pm		send_back_to_qa
+02453317-1666-4225-ba81-e8cfd6d0bfa2	in_qa	deliver	delivered	qa	2017-01-20 14:23:00	first delivery
+02453317-1666-4225-ba81-e8cfd6d0bfa2	delivered	refuse	refused	customer	2017-02-09 10:06:00	last_refusal_date
+02453317-1666-4225-ba81-e8cfd6d0bfa2	refused	require_revision	in_qa	pm		send_back_to_qa
+02453317-1666-4225-ba81-e8cfd6d0bfa2	in_qa	deliver	delivered	qa	2017-02-23 22:54:40	last_deliver_date
+0328c4de-2c40-42b2-9548-f5e70f9c98c0	in_qa	deliver	delivered	qa	2017-01-17 11:28:00	first delivery
+0328c4de-2c40-42b2-9548-f5e70f9c98c0	delivered	refuse	refused	customer	2017-02-03 05:57:00	last_refusal_date
+0328c4de-2c40-42b2-9548-f5e70f9c98c0	refused	require_revision	in_qa	pm		send_back_to_qa
+0328c4de-2c40-42b2-9548-f5e70f9c98c0	in_qa	deliver	delivered	qa	2017-02-10 12:30:00	last_deliver_date
+04a493a0-64a4-4bc7-8828-bd4241a4d091	in_qa	deliver	delivered	qa	2016-11-07 12:23:00	first delivery
+04a493a0-64a4-4bc7-8828-bd4241a4d091	delivered	refuse	refused	customer	2016-11-30 16:45:00	refusal
+04a493a0-64a4-4bc7-8828-bd4241a4d091	refused	require_revision	in_qa	pm		send_back_to_qa
+04a493a0-64a4-4bc7-8828-bd4241a4d091	in_qa	deliver	delivered	qa	2017-01-20 16:11:00	deliver_add._transition
+04cd2a3a-cfb4-468c-be48-1b8510d02035	in_qa	deliver	delivered	qa	2017-01-02 15:39:00	first delivery
+04cd2a3a-cfb4-468c-be48-1b8510d02035	delivered	refuse	refused	customer	2017-01-24 11:36:00	refusal
+04cd2a3a-cfb4-468c-be48-1b8510d02035	refused	require_revision	in_qa	pm		send_back_to_qa
+04fcd194-fb96-40a2-9704-369057405b52	in_qa	deliver	delivered	qa	2017-01-20 13:17:00	first delivery
+04fcd194-fb96-40a2-9704-369057405b52	delivered	refuse	refused	customer	2017-02-10 06:41:00	refusal
+04fcd194-fb96-40a2-9704-369057405b52	refused	require_revision	in_qa	pm		send_back_to_qa
+05cc0458-24dc-4850-ac28-f06486a440f4	in_qa	deliver	delivered	qa	2016-11-09 17:31:00	first delivery
+05cc0458-24dc-4850-ac28-f06486a440f4	delivered	refuse	refused	customer	2016-11-28 10:56:00	refusal
+05cc0458-24dc-4850-ac28-f06486a440f4	refused	require_revision	in_qa	pm		send_back_to_qa
+05cc0458-24dc-4850-ac28-f06486a440f4	in_qa	deliver	delivered	qa	2017-01-25 15:07:00	deliver_add._transition
+0644ab3d-646e-4089-a582-27b7c323e827	in_qa	deliver	delivered	qa	2016-12-20 17:15:00	first delivery
+0644ab3d-646e-4089-a582-27b7c323e827	delivered	refuse	refused	customer	2016-12-27 10:44:00	refusal
+0644ab3d-646e-4089-a582-27b7c323e827	refused	require_revision	in_qa	pm		send_back_to_qa
+0644ab3d-646e-4089-a582-27b7c323e827	in_qa	deliver	delivered	qa	2017-01-09 17:30:00	deliver_add._transition
+078f5b8c-2872-4cd1-8220-903ff1c6f2c0	in_qa	deliver	delivered	qa	2017-01-18 09:02:00	first delivery
+078f5b8c-2872-4cd1-8220-903ff1c6f2c0	delivered	refuse	refused	customer	2017-02-06 10:15:00	refusal
+078f5b8c-2872-4cd1-8220-903ff1c6f2c0	refused	require_revision	in_qa	pm		send_back_to_qa
+078f5b8c-2872-4cd1-8220-903ff1c6f2c0	in_qa	deliver	delivered	qa	2017-02-07 15:13:00	deliver_add._transition
+0a44e470-c2ce-44fc-a4f7-7d2559dfcf1c	in_qa	deliver	delivered	qa	2016-10-26 14:41:00	first delivery
+0a44e470-c2ce-44fc-a4f7-7d2559dfcf1c	delivered	refuse	refused	customer	2016-11-25 06:14:00	refusal
+0de38639-9082-4ec8-8325-ed8463a0aa3f	in_qa	deliver	delivered	qa	2016-12-27 11:42:00	first delivery
+0de38639-9082-4ec8-8325-ed8463a0aa3f	delivered	refuse	refused	customer	2017-01-16 11:20:00	refusal
+0de38639-9082-4ec8-8325-ed8463a0aa3f	refused	require_revision	in_qa	pm		send_back_to_qa
+0de38639-9082-4ec8-8325-ed8463a0aa3f	in_qa	deliver	delivered	qa	2017-02-10 10:54:00	deliver_add._transition
+0f501c2a-a481-4e1d-b2da-5fe7be844dab	in_qa	deliver	delivered	qa	2016-12-07 10:59:00	first delivery
+0f501c2a-a481-4e1d-b2da-5fe7be844dab	delivered	refuse	refused	customer	2016-12-21 09:51:00	refusal
+0f501c2a-a481-4e1d-b2da-5fe7be844dab	refused	require_revision	in_qa	pm		send_back_to_qa
+0f501c2a-a481-4e1d-b2da-5fe7be844dab	in_qa	deliver	delivered	qa	2017-01-25 14:30:00	deliver_add._transition
+10822938-d8ac-4104-a5d3-37201deeaa26	in_qa	deliver	delivered	qa	2016-10-24 13:50:00	first delivery
+10822938-d8ac-4104-a5d3-37201deeaa26	delivered	refuse	refused	customer	2016-11-30 00:00:00	refusal
+10822938-d8ac-4104-a5d3-37201deeaa26	refused	require_revision	in_qa	pm		send_back_to_qa
+10822938-d8ac-4104-a5d3-37201deeaa26	in_qa	deliver	delivered	qa	2017-01-12 12:20:00	deliver_add._transition
+14fc7ccd-2067-4c19-b560-eadf8ed32f93	in_qa	deliver	delivered	qa	2016-11-11 10:24:00	first delivery
+14fc7ccd-2067-4c19-b560-eadf8ed32f93	delivered	refuse	refused	customer	2016-12-14 05:22:00	refusal
+14fc7ccd-2067-4c19-b560-eadf8ed32f93	refused	require_revision	in_qa	pm		send_back_to_qa
+15972a72-73bd-4c17-9ee6-aeb5e9155963	in_qa	deliver	delivered	qa	2016-12-29 11:53:00	first delivery
+15972a72-73bd-4c17-9ee6-aeb5e9155963	delivered	refuse	refused	customer	2017-01-19 07:28:00	refusal
+15972a72-73bd-4c17-9ee6-aeb5e9155963	refused	require_revision	in_qa	pm		send_back_to_qa
+15972a72-73bd-4c17-9ee6-aeb5e9155963	in_qa	deliver	delivered	qa	2017-01-20 12:09:00	deliver_add._transition
+15e8293a-9039-46dd-9ec9-72df0f07255b	in_qa	deliver	delivered	qa	2016-10-31 12:57:00	first delivery
+15e8293a-9039-46dd-9ec9-72df0f07255b	delivered	refuse	refused	customer	2016-11-07 00:00:00	refusal
+15e8293a-9039-46dd-9ec9-72df0f07255b	refused	require_revision	in_qa	pm		send_back_to_qa
+15ff0312-7880-416d-986b-64293f51aa7d	in_qa	deliver	delivered	qa	2016-12-29 13:03:00	first delivery
+15ff0312-7880-416d-986b-64293f51aa7d	delivered	refuse	refused	customer	2017-01-19 10:31:00	refusal
+15ff0312-7880-416d-986b-64293f51aa7d	refused	require_revision	in_qa	pm		send_back_to_qa
+15ff0312-7880-416d-986b-64293f51aa7d	in_qa	deliver	delivered	qa	2017-01-20 12:07:00	deliver_add._transition
+1672fe6d-36b0-471e-8e2f-67e7c153096c	in_qa	deliver	delivered	qa	2016-10-27 09:16:00	first delivery
+1672fe6d-36b0-471e-8e2f-67e7c153096c	delivered	refuse	refused	customer	2016-11-02 00:00:00	refusal
+1672fe6d-36b0-471e-8e2f-67e7c153096c	refused	require_revision	in_qa	pm		send_back_to_qa
+1672fe6d-36b0-471e-8e2f-67e7c153096c	in_qa	deliver	delivered	qa	2017-01-30 04:57:09	deliver_add._transition
+16ff4bc7-95d8-46dc-a38b-f153f6d8ef55	in_qa	deliver	delivered	qa	2016-10-31 16:13:00	first delivery
+16ff4bc7-95d8-46dc-a38b-f153f6d8ef55	delivered	refuse	refused	customer	2016-11-07 00:00:00	refusal
+16ff4bc7-95d8-46dc-a38b-f153f6d8ef55	refused	require_revision	in_qa	pm		send_back_to_qa
+16ff4bc7-95d8-46dc-a38b-f153f6d8ef55	in_qa	deliver	delivered	qa	2017-01-23 12:02:00	deliver_add._transition
+175040dc-c923-4e62-83bb-6e460f40a582	in_qa	deliver	delivered	qa	2016-12-19 16:16:00	first delivery
+175040dc-c923-4e62-83bb-6e460f40a582	delivered	refuse	refused	customer	2016-12-28 05:08:00	refusal
+175040dc-c923-4e62-83bb-6e460f40a582	refused	require_revision	in_qa	pm		send_back_to_qa
+175040dc-c923-4e62-83bb-6e460f40a582	in_qa	deliver	delivered	qa	2017-01-12 13:05:00	deliver_add._transition
+18d2186f-6ddb-4fe1-9a81-7d8675294c61	in_qa	deliver	delivered	qa	2016-10-28 11:30:00	first delivery
+18d2186f-6ddb-4fe1-9a81-7d8675294c61	delivered	refuse	refused	customer	2016-11-25 00:00:00	refusal
+221d34a4-8738-4bfd-9047-a1c7aa20bdf6	in_qa	deliver	delivered	qa	2017-01-04 11:08:00	first delivery
+221d34a4-8738-4bfd-9047-a1c7aa20bdf6	delivered	refuse	refused	customer	2017-01-25 11:51:00	refusal
+221d34a4-8738-4bfd-9047-a1c7aa20bdf6	refused	require_revision	in_qa	pm		send_back_to_qa
+237d0c23-377e-45d9-a1ad-bfc1e48002cc	in_qa	deliver	delivered	qa	2016-10-27 13:29:00	first delivery
+237d0c23-377e-45d9-a1ad-bfc1e48002cc	delivered	refuse	refused	customer	2016-11-25 00:00:00	last_refusal_date
+244b9c6a-568d-449c-aec1-c6d6ed04188d	in_qa	deliver	delivered	qa	2016-11-04 16:46:00	first delivery
+244b9c6a-568d-449c-aec1-c6d6ed04188d	delivered	refuse	refused	customer	2017-01-19 03:57:00	refusal
+244b9c6a-568d-449c-aec1-c6d6ed04188d	refused	require_revision	in_qa	pm		send_back_to_qa
+244b9c6a-568d-449c-aec1-c6d6ed04188d	in_qa	deliver	delivered	qa	2017-01-19 04:12:00	deliver_add._transition
+244b9c6a-568d-449c-aec1-c6d6ed04188d	delivered	refuse	refused	customer	2017-02-10 10:51:00	refusal
+244b9c6a-568d-449c-aec1-c6d6ed04188d	refused	require_revision	in_qa	pm		send_back_to_qa
+2896d823-4b59-4998-81b9-6ded2c657bce	in_qa	deliver	delivered	qa	2017-01-16 15:55:00	first delivery
+2896d823-4b59-4998-81b9-6ded2c657bce	delivered	refuse	refused	customer	2017-02-03 05:16:00	refusal
+2896d823-4b59-4998-81b9-6ded2c657bce	refused	require_revision	in_qa	pm		send_back_to_qa
+2896d823-4b59-4998-81b9-6ded2c657bce	in_qa	deliver	delivered	qa	2017-02-09 13:32:00	deliver_add._transition
+2b17463d-c0ae-4d2c-a997-fea6dbdc0079	in_qa	deliver	delivered	qa	2016-10-31 18:15:00	first delivery
+2b17463d-c0ae-4d2c-a997-fea6dbdc0079	delivered	refuse	refused	customer	2016-11-02 00:00:00	last_refusal_date
+2b7f9788-2eba-45da-b4a4-152fb37c12d2	in_qa	deliver	delivered	qa	2016-12-29 15:48:00	first delivery
+2b7f9788-2eba-45da-b4a4-152fb37c12d2	delivered	refuse	refused	customer	2017-01-19 04:22:00	refusal
+2b7f9788-2eba-45da-b4a4-152fb37c12d2	refused	require_revision	in_qa	pm		send_back_to_qa
+2bf19ea2-3182-4216-8208-2939b7bb599f	in_qa	deliver	delivered	qa	2017-01-20 10:02:00	first delivery
+2bf19ea2-3182-4216-8208-2939b7bb599f	delivered	refuse	refused	customer	2017-02-09 08:32:00	refusal
+2bf19ea2-3182-4216-8208-2939b7bb599f	refused	require_revision	in_qa	pm		send_back_to_qa
+2fd4a425-f52b-4956-8927-e0118332e6e6	in_qa	deliver	delivered	qa	2017-01-20 17:14:00	first delivery
+2fd4a425-f52b-4956-8927-e0118332e6e6	delivered	refuse	refused	customer	2017-02-09 10:42:00	refusal
+2fd4a425-f52b-4956-8927-e0118332e6e6	refused	require_revision	in_qa	pm		send_back_to_qa
+30454848-3695-4903-b8b4-161f9b85b4d5	in_qa	deliver	delivered	qa	2016-11-23 12:36:00	first delivery
+30454848-3695-4903-b8b4-161f9b85b4d5	delivered	refuse	refused	customer	2016-12-08 07:31:00	refusal
+30454848-3695-4903-b8b4-161f9b85b4d5	refused	require_revision	in_qa	pm		send_back_to_qa
+30454848-3695-4903-b8b4-161f9b85b4d5	in_qa	deliver	delivered	qa	2017-01-31 11:06:00	deliver_add._transition
+31e525db-230c-4ace-87b9-a52cbefd686c	in_qa	deliver	delivered	qa	2016-12-28 14:52:00	first delivery
+31e525db-230c-4ace-87b9-a52cbefd686c	delivered	refuse	refused	customer	2017-01-19 03:39:00	refusal
+31e525db-230c-4ace-87b9-a52cbefd686c	refused	require_revision	in_qa	pm		send_back_to_qa
+31e525db-230c-4ace-87b9-a52cbefd686c	in_qa	deliver	delivered	qa	2017-02-08 17:31:00	deliver_add._transition
+33a0c606-f73d-4cfd-8230-a2a27aaeaf94	in_qa	deliver	delivered	qa	2016-11-30 16:32:00	first delivery
+33a0c606-f73d-4cfd-8230-a2a27aaeaf94	delivered	refuse	refused	customer	2016-12-21 03:39:00	refusal
+33a0c606-f73d-4cfd-8230-a2a27aaeaf94	refused	require_revision	in_qa	pm		send_back_to_qa
+33a0c606-f73d-4cfd-8230-a2a27aaeaf94	in_qa	deliver	delivered	qa	2017-01-12 13:12:00	deliver_add._transition
+34484cf6-6a82-474b-a5b7-62b800520f9a	in_qa	deliver	delivered	qa	2017-01-10 14:22:00	first delivery
+34484cf6-6a82-474b-a5b7-62b800520f9a	delivered	refuse	refused	customer	2017-01-17 10:29:00	refusal
+34484cf6-6a82-474b-a5b7-62b800520f9a	refused	require_revision	in_qa	pm		send_back_to_qa
+34484cf6-6a82-474b-a5b7-62b800520f9a	in_qa	deliver	delivered	qa	2017-02-07 13:23:00	deliver_add._transition
+39b23c22-201c-4024-8aa0-11dcc54018fe	in_qa	deliver	delivered	qa	2016-10-31 14:34:00	first delivery
+39b23c22-201c-4024-8aa0-11dcc54018fe	delivered	refuse	refused	customer	2016-11-25 00:00:00	refusal
+39b23c22-201c-4024-8aa0-11dcc54018fe	refused	require_revision	in_qa	pm		send_back_to_qa
+3ccb7c82-eaa8-4698-aca3-d822e71b6de3	in_qa	deliver	delivered	qa	2016-11-07 17:52:00	first delivery
+3ccb7c82-eaa8-4698-aca3-d822e71b6de3	delivered	refuse	refused	customer	2016-12-01 03:41:00	refusal
+3ccb7c82-eaa8-4698-aca3-d822e71b6de3	refused	require_revision	in_qa	pm	2017-01-04 16:51:00	send_back_to_qa
+3ccb7c82-eaa8-4698-aca3-d822e71b6de3	in_qa	deliver	delivered	qa	2017-01-04 17:00:00	deliver_add._transition
+400f5f00-3054-4e9a-8f41-72bd62fcc0f4	in_qa	deliver	delivered	qa	2016-10-13 13:08:00	first delivery
+400f5f00-3054-4e9a-8f41-72bd62fcc0f4	delivered	refuse	refused	customer	2016-10-18 00:00:00	refusal
+413c4633-97db-43d1-97bb-2d166f32b288	in_qa	deliver	delivered	qa	2017-01-09 10:03:00	first delivery
+413c4633-97db-43d1-97bb-2d166f32b288	delivered	refuse	refused	customer	2017-01-27 03:40:00	refusal
+413c4633-97db-43d1-97bb-2d166f32b288	refused	require_revision	in_qa	pm		send_back_to_qa
+413c4633-97db-43d1-97bb-2d166f32b288	in_qa	deliver	delivered	qa	2017-02-09 11:56:00	deliver_add._transition
+41a16d31-6261-4cc1-a9ce-e0855554e27c	in_qa	deliver	delivered	qa	2017-01-16 15:34:00	first delivery
+41a16d31-6261-4cc1-a9ce-e0855554e27c	delivered	refuse	refused	customer	2017-02-02 11:24:00	refusal
+41a16d31-6261-4cc1-a9ce-e0855554e27c	refused	require_revision	in_qa	pm		send_back_to_qa
+41a16d31-6261-4cc1-a9ce-e0855554e27c	in_qa	deliver	delivered	qa	2017-02-09 13:09:00	deliver_add._transition
+41aaa724-a178-4f34-8378-2a64874f994b	in_qa	deliver	delivered	qa	2016-12-21 11:53:00	first delivery
+41aaa724-a178-4f34-8378-2a64874f994b	delivered	refuse	refused	customer	2017-01-11 07:48:00	refusal
+41aaa724-a178-4f34-8378-2a64874f994b	refused	require_revision	in_qa	pm		send_back_to_qa
+41aaa724-a178-4f34-8378-2a64874f994b	in_qa	deliver	delivered	qa	2017-02-12 07:49:00	deliver_add._transition
+42913433-4610-4bea-ab1c-62457f789f23	in_qa	deliver	delivered	qa	2016-10-31 10:37:00	first delivery
+42913433-4610-4bea-ab1c-62457f789f23	delivered	refuse	refused	customer	2016-11-02 00:00:00	refusal
+44037506-2e1f-4442-ab35-2903427548b4	in_qa	deliver	delivered	qa	2016-11-03 17:01:00	first delivery
+44037506-2e1f-4442-ab35-2903427548b4	delivered	refuse	refused	customer	2016-12-01 05:21:00	refusal
+44037506-2e1f-4442-ab35-2903427548b4	refused	require_revision	in_qa	pm		send_back_to_qa
+44037506-2e1f-4442-ab35-2903427548b4	in_qa	deliver	delivered	qa	2017-01-10 14:01:00	deliver_add._transition
+443c0b05-6ee8-4b3e-b3b5-b5b1a0bf9b49	in_qa	deliver	delivered	qa	2017-01-04 10:30:00	first delivery
+443c0b05-6ee8-4b3e-b3b5-b5b1a0bf9b49	delivered	refuse	refused	customer	2017-01-25 11:42:00	refusal
+443c0b05-6ee8-4b3e-b3b5-b5b1a0bf9b49	refused	require_revision	in_qa	pm		send_back_to_qa
+443c0b05-6ee8-4b3e-b3b5-b5b1a0bf9b49	in_qa	deliver	delivered	qa	2017-02-12 07:47:00	deliver_add._transition
+450f917a-0d82-4ae1-93e3-e69cb10ebb8c	in_qa	deliver	delivered	qa	2017-01-03 18:39:00	first delivery
+450f917a-0d82-4ae1-93e3-e69cb10ebb8c	delivered	refuse	refused	customer	2017-01-27 00:00:00	refusal
+450f917a-0d82-4ae1-93e3-e69cb10ebb8c	refused	require_revision	in_qa	pm		send_back_to_qa
+46b5b293-b536-4e68-9859-c92a5788dfca	in_qa	deliver	delivered	qa	2016-11-10 16:20:00	first delivery
+46b5b293-b536-4e68-9859-c92a5788dfca	delivered	refuse	refused	customer	2016-12-08 10:16:00	refusal
+46b5b293-b536-4e68-9859-c92a5788dfca	refused	require_revision	in_qa	pm		send_back_to_qa
+46b5b293-b536-4e68-9859-c92a5788dfca	in_qa	deliver	delivered	qa	2017-01-04 16:32:00	deliver_add._transition
+4d7bdda9-e9ac-44e5-8ce9-3ab619f34441	in_qa	deliver	delivered	qa	2016-12-07 13:56:00	first delivery
+4d7bdda9-e9ac-44e5-8ce9-3ab619f34441	delivered	refuse	refused	customer	2016-12-21 10:43:00	refusal
+4d7bdda9-e9ac-44e5-8ce9-3ab619f34441	refused	require_revision	in_qa	pm		send_back_to_qa
+4d7bdda9-e9ac-44e5-8ce9-3ab619f34441	in_qa	deliver	delivered	qa	2017-01-10 18:46:00	deliver_add._transition
+4ee88634-64bc-4945-ae18-6db3171b4ba2	in_qa	deliver	delivered	qa	2017-01-02 17:05:00	first delivery
+4ee88634-64bc-4945-ae18-6db3171b4ba2	delivered	refuse	refused	customer	2017-01-24 12:11:00	refusal
+4ee88634-64bc-4945-ae18-6db3171b4ba2	refused	require_revision	in_qa	pm		send_back_to_qa
+4ee88634-64bc-4945-ae18-6db3171b4ba2	in_qa	deliver	delivered	qa	2017-02-06 13:35:00	deliver_add._transition
+4f76a538-eb6e-4685-9418-37af4310ceb2	in_qa	deliver	delivered	qa	2016-10-25 11:37:00	first delivery
+4f76a538-eb6e-4685-9418-37af4310ceb2	delivered	refuse	refused	customer	2016-11-25 05:11:00	refusal
+4f7cc816-cf31-4685-b73a-a78106c34d81	in_qa	deliver	delivered	qa	2016-12-28 11:07:00	first delivery
+4f7cc816-cf31-4685-b73a-a78106c34d81	delivered	refuse	refused	customer	2017-01-19 03:53:00	refusal
+4f7cc816-cf31-4685-b73a-a78106c34d81	refused	require_revision	in_qa	pm		send_back_to_qa
+4f7cc816-cf31-4685-b73a-a78106c34d81	in_qa	deliver	delivered	qa	2017-02-08 17:01:00	deliver_add._transition
+51067968-3dc0-4fef-a055-ed5a95f76e6f	in_qa	deliver	delivered	qa	2016-11-30 16:48:00	first delivery
+51067968-3dc0-4fef-a055-ed5a95f76e6f	delivered	refuse	refused	customer	2016-12-21 03:58:00	refusal
+51067968-3dc0-4fef-a055-ed5a95f76e6f	refused	require_revision	in_qa	pm		send_back_to_qa
+53148261-b348-471e-82b3-76bf9a521864	in_qa	deliver	delivered	qa	2016-10-31 13:28:00	first delivery
+53148261-b348-471e-82b3-76bf9a521864	delivered	refuse	refused	customer	2016-11-25 00:00:00	refusal
+53e0a8bb-ba7b-4c0e-8ef8-dfb34066e9ce	in_qa	deliver	delivered	qa	2017-01-04 11:38:00	first delivery
+53e0a8bb-ba7b-4c0e-8ef8-dfb34066e9ce	delivered	refuse	refused	customer	2017-01-25 12:26:00	refusal
+53e0a8bb-ba7b-4c0e-8ef8-dfb34066e9ce	refused	require_revision	in_qa	pm		send_back_to_qa
+53e0a8bb-ba7b-4c0e-8ef8-dfb34066e9ce	in_qa	deliver	delivered	qa	2017-02-08 16:12:00	deliver_add._transition
+5abe3bce-ad41-46ab-ae8b-4ab58c3302a7	in_qa	deliver	delivered	qa	2016-10-27 10:52:00	first delivery
+5abe3bce-ad41-46ab-ae8b-4ab58c3302a7	delivered	refuse	refused	customer	2016-11-28 00:00:00	refusal
+5abe3bce-ad41-46ab-ae8b-4ab58c3302a7	refused	require_revision	in_qa	pm		send_back_to_qa
+5abe3bce-ad41-46ab-ae8b-4ab58c3302a7	in_qa	deliver	delivered	qa	2017-01-19 16:11:00	deliver_add._transition
+5ba464cc-61e1-4146-8a2c-f8e6539b53a8	in_qa	deliver	delivered	qa	2016-12-22 12:15:00	first delivery
+5ba464cc-61e1-4146-8a2c-f8e6539b53a8	delivered	refuse	refused	customer	2016-12-28 04:11:00	refusal
+5ba464cc-61e1-4146-8a2c-f8e6539b53a8	refused	require_revision	in_qa	pm		send_back_to_qa
+5ba464cc-61e1-4146-8a2c-f8e6539b53a8	in_qa	deliver	delivered	qa	2017-02-08 16:53:00	deliver_add._transition
+5e0e6022-2a22-4302-8e7a-acb9330c439f	in_qa	deliver	delivered	qa	2016-10-24 10:54:00	first delivery
+5e0e6022-2a22-4302-8e7a-acb9330c439f	delivered	refuse	refused	customer	2016-11-30 05:10:00	refusal
+5e0e6022-2a22-4302-8e7a-acb9330c439f	refused	require_revision	in_qa	pm		send_back_to_qa
+5e2a3a5f-1da9-4fba-83d7-fdc013b620e6	in_qa	deliver	delivered	qa	2016-11-14 10:34:00	first delivery
+5e2a3a5f-1da9-4fba-83d7-fdc013b620e6	delivered	refuse	refused	customer	2016-12-07 08:45:00	refusal
+5e2a3a5f-1da9-4fba-83d7-fdc013b620e6	refused	require_revision	in_qa	pm		send_back_to_qa
+5e2a3a5f-1da9-4fba-83d7-fdc013b620e6	in_qa	deliver	delivered	qa	2017-01-04 13:14:00	deliver_add._transition
+5e4eac03-2e3a-4182-81a7-ec0dad4f71c2	in_qa	deliver	delivered	qa	2017-01-12 09:49:00	first delivery
+5e4eac03-2e3a-4182-81a7-ec0dad4f71c2	delivered	refuse	refused	customer	2017-01-31 11:37:00	refusal
+5e4eac03-2e3a-4182-81a7-ec0dad4f71c2	refused	require_revision	in_qa	pm		send_back_to_qa
+5e4eac03-2e3a-4182-81a7-ec0dad4f71c2	in_qa	deliver	delivered	qa	2017-02-08 15:49:00	deliver_add._transition
+5eaebd02-6546-49d0-b627-5e5e3e85887d	in_qa	deliver	delivered	qa	2016-11-10 13:22:00	first delivery
+5eaebd02-6546-49d0-b627-5e5e3e85887d	delivered	refuse	refused	customer	2016-11-28 09:55:00	refusal
+5eaebd02-6546-49d0-b627-5e5e3e85887d	refused	require_revision	in_qa	pm	2017-02-10 16:14:00	send_back_to_qa
+68fa122b-f0ee-4d0f-ac81-98d8e6610565	in_qa	deliver	delivered	qa	2016-11-14 14:16:00	first delivery
+68fa122b-f0ee-4d0f-ac81-98d8e6610565	delivered	refuse	refused	customer	2016-12-08 12:38:00	refusal
+68fa122b-f0ee-4d0f-ac81-98d8e6610565	refused	require_revision	in_qa	pm		send_back_to_qa
+68fa122b-f0ee-4d0f-ac81-98d8e6610565	in_qa	deliver	delivered	qa	2017-01-04 18:23:00	deliver_add._transition
+6dab855a-d0fa-4efb-9764-9012363a7be6	in_qa	deliver	delivered	qa	2016-11-02 16:42:00	first delivery
+6dab855a-d0fa-4efb-9764-9012363a7be6	delivered	refuse	refused	customer	2016-11-24 10:18:00	refusal
+6dab855a-d0fa-4efb-9764-9012363a7be6	refused	require_revision	in_qa	pm		send_back_to_qa
+6dab855a-d0fa-4efb-9764-9012363a7be6	in_qa	deliver	delivered	qa	2017-01-12 13:22:00	deliver_add._transition
+6ff386e2-ce91-44d4-809e-7dd3cf007f65	in_qa	deliver	delivered	qa	2017-01-17 12:50:00	first delivery
+6ff386e2-ce91-44d4-809e-7dd3cf007f65	delivered	refuse	refused	customer	2017-02-03 10:02:00	refusal
+6ff386e2-ce91-44d4-809e-7dd3cf007f65	refused	require_revision	in_qa	pm		send_back_to_qa
+6ff386e2-ce91-44d4-809e-7dd3cf007f65	in_qa	deliver	delivered	qa	2017-02-07 16:13:00	deliver_add._transition
+70aed544-6d27-4edc-8b5e-1d9852ca6d9f	in_qa	deliver	delivered	qa	2017-01-11 08:33:00	first delivery
+70aed544-6d27-4edc-8b5e-1d9852ca6d9f	delivered	refuse	refused	customer	2017-01-31 09:07:00	refusal
+70aed544-6d27-4edc-8b5e-1d9852ca6d9f	refused	require_revision	in_qa	pm		send_back_to_qa
+76fc4268-6277-46f7-81cd-0505db7e8891	in_qa	deliver	delivered	qa	2016-12-23 12:55:00	first delivery
+76fc4268-6277-46f7-81cd-0505db7e8891	delivered	refuse	refused	customer	2017-01-10 05:25:00	refusal
+76fc4268-6277-46f7-81cd-0505db7e8891	refused	require_revision	in_qa	pm		send_back_to_qa
+76fc4268-6277-46f7-81cd-0505db7e8891	in_qa	deliver	delivered	qa	2017-02-06 18:18:00	deliver_add._transition
+786dc2ab-af5b-42f6-afe1-f25595f656d8	in_qa	deliver	delivered	qa	2017-01-06 14:50:00	first delivery
+786dc2ab-af5b-42f6-afe1-f25595f656d8	delivered	refuse	refused	customer	2017-01-26 02:43:00	refusal
+786dc2ab-af5b-42f6-afe1-f25595f656d8	refused	require_revision	in_qa	pm		send_back_to_qa
+786dc2ab-af5b-42f6-afe1-f25595f656d8	in_qa	deliver	delivered	qa	2017-02-07 13:24:00	deliver_add._transition
+79ac6f5a-6774-4849-9006-18c8003d2e77	in_qa	deliver	delivered	qa	2016-10-28 09:58:00	first delivery
+79ac6f5a-6774-4849-9006-18c8003d2e77	delivered	refuse	refused	customer	2016-11-03 00:00:00	refusal
+79ac6f5a-6774-4849-9006-18c8003d2e77	refused	require_revision	in_qa	pm		send_back_to_qa
+79ac6f5a-6774-4849-9006-18c8003d2e77	in_qa	deliver	delivered	qa	2017-01-24 18:46:00	deliver_add._transition
+7c8524a9-a8cd-44a3-bd7d-382c7947477f	in_qa	deliver	delivered	qa	2016-12-13 11:57:00	first delivery
+7c8524a9-a8cd-44a3-bd7d-382c7947477f	delivered	refuse	refused	customer	2016-12-23 10:28:00	refusal
+7c8524a9-a8cd-44a3-bd7d-382c7947477f	refused	require_revision	in_qa	pm		send_back_to_qa
+7c8524a9-a8cd-44a3-bd7d-382c7947477f	in_qa	deliver	delivered	qa	2017-01-04 14:06:00	deliver_add._transition
+7c921220-aaa2-4d6d-8b18-bc3f8418bc2b	in_qa	deliver	delivered	qa	2016-12-21 11:06:00	first delivery
+7c921220-aaa2-4d6d-8b18-bc3f8418bc2b	delivered	refuse	refused	customer	2017-01-11 07:23:00	refusal
+7c921220-aaa2-4d6d-8b18-bc3f8418bc2b	refused	require_revision	in_qa	pm	2017-02-10 16:20:00	send_back_to_qa
+7d5b87b8-6f0b-4663-9622-dc8f80d43844	in_qa	deliver	delivered	qa	2017-01-09 10:49:00	first delivery
+7d5b87b8-6f0b-4663-9622-dc8f80d43844	delivered	refuse	refused	customer	2017-01-27 05:56:00	refusal
+7d5b87b8-6f0b-4663-9622-dc8f80d43844	refused	require_revision	in_qa	pm		send_back_to_qa
+7d5b87b8-6f0b-4663-9622-dc8f80d43844	in_qa	deliver	delivered	qa	2017-02-08 17:21:00	deliver_add._transition
+8046a06f-0ab4-411f-93a3-8c6bf68e5a33	in_qa	deliver	delivered	qa	2016-12-14 10:50:00	first delivery
+8046a06f-0ab4-411f-93a3-8c6bf68e5a33	delivered	refuse	refused	customer	2016-12-23 08:29:00	refusal
+8046a06f-0ab4-411f-93a3-8c6bf68e5a33	refused	require_revision	in_qa	pm		send_back_to_qa
+8046a06f-0ab4-411f-93a3-8c6bf68e5a33	in_qa	deliver	delivered	qa	2017-01-25 13:25:00	deliver_add._transition
+82b09471-a73c-42ee-8da2-8ec1b0b9dce8	in_qa	deliver	delivered	qa	2016-12-12 12:05:00	first delivery
+82b09471-a73c-42ee-8da2-8ec1b0b9dce8	delivered	refuse	refused	customer	2017-01-10 05:43:00	refusal
+82b09471-a73c-42ee-8da2-8ec1b0b9dce8	refused	require_revision	in_qa	pm		send_back_to_qa
+82b09471-a73c-42ee-8da2-8ec1b0b9dce8	in_qa	deliver	delivered	qa	2017-01-18 11:46:00	deliver_add._transition
+85674952-249d-46b6-af8a-9f687d38822c	in_qa	deliver	delivered	qa	2016-12-22 11:14:00	first delivery
+85674952-249d-46b6-af8a-9f687d38822c	delivered	refuse	refused	customer	2017-01-10 04:29:00	refusal
+85674952-249d-46b6-af8a-9f687d38822c	refused	require_revision	in_qa	pm		send_back_to_qa
+85674952-249d-46b6-af8a-9f687d38822c	in_qa	deliver	delivered	qa	2017-01-10 15:31:00	deliver_add._transition
+85abd017-f249-4faa-947d-754191712c3b	in_qa	deliver	delivered	qa	2017-01-17 17:21:00	first delivery
+85abd017-f249-4faa-947d-754191712c3b	delivered	refuse	refused	customer	2017-02-03 11:38:00	refusal
+85abd017-f249-4faa-947d-754191712c3b	refused	require_revision	in_qa	pm		send_back_to_qa
+85abd017-f249-4faa-947d-754191712c3b	in_qa	deliver	delivered	qa	2017-02-08 17:16:00	deliver_add._transition
+891aa3d0-1300-4e6e-ab55-51cd535a2758	in_qa	deliver	delivered	qa	2016-12-27 13:07:00	first delivery
+891aa3d0-1300-4e6e-ab55-51cd535a2758	delivered	refuse	refused	customer	2017-01-16 09:47:00	refusal
+891aa3d0-1300-4e6e-ab55-51cd535a2758	refused	require_revision	in_qa	pm		send_back_to_qa
+891aa3d0-1300-4e6e-ab55-51cd535a2758	in_qa	deliver	delivered	qa	2017-02-07 13:41:00	deliver_add._transition
+8a0814b7-ddc7-4082-bd70-d648fb158917	in_qa	deliver	delivered	qa	2016-11-18 14:48:00	first delivery
+8a0814b7-ddc7-4082-bd70-d648fb158917	delivered	refuse	refused	customer	2016-12-08 10:15:00	refusal
+8a0814b7-ddc7-4082-bd70-d648fb158917	refused	require_revision	in_qa	pm		send_back_to_qa
+8a0814b7-ddc7-4082-bd70-d648fb158917	in_qa	deliver	delivered	qa	2017-01-20 12:14:00	deliver_add._transition
+8ab9f893-30be-4c19-a8cc-f64838a2e3b2	in_qa	deliver	delivered	qa	2016-12-23 12:30:00	first delivery
+8ab9f893-30be-4c19-a8cc-f64838a2e3b2	delivered	refuse	refused	customer	2017-01-12 00:00:00	refusal
+8ab9f893-30be-4c19-a8cc-f64838a2e3b2	refused	require_revision	in_qa	pm		send_back_to_qa
+8ab9f893-30be-4c19-a8cc-f64838a2e3b2	in_qa	deliver	delivered	qa	2017-01-31 16:50:00	deliver_add._transition
+8ab9f893-30be-4c19-a8cc-f64838a2e3b2	delivered	refuse	refused	customer	2017-02-10 10:27:00	refusal
+8ab9f893-30be-4c19-a8cc-f64838a2e3b2	refused	require_revision	in_qa	pm		send_back_to_qa
+8b86fc66-9116-418a-afc7-b71200517202	in_qa	deliver	delivered	qa	2017-01-17 11:26:00	first delivery
+8b86fc66-9116-418a-afc7-b71200517202	delivered	refuse	refused	customer	2017-02-10 00:00:00	refusal
+8b86fc66-9116-418a-afc7-b71200517202	refused	require_revision	in_qa	pm		send_back_to_qa
+8e0cd110-dd5a-498a-b7b6-ef496a005b8b	in_qa	deliver	delivered	qa	2017-01-04 15:14:00	first delivery
+8e0cd110-dd5a-498a-b7b6-ef496a005b8b	delivered	refuse	refused	customer	2017-01-25 10:48:00	refusal
+8e0cd110-dd5a-498a-b7b6-ef496a005b8b	refused	require_revision	in_qa	pm		send_back_to_qa
+8e0cd110-dd5a-498a-b7b6-ef496a005b8b	in_qa	deliver	delivered	qa	2017-01-25 14:19:00	deliver_add._transition
+8f31a7f7-5284-408a-aea0-ca279e2ba235	in_qa	deliver	delivered	qa	2016-12-28 11:32:00	first delivery
+8f31a7f7-5284-408a-aea0-ca279e2ba235	delivered	refuse	refused	customer	2017-01-19 09:47:00	refusal
+8f31a7f7-5284-408a-aea0-ca279e2ba235	refused	require_revision	in_qa	pm	2017-02-08 11:32:18	send_back_to_qa
+900e7405-f8f2-4235-b690-5f1361e9a21e	in_qa	deliver	delivered	qa	2016-11-04 10:51:00	first delivery
+900e7405-f8f2-4235-b690-5f1361e9a21e	delivered	refuse	refused	customer	2016-12-08 10:43:00	refusal
+900e7405-f8f2-4235-b690-5f1361e9a21e	refused	require_revision	in_qa	pm		send_back_to_qa
+900e7405-f8f2-4235-b690-5f1361e9a21e	in_qa	deliver	delivered	qa	2017-01-04 18:29:00	deliver_add._transition
+9147920d-fbcb-47fd-86e6-675c7279ee1d	in_qa	deliver	delivered	qa	2017-01-06 10:30:00	first delivery
+9147920d-fbcb-47fd-86e6-675c7279ee1d	delivered	refuse	refused	customer	2017-01-26 11:01:00	refusal
+9147920d-fbcb-47fd-86e6-675c7279ee1d	refused	require_revision	in_qa	pm		send_back_to_qa
+9147920d-fbcb-47fd-86e6-675c7279ee1d	in_qa	deliver	delivered	qa	2017-02-10 10:33:00	deliver_add._transition
+93203713-5f8f-42be-ad24-f803a5ccf9d7	in_qa	deliver	delivered	qa	2017-01-12 10:32:00	first delivery
+93203713-5f8f-42be-ad24-f803a5ccf9d7	delivered	refuse	refused	customer	2017-01-31 12:00:00	refusal
+93203713-5f8f-42be-ad24-f803a5ccf9d7	refused	require_revision	in_qa	pm		send_back_to_qa
+93203713-5f8f-42be-ad24-f803a5ccf9d7	in_qa	deliver	delivered	qa	2017-02-09 11:21:00	deliver_add._transition
+9522a291-e6a2-45b0-9110-3898b65d763d	in_qa	deliver	delivered	qa	2016-10-28 13:26:00	first delivery
+9522a291-e6a2-45b0-9110-3898b65d763d	delivered	refuse	refused	customer	2016-11-03 00:00:00	refusal
+9522a291-e6a2-45b0-9110-3898b65d763d	refused	require_revision	in_qa	pm		send_back_to_qa
+9522a291-e6a2-45b0-9110-3898b65d763d	in_qa	deliver	delivered	qa	2017-01-20 16:10:00	deliver_add._transition
+95708c22-146f-4daa-9ddc-f619d704684d	in_qa	deliver	delivered	qa	2016-12-30 13:45:00	first delivery
+95708c22-146f-4daa-9ddc-f619d704684d	delivered	refuse	refused	customer	2017-01-05 07:43:00	refusal
+95708c22-146f-4daa-9ddc-f619d704684d	refused	require_revision	in_qa	pm		send_back_to_qa
+95708c22-146f-4daa-9ddc-f619d704684d	in_qa	deliver	delivered	qa	2017-02-07 13:24:00	deliver_add._transition
+9e6a0189-2265-4c6c-9e4e-e758153be94d	in_qa	deliver	delivered	qa	2017-01-09 14:22:00	first delivery
+9e6a0189-2265-4c6c-9e4e-e758153be94d	delivered	refuse	refused	customer	2017-01-27 04:39:00	refusal
+9e6a0189-2265-4c6c-9e4e-e758153be94d	refused	require_revision	in_qa	pm		send_back_to_qa
+9e6a0189-2265-4c6c-9e4e-e758153be94d	in_qa	deliver	delivered	qa	2017-02-08 16:02:00	deliver_add._transition
+9fda8587-4c47-4174-b443-8746fadde42c	in_qa	deliver	delivered	qa	2016-12-09 13:27:00	first delivery
+9fda8587-4c47-4174-b443-8746fadde42c	delivered	refuse	refused	customer	2016-12-22 09:20:00	refusal
+9fda8587-4c47-4174-b443-8746fadde42c	refused	require_revision	in_qa	pm		send_back_to_qa
+9fda8587-4c47-4174-b443-8746fadde42c	in_qa	deliver	delivered	qa	2017-01-24 18:55:00	deliver_add._transition
+a0954913-b8ba-48cd-9c2d-1ca990769e63	in_qa	deliver	delivered	qa	2017-01-03 16:18:00	first delivery
+a0954913-b8ba-48cd-9c2d-1ca990769e63	delivered	refuse	refused	customer	2017-01-25 08:20:00	refusal
+a0954913-b8ba-48cd-9c2d-1ca990769e63	refused	require_revision	in_qa	pm		send_back_to_qa
+a2b0a02d-199a-47e9-82a9-e624b911a1f5	in_qa	deliver	delivered	qa	2016-11-10 15:31:00	first delivery
+a2b0a02d-199a-47e9-82a9-e624b911a1f5	delivered	refuse	refused	customer	2016-11-29 12:16:00	refusal
+a2b0a02d-199a-47e9-82a9-e624b911a1f5	refused	require_revision	in_qa	pm	2017-01-10 17:25:04	send_back_to_qa
+a2e7be4a-e0fe-4b64-8714-4f9a3231ae89	in_qa	deliver	delivered	qa	2017-01-04 12:27:00	first delivery
+a2e7be4a-e0fe-4b64-8714-4f9a3231ae89	delivered	refuse	refused	customer	2017-01-25 10:37:00	refusal
+a2e7be4a-e0fe-4b64-8714-4f9a3231ae89	refused	require_revision	in_qa	pm		send_back_to_qa
+a2e7be4a-e0fe-4b64-8714-4f9a3231ae89	in_qa	deliver	delivered	qa	2017-02-06 13:47:00	deliver_add._transition
+a31cb36e-0621-443a-9911-3e230eb97de8	in_qa	deliver	delivered	qa	2016-11-21 11:36:00	first delivery
+a31cb36e-0621-443a-9911-3e230eb97de8	delivered	refuse	refused	customer	2016-12-08 10:59:00	refusal
+a31cb36e-0621-443a-9911-3e230eb97de8	refused	require_revision	in_qa	pm		send_back_to_qa
+a31cb36e-0621-443a-9911-3e230eb97de8	in_qa	deliver	delivered	qa	2017-01-18 11:29:00	deliver_add._transition
+ade9fa0c-c2ae-4588-9935-59b3ecd027de	in_qa	deliver	delivered	qa	2016-11-10 16:27:00	first delivery
+ade9fa0c-c2ae-4588-9935-59b3ecd027de	delivered	refuse	refused	customer	2016-11-28 10:09:00	refusal
+ade9fa0c-c2ae-4588-9935-59b3ecd027de	refused	require_revision	in_qa	pm		send_back_to_qa
+ade9fa0c-c2ae-4588-9935-59b3ecd027de	in_qa	deliver	delivered	qa	2017-01-20 16:11:00	deliver_add._transition
+b0ad195e-bd2c-4353-b2b1-4297659b0f6c	in_qa	deliver	delivered	qa	2017-01-19 15:08:00	first delivery
+b0ad195e-bd2c-4353-b2b1-4297659b0f6c	delivered	refuse	refused	customer	2017-02-07 09:27:59	refusal
+b0ad195e-bd2c-4353-b2b1-4297659b0f6c	refused	require_revision	in_qa	pm	2017-02-07 10:29:50	send_back_to_qa
+b0ad195e-bd2c-4353-b2b1-4297659b0f6c	in_qa	deliver	delivered	qa	2017-02-07 13:23:00	deliver_add._transition
+b3ea2f22-0b92-4f04-9fa6-a4b915fc74f2	in_qa	deliver	delivered	qa	2016-12-22 12:43:00	first delivery
+b3ea2f22-0b92-4f04-9fa6-a4b915fc74f2	delivered	refuse	refused	customer	2017-01-11 09:28:00	refusal
+b3ea2f22-0b92-4f04-9fa6-a4b915fc74f2	refused	require_revision	in_qa	pm		send_back_to_qa
+b3ea2f22-0b92-4f04-9fa6-a4b915fc74f2	in_qa	deliver	delivered	qa	2017-02-08 03:37:00	deliver_add._transition
+b69ca315-b5ca-4362-8ed3-d46a56bfb025	in_qa	deliver	delivered	qa	2016-11-07 15:30:00	first delivery
+b69ca315-b5ca-4362-8ed3-d46a56bfb025	delivered	refuse	refused	customer	2016-12-01 04:58:00	refusal
+b69ca315-b5ca-4362-8ed3-d46a56bfb025	refused	require_revision	in_qa	pm	2016-12-08 09:35:00	send_back_to_qa
+b69ca315-b5ca-4362-8ed3-d46a56bfb025	in_qa	deliver	delivered	qa	2017-02-17 18:04:26	deliver_add._transition
+b7021ea8-9fdd-4b01-93a5-6241e36d2194	in_qa	deliver	delivered	qa	2016-10-04 11:43:00	first delivery
+b7021ea8-9fdd-4b01-93a5-6241e36d2194	delivered	refuse	refused	customer	2016-10-17 00:00:00	refusal
+b7021ea8-9fdd-4b01-93a5-6241e36d2194	refused	require_revision	in_qa	pm		send_back_to_qa
+b7021ea8-9fdd-4b01-93a5-6241e36d2194	in_qa	deliver	delivered	qa	2017-01-06 18:30:00	deliver_add._transition
+bb41a246-76b6-43c8-ad5b-4cb9826f9b0f	in_qa	deliver	delivered	qa	2016-12-07 09:54:00	first delivery
+bb41a246-76b6-43c8-ad5b-4cb9826f9b0f	delivered	refuse	refused	customer	2016-12-21 09:09:00	refusal
+bb41a246-76b6-43c8-ad5b-4cb9826f9b0f	refused	require_revision	in_qa	pm	2017-01-20 12:08:04	send_back_to_qa
+bb41a246-76b6-43c8-ad5b-4cb9826f9b0f	in_qa	deliver	delivered	qa	2017-01-25 13:55:00	deliver_add._transition
+bb895e5e-1039-42e8-952c-bfb5af8df0f1	in_qa	deliver	delivered	qa	2016-12-27 10:23:00	first delivery
+bb895e5e-1039-42e8-952c-bfb5af8df0f1	delivered	refuse	refused	customer	2017-01-16 11:59:00	refusal
+bb895e5e-1039-42e8-952c-bfb5af8df0f1	refused	require_revision	in_qa	pm	2017-02-10 17:39:12	send_back_to_qa
+bc221561-db37-476c-b10c-6c84dc0fe3d1	in_qa	deliver	delivered	qa	2017-01-02 13:14:00	first delivery
+bc221561-db37-476c-b10c-6c84dc0fe3d1	delivered	refuse	refused	customer	2017-01-20 10:48:00	refusal
+bc221561-db37-476c-b10c-6c84dc0fe3d1	refused	require_revision	in_qa	pm	2017-02-07 11:00:00	send_back_to_qa
+bd4c9cb7-09be-407e-a5f1-9913471542f3	in_qa	deliver	delivered	qa	2017-01-16 15:45:00	first delivery
+bd4c9cb7-09be-407e-a5f1-9913471542f3	delivered	refuse	refused	customer	2017-02-02 08:50:58	refusal
+bd4c9cb7-09be-407e-a5f1-9913471542f3	refused	require_revision	in_qa	pm	2017-02-02 08:55:18	send_back_to_qa
+bd4c9cb7-09be-407e-a5f1-9913471542f3	in_qa	deliver	delivered	qa	2017-02-06 16:50:00	deliver_add._transition
+bfafffeb-5c15-4094-b829-29387bc34156	in_qa	deliver	delivered	qa	2016-11-10 14:57:00	first delivery
+bfafffeb-5c15-4094-b829-29387bc34156	delivered	refuse	refused	customer	2016-11-29 07:58:00	refusal
+bfafffeb-5c15-4094-b829-29387bc34156	refused	require_revision	in_qa	pm	2016-12-08 09:39:25	send_back_to_qa
+bfafffeb-5c15-4094-b829-29387bc34156	in_qa	deliver	delivered	qa	2017-01-10 12:52:00	deliver_add._transition
+bfb92b78-1587-404a-9255-66dddfab70a2	in_qa	deliver	delivered	qa	2016-11-11 12:12:00	first delivery
+bfb92b78-1587-404a-9255-66dddfab70a2	delivered	refuse	refused	customer	2016-12-14 05:32:00	refusal
+bfb92b78-1587-404a-9255-66dddfab70a2	refused	require_revision	in_qa	pm	2017-02-10 15:18:02	send_back_to_qa
+c15ca4f1-3aba-49ad-a6c2-da6437b3ec89	in_qa	deliver	delivered	qa	2016-12-28 15:46:00	first delivery
+c15ca4f1-3aba-49ad-a6c2-da6437b3ec89	delivered	refuse	refused	customer	2017-01-18 15:19:00	refusal
+c15ca4f1-3aba-49ad-a6c2-da6437b3ec89	refused	require_revision	in_qa	pm	2017-01-19 14:29:57	send_back_to_qa
+c15ca4f1-3aba-49ad-a6c2-da6437b3ec89	in_qa	deliver	delivered	qa	2017-01-19 16:10:00	deliver_add._transition
+c38236cd-f4af-4523-86ba-711680fc40c3	in_qa	deliver	delivered	qa	2017-01-10 09:06:00	first delivery
+c38236cd-f4af-4523-86ba-711680fc40c3	delivered	refuse	refused	customer	2017-01-30 10:45:00	refusal
+c38236cd-f4af-4523-86ba-711680fc40c3	refused	require_revision	in_qa	pm	2017-02-08 11:56:33	send_back_to_qa
+c38236cd-f4af-4523-86ba-711680fc40c3	in_qa	deliver	delivered	qa	2017-02-08 13:57:00	deliver_add._transition
+c3c394b9-8172-49b9-8c22-46cdd7fefbf0	in_qa	deliver	delivered	qa	2017-01-04 11:23:00	first delivery
+c3c394b9-8172-49b9-8c22-46cdd7fefbf0	delivered	refuse	refused	customer	2017-01-25 12:14:00	refusal
+c3c394b9-8172-49b9-8c22-46cdd7fefbf0	refused	require_revision	in_qa	pm	2017-02-07 12:56:11	send_back_to_qa
+cb1f55f3-ed06-41a2-884b-8f1603f0fa47	in_qa	deliver	delivered	qa	2017-01-13 12:35:00	first delivery
+cb1f55f3-ed06-41a2-884b-8f1603f0fa47	delivered	refuse	refused	customer	2017-02-01 08:26:00	refusal
+cb1f55f3-ed06-41a2-884b-8f1603f0fa47	refused	require_revision	in_qa	pm	2017-02-07 12:20:18	send_back_to_qa
+cb1f55f3-ed06-41a2-884b-8f1603f0fa47	in_qa	deliver	delivered	qa	2017-02-08 17:38:00	deliver_add._transition
+cd31225b-95c6-4b7d-bcae-67b1e75689bc	in_qa	deliver	delivered	qa	2016-12-02 14:59:00	first delivery
+cd31225b-95c6-4b7d-bcae-67b1e75689bc	delivered	refuse	refused	customer	2016-12-20 08:27:00	refusal
+cd31225b-95c6-4b7d-bcae-67b1e75689bc	refused	require_revision	in_qa	pm	2017-02-10 17:15:03	send_back_to_qa
+cd31225b-95c6-4b7d-bcae-67b1e75689bc	in_qa	deliver	delivered	qa	2017-02-10 18:22:00	deliver_add._transition
+cd9ba87c-a613-444c-ad52-6e2c19b541ec	in_qa	deliver	delivered	qa	2017-01-11 15:03:00	first delivery
+cd9ba87c-a613-444c-ad52-6e2c19b541ec	delivered	refuse	refused	customer	2017-01-31 10:39:00	refusal
+cd9ba87c-a613-444c-ad52-6e2c19b541ec	refused	require_revision	in_qa	pm	2017-02-07 10:57:49	send_back_to_qa
+cd9ba87c-a613-444c-ad52-6e2c19b541ec	in_qa	deliver	delivered	qa	2017-02-09 13:11:00	deliver_add._transition
+cf469545-063f-41b8-b09c-5ae09f6a4a7c	in_qa	deliver	delivered	qa	2017-01-03 18:59:00	first delivery
+cf469545-063f-41b8-b09c-5ae09f6a4a7c	delivered	refuse	refused	customer	2017-01-24 11:41:14	refusal
+cf469545-063f-41b8-b09c-5ae09f6a4a7c	refused	require_revision	in_qa	pm	2017-02-10 17:44:03	send_back_to_qa
+cf6c20aa-f91a-428a-bb83-ce5e7224c5f8	in_qa	deliver	delivered	qa	2016-11-01 18:04:00	first delivery
+cf6c20aa-f91a-428a-bb83-ce5e7224c5f8	delivered	refuse	refused	customer	2017-01-10 16:49:00	refusal
+cf6c20aa-f91a-428a-bb83-ce5e7224c5f8	refused	require_revision	in_qa	pm	2017-01-10 16:51:18	send_back_to_qa
+cf6c20aa-f91a-428a-bb83-ce5e7224c5f8	in_qa	deliver	delivered	qa	2017-01-12 12:59:00	deliver_add._transition
+d14d1499-d97f-4833-9697-e451a3ff3498	in_qa	deliver	delivered	qa	2016-11-14 11:00:00	first delivery
+d14d1499-d97f-4833-9697-e451a3ff3498	delivered	refuse	refused	customer	2016-12-07 09:22:00	refusal
+d14d1499-d97f-4833-9697-e451a3ff3498	refused	require_revision	in_qa	pm	2016-12-08 09:40:42	send_back_to_qa
+d14d1499-d97f-4833-9697-e451a3ff3498	in_qa	deliver	delivered	qa	2017-01-04 12:23:00	deliver_add._transition
+d4a9aba2-4e86-469d-956a-5f0e6650aa3e	in_qa	deliver	delivered	qa	2016-12-15 10:53:00	first delivery
+d4a9aba2-4e86-469d-956a-5f0e6650aa3e	delivered	refuse	refused	customer	2017-01-16 04:51:00	refusal
+d4a9aba2-4e86-469d-956a-5f0e6650aa3e	refused	require_revision	in_qa	pm	2017-01-17 11:28:53	send_back_to_qa
+d4a9aba2-4e86-469d-956a-5f0e6650aa3e	in_qa	deliver	delivered	qa	2017-01-18 11:54:00	deliver_add._transition
+d4a9aba2-4e86-469d-956a-5f0e6650aa3e	delivered	refuse	refused	customer	2017-02-10 08:49:00	refusal
+d4a9aba2-4e86-469d-956a-5f0e6650aa3e	refused	require_revision	in_qa	pm	2017-02-10 16:56:47	send_back_to_qa
+d63d43f8-63a8-4920-8a09-968cd563de00	in_qa	deliver	delivered	qa	2016-12-22 16:46:00	first delivery
+d63d43f8-63a8-4920-8a09-968cd563de00	delivered	refuse	refused	customer	2017-01-10 04:56:00	refusal
+d63d43f8-63a8-4920-8a09-968cd563de00	refused	require_revision	in_qa	pm	2017-01-10 12:59:57	send_back_to_qa
+d63d43f8-63a8-4920-8a09-968cd563de00	in_qa	deliver	delivered	qa	2017-01-12 13:20:00	deliver_add._transition
+d68ba673-ee1e-4ef3-ac82-63eb21414510	in_qa	deliver	delivered	qa	2016-11-18 11:04:00	first delivery
+d68ba673-ee1e-4ef3-ac82-63eb21414510	delivered	refuse	refused	customer	2016-12-08 09:09:00	refusal
+d68ba673-ee1e-4ef3-ac82-63eb21414510	refused	require_revision	in_qa	pm	2016-12-08 09:10:00	send_back_to_qa
+d68ba673-ee1e-4ef3-ac82-63eb21414510	in_qa	deliver	delivered	qa	2017-01-10 14:57:00	deliver_add._transition
+da270950-8938-4198-9c39-d117b7039f8d	in_qa	deliver	delivered	qa	2016-11-01 18:00:00	first delivery
+da270950-8938-4198-9c39-d117b7039f8d	delivered	refuse	refused	customer	2016-12-08 09:38:00	refusal
+da270950-8938-4198-9c39-d117b7039f8d	refused	require_revision	in_qa	pm	2016-12-08 09:38:00	send_back_to_qa
+da270950-8938-4198-9c39-d117b7039f8d	in_qa	deliver	delivered	qa	2017-01-04 14:05:00	deliver_add._transition
+e027176d-b217-43df-ba47-8e08ef22497c	in_qa	deliver	delivered	qa	2016-11-10 11:39:00	first delivery
+e027176d-b217-43df-ba47-8e08ef22497c	delivered	refuse	refused	customer	2016-11-29 12:38:00	refusal
+e027176d-b217-43df-ba47-8e08ef22497c	refused	require_revision	in_qa	pm	2017-01-20 16:12:21	send_back_to_qa
+e027176d-b217-43df-ba47-8e08ef22497c	in_qa	deliver	delivered	qa	2017-01-25 14:20:00	deliver_add._transition
+e3614955-58a6-4ef2-9c2b-fe6335899881	in_qa	deliver	delivered	qa	2016-12-23 12:03:00	first delivery
+e3614955-58a6-4ef2-9c2b-fe6335899881	delivered	refuse	refused	customer	2017-01-13 08:32:00	refusal
+e3614955-58a6-4ef2-9c2b-fe6335899881	refused	require_revision	in_qa	pm	2017-01-20 16:28:22	send_back_to_qa
+e3614955-58a6-4ef2-9c2b-fe6335899881	in_qa	deliver	delivered	qa	2017-01-24 18:48:00	deliver_add._transition
+e4bce5b7-8629-4a58-ab1d-85f6206bd7d1	in_qa	deliver	delivered	qa	2016-11-28 14:52:00	first delivery
+e4bce5b7-8629-4a58-ab1d-85f6206bd7d1	delivered	refuse	refused	customer	2016-12-20 09:23:00	refusal
+e4bce5b7-8629-4a58-ab1d-85f6206bd7d1	refused	require_revision	in_qa	pm	2017-01-02 16:19:23	send_back_to_qa
+e4bce5b7-8629-4a58-ab1d-85f6206bd7d1	in_qa	deliver	delivered	qa	2017-01-05 11:56:00	deliver_add._transition
+e4bfc4fa-6532-4139-9059-bf8a9110ba55	in_qa	deliver	delivered	qa	2016-10-27 13:02:00	first delivery
+e4bfc4fa-6532-4139-9059-bf8a9110ba55	delivered	refuse	refused	customer	2016-11-28 00:00:00	refusal
+e4bfc4fa-6532-4139-9059-bf8a9110ba55	refused	require_revision	in_qa	pm	2016-12-08 09:42:02	send_back_to_qa
+e4bfc4fa-6532-4139-9059-bf8a9110ba55	in_qa	deliver	delivered	qa	2017-01-31 12:47:00	deliver_add._transition
+e5a95346-1c56-4a38-a1d4-bb5e858efbc6	in_qa	deliver	delivered	qa	2016-12-29 09:44:00	first delivery
+e5a95346-1c56-4a38-a1d4-bb5e858efbc6	delivered	refuse	refused	customer	2017-01-18 04:19:20	refusal
+e5a95346-1c56-4a38-a1d4-bb5e858efbc6	refused	require_revision	in_qa	pm	2017-01-18 13:03:12	send_back_to_qa
+e5a95346-1c56-4a38-a1d4-bb5e858efbc6	in_qa	deliver	delivered	qa	2017-01-18 17:42:00	deliver_add._transition
+e5a95346-1c56-4a38-a1d4-bb5e858efbc6	delivered	refuse	refused	customer	2017-02-10 10:00:51	refusal
+e5a95346-1c56-4a38-a1d4-bb5e858efbc6	refused	require_revision	in_qa	pm	2017-02-10 17:12:02	send_back_to_qa
+e7b9e972-6cf6-4a80-8abe-80c1ad0c7d1b	in_qa	deliver	delivered	qa	2016-10-27 13:47:00	first delivery
+e7b9e972-6cf6-4a80-8abe-80c1ad0c7d1b	delivered	refuse	refused	customer	2016-10-28 12:00:00	refusal
+e7b9e972-6cf6-4a80-8abe-80c1ad0c7d1b	refused	require_revision	in_qa	pm	2017-02-10 15:12:12	send_back_to_qa
+eb42057b-598f-422b-840e-45e0e567eec6	in_qa	deliver	delivered	qa	2016-11-08 13:24:00	first delivery
+eb42057b-598f-422b-840e-45e0e567eec6	delivered	refuse	refused	customer	2016-11-28 06:05:00	refusal
+eb42057b-598f-422b-840e-45e0e567eec6	refused	require_revision	in_qa	pm	2016-12-08 09:37:10	send_back_to_qa
+eb42057b-598f-422b-840e-45e0e567eec6	in_qa	deliver	delivered	qa	2017-01-10 18:31:00	deliver_add._transition
+ece89050-e4a2-47c9-b367-6e94d1984c42	in_qa	deliver	delivered	qa	2017-01-04 11:48:00	first delivery
+ece89050-e4a2-47c9-b367-6e94d1984c42	delivered	refuse	refused	customer	2017-01-25 12:33:00	refusal
+ece89050-e4a2-47c9-b367-6e94d1984c42	refused	require_revision	in_qa	pm	2017-02-07 12:23:03	send_back_to_qa
+ee47711b-4eee-404b-acf2-a9cb722a0eaa	in_qa	deliver	delivered	qa	2016-12-09 13:04:00	first delivery
+ee47711b-4eee-404b-acf2-a9cb722a0eaa	delivered	refuse	refused	customer	2016-12-22 08:55:00	refusal
+ee47711b-4eee-404b-acf2-a9cb722a0eaa	refused	require_revision	in_qa	pm	2017-02-07 10:21:09	send_back_to_qa
+efd3303d-0647-4c8e-9a96-96f9eee62cd3	in_qa	deliver	delivered	qa	2017-01-03 17:40:00	first delivery
+efd3303d-0647-4c8e-9a96-96f9eee62cd3	delivered	refuse	refused	customer	2017-01-24 11:20:00	refusal
+efd3303d-0647-4c8e-9a96-96f9eee62cd3	refused	require_revision	in_qa	pm	2017-02-07 10:47:11	send_back_to_qa
+f23369ef-59e5-4ada-8cb2-4c70d18cf9d5	in_qa	deliver	delivered	qa	2016-12-08 11:41:00	first delivery
+f23369ef-59e5-4ada-8cb2-4c70d18cf9d5	delivered	refuse	refused	customer	2016-12-21 11:55:00	refusal
+f23369ef-59e5-4ada-8cb2-4c70d18cf9d5	refused	require_revision	in_qa	pm	2017-01-04 17:15:30	send_back_to_qa
+f23369ef-59e5-4ada-8cb2-4c70d18cf9d5	in_qa	deliver	delivered	qa	2017-01-10 13:43:00	deliver_add._transition
+f23369ef-59e5-4ada-8cb2-4c70d18cf9d5	delivered	refuse	refused	customer	2017-02-10 08:28:00	refusal
+f23369ef-59e5-4ada-8cb2-4c70d18cf9d5	refused	require_revision	in_qa	pm	2017-02-10 15:15:55	send_back_to_qa
+f761f415-abc7-4e41-a9de-0e8c076380ca	in_qa	deliver	delivered	qa	2017-01-24 08:08:00	first delivery
+f761f415-abc7-4e41-a9de-0e8c076380ca	delivered	refuse	refused	customer	2017-02-10 06:23:00	refusal
+f761f415-abc7-4e41-a9de-0e8c076380ca	refused	require_revision	in_qa	pm	2017-02-10 17:23:54	send_back_to_qa
+f89f491a-d79b-44f7-a3e4-ac81bf697f39	in_qa	deliver	delivered	qa	2016-10-14 13:43:00	first delivery
+f89f491a-d79b-44f7-a3e4-ac81bf697f39	delivered	refuse	refused	customer	2016-11-01 00:00:00	last_refusal_date
+f8e61016-1a48-43f8-85df-f5e5d82930d9	in_qa	deliver	delivered	qa	2016-12-16 13:13:00	first delivery
+f8e61016-1a48-43f8-85df-f5e5d82930d9	delivered	refuse	refused	customer	2017-01-16 05:41:00	refusal
+f8e61016-1a48-43f8-85df-f5e5d82930d9	refused	require_revision	in_qa	pm	2017-01-17 11:32:04	send_back_to_qa
+f8e61016-1a48-43f8-85df-f5e5d82930d9	in_qa	deliver	delivered	qa	2017-01-23 12:15:00	deliver_add._transition
+f8e61016-1a48-43f8-85df-f5e5d82930d9	delivered	refuse	refused	customer	2017-02-10 09:59:00	refusal
+f8e61016-1a48-43f8-85df-f5e5d82930d9	refused	require_revision	in_qa	pm	2017-02-10 17:06:48	send_back_to_qa
+f93d7478-fd4a-48ca-98f9-39d8572008ae	in_qa	deliver	delivered	qa	2016-12-29 10:28:00	first delivery
+f93d7478-fd4a-48ca-98f9-39d8572008ae	delivered	refuse	refused	customer	2017-01-19 11:11:00	refusal
+f93d7478-fd4a-48ca-98f9-39d8572008ae	refused	require_revision	in_qa	pm	2017-02-08 11:27:01	send_back_to_qa
+f93d7478-fd4a-48ca-98f9-39d8572008ae	in_qa	deliver	delivered	qa	2017-02-08 16:34:00	deliver_add._transition
+fa71149c-347e-47b2-9d29-8a580af99e26	in_qa	deliver	delivered	qa	2016-10-31 15:36:00	first delivery
+fa71149c-347e-47b2-9d29-8a580af99e26	delivered	refuse	refused	customer	2016-11-25 00:00:00	last_refusal_date
+fccacd50-d8b3-4cba-a827-8218c7b84056	in_qa	deliver	delivered	qa	2016-11-09 12:53:00	first delivery
+fccacd50-d8b3-4cba-a827-8218c7b84056	delivered	refuse	refused	customer	2016-11-28 04:29:00	refusal
+fccacd50-d8b3-4cba-a827-8218c7b84056	refused	require_revision	in_qa	pm	2017-01-19 15:27:29	send_back_to_qa
+fccacd50-d8b3-4cba-a827-8218c7b84056	in_qa	deliver	delivered	qa	2017-01-19 18:12:00	deliver_add._transition
+fce461fa-c521-4bb7-884c-392dded8d77a	in_qa	deliver	delivered	qa	2017-01-11 11:10:00	first delivery
+fce461fa-c521-4bb7-884c-392dded8d77a	delivered	refuse	refused	customer	2017-01-31 09:44:00	refusal
+fce461fa-c521-4bb7-884c-392dded8d77a	refused	require_revision	in_qa	pm	2017-02-07 11:14:33	send_back_to_qa
+fce461fa-c521-4bb7-884c-392dded8d77a	in_qa	deliver	delivered	qa	2017-02-08 17:08:00	deliver_add._transition
+ffd41cb5-9fd1-4077-81bb-84b984c43a99	in_qa	deliver	delivered	qa	2016-11-28 13:54:00	first delivery
+ffd41cb5-9fd1-4077-81bb-84b984c43a99	delivered	refuse	refused	customer	2016-12-20 08:51:00	refusal
+ffd41cb5-9fd1-4077-81bb-84b984c43a99	refused	require_revision	in_qa	pm	2017-01-02 16:23:13	send_back_to_qa
+ffd41cb5-9fd1-4077-81bb-84b984c43a99	in_qa	deliver	delivered	qa	2017-02-06 18:10:00	deliver_add._transition
