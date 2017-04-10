@@ -1,0 +1,8 @@
+assignment_uid	previous_assignment_status	transition_name	current_assignment_status	user_role	date_time	new_previous_assignment_status	new_transition_name	new_current_assignment_status	new_user_role	new_date_time	comment
+eff3b747-385a-45be-ab74-a716c81bec17	in_qa	reject	awaiting_assets	qa	2016-12-21 10:00:00	in_qa	approve	approved	qa	2016-12-21 10:00:00	### Delete message
+86d8f1c2-6d6a-4eb9-ae3e-cec51d5d9127	in_qa	reject	awaiting_assets	qa	2016-11-03 16:08:00	in_qa	approve	approved	qa	2016-11-03 16:08:00	### Delete message
+e4023192-8c02-4104-9ae4-66f372bb28a2	in_qa	reject	awaiting_assets	qa	2016-10-28 13:06:00	in_qa	approve	approved	qa	2016-10-28 13:06:00	### Delete message
+469f4298-5add-412f-829f-cb14cfc1ad98	in_qa	reject	awaiting_assets	qa	2016-11-07 11:18:00	in_qa	approve	approved	qa	2016-11-07 11:18:00	### Delete message
+68732a45-c9a1-4990-817a-29a88bf77a90	in_qa	reject	awaiting_assets	qa	2016-12-20 12:08:00	in_qa	approve	approved	qa	2016-12-20 12:08:00	### Delete message
+c99f0637-1695-4cee-b861-a5ddcf332976	in_qa	reject	awaiting_assets	qa	2016-11-02 12:49:00	in_qa	approve	approved	qa	2016-11-02 12:49:00	### Delete message
+9f671c1e-b1ea-492d-80ca-a57f0ccc64f6	in_qa	reject	awaiting_assets	qa	2016-11-03 16:36:00	in_qa	approve	approved	qa	2016-11-03 16:36:00	### Delete message

@@ -4,87 +4,23 @@ Assignments: Approve, Refuse, Return to QA.
 Orders: Deliver, Refuse, Require Revision.
 """
 from briefy.leica.db import Session
+from briefy.leica.models import Assignment
 from briefy.leica.models import Order
 from briefy.leica.sync.db import configure
 from dateutil.parser import parse
+from pprint import pprint
 
+import csv
 import pytz
 import transaction
 
 
-fieldnames = ['uid', 'previous_order_status', 'transition_name',
-              'new_order_status', 'user_role', 'date_time', 'comment']
-data = [
-    ("fce461fa-c521-4bb7-884c-392dded8d77a", "in_qa", "deliver",
-     "delivered", "qa", "11.01.2017", "first delivery",),
-    ("fce461fa-c521-4bb7-884c-392dded8d77a", "delivered", "refuse",
-     "refused", "customer", "31.01.2017", "first refusal",),
-    ("fce461fa-c521-4bb7-884c-392dded8d77a", "refused", "require_revision", "in_qa", "pm", "",
-     "sent back to QA_missing date",),
-    ("fce461fa-c521-4bb7-884c-392dded8d77a", "in_qa", "deliver",
-     "delivered", "qa", "08.02.2017", "second delivery",),
-    ("fce461fa-c521-4bb7-884c-392dded8d77a", "delivered", "accept",
-     "accepted", "customer", "14.02.2017", "acceptance",),
-    ("4d7bdda9-e9ac-44e5-8ce9-3ab619f34441", "in_qa", "deliver",
-     "delivered", "qa", "07.12.2016", "first delivery",),
-    ("4d7bdda9-e9ac-44e5-8ce9-3ab619f34441", "delivered", "refuse",
-     "refused", "customer", "21.12.2016", "first refusal",),
-    ("4d7bdda9-e9ac-44e5-8ce9-3ab619f34441", "refused", "require_revision", "in_qa", "pm", "",
-     "sent back to QA_missing date",),
-    ("4d7bdda9-e9ac-44e5-8ce9-3ab619f34441", "in_qa", "deliver",
-     "delivered", "qa", "10.01.2017", "second delivery",),
-    ("4d7bdda9-e9ac-44e5-8ce9-3ab619f34441", "delivered", "refuse",
-     "refused", "customer", "16.02.2017", "second refusal",),
-    ("cd31225b-95c6-4b7d-bcae-67b1e75689bc", "in_qa", "deliver",
-     "delivered", "qa", "02.12.2016", "first delivery",),
-    ("cd31225b-95c6-4b7d-bcae-67b1e75689bc", "delivered", "refuse",
-     "refused", "customer", "20.12.2016", "first refusal",),
-    ("cd31225b-95c6-4b7d-bcae-67b1e75689bc", "refused", "require_revision",
-     "in_qa", "pm", "", "sent back to QA_missing date",),
-    ("cd31225b-95c6-4b7d-bcae-67b1e75689bc", "in_qa", "deliver",
-     "delivered", "qa", "10.02.2017", "second delivery",),
-    ("b3ea2f22-0b92-4f04-9fa6-a4b915fc74f2", "in_qa", "deliver",
-     "delivered", "qa", "22.12.2016", "first delivery",),
-    ("b3ea2f22-0b92-4f04-9fa6-a4b915fc74f2", "delivered", "refuse",
-     "refused", "customer", "11.01.2017", "first refusal",),
-    ("b3ea2f22-0b92-4f04-9fa6-a4b915fc74f2", "refused", "require_revision", "in_qa", "pm", "",
-     "sent back to QA_missing date",),
-    ("b3ea2f22-0b92-4f04-9fa6-a4b915fc74f2", "in_qa", "deliver",
-     "delivered", "qa", "08.02.2017", "second delivery",),
-    ("b3ea2f22-0b92-4f04-9fa6-a4b915fc74f2", "delivered", "refuse",
-     "refused", "customer", "20.02.2017", "second refusal",),
-    ("cf6c20aa-f91a-428a-bb83-ce5e7224c5f8", "in_qa", "deliver", "delivered", "qa", "01.11.2016",
-     "first delivery_in Leica",),
-    ("cf6c20aa-f91a-428a-bb83-ce5e7224c5f8", "delivered", "refuse",
-     "refused", "customer", "10.01.2017", "first refusal_missing",),
-    ("cf6c20aa-f91a-428a-bb83-ce5e7224c5f8", "refused", "require_revision", "in_qa", "pm", "",
-     "sent back to QA_missing date",),
-    ("cf6c20aa-f91a-428a-bb83-ce5e7224c5f8", "in_qa", "deliver",
-     "delivered", "qa", "12.01.2017", "second delivery",),
-    ("cf6c20aa-f91a-428a-bb83-ce5e7224c5f8", "delivered", "refuse",
-     "refused", "customer", "21.02.2017",
-     "second refusal",),
-    ("d14d1499-d97f-4833-9697-e451a3ff3498", "in_qa", "deliver", "delivered", "qa", "14.11.2016",
-     "first delivery_in Leica",),
-    ("d14d1499-d97f-4833-9697-e451a3ff3498", "delivered", "refuse",
-     "refused", "customer", "07.12.2016",
-     "first refusal_missing",),
-    ("d14d1499-d97f-4833-9697-e451a3ff3498", "refused", "require_revision", "in_qa", "pm", "",
-     "sent back to QA_missing date",),
-    ("d14d1499-d97f-4833-9697-e451a3ff3498", "in_qa", "deliver",
-     "delivered", "qa", "04.01.2017", "second delivery",),
-    ("95708c22-146f-4daa-9ddc-f619d704684d", "in_qa", "deliver", "delivered", "qa", "30.12.2016",
-     "first delivery_in Leica",),
-    ("95708c22-146f-4daa-9ddc-f619d704684d", "delivered", "refuse",
-     "refused", "customer", "05.01.2017",
-     "first refusal_missing",),
-    ("95708c22-146f-4daa-9ddc-f619d704684d", "refused", "require_revision", "in_qa", "pm", "",
-     "sent back to QA_missing date",),
-    ("95708c22-146f-4daa-9ddc-f619d704684d", "in_qa", "deliver",
-     "delivered", "qa", "07.02.2017", "second delivery",),
-    ("95708c22-146f-4daa-9ddc-f619d704684d", "delivered", "refuse",
-     "refused", "customer", "28.02.2017", "second refusal",),
-]
+BASE_PATH = 'src/briefy/leica/tools/oneshots/data'
+FIX_ASSIGNMENTS_TRANSITIONS_FNAME = BASE_PATH + '/Batch_April17_Fix_assignments_wrong_transitions.txt'  # noqa
+ASSIGNMENTS_INSERT_TRANSITIONS = BASE_PATH + '/Batch_April17_Fix_assignments_missing_transitions.txt'  # noqa
+FIX_DATES_FNAME = BASE_PATH + '/Batch_April17_Fix_wrong_transition_dates.txt'
+ORDER_INSERT_TRANSITIONS = BASE_PATH + '/Batch_April17_Fix_missing_transitions_deliver_refuse_require-revision.txt'  # noqa
+FIX_ORDER_TRANSITIONS_FNAME = BASE_PATH + '/Batch_April17_Fix_orders_wrong_transitions.txt'
 
 ROLE_MAP = {
     'pm': 'project_manager',
@@ -96,7 +32,8 @@ ORDER_ASSIGNMENT_TRANSITION = {
     'deliver': 'approve',
     'refuse': 'refuse',
     'require_revision': 'return_to_qa',
-    'accept': 'complete'
+    'accept': 'complete',
+    'start_qa': 'ready_for_upload',
 }
 
 ORDER_ASSIGNMENT_STATUS = {
@@ -142,14 +79,21 @@ def find_state_position(state_history, state, date):
     return position
 
 
-def insert_transition_order(order, item, date):
+def insert_transition_order(order, item, date, debug=False, debug_duplicate=False):
     """Insert new transition in the Order state_history."""
     state_history = order.state_history
     previous_status = item.get('previous_order_status')
     position = find_state_position(state_history, previous_status, date)
     if position is None:
-        print('Could not find position for Order id: {uid}'.format(uid=order.id))
-
+        if debug:
+            message = 'Could not find position for Order id: {uid} ' \
+                      'previous_status = {status} date = {date}'
+            print(message.format(
+                uid=order.id,
+                status=previous_status,
+                date=date
+            ))
+            return
     last_state = state_history[position - 1]['to']
     actor = find_user_by_role(order, item.get('user_role'))
     new_state = item.get('new_order_status')
@@ -173,12 +117,13 @@ def insert_transition_order(order, item, date):
             convert_date(
                 new_history['date'], dayfirst=False).date() == convert_date(
                         current_history['date'], dayfirst=False).date()):
-            message = 'This transition already exists. \n Order: {current} : {new}'
-            print(
-                message.format(
-                    current=current_history,
-                    new=new_history)
-            )
+            if debug_duplicate:
+                message = 'This transition already exists. \n Order: {current} : {new}'
+                print(
+                    message.format(
+                        current=current_history,
+                        new=new_history)
+                )
             return
 
     state_history.insert(position, new_history)
@@ -186,14 +131,30 @@ def insert_transition_order(order, item, date):
     order._update_dates_from_history()
 
 
-def insert_transition_assignment(order, item, date):
+def insert_transition_assignment(
+        order,
+        item,
+        date,
+        assignment_pos=0,
+        debug=False,
+        debug_duplicate=False):
     """Insert new transition in the Assignment state_history."""
-    assignment = order.assignments[0]
+    assignment = order.assignments[assignment_pos]
     state_history = assignment.state_history
     previous_status = ORDER_ASSIGNMENT_STATUS.get(item.get('previous_order_status'))
     position = find_state_position(state_history, previous_status, date)
     if position is None:
-        print('Could not find position for Assignment id: {uid}'.format(uid=assignment.id))
+        if debug:
+            message = 'Could not find position for Assignment. ' \
+                      'Order id: {uid} Assignment id: {auid} ' \
+                      'previous_status = {status} date = {date}'
+            print(message.format(
+                uid=order.id,
+                auid=assignment.id,
+                status=previous_status,
+                date=date
+            ))
+        return
 
     last_state = state_history[position - 1]['to']
     actor = find_user_by_role(order, item.get('user_role'))
@@ -217,12 +178,13 @@ def insert_transition_assignment(order, item, date):
             new_history['to'] == current_history['to'] and convert_date(
                 new_history['date'], dayfirst=False).date() == convert_date(
                 current_history['date'], dayfirst=False).date()):
-            message = 'This transition already exists. \nAssignment: {current} : {new}'
-            print(
-                message.format(
-                    current=current_history,
-                    new=new_history)
-            )
+            if debug_duplicate:
+                message = 'This transition already exists. \nAssignment: {current} : {new}'
+                print(
+                    message.format(
+                        current=current_history,
+                        new=new_history)
+                )
             return
 
     state_history.insert(position, new_history)
@@ -230,27 +192,207 @@ def insert_transition_assignment(order, item, date):
     assignment._update_dates_from_history()
 
 
-def main(data):
-    """Iterate over the data set to fix orders and respective assignments state_history."""
-    for line_number, line in enumerate(data):
-        item = {field: line[i] for i, field in enumerate(fieldnames)}
-        uid = item.get('uid')
-        date = item.get('date_time')
-        if not date:
-            previous_line = data[line_number - 1]
-            previous_item = {field: previous_line[i] for i, field in enumerate(fieldnames)}
-            date = previous_item.get('date_time')
-        date = convert_date(date)
+def read_tsv(fname):
+    """Read tsv text file using DictReader."""
+    with open(fname, 'r') as fin:
+        reader = csv.DictReader(fin, delimiter='\t')
+        for line_item in reader:
+            yield line_item
+
+
+def fix_order_date(order, position, item, debug=True):
+    """Fix order transition date."""
+    if debug:
+        pprint(order.state_history[position])
+    new_state_history = order.state_history.copy()
+    new_date = item.get('new_date_time')
+    new_date = convert_date(new_date, dayfirst=False)
+    new_state_history[position]['date'] = new_date.isoformat()
+    order.state_history = new_state_history
+    if debug:
+        pprint(order.state_history[position])
+        pprint(item)
+
+
+def fix_assignment_date(order, date, item, debug=True):
+    """Fix assignment transition date."""
+    assignment = order.assignment
+    state_history = assignment.state_history
+    previous_status = ORDER_ASSIGNMENT_STATUS.get(item.get('previous_order_status'))
+
+    position = find_state_position(
+        state_history,
+        previous_status,
+        date,
+    )
+
+    if debug:
+        pprint(assignment.state_history[position])
+
+    new_state_history = assignment.state_history.copy()
+    new_date = item.get('new_date_time')
+    new_date = convert_date(new_date, dayfirst=False)
+    new_state_history[position]['date'] = new_date.isoformat()
+    assignment.state_history = new_state_history
+
+    if debug:
+        pprint(assignment.state_history[position])
+        pprint(item)
+
+
+def fix_dates():
+    """Fix orders and respective assignments state_history: date of transition."""
+    for line_number, item in enumerate(read_tsv(FIX_DATES_FNAME)):
+        uid = item.get('order_uid')
+        date = item.get('current_date_time')
+        date = convert_date(date, dayfirst=False)
         order = Order.get(uid)
-        insert_transition_order(order, item, date)
+        state_history = order.state_history
+        previous_status = item.get('previous_order_status')
+        position = find_state_position(
+            state_history,
+            previous_status,
+            date
+        )
+
+        fix_order_date(order, position, item, debug=False)
         if len(order.assignments) == 1:
-            insert_transition_assignment(order, item, date)
+            try:
+                fix_assignment_date(order, date, item, debug=False)
+            except:
+                message = 'Could not fix assignment for Order: {uid}\n' \
+                          'Transition: {transition}. Assignment: {auid}'
+                transition = item.get('transition_name')
+                print(message.format(
+                    uid=order.id,
+                    auid=order.assignment.id,
+                    transition=transition
+                ))
         else:
-            print('Order has {} assignments.'.format(len(order.assignments)))
+            print('Order {uid} has {total} assignments.'.format(
+                uid=order.id, total=len(order.assignments)
+            ))
 
     transaction.commit()
 
 
+def fix_orders_insert_transitions():
+    """Fix orders and respective assignments state_history: insert missing transitions."""
+    previous_item = None
+    for line_number, item in enumerate(read_tsv(ORDER_INSERT_TRANSITIONS)):
+        uid = item.get('order_uid')
+        date = item.get('date_time')
+        if not date:
+            date = previous_item.get('date_time')
+        date = convert_date(date, dayfirst=False)
+        order = Order.get(uid)
+        insert_transition_order(order, item, date, debug=True)
+        if len(order.assignments) == 1:
+            insert_transition_assignment(order, item, date, debug=True)
+        else:
+            # in this case second assignment should be used
+            insert_transition_assignment(order, item, date, assignment_pos=1, debug=True)
+        previous_item = item
+    transaction.commit()
+
+
+def fix_assignments_transitions(debug=False):
+    """Fix assignments with wrong transitions."""
+    for line_number, item in enumerate(read_tsv(FIX_ASSIGNMENTS_TRANSITIONS_FNAME)):
+        uid = item.get('assignment_uid')
+        date = item.get('date_time')
+        date = convert_date(date, dayfirst=False)
+        assignment = Assignment.get(uid)
+        state_history = assignment.state_history
+        previous_status = item.get('previous_assignment_status')
+        position = find_state_position(
+            state_history,
+            previous_status,
+            date
+        )
+        new_history = state_history.copy()
+        if debug:
+            pprint(item)
+            pprint(new_history[position])
+        new_history[position]['message'] = ''
+        new_history[position]['transition'] = item.get('new_transition_name')
+        new_history[position]['to'] = item.get('new_current_assignment_status')
+        new_history[position]['date'] = convert_date(
+            item.get('new_date_time'),
+            dayfirst=False).isoformat()
+        new_history[position]['actor'] = str(find_user_by_role(
+            assignment.order,
+            item.get('new_user_role'))
+        )
+        if debug:
+            pprint(new_history[position])
+
+
+def fix_assignments_insert_transitions(debug=False):
+    """Fix assignments insert missing transitions."""
+    for line_number, item in enumerate(read_tsv(ASSIGNMENTS_INSERT_TRANSITIONS)):
+        uid = item.get('assignment_uid')
+        date = item.get('date_time')
+        date = convert_date(date, dayfirst=False)
+        assignment = Assignment.get(uid)
+        state_history = assignment.state_history.copy()
+        previous_status = item.get('previous_assignment_status')
+        position = find_state_position(
+            state_history,
+            previous_status,
+            date
+        )
+        date = convert_date(item.get('date_time'), dayfirst=False)
+        new_history = {
+            'actor': str(find_user_by_role(assignment.order, item.get('user_role'))),
+            'date': date.isoformat(),
+            'from': previous_status,
+            'to': item.get('new_assignment_status'),
+            'transition': item.get('transition_name'),
+            'message': 'Inserted after migration: history fixing procedure.'
+        }
+        if debug:
+            pprint(item)
+            pprint(new_history)
+
+        state_history.insert(position, new_history)
+        assignment.state_history = state_history
+
+
+def fix_transitions_and_dates(debug=False):
+    """Fix orders and respective assignments state_history: update from state and date."""
+    for line_number, item in enumerate(read_tsv(FIX_ORDER_TRANSITIONS_FNAME)):
+        uid = item.get('order_uid')
+        date = item.get('date_time')
+        date = convert_date(date, dayfirst=False)
+        order = Order.get(uid)
+        state_history = order.state_history.copy()
+        previous_status = item.get('previous_order_status')
+        position = find_state_position(
+            state_history,
+            previous_status,
+            date
+        )
+        if debug:
+            pprint(item)
+            pprint(state_history[position])
+        state_history[position]['message'] = item.get('comment')
+        state_history[position]['transition'] = item.get('new_transition_name')
+        state_history[position]['to'] = item.get('new_order_status')
+        state_history[position]['from'] = item.get('new_previous_order_status')
+        state_history[position]['date'] = convert_date(
+            item.get('new_date_time'),
+            dayfirst=False).isoformat()
+        state_history[position]['actor'] = str(find_user_by_role(order, item.get('new_user_role')))
+        if debug:
+            pprint(state_history[position])
+
+
 if __name__ == '__main__':
     configure(Session)
-    main(data)
+    with transaction.manager:
+        fix_assignments_transitions()
+        fix_assignments_insert_transitions()
+        fix_dates()
+        fix_orders_insert_transitions()
+        fix_transitions_and_dates()
