@@ -5,6 +5,7 @@ History
 2.1.4 (2017-04-10)
 ------------------
     * Card #237: fix failure when try to view a cancelled Order (rudaporto).
+    * Card #73: fix transition Assignment.workflow.assign to set the scout_manager (Order and Assignment) properly (rudaporto).
 
 2.1.4 (2017-04-06)
 ------------------
