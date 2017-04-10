@@ -128,6 +128,11 @@ dumpdb_stg:
 	-d leica > /tmp/staging-leica.dump
 	sudo chmod 0644 /tmp/staging-leica.dump
 
+uploaddb_live_to_stg:
+	scp live:/tmp/production-leica.dump /tmp/production-leica.dump
+	scp /tmp/production-leica.dump stg:/tmp/production-leica.dump
+
+	
 restoredb_prod_local: clean_dockers create_dockers
 	scp live:/tmp/production-leica.dump /tmp/production-leica.dump
 	pg_restore --no-owner -x -h localhost -p 9999 -U briefy -W -d briefy-leica /tmp/production-leica.dump

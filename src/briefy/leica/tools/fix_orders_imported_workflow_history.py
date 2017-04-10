@@ -16,13 +16,11 @@ import transaction
 
 
 BASE_PATH = 'src/briefy/leica/tools/oneshots/data'
-FIX_ASSIGNMENTS_TRANSITIONS_FNAME = BASE_PATH + '/Batch_April17_Fix_assignments_wrong_transitions.txt'
-ASSIGNMENTS_INSERT_TRANSITIONS = BASE_PATH + '/Batch_April17_Fix_assignments_missing_transitions.txt'
+FIX_ASSIGNMENTS_TRANSITIONS_FNAME = BASE_PATH + '/Batch_April17_Fix_assignments_wrong_transitions.txt'  # noqa
+ASSIGNMENTS_INSERT_TRANSITIONS = BASE_PATH + '/Batch_April17_Fix_assignments_missing_transitions.txt'  # noqa
 FIX_DATES_FNAME = BASE_PATH + '/Batch_April17_Fix_wrong_transition_dates.txt'
-ORDER_INSERT_TRANSITIONS = BASE_PATH + '/Batch_April17_Fix_missing_transitions_deliver_refuse_require-revision.txt'
+ORDER_INSERT_TRANSITIONS = BASE_PATH + '/Batch_April17_Fix_missing_transitions_deliver_refuse_require-revision.txt'  # noqa
 FIX_ORDER_TRANSITIONS_FNAME = BASE_PATH + '/Batch_April17_Fix_orders_wrong_transitions.txt'
-
-
 
 ROLE_MAP = {
     'pm': 'project_manager',
@@ -133,7 +131,13 @@ def insert_transition_order(order, item, date, debug=False, debug_duplicate=Fals
     order._update_dates_from_history()
 
 
-def insert_transition_assignment(order, item, date, assignment_pos=0, debug=False, debug_duplicate=False):
+def insert_transition_assignment(
+        order,
+        item,
+        date,
+        assignment_pos=0,
+        debug=False,
+        debug_duplicate=False):
     """Insert new transition in the Assignment state_history."""
     assignment = order.assignments[assignment_pos]
     state_history = assignment.state_history
@@ -313,8 +317,13 @@ def fix_assignments_transitions(debug=False):
         new_history[position]['message'] = ''
         new_history[position]['transition'] = item.get('new_transition_name')
         new_history[position]['to'] = item.get('new_current_assignment_status')
-        new_history[position]['date'] = convert_date(item.get('new_date_time'), dayfirst=False).isoformat()
-        new_history[position]['actor'] = str(find_user_by_role(assignment.order, item.get('new_user_role')))
+        new_history[position]['date'] = convert_date(
+            item.get('new_date_time'),
+            dayfirst=False).isoformat()
+        new_history[position]['actor'] = str(find_user_by_role(
+            assignment.order,
+            item.get('new_user_role'))
+        )
         if debug:
             pprint(new_history[position])
 
@@ -351,7 +360,7 @@ def fix_assignments_insert_transitions(debug=False):
 
 
 def fix_transitions_and_dates(debug=False):
-    """Fix orders and respective assignments state_history: change from state of transition and date."""
+    """Fix orders and respective assignments state_history: update from state and date."""
     for line_number, item in enumerate(read_tsv(FIX_ORDER_TRANSITIONS_FNAME)):
         uid = item.get('order_uid')
         date = item.get('date_time')
@@ -371,7 +380,9 @@ def fix_transitions_and_dates(debug=False):
         state_history[position]['transition'] = item.get('new_transition_name')
         state_history[position]['to'] = item.get('new_order_status')
         state_history[position]['from'] = item.get('new_previous_order_status')
-        state_history[position]['date'] = convert_date(item.get('new_date_time'), dayfirst=False).isoformat()
+        state_history[position]['date'] = convert_date(
+            item.get('new_date_time'),
+            dayfirst=False).isoformat()
         state_history[position]['actor'] = str(find_user_by_role(order, item.get('new_user_role')))
         if debug:
             pprint(state_history[position])
