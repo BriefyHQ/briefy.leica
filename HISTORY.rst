@@ -7,6 +7,7 @@ History
     * Card #237: fix failure when try to view a cancelled Order (rudaporto).
     * Card #73: fix transition Assignment.workflow.assign to set the scout_manager (Order and Assignment) properly (rudaporto).
     * Card #230: Order.workflow.perm_reject now understand a special value ('null') for reason_additional_compensation that sets to None the value and also sets to zero (0) the additional_compensation of the old assignment (rudaporto).
+    * Card #49: Update the comment rule when remove_schedule transition is executed from Assignment and Order (rudaporto).
 
 2.1.4 (2017-04-06)
 ------------------

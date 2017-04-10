@@ -77,7 +77,6 @@ def order_remove_schedule(event):
     """Handle Order remove_schedule workflow event."""
     order = event.obj
     user = order.workflow.context
-
     # this should be always in the subscriber
     # to avoid loop with the order remove_schedule
     assignment = order.assignment
@@ -85,25 +84,11 @@ def order_remove_schedule(event):
     if assignment.state == 'scheduled':
         assignment.workflow.remove_schedule(message=message)
 
-    # create comment
+    # create the comment if applicable
     if G['customers'].value in user.groups:
         to_role = 'project_manager'
         author_role = 'customer_user'
-    elif G['pm'].value in user.groups:
-        to_role = 'customer_user'
-        author_role = 'project_manager'
-    elif G['professionals'].value in user.groups:
-        # this should not create a comment on the order only on the assignment
-        return
-    else:
-        to_role = 'customer_user'
-        author_role = 'project_manager'
-
-    create_comment_from_wf_transition(
-        order,
-        author_role,
-        to_role
-    )
+        create_comment_from_wf_transition(order, author_role, to_role)
 
 
 def order_refuse(event):
