@@ -139,7 +139,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         user_id = str(self.context.id)
         assignment = self.document
         order = assignment.order
-        if order.state in ('received', 'scheduled'):
+        if order.state == 'received':
             fields = {'scout_manager': user_id}
             order.workflow.assign(fields=fields)
         # set local roles
@@ -845,6 +845,8 @@ class OrderWorkflow(BriefyWorkflow):
     def reassign(self, **kwargs):
         """Transition: Inform the reassignment to the customer."""
         order = self.document
+        user_id = str(self.context.id)
+        order.scout_manager = user_id
         old_assignment = order.assignment
         message = kwargs.get('message', '')
         old_assignment.workflow.cancel(message=message)
