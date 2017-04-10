@@ -1038,6 +1038,10 @@ class OrderWorkflow(BriefyWorkflow):
             copy_payout=True,
             old_assignment=old_assignment
         )
+        # force no None value for reason
+        if kwargs['fields']['reason_additional_compensation'] == 'null':
+            kwargs['fields']['reason_additional_compensation'] = None
+            kwargs['fields']['additional_compensation'] = 0
         old_assignment.workflow.perm_reject(**kwargs)
         return True
 
