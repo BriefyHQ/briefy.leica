@@ -1126,7 +1126,8 @@ class OrderWorkflow(BriefyWorkflow):
         """
         order = self.document
         result = True
-        if order.assignment.state != 'refused':
+        assignment = order.assignments[-1]
+        if assignment.state != 'refused':
             result = False
         return result
 
