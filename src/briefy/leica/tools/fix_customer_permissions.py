@@ -86,9 +86,10 @@ def fix_just_eat_permissions():
         user = get_user_from_email(email)
         users.append(user)
 
-    customer = 'd36729f1-7879-4398-8f85-c579e1031250'
+    customer_id = 'd36729f1-7879-4398-8f85-c579e1031250'
+    customer = Customer.get(customer_id)
     projects = customer.projects
-    fix_customers_and_project_permissions(users, customer, projects)
+    fix_customers_and_project_permissions(users, customer_id, projects)
 
 
 def fix_wolt_permissions():
@@ -103,17 +104,19 @@ def fix_wolt_permissions():
         user = get_user_from_email(email)
         users.append(user)
 
-    customer = '11928c11-6b81-4a91-9f03-27772ad53d72'
+    customer_id = '11928c11-6b81-4a91-9f03-27772ad53d72'
+    customer = Customer.get(customer_id)
     projects = customer.projects
-    fix_customers_and_project_permissions(users, customer, projects)
+    fix_customers_and_project_permissions(users, customer_id, projects)
 
 
 def fix_ehvisio_permissions():
     """Fix eH Vision permissions."""
-    customer = '83006d14-c78b-4969-9624-c1b704897877'
+    customer_id = '83006d14-c78b-4969-9624-c1b704897877'
+    customer = Customer.get(customer_id)
     projects = customer.projects
     users = [CustomerUserProfile.get(u) for u in customer.customer_users]
-    fix_customers_and_project_permissions(users, customer, projects)
+    fix_customers_and_project_permissions(users, customer_id, projects)
 
 
 def fix_agoda_permissions():
@@ -136,26 +139,29 @@ def fix_agoda_permissions():
         user = get_user_from_email(email)
         users.append(user)
 
-    customer = 'd466091b-98c5-4f9d-81a6-ecbc83dd3386'
+    customer_id = 'd466091b-98c5-4f9d-81a6-ecbc83dd3386'
+    customer = Customer.get(customer_id)
     projects = customer.projects
 
-    fix_customers_and_project_permissions(users, customer, projects)
+    fix_customers_and_project_permissions(users, customer_id, projects)
 
 
 def fix_delivery_hero_permissions():
     """Fix Delivery Hero permissions."""
+    import pdb; pdb.set_trace()
     emails = [
-        'pia.jentgens@deliveryhero.com '
+        'pia.jentgens@deliveryhero.com'
     ]
     users = []
     for email in emails:
         user = get_user_from_email(email)
         users.append(user)
 
-    customer = 'acccf88b-2f73-4478-9422-4bad19b2ffd9'
+    customer_id = '26cd8552-753c-4ff1-b413-74d61804e9bb'
+    customer = Customer.get(customer_id)
     projects = customer.projects
 
-    fix_customers_and_project_permissions(users, customer, projects)
+    fix_customers_and_project_permissions(users, customer_id, projects)
 
 
 if __name__ == '__main__':
