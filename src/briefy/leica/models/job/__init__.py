@@ -17,6 +17,7 @@ from zope.interface import implementer
 from zope.interface import Interface
 
 import colander
+import copy
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils
 
@@ -35,13 +36,25 @@ __listing_attributes__ = __summary_attributes__ + [
     'location', 'project', 'closed_on_date', 'pool', 'delivery'
 ]
 
-overrides = mixins.AssignmentBriefyRoles.__colanderalchemy_config__['overrides']
-overrides['customer_message'] = {
-    'title': 'Customer message',
-    'default': '',
-    'missing': colander.drop,
-    'typ': colander.String()
-}
+__colander_alchemy_config_overrides__ = \
+    copy.copy(mixins.AssignmentBriefyRoles.__colanderalchemy_config__['overrides'])
+
+__colander_alchemy_config_overrides__.update(
+    dict(
+        customer_message={
+            'title': 'Customer message',
+            'default': '',
+            'missing': colander.drop,
+            'typ': colander.String()
+        },
+        additional_message={
+            'title': 'Transition Additional Message',
+            'default': '',
+            'missing': colander.drop,
+            'typ': colander.String()
+        },
+    )
+)
 
 
 def create_slug_from_order(context):
@@ -159,7 +172,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
             '_scout_manager', '_project_manager', '_qa_manager',
             '_professional_user', 'pool', 'active_order'
         ],
-        'overrides': overrides
+        'overrides': __colander_alchemy_config_overrides__
     }
 
     __versioned__ = {

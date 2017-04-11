@@ -291,11 +291,13 @@ class AssignmentWorkflow(BriefyWorkflow):
         assigned,
         'can_reschedule',
         require_message=True,
+        required_fields=('additional_message',)
     )
     def scheduling_issues(self, **kwargs):
         """Professional or PM reports scheduling issues."""
-        # subscriber will create a new Comment instance from this transition
-        pass
+        fields = kwargs.get('fields')
+        kwargs['message'] += '\n\n{0}'.format(fields.get('additional_message'))
+        return kwargs
 
     @Permission(groups=[G['professionals'], G['pm']])
     def can_reschedule(self):
