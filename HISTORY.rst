@@ -9,6 +9,7 @@ History
     * Card #230: Order.workflow.perm_reject now understand a special value ('null') for reason_additional_compensation that sets to None the value and also sets to zero (0) the additional_compensation of the old assignment (rudaporto).
     * Card #49: Update the comment rule when remove_schedule transition is executed from Assignment and Order (rudaporto).
     * Card #241: move fix permissions helpers from scripts to briefy.leica and add fix for Delivery Hero (rudaoporto).
+    * Card #114: scheduling_issues transition now require an additional_message field that will be concatenated with the message field (rudaporto).
 
 2.1.4 (2017-04-06)
 ------------------
