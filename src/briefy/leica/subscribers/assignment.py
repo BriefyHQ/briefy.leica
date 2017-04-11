@@ -99,21 +99,19 @@ def assignment_remove_schedule(event):
     if order.state == 'scheduled':
         order.workflow.remove_schedule(message=message)
 
-    # create the comment
-    if G['customers'].value in user.groups:
-        # this should not create a comment on the assignment only on the order
-        return
-    elif G['pm'].value in user.groups:
-        to_role = 'professional_user'
-        author_role = 'project_manager'
+    # create the comment if applicable
+    create_comment = False
+    to_role = 'professional_user'
+    author_role = 'project_manager'
+    if G['pm'].value in user.groups:
+        create_comment = True
     elif G['professionals'].value in user.groups:
         to_role = 'project_manager'
         author_role = 'professional_user'
-    else:
-        to_role = 'professional_user'
-        author_role = 'project_manager'
+        create_comment = True
 
-    create_comment_from_wf_transition(assignment, author_role, to_role)
+    if create_comment:
+        create_comment_from_wf_transition(assignment, author_role, to_role)
 
 
 def assignment_reschedule(event):

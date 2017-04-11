@@ -144,6 +144,7 @@ class AssignmentWorkflow(BriefyWorkflow):
             order.workflow.assign(fields=fields)
         # set local roles
         fields = kwargs['fields']
+        assignment.scout_manager = user_id
         professional_id = fields.get('professional_id')
         assignment.professional_user = professional_id
         # force explicit here but it will also be set by the workflow engine
@@ -290,11 +291,15 @@ class AssignmentWorkflow(BriefyWorkflow):
         assigned,
         'can_reschedule',
         require_message=True,
+        required_fields=('additional_message',)
     )
     def scheduling_issues(self, **kwargs):
         """Professional or PM reports scheduling issues."""
-        # subscriber will create a new Comment instance from this transition
-        pass
+        fields = kwargs.get('fields')
+        additional_message = fields.get('additional_message').strip()
+        if additional_message:
+            kwargs['message'] += '\n\n{0}'.format(additional_message)
+        return kwargs
 
     @Permission(groups=[G['professionals'], G['pm']])
     def can_reschedule(self):
@@ -844,6 +849,8 @@ class OrderWorkflow(BriefyWorkflow):
     def reassign(self, **kwargs):
         """Transition: Inform the reassignment to the customer."""
         order = self.document
+        user_id = str(self.context.id)
+        order.scout_manager = user_id
         old_assignment = order.assignment
         message = kwargs.get('message', '')
         old_assignment.workflow.cancel(message=message)
@@ -1035,6 +1042,10 @@ class OrderWorkflow(BriefyWorkflow):
             copy_payout=True,
             old_assignment=old_assignment
         )
+        # force no None value for reason
+        if kwargs['fields']['reason_additional_compensation'] == 'null':
+            kwargs['fields']['reason_additional_compensation'] = None
+            kwargs['fields']['additional_compensation'] = 0
         old_assignment.workflow.perm_reject(**kwargs)
         return True
 
@@ -1126,7 +1137,8 @@ class OrderWorkflow(BriefyWorkflow):
         """
         order = self.document
         result = True
-        if order.assignment.state != 'refused':
+        assignment = order.assignments[-1]
+        if assignment.state != 'refused':
             result = False
         return result
 

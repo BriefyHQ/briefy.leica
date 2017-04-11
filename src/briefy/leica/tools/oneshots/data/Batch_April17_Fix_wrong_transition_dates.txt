@@ -1,0 +1,47 @@
+order_uid	previous_order_status	transition_name	current_order_status	current_date_time	new_date_time	comment
+00ade521-d0e3-4159-b3f7-a55c3d654347	scheduled	start_qa	in_qa	2017-02-04 09:39:00	2017-01-24 10:08:00
+e3614955-58a6-4ef2-9c2b-fe6335899881	scheduled	start_qa	in_qa	2017-01-30 05:57:00	2016-10-27 10:16:00
+da270950-8938-4198-9c39-d117b7039f8d	scheduled	start_qa	in_qa	2016-12-15 17:21:00	2016-11-01 18:00:00
+d68ba673-ee1e-4ef3-ac82-63eb21414510	scheduled	start_qa	in_qa	2016-12-17 15:37:00	2016-11-18 11:04:00
+bfafffeb-5c15-4094-b829-29387bc34156	scheduled	start_qa	in_qa	2016-12-12 12:20:00	2016-11-10 14:57:00
+b69ca315-b5ca-4362-8ed3-d46a56bfb025	scheduled	start_qa	in_qa	2017-01-15 13:06:00	2016-11-07 15:30:00
+a31cb36e-0621-443a-9911-3e230eb97de8	scheduled	start_qa	in_qa	2016-12-21 17:20:00	2016-11-21 11:36:00
+900e7405-f8f2-4235-b690-5f1361e9a21e	scheduled	start_qa	in_qa	2016-12-17 15:54:00	2016-11-04 10:51:00
+46b5b293-b536-4e68-9859-c92a5788dfca	scheduled	start_qa	in_qa	2016-12-25 06:02:00	2016-11-10 16:20:00
+44037506-2e1f-4442-ab35-2903427548b4	scheduled	start_qa	in_qa	2016-12-09 13:28:00	2016-11-03 17:01:00
+16ff4bc7-95d8-46dc-a38b-f153f6d8ef55	scheduled	start_qa	in_qa	2017-01-21 10:48:00	2016-10-31 16:13:00
+1672fe6d-36b0-471e-8e2f-67e7c153096c	scheduled	start_qa	in_qa	2017-01-30 05:57:00	2016-10-27 09:16:00
+15e8293a-9039-46dd-9ec9-72df0f07255b	scheduled	start_qa	in_qa	2017-01-30 05:56:00	2016-10-31 12:57:00
+111ef590-fc9a-4466-953b-3cba9b90d54e	delivered	refuse	refused	2017-02-05 02:10:00	2016-12-28 04:32:00	wrong refusal_date
+149a1400-ac96-4455-9bf1-92cf0a3c6f03	delivered	refuse	refused	2017-02-05 02:10:00	2016-11-30 12:00:00	wrong refusal_date
+1c2c4700-7ea7-4efd-8339-2c5ddbfe6ef8	delivered	accept	accepted	2016-11-02 11:32:00	2016-12-01 03:29:00	wrong accept_date
+41ed86a4-aa9d-4ccb-acb6-df5866b155e4	delivered	accept	accepted	2016-11-07 17:59:00	2016-11-30 10:01:00	wrong accept_date
+5dff8bb9-8c33-43f5-926e-aa1b0f827f6e	delivered	refuse	refused	2017-02-05 02:10:00	2016-11-25 07:34:00	wrong refusal_date
+70b7dd9b-9164-455d-ace0-21a480c1111b	delivered	refuse	refused	2017-02-05 02:10:00	2017-01-18 03:38:00	wrong refusal_date
+89cef402-7506-46c8-8ca6-a017f953d308	delivered	refuse	refused	2017-02-05 02:10:00	2016-11-25 08:02:00	wrong refusal_date
+b2c2ec02-efd4-4d63-a847-246aa5a6bd76	delivered	accept	accepted	2016-11-02 13:42:00	2016-11-30 11:09:00	wrong accept_date
+b8c17d2b-c4e5-4e6c-9c51-699ef518ea92	delivered	refuse	refused	2017-02-05 02:10:00	2016-11-25 07:42:00	wrong refusal_date
+bdf3941a-08f5-4b77-b799-0a5a4c040ee7	delivered	refuse	refused	2017-02-05 02:10:00	2016-11-28 12:00:00	wrong refusal_date
+dc019c96-e50b-449b-a0ed-99e6572a0b25	delivered	refuse	refused	2017-02-05 02:10:00	2016-11-25 05:04:00	wrong refusal_date
+ed63828f-89fc-4346-ab30-0afdf8de9f66	delivered	refuse	refused	2017-02-05 02:10:00	2016-11-03 12:00:00	wrong refusal_date
+fb3a4ce3-9580-4b22-a804-827c97a4a6b9	delivered	refuse	refused	2017-02-05 02:10:00	2016-11-02 12:00:00	wrong refusal_date
+fb61dbf9-64aa-4a84-a20d-2f9869129898	delivered	refuse	refused	2017-02-05 02:10:00	2016-12-28 05:54:00	wrong refusal_date
+fcb98fa4-d48c-4fa5-985b-35812869a7f2	delivered	refuse	refused	2017-02-05 02:10:00	2016-11-03 12:00:00	wrong refusal_date
+ff2e58f0-cee7-4b27-8566-26da76a1efba	delivered	refuse	refused	2017-02-05 02:10:00	2016-11-07 12:00:00	wrong refusal_date
+3ccb7c82-eaa8-4698-aca3-d822e71b6de3	delivered	accept	accepted	2017-01-04 16:59:00	2017-01-31 18:56:00	wrong accept_date
+46b5b293-b536-4e68-9859-c92a5788dfca	delivered	accept	accepted	2017-01-04 16:31:00	2017-01-31 18:56:00	wrong accept_date
+5e2a3a5f-1da9-4fba-83d7-fdc013b620e6	delivered	accept	accepted	2017-01-04 13:14:00	2017-01-31 18:56:00	wrong accept_date
+68fa122b-f0ee-4d0f-ac81-98d8e6610565	delivered	accept	accepted	2017-01-04 18:23:00	2017-01-31 18:56:00	wrong accept_date
+7c8524a9-a8cd-44a3-bd7d-382c7947477f	delivered	accept	accepted	2017-01-04 14:06:00	2017-01-31 18:56:00	wrong accept_date
+8a0814b7-ddc7-4082-bd70-d648fb158917	delivered	accept	accepted	2017-01-20 12:14:00	2017-02-10 08:19:48	wrong accept_date
+8e0cd110-dd5a-498a-b7b6-ef496a005b8b	delivered	accept	accepted	2017-01-25 14:19:00	2017-02-10 07:40:49	wrong accept_date
+900e7405-f8f2-4235-b690-5f1361e9a21e	delivered	accept	accepted	2017-01-04 18:29:00	2017-01-31 18:56:00	wrong accept_date
+9fda8587-4c47-4174-b443-8746fadde42c	delivered	accept	accepted	2017-01-20 12:14:00	2017-02-10 10:37:07	wrong accept_date
+a2e7be4a-e0fe-4b64-8714-4f9a3231ae89	delivered	accept	accepted	2017-02-06 13:47:00	2017-02-10 07:20:49	wrong accept_date
+a31cb36e-0621-443a-9911-3e230eb97de8	delivered	accept	accepted	2017-01-18 11:29:00	2017-02-10 10:20:44	wrong accept_date
+b7021ea8-9fdd-4b01-93a5-6241e36d2194	delivered	accept	accepted	2017-01-06 18:30:00	2017-01-31 18:56:00	wrong accept_date
+bd4c9cb7-09be-407e-a5f1-9913471542f3	delivered	accept	accepted	2017-02-06 16:50:00	2017-02-10 07:45:54	wrong accept_date
+d14d1499-d97f-4833-9697-e451a3ff3498	delivered	accept	accepted	2017-01-04 12:23:00	2017-01-31 18:56:00	wrong accept_date
+da270950-8938-4198-9c39-d117b7039f8d	delivered	accept	accepted	2017-01-04 14:04:00	2017-01-31 18:56:00	wrong accept_date
+e4bce5b7-8629-4a58-ab1d-85f6206bd7d1	delivered	accept	accepted	2017-01-05 11:56:00	2017-01-31 18:56:00	wrong accept_date
+eb42057b-598f-422b-840e-45e0e567eec6	delivered	accept	accepted	2017-01-10 18:31:00	2017-02-10 08:30:09	wrong accept_date
