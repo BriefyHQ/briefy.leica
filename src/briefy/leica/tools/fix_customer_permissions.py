@@ -148,7 +148,6 @@ def fix_agoda_permissions():
 
 def fix_delivery_hero_permissions():
     """Fix Delivery Hero permissions."""
-    import pdb; pdb.set_trace()
     emails = [
         'pia.jentgens@deliveryhero.com'
     ]
@@ -174,4 +173,3 @@ if __name__ == '__main__':
     # fix_wolt_permissions()
     # fix_ehvisio_permissions()
     # fix_agoda_permissions()
-
