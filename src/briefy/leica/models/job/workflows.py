@@ -296,7 +296,9 @@ class AssignmentWorkflow(BriefyWorkflow):
     def scheduling_issues(self, **kwargs):
         """Professional or PM reports scheduling issues."""
         fields = kwargs.get('fields')
-        kwargs['message'] += '\n\n{0}'.format(fields.get('additional_message'))
+        additional_message = fields.get('additional_message').strip()
+        if additional_message:
+            kwargs['message'] += '\n\n{0}'.format(additional_message)
         return kwargs
 
     @Permission(groups=[G['professionals'], G['pm']])
