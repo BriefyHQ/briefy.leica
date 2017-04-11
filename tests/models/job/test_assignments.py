@@ -99,7 +99,10 @@ class TestAssignmentModel(BaseModelTest):
         wf.context = roles['professional']
         request.user = roles['professional']
         assert 'schedule' in wf.transitions
-        wf.scheduling_issues(message='Problem with this Schedule.')
+        wf.scheduling_issues(
+            message='Problem with this Schedule.',
+            fields=dict(additional_message='Please ask for a new date.')
+        )
         # assignment will still be assigned
         assert assignment.state == 'assigned'
 
