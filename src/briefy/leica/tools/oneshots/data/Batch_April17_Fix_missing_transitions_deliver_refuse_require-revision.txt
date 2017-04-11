@@ -485,3 +485,6 @@ ffd41cb5-9fd1-4077-81bb-84b984c43a99	in_qa	deliver	delivered	qa	2016-11-28 13:54
 ffd41cb5-9fd1-4077-81bb-84b984c43a99	delivered	refuse	refused	customer	2016-12-20 08:51:00	refusal
 ffd41cb5-9fd1-4077-81bb-84b984c43a99	refused	require_revision	in_qa	pm	2017-01-02 16:23:13	send_back_to_qa
 ffd41cb5-9fd1-4077-81bb-84b984c43a99	in_qa	deliver	delivered	qa	2017-02-06 18:10:00	deliver_add._transition
+5f70a026-83b8-460c-91e7-07bc3b9efbe0	in_qa	deliver	delivered	qa	2016-12-13 18:26:00	first delivery
+5f70a026-83b8-460c-91e7-07bc3b9efbe0	delivered	refuse	refused	customer	2016-12-22 07:42:03	refusal
+5f70a026-83b8-460c-91e7-07bc3b9efbe0	refused	require_revision	in_qa	pm	2017-01-02 16:29:42	send_back_to_qa
