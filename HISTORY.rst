@@ -2,15 +2,21 @@
 History
 =======
 
-2.1.6 (2017-04-13)
+2.1.7 (2017-04-13)
 ------------------
-    * New column added to orders.csv exported from finance_csv_export: delivery_sftp_link (rudaporto).
-    * Fix: retract_rejection transition now also move Order to in_qa if still scheduled (rudaporto).
+
     * Card #142: Trigger events on Tasks execution (ericof).
 
 
+2.1.6 (2017-04-13)
+------------------
+
+    * New column added to orders.csv exported from finance_csv_export: delivery_sftp_link (rudaporto).
+    * Fix: retract_rejection transition now also move Order to in_qa if still scheduled (rudaporto).
+
 2.1.5 (2017-04-11)
 ------------------
+
     * Card #237: fix failure when try to view a cancelled Order (rudaporto).
     * Card #73: fix transition Assignment.workflow.assign to set the scout_manager (Order and Assignment) properly (rudaporto).
     * Card #230: Order.workflow.perm_reject now understand a special value ('null') for reason_additional_compensation that sets to None the value and also sets to zero (0) the additional_compensation of the old assignment (rudaporto).
@@ -20,11 +26,13 @@ History
 
 2.1.4 (2017-04-06)
 ------------------
+
     * Card #215: new script to export all transition history of Orders to a tsv file (rudaporto).
     * Card #218: default value for empty submission_path in the Assignment must be None (rudaporto).
 
 2.1.3 (2017-04-05)
 ------------------
+
     * Card #184: new script to add missing transitions to Order and Assignments using Ophelie's data set (rudaporto).
     * Card #136: improve perm_refuse workflow transition of Order to create an internal note (Order) and complete the Assignment (rudaporto).
 
