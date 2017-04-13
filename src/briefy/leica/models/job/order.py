@@ -569,7 +569,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         state_history = self.state_history
 
         def number_of_transitions(transition_name):
-            """Return the number of times one transition happen."""
+            """Return the number of times one transition happened."""
             total = [t for t in state_history if t['transition'] == transition_name]
             return len(total)
 
