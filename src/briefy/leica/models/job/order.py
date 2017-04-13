@@ -31,7 +31,8 @@ __summary_attributes__ = [
 ]
 
 __listing_attributes__ = __summary_attributes__ + [
-    'accept_date', 'availability', 'assignment', 'requirements', 'project', 'customer'
+    'accept_date', 'availability', 'assignment', 'requirements', 'project',
+    'customer', 'refused_times'
 ]
 
 __colander_alchemy_config_overrides__ = \
@@ -273,6 +274,12 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         default=10
     )
     """Number of required assets of an Order."""
+
+    refused_times = sa.Column(
+        sa.Integer(),
+        default=0
+    )
+    """Number times the Order was refused."""
 
     requirements = sa.Column(sa.Text, default='')
     """Human-readable requirements for an Order."""
@@ -560,6 +567,14 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         """Update dates from history."""
         updated_at = self.updated_at
         state_history = self.state_history
+
+        def number_of_transitions(transition_name):
+            """Return the number of times one transition happen."""
+            total = [t for t in state_history if t['transition'] == transition_name]
+            return len(total)
+
+        # updated refused times
+        self.refused_times = number_of_transitions('refused')
 
         def updated_if_changed(attr, t_list, first=False):
             """Update only if changed."""
