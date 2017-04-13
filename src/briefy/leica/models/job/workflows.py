@@ -376,6 +376,11 @@ class AssignmentWorkflow(BriefyWorkflow):
         assignment = self.document
         last_revision = assignment.versions[-1]
         assignment.set_type = last_revision.set_type
+        order = assignment.order
+        if order.state == 'scheduled':
+            message = kwargs.get('message')
+            order.workflow.context = self.context
+            order.workflow.start_qa(message=message)
         return True
 
     @Permission(groups=[G['qa'], G['pm'], G['system'], ])

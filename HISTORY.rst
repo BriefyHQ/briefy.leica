@@ -2,6 +2,12 @@
 History
 =======
 
+2.1.6 (2017-04-13)
+------------------
+    * New column added to orders.csv exported from finance_csv_export: delivery_sftp_link (rudaporto).
+    * Fix: retract_rejection transition now also move Order to in_qa if still scheduled (rudaporto).
+
+
 2.1.5 (2017-04-11)
 ------------------
     * Card #237: fix failure when try to view a cancelled Order (rudaporto).
