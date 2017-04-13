@@ -86,6 +86,7 @@ def export_order(state=None, customer_comments=False):
         'accept_date',
         'price_currency',
         'price',
+        'delivery_sftp_link',
     ]
 
     query = Order.query()
@@ -106,12 +107,19 @@ def export_order(state=None, customer_comments=False):
             submission_date = None
             submission_path = None
 
-        if item.delivery and 'sftp' in item.delivery:
-            delivery_link = item.delivery.get('sftp')
-        elif item.delivery and 'gdrive' in item.delivery:
-            delivery_link = item.delivery.get('gdrive')
-        else:
+        if not item.delivery:
             delivery_link = None
+            delivery_sftp_link = None
+        else:
+            if 'sftp' in item.delivery:
+                delivery_sftp_link = item.delivery.get('sftp')
+            else:
+                delivery_sftp_link = None
+
+            if 'gdrive' in item.delivery:
+                delivery_link = item.delivery.get('gdrive')
+            else:
+                delivery_link = None
 
         payload = dict(
             project_name=item.project.title,
@@ -137,6 +145,7 @@ def export_order(state=None, customer_comments=False):
             accept_date=export_datetime(accept_date),
             price_currency=item.price_currency,
             price=export_integer(item.price),
+            delivery_sftp_link=delivery_sftp_link
         )
 
         if customer_comments:

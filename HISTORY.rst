@@ -2,6 +2,11 @@
 History
 =======
 
+2.1.6 (Unreleased)
+------------------
+    * New column added to orders.csv exported from finance_csv_export: delivery_sftp_link (rudaporto).
+
+
 2.1.5 (2017-04-11)
 ------------------
     * Card #237: fix failure when try to view a cancelled Order (rudaporto).
