@@ -574,7 +574,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
             return len(total)
 
         # updated refused times
-        self.refused_times = number_of_transitions('refused')
+        self.refused_times = number_of_transitions('refuse')
 
         def updated_if_changed(attr, t_list, first=False):
             """Update only if changed."""
