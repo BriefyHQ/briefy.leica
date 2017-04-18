@@ -411,9 +411,13 @@ def fix_transitions_and_dates_assignments(debug=False):
             pprint(state_history[position])
         state_history[position]['message'] = 'Update transition, status to, ' \
                                              'status from and date. history fixing procedure.'
-        state_history[position]['transition'] = ORDER_ASSIGNMENT_TRANSITION.get(item.get('new_transition_name'))
+        state_history[position]['transition'] = ORDER_ASSIGNMENT_TRANSITION.get(
+            item.get('new_transition_name')
+        )
         state_history[position]['to'] = ORDER_ASSIGNMENT_STATUS.get(item.get('new_order_status'))
-        state_history[position]['from'] = ORDER_ASSIGNMENT_STATUS.get(item.get('new_previous_order_status'))
+        state_history[position]['from'] = ORDER_ASSIGNMENT_STATUS.get(
+            item.get('new_previous_order_status')
+        )
         state_history[position]['date'] = convert_date(
             item.get('new_date_time'),
             dayfirst=False).isoformat()
