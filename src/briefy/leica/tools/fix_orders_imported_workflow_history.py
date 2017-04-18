@@ -359,8 +359,8 @@ def fix_assignments_insert_transitions(debug=False):
         assignment.state_history = state_history
 
 
-def fix_transitions_and_dates(debug=False):
-    """Fix orders and respective assignments state_history: update from state and date."""
+def fix_transitions_and_dates_orders(debug=False):
+    """Fix orders state_history: update from state and date."""
     for line_number, item in enumerate(read_tsv(FIX_ORDER_TRANSITIONS_FNAME)):
         uid = item.get('order_uid')
         date = item.get('date_time')
@@ -373,6 +373,7 @@ def fix_transitions_and_dates(debug=False):
             previous_status,
             date
         )
+        position = position + 1
         if debug:
             pprint(item)
             pprint(state_history[position])
@@ -386,6 +387,40 @@ def fix_transitions_and_dates(debug=False):
         state_history[position]['actor'] = str(find_user_by_role(order, item.get('new_user_role')))
         if debug:
             pprint(state_history[position])
+        order.state_history = state_history
+
+
+def fix_transitions_and_dates_assignments(debug=False):
+    """Fix assignments state_history: update from state and date."""
+    for line_number, item in enumerate(read_tsv(FIX_ORDER_TRANSITIONS_FNAME)):
+        uid = item.get('order_uid')
+        date = item.get('date_time')
+        date = convert_date(date, dayfirst=False)
+        order = Order.get(uid)
+        assignment = order.assignments[-1]
+        state_history = assignment.state_history.copy()
+        previous_status = ORDER_ASSIGNMENT_STATUS.get(item.get('previous_order_status'))
+        position = find_state_position(
+            state_history,
+            previous_status,
+            date
+        )
+        position = position + 1
+        if debug:
+            pprint(item)
+            pprint(state_history[position])
+        state_history[position]['message'] = 'Update transition, status to, ' \
+                                             'status from and date. history fixing procedure.'
+        state_history[position]['transition'] = ORDER_ASSIGNMENT_TRANSITION.get(item.get('new_transition_name'))
+        state_history[position]['to'] = ORDER_ASSIGNMENT_STATUS.get(item.get('new_order_status'))
+        state_history[position]['from'] = ORDER_ASSIGNMENT_STATUS.get(item.get('new_previous_order_status'))
+        state_history[position]['date'] = convert_date(
+            item.get('new_date_time'),
+            dayfirst=False).isoformat()
+        state_history[position]['actor'] = str(find_user_by_role(order, item.get('new_user_role')))
+        if debug:
+            pprint(state_history[position])
+        assignment.state_history = state_history
 
 
 if __name__ == '__main__':
@@ -395,4 +430,5 @@ if __name__ == '__main__':
         fix_assignments_insert_transitions()
         fix_dates()
         fix_orders_insert_transitions()
-        fix_transitions_and_dates()
+        fix_transitions_and_dates_orders()
+        fix_transitions_and_dates_assignments()
