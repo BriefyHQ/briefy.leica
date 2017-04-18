@@ -2,16 +2,11 @@
 History
 =======
 
-2.1.8 (2017-04-18)
-------------------
-
-    * Card #243 and #244: added new column to store a number of refuse transitions order and assignment have  (rudaporto).
-
-2.1.7 (2017-04-13)
+2.1.7 (2017-04-18)
 ------------------
 
     * Card #142: Trigger events on Tasks execution (ericof).
-
+    * Card #243 and #244: added new column to store a number of refuse transitions order and assignment have  (rudaporto).
 
 2.1.6 (2017-04-13)
 ------------------
