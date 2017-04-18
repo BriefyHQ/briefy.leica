@@ -1,2 +1,2 @@
 #!/bin/sh
-alembic upgrade head
+alembic --raiseerr upgrade head
