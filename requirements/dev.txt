@@ -1,5 +1,6 @@
 -r prod.txt
 alabaster==0.7.7
+appdirs==1.4.0
 coverage==4.1
 flake8
 flake8_docstrings
@@ -8,8 +9,9 @@ Jinja2==2.8
 moto==0.4.27
 pyramid-debugtoolbar==2.4.2
 pyramid_ipython
+pydocstyle==1.1.1
 pytest-cov==2.3.1
-pytest==3.0.5
+pytest==3.0.7
 requests_mock
 snowballstemmer==1.2.1
 sphinx-autodoc-typehints
@@ -21,4 +23,3 @@ sphinxcontrib-sadisplay
 tox==2.3.1
 virtualenv==15.0.3
 WebTest==2.0.20
-appdirs==1.4.0
