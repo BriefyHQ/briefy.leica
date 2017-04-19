@@ -3,16 +3,16 @@ from briefy import leica
 from briefy.common.types import BaseUser
 from briefy.common.utils.transformers import to_serializable
 from briefy.leica import models
+from briefy.leica.db import Session as DBSession
 from briefy.leica.db import Base
 from briefy.leica.db import create_engine
-from briefy.leica.db import Session as DBSession
 from briefy.ws.config import JWT_EXPIRATION
 from briefy.ws.config import JWT_SECRET
 from datetime import date
 from datetime import datetime
 from prettyconf import config
-from pyramid_jwt.policy import JWTAuthenticationPolicy
 from pyramid.paster import get_app
+from pyramid_jwt.policy import JWTAuthenticationPolicy
 from sqlalchemy_utils import PhoneNumber
 from webtest import TestApp
 from zope.configuration.xmlconfig import XMLConfig
@@ -21,9 +21,9 @@ import botocore
 import configparser
 import enum
 import json
-import requests
-import pytest
 import os
+import pytest
+import requests
 import uuid
 
 
@@ -572,19 +572,19 @@ def app():
 def login(request):
     """Login and get JWT token."""
     user_payload = {
-        "locale": "en_GB",
-        "id": "669a99c2-9bb3-443f-8891-e600a15e3c10",
-        "fullname": "Rudá Filgueiras",
-        "first_name": "Rudá",
-        "email": "rudazz@gmail.com",
-        "last_name": "Filgueiras",
-        "groups": [
-            "g:briefy_qa",
-            "g:briefy_pm",
-            "g:briefy_bizdev",
-            "g:briefy_scout",
-            "g:briefy_finance",
-            "g:briefy"
+        'locale': 'en_GB',
+        'id': '669a99c2-9bb3-443f-8891-e600a15e3c10',
+        'fullname': 'Rudá Filgueiras',
+        'first_name': 'Rudá',
+        'email': 'rudazz@gmail.com',
+        'last_name': 'Filgueiras',
+        'groups': [
+            'g:briefy_qa',
+            'g:briefy_pm',
+            'g:briefy_bizdev',
+            'g:briefy_scout',
+            'g:briefy_finance',
+            'g:briefy'
         ]
     }
     policy = JWTAuthenticationPolicy(private_key=JWT_SECRET,

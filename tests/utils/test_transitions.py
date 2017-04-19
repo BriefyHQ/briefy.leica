@@ -35,7 +35,7 @@ testdata = [
 ]
 
 
-@pytest.mark.parametrize("t,history,first,expected", testdata)
+@pytest.mark.parametrize('t,history,first,expected', testdata)
 def test_get_transition_date(t, history, first, expected):
     """Test get_transition_date."""
     func = transitions.get_transition_date

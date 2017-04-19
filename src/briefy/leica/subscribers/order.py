@@ -3,8 +3,8 @@ from briefy.common.users import SystemUser
 from briefy.common.vocabularies.roles import Groups as G
 from briefy.leica.events.order import OrderCreatedEvent
 from briefy.leica.subscribers.utils import apply_local_roles_from_parent
-from briefy.leica.subscribers.utils import create_new_assignment_from_order
 from briefy.leica.subscribers.utils import create_comment_from_wf_transition
+from briefy.leica.subscribers.utils import create_new_assignment_from_order
 from pyramid.events import subscriber
 
 

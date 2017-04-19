@@ -1,19 +1,20 @@
 """Script to list all events triggered by Leica."""
 from briefy.leica.models.asset.workflows import AssetWorkflow
 from briefy.leica.models.comment.workflows import CommentWorkflow
-from briefy.leica.models.customer.workflows import CustomerWorkflow
 from briefy.leica.models.customer.workflows import BillingAddressWorkflow
 from briefy.leica.models.customer.workflows import ContactWorkflow
+from briefy.leica.models.customer.workflows import CustomerWorkflow
 from briefy.leica.models.job.workflows import AssignmentWorkflow
 from briefy.leica.models.job.workflows import OrderLocationWorkflow
 from briefy.leica.models.job.workflows import OrderWorkflow
 from briefy.leica.models.job.workflows import PoolWorkflow
-from briefy.leica.models.professional.workflows import ProfessionalWorkflow
-from briefy.leica.models.professional.workflows import LocationWorkflow
 from briefy.leica.models.professional.workflows import LinkWorkflow
+from briefy.leica.models.professional.workflows import LocationWorkflow
+from briefy.leica.models.professional.workflows import ProfessionalWorkflow
 from briefy.leica.models.project.workflows import ProjectWorkflow
 from briefy.leica.models.user.workflows import BriefyUserProfileWorkflow
 from briefy.leica.models.user.workflows import CustomerUserProfileWorkflow
+
 
 entities = [
     'asset',

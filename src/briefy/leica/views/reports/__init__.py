@@ -4,7 +4,6 @@ from datetime import datetime
 from io import StringIO
 from pyramid.request import Response
 
-
 import csv
 
 

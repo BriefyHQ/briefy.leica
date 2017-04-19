@@ -7,6 +7,7 @@ from briefy.leica.config import UPLOAD_BUCKET
 import boto3
 import logging
 
+
 logger = logging.getLogger('briefy.leica')
 
 

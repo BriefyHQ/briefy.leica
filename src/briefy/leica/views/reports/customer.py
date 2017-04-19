@@ -6,6 +6,7 @@ from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
 from pyramid.security import Allow
 
+
 STATES = {
     'created': 'Created',
     'received': 'New',

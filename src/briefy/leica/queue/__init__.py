@@ -1,6 +1,6 @@
 """Briefy Leica Queue."""
 from briefy.common.queue import IQueue
-from briefy.common.queue import Queue as BaseQueue
+from briefy.common.queue import Queue
 from briefy.common.utils.schema import Dictionary
 from briefy.common.validators import EventName
 from briefy.leica.config import LEICA_QUEUE
@@ -8,6 +8,7 @@ from zope.interface import implementer
 
 import colander
 import logging
+
 
 logger = logging.getLogger('briefy.leica')
 
@@ -32,7 +33,7 @@ class Schema(colander.MappingSchema):
 
 
 @implementer(IQueue)
-class Queue(BaseQueue):
+class SQSQueue(Queue):
     """A Queue to handle messages to send emails."""
 
     name = LEICA_QUEUE
@@ -52,4 +53,4 @@ class Queue(BaseQueue):
         }
 
 
-LeicaQueue = Queue()
+LeicaQueue = SQSQueue()

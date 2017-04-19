@@ -32,7 +32,7 @@ class TestAssetImportView():
 
     def test_post_knack_logger_failure(self, app):
         """Test invalid post to knack logger endpoint"""
-        payload = "foo=bar"
+        payload = 'foo=bar'
         request = app.post('{base}'.format(base=self.base_path),
                            payload, headers=self.headers, status=400)
 

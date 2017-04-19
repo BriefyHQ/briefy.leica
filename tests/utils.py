@@ -1,8 +1,8 @@
 """Utils to export db data to json."""
 from briefy.leica.models import Asset
+from briefy.leica.models import Assignment
 from briefy.leica.models import Comment
 from briefy.leica.models import Customer
-from briefy.leica.models import Assignment
 from briefy.leica.models import Project
 
 
@@ -15,7 +15,7 @@ def export_model(file_name, model):
     file = open(file_name, 'w')
     file.write('[')
     for item in model.query().all():
-        file.write('{},'.format(item.to_JSON()))
+        file.write('{0},'.format(item.to_JSON()))
     file.write(']')
     file.flush()
 

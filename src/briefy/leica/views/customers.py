@@ -8,6 +8,7 @@ from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
 from pyramid.security import Allow
 
+
 COLLECTION_PATH = '/customers'
 PATH = COLLECTION_PATH + '/{id}'
 

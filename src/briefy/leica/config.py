@@ -2,6 +2,7 @@
 from briefy.common.config import _queue_suffix
 from prettyconf import config
 
+
 # NewRelic
 NEW_RELIC_LICENSE_KEY = config('NEW_RELIC_LICENSE_KEY', default='')
 
@@ -15,7 +16,7 @@ UPLOAD_BUCKET = config(
 )
 
 # Queue
-LEICA_QUEUE = config('LEICA_QUEUE', default='leica-{}'.format(_queue_suffix))
+LEICA_QUEUE = config('LEICA_QUEUE', default='leica-{0}'.format(_queue_suffix))
 
 IMAGE_BUCKET = config(
     'IMAGE_BUCKET',

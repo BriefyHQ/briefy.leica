@@ -16,7 +16,7 @@ testdata = [
 ]
 
 
-@pytest.mark.parametrize("value,op,expected", testdata)
+@pytest.mark.parametrize('value,op,expected', testdata)
 def test_dimensions(value, op, expected):
     """Test check dimensions."""
     func = imaging._check_dimensions
@@ -33,7 +33,7 @@ testdata = [
 ]
 
 
-@pytest.mark.parametrize("value,op,expected", testdata)
+@pytest.mark.parametrize('value,op,expected', testdata)
 def test_ratio(value, op, expected):
     """Test check ratio."""
     func = imaging._check_ratio
@@ -54,7 +54,7 @@ testdata = [
 ]
 
 
-@pytest.mark.parametrize("value,op,expected", testdata)
+@pytest.mark.parametrize('value,op,expected', testdata)
 def test_size(value, op, expected):
     """Test check image size."""
     func = imaging._check_size
@@ -71,7 +71,7 @@ testdata = [
 ]
 
 
-@pytest.mark.parametrize("value,op,expected", testdata)
+@pytest.mark.parametrize('value,op,expected', testdata)
 def test_dpi(value, op, expected):
     """Test check dpi."""
     func = imaging._check_dpi
@@ -89,7 +89,7 @@ testdata = [
 ]
 
 
-@pytest.mark.parametrize("value,op,expected", testdata)
+@pytest.mark.parametrize('value,op,expected', testdata)
 def test_mimetype(value, op, expected):
     """Test check mimetype."""
     func = imaging._check_mimetype
@@ -122,7 +122,7 @@ testdata = [
 ]
 
 
-@pytest.mark.parametrize("value,expected", testdata)
+@pytest.mark.parametrize('value,expected', testdata)
 def test_check_image_constraints(value, expected):
     """Test check image constraints."""
     func = imaging.check_image_constraints

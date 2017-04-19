@@ -6,10 +6,10 @@ from briefy.leica.models import Order
 from briefy.leica.models import Project
 from briefy.leica.models.dashboard.base import total_order_project
 from sqlalchemy import and_
-from sqlalchemy import or_
 from sqlalchemy import case
 from sqlalchemy import distinct
 from sqlalchemy import func
+from sqlalchemy import or_
 from sqlalchemy import select
 from sqlalchemy import types
 from sqlalchemy.sql import expression

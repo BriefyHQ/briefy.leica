@@ -10,6 +10,7 @@ from io import StringIO
 
 import csv
 
+
 ORDER_CSV = '/tmp/orders.csv'
 ASSIGNMENT_CSV = '/tmp/assignments.csv'
 

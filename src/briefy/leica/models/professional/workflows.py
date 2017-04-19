@@ -1,12 +1,10 @@
 """Professional workflow."""
 from briefy.common.vocabularies.roles import Groups as G
 from briefy.common.vocabularies.roles import LocalRolesChoices as LR
+from briefy.common.workflow import WorkflowState as WS
 from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import Permission
-from briefy.common.workflow import WorkflowState as WS
-
 from briefy.leica.utils.user import create_rolleiflex_user
-
 
 import logging
 

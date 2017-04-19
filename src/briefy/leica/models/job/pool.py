@@ -9,8 +9,8 @@ from briefy.leica.models.professional import Professional
 from sqlalchemy import func
 from sqlalchemy import orm
 from sqlalchemy import select
-from sqlalchemy.sql import and_
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.sql import and_
 
 import colander
 import sqlalchemy as sa

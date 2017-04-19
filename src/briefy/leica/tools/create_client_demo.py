@@ -5,11 +5,12 @@ from briefy.leica.db import Session
 from briefy.leica.models import Customer
 from briefy.leica.models import CustomerBillingAddress
 from briefy.leica.models import CustomerUserProfile
-from briefy.leica.models import Project
 from briefy.leica.models import Order
+from briefy.leica.models import Project
 from briefy.leica.sync import db
 
 import transaction
+
 
 PROJECT_MANAGER = '9df18a79-44dc-4c2f-86aa-09bf7706ae86'
 CUSTOMER_USER = '4111d75b-19be-4a43-ad8a-3cd0fe854228'
@@ -27,18 +28,18 @@ class SetupDemo:
         self.user = BaseUser(
             user_id=PROJECT_MANAGER,
             data={
-                "locale": "en_GB",
-                "fullname": "Erico Andrei",
-                "first_name": "Erico",
-                "email": "erico@briefy.co",
-                "last_name": "Andrei",
-                "groups": [
-                    "g:briefy_pm",
-                    "g:briefy_qa",
-                    "g:briefy_bizdev",
-                    "g:briefy_finance",
-                    "g:briefy_scout",
-                    "g:system"
+                'locale': 'en_GB',
+                'fullname': 'Erico Andrei',
+                'first_name': 'Erico',
+                'email': 'erico@briefy.co',
+                'last_name': 'Andrei',
+                'groups': [
+                    'g:briefy_pm',
+                    'g:briefy_qa',
+                    'g:briefy_bizdev',
+                    'g:briefy_finance',
+                    'g:briefy_scout',
+                    'g:system'
                 ]
             }
         )

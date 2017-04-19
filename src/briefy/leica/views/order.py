@@ -13,6 +13,7 @@ from pyramid.security import Allow
 from sqlalchemy import and_
 from sqlalchemy import or_
 
+
 COLLECTION_PATH = '/orders'
 PATH = COLLECTION_PATH + '/{id}'
 

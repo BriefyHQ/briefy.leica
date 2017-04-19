@@ -1,6 +1,6 @@
 """Views to handle QA Dashboards."""
-from briefy.leica.models.dashboard.qa import DashboardQaType
 from briefy.leica.models.dashboard.qa import DashboardQaProject
+from briefy.leica.models.dashboard.qa import DashboardQaType
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources import RESTService
 from briefy.ws.resources.factory import BaseFactory

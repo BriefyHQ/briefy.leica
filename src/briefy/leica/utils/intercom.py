@@ -3,8 +3,8 @@ from briefy.leica.config import INTERCOM_APP_ID
 from briefy.leica.config import INTERCOM_HASH_KEY
 from briefy.leica.models.mixins import get_public_user_info
 
-import hmac
 import hashlib
+import hmac
 
 
 def _generate_hash(message):

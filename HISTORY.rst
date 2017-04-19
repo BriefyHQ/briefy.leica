@@ -2,6 +2,12 @@
 History
 =======
 
+2.1.8 (Unreleased)
+------------------
+
+    * Usage of octopus.checkstyle for Flake8 (ericof).
+
+
 2.1.7 (2017-04-19)
 ------------------
 

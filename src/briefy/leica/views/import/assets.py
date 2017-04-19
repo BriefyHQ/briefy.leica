@@ -22,7 +22,7 @@ class AssetImportFactory(BaseFactory):
         :rtype list
         """
         return [
-            (Allow, "g:briefy", ['view', 'list', 'create']),
+            (Allow, 'g:briefy', ['view', 'list', 'create']),
         ]
 
 

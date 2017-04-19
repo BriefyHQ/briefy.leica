@@ -1,7 +1,7 @@
 """Main script to import Assets."""
 from briefy.leica.db import Session
-from briefy.leica.sync.db import configure
 from briefy.leica.sync.asset import import_assets
+from briefy.leica.sync.db import configure
 from briefy.leica.tools import logger # noqa
 
 import csv

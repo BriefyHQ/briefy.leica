@@ -32,8 +32,8 @@ def import_assets(session, asset_rows):
         filename = s3_path.split('/')[-1]
         title = filename.strip('-_ ')
         if title.lower().startswith(job.order.customer_order_id.lower()):
-            title = title[len(job.order.customer_order_id):].strip(" -+")
-        title = title.replace("_", " ")
+            title = title[len(job.order.customer_order_id):].strip(' -+')
+        title = title.replace('_', ' ')
         # source_path = os.path.join(S3_SOURCE_PREFIX, s3_path.lstrip('/'))
 
         new_asset = False
@@ -60,7 +60,7 @@ def import_assets(session, asset_rows):
                 assignment_id=assignment_id,
                 title=title,
                 type='image',
-                description="",
+                description='',
                 content_type='image/jpeg',
                 owner=str(professional_id),
                 professional_id=professional_id,
@@ -89,10 +89,9 @@ def import_assets(session, asset_rows):
             if new_asset:
                 session.add(asset)
             session.flush()
-            print(".", end='', flush=True)
+            print('.', end='', flush=True)
         except Exception as error:
-            logger.error('Could not import asset "{}". Error {}'.format(
-                s3_path, error))
+            logger.error('Could not import asset "{0}". Error {1}'.format(s3_path, error))
             savepoint.rollback()
             failed.append(dict(assignment_id=job.id, asset_name=filename))
             continue

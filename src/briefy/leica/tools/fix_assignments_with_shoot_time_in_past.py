@@ -1,14 +1,14 @@
 """Fix shoot time in past."""
 from briefy.leica.db import Session
+from briefy.leica.models import Assignment
 from briefy.leica.sync.db import configure
 from briefy.leica.tasks.assignment import move_assignments_awaiting_assets
-from briefy.leica.models import Assignment
-from dateutil.parser import parse
 from datetime import timedelta
-
+from dateutil.parser import parse
 
 import pytz
 import transaction
+
 
 pm_tzinfo = pytz.timezone('Europe/Berlin')
 

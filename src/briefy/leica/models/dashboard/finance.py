@@ -11,6 +11,7 @@ from sqlalchemy import select
 from sqlalchemy import types
 from sqlalchemy.sql import expression
 
+
 total_order_project = select([
     func.CONCAT('/projects/', expression.cast(Project.id, types.Unicode)).label('absolute_url'),
     Project.title,

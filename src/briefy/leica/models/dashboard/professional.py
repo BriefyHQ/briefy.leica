@@ -2,11 +2,11 @@
 from briefy.leica.db import Base
 from briefy.leica.db import Session
 from briefy.leica.models import Assignment
+from sqlalchemy import and_
 from sqlalchemy import case
 from sqlalchemy import distinct
 from sqlalchemy import func
 from sqlalchemy import select
-from sqlalchemy import and_
 
 
 total_assignments_professional = select([

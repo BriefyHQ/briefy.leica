@@ -1,8 +1,8 @@
 """Test Task to move assignments to a Pool."""
-from conftest import BaseTaskTest
 from briefy.leica import models
 from briefy.leica.tasks.pool import _move_assignment_to_pool
 from briefy.leica.tasks.pool import move_assignments_to_pool
+from conftest import BaseTaskTest
 
 import json
 

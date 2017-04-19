@@ -130,7 +130,7 @@ def add_order_history(session, obj, kobj):
     actor = str(actor_id) if actor_id else str(SystemUser.id)
     history.append({
         'date': _build_date(kobj.input_date),
-        'message': 'Created by {} on Knack database'.format(person),
+        'message': 'Created by {0} on Knack database'.format(person),
         'actor': actor,
         'transition': '',
         'from': '',
@@ -158,7 +158,7 @@ def add_order_history(session, obj, kobj):
         actor = str(actor_id) if actor_id else str(SystemUser.id)
         history.append({
             'date': _build_date(kobj.assignment_date, last_date),
-            'message': "Photographer assigned by '{}' on the Knack database".format(person),
+            'message': 'Photographer assigned by \'{0}\' on the Knack database'.format(person),
             'actor': actor,
             'transition': 'assign',
             'from': 'received',
@@ -186,7 +186,7 @@ def add_order_history(session, obj, kobj):
         actor = str(actor_id) if actor_id else str(SystemUser.id)
         history.append({
             'date': _build_date(date, last_date),
-            'message': "Scheduled by '{}' on the Knack database".format(person) + extra_message,
+            'message': 'Scheduled by \'{0}\' on the Knack database'.format(person) + extra_message,
             'actor': actor,
             'transition': 'schedule',
             'from': history[-1]['to'],
@@ -203,7 +203,7 @@ def add_order_history(session, obj, kobj):
         actor = str(actor_id) if actor_id else str(SystemUser.id)
         history.append({
             'date': _build_date(date, last_date),
-            'message': "Submited by '{}' on the Knack database".format(person),
+            'message': 'Submited by \'{0}\' on the Knack database'.format(person),
             'actor': actor,
             'transition': 'start_qa',
             'from': history[-1]['to'],
@@ -220,7 +220,7 @@ def add_order_history(session, obj, kobj):
         actor = str(actor_id) if actor_id else 'g:briefy_qa'
         history.append({
             'date': _build_date(date, last_date),
-            'message': "Delivered by '{}' on the Knack database".format(person),
+            'message': 'Delivered by \'{0}\' on the Knack database'.format(person),
             'actor': actor,
             'transition': 'deliver',
             'from': history[-1]['to'],
@@ -236,7 +236,7 @@ def add_order_history(session, obj, kobj):
         actor = str(actor_id) if actor_id else str(SystemUser.id)
         history.append({
             'date': _build_date(date, last_date),
-            'message': "Marked as  'completed' on the Knack database",
+            'message': 'Marked as \'completed\' on the Knack database',
             'actor': actor,
             'transition': 'accept',
             'from': history[-1]['to'],
@@ -413,7 +413,7 @@ def add_assignment_history(session, obj, kobj, versions=()):
         actor = str(actor_id) if actor_id else system_id
         history.append({
             'date': _build_date(assignment_date, last_date),
-            'message': "Scheduled by '{0}' on the Knack database".format(person),
+            'message': 'Scheduled by \'{0}\' on the Knack database'.format(person),
             'actor': actor,
             'transition': 'schedule',
             'from': history[-1]['to'],
@@ -454,7 +454,7 @@ def add_assignment_history(session, obj, kobj, versions=()):
                 date = _build_date(submission_date, last_date)
                 history.append({
                     'date': date,
-                    'message': "Submitted by '{0}' (from data on Knack)".format(person),
+                    'message': 'Submitted by \'{0}\' (from data on Knack)'.format(person),
                     'actor': actor,
                     'transition': 'upload',
                     'from': 'awaiting_assets',
@@ -464,7 +464,7 @@ def add_assignment_history(session, obj, kobj, versions=()):
                 date = submission_date
                 history.append({
                     'date': _build_date(date, last_date),
-                    'message': "Automatic validation skipped (from data on Knack)",
+                    'message': 'Automatic validation skipped (from data on Knack)',
                     'actor': system_id,
                     'transition': 'validate_assets',
                     'from': 'asset_validation',
@@ -473,7 +473,7 @@ def add_assignment_history(session, obj, kobj, versions=()):
                 id_ = str(obj.qa_manager) or system_id
                 history.append({
                     'date': date.isoformat(),
-                    'message': "Rejected by '{0}' (from data on Knack)".format(qa_manager),
+                    'message': 'Rejected by \'{0}\' (from data on Knack)'.format(qa_manager),
                     'actor': id_,
                     'transition': 'reject',
                     'from': 'in_qa',
@@ -492,7 +492,7 @@ def add_assignment_history(session, obj, kobj, versions=()):
                 id_ = str(obj.qa_manager) or system_id
                 history.append({
                     'date': date.isoformat(),
-                    'message': "Rejected by '{0}' (from data on Knack)".format(qa_manager),
+                    'message': 'Rejected by \'{0}\' (from data on Knack)'.format(qa_manager),
                     'actor': id_,
                     'transition': 'reject',
                     'from': 'in_qa',
@@ -500,7 +500,7 @@ def add_assignment_history(session, obj, kobj, versions=()):
                 })
             history.append({
                 'date': (entry['date'] - timedelta(1/1440)).isoformat(),
-                'message': "Submitted by '{0}' (from data on Knack)".format(person),
+                'message': 'Submitted by \'{0}\' (from data on Knack)'.format(person),
                 'actor': actor,
                 'transition': 'upload',
                 'from': 'awaiting_assets',
@@ -520,7 +520,7 @@ def add_assignment_history(session, obj, kobj, versions=()):
         date = _build_date(submission_date, last_date)
         history.append({
             'date': date,
-            'message': "Submitted by '{0}' (from data on Knack)".format(person),
+            'message': 'Submitted by \'{0}\' (from data on Knack)'.format(person),
             'actor': actor,
             'transition': 'upload',
             'from': 'awaiting_assets',
@@ -530,7 +530,7 @@ def add_assignment_history(session, obj, kobj, versions=()):
         date = submission_date
         history.append({
             'date': _build_date(date, last_date),
-            'message': "Automatic validation skipped (from data on Knack)",
+            'message': 'Automatic validation skipped (from data on Knack)',
             'actor': system_id,
             'transition': 'validate_assets',
             'from': 'asset_validation',
@@ -548,7 +548,7 @@ def add_assignment_history(session, obj, kobj, versions=()):
         date = last_approval_date or submission_date
         history.append({
             'date': _build_date(last_approval_date, last_date),
-            'message': "Rejected by '{0}'".format(person),
+            'message': 'Rejected by \'{0}\''.format(person),
             'actor': actor,
             'transition': 'reject',
             'from': 'in_qa',
@@ -567,7 +567,7 @@ def add_assignment_history(session, obj, kobj, versions=()):
             date = last_photographer_update
             history.append({
                 'date': _build_date(last_photographer_update, last_date),
-                'message': "Submitted by '{0}' (from data on Knack)".format(person),
+                'message': 'Submitted by \'{0}\' (from data on Knack)'.format(person),
                 'actor': actor,
                 'transition': 'upload',
                 'from': 'awaiting_assets',
@@ -576,7 +576,7 @@ def add_assignment_history(session, obj, kobj, versions=()):
             dates.add(date)
             history.append({
                 'date': _build_date(date, last_date),
-                'message': "Automatic validation skipped (from data on Knack)",
+                'message': 'Automatic validation skipped (from data on Knack)',
                 'actor': system_id,
                 'transition': 'validate_assets',
                 'from': 'asset_validation',
@@ -591,7 +591,7 @@ def add_assignment_history(session, obj, kobj, versions=()):
         date = delivery_date_to_client or last_approval_date or submission_date
         history.append({
             'date': _build_date(date, last_date),
-            'message': "Approved by '{0}'".format(person),
+            'message': 'Approved by \'{0}\''.format(person),
             'actor': actor,
             'transition': 'approve',
             'from': 'in_qa',
@@ -609,7 +609,7 @@ def add_assignment_history(session, obj, kobj, versions=()):
         actor = str(actor_id) if actor_id else system_id
         history.append({
             'date': _build_date(refuse_date, last_date),
-            'message': "Set of photos refused by client",
+            'message': 'Set of photos refused by client',
             'actor': actor,
             'transition': 'refuse',
             'from': 'approved',
@@ -624,7 +624,7 @@ def add_assignment_history(session, obj, kobj, versions=()):
         actor = str(actor_id) if actor_id else system_id
         history.append({
             'date': _build_date(delivery_date_to_client, last_date),
-            'message': "completed",
+            'message': 'completed',
             'actor': actor,
             'transition': 'complete',
             'from': 'approved',
@@ -640,7 +640,7 @@ def add_assignment_history(session, obj, kobj, versions=()):
         history.append({
             # TODO: verify this date
             'date': _build_date(date, last_date),
-            'message': "Cancelled by customer",
+            'message': 'Cancelled by customer',
             'actor': actor,
             'transition': 'cancel',
             'from': history[-1]['to'],
