@@ -377,7 +377,7 @@ def fix_transitions_and_dates_orders(debug=False):
         if debug:
             pprint(item)
             pprint(state_history[position])
-        state_history[position]['message'] = item.get('comment')
+        state_history[position]['message'] = 'Transition corrected after migration: history fixing procedure.'
         state_history[position]['transition'] = item.get('new_transition_name')
         state_history[position]['to'] = item.get('new_order_status')
         state_history[position]['from'] = item.get('new_previous_order_status')
@@ -409,8 +409,7 @@ def fix_transitions_and_dates_assignments(debug=False):
         if debug:
             pprint(item)
             pprint(state_history[position])
-        state_history[position]['message'] = 'Update transition, status to, ' \
-                                             'status from and date. history fixing procedure.'
+        state_history[position]['message'] = 'Transition corrected after migration: history fixing procedure.'
         state_history[position]['transition'] = ORDER_ASSIGNMENT_TRANSITION.get(
             item.get('new_transition_name')
         )
