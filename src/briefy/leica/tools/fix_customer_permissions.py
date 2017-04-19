@@ -174,3 +174,5 @@ if __name__ == '__main__':
     # fix_wolt_permissions()
     # fix_ehvisio_permissions()
     # fix_agoda_permissions()
+
+    transaction.commit()

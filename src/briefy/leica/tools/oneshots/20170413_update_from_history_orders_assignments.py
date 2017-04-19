@@ -39,3 +39,4 @@ if __name__ == '__main__':
     session = configure(Session)
     update_orders(session)
     update_assignments(session)
+    transaction.commit()
