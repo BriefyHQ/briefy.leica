@@ -8,6 +8,7 @@ History
     * Card #142: Trigger events on Tasks execution (ericof).
     * Card #243 and #244: added new column to store a number of refuse transitions order and assignment have  (rudaporto).
     * Card #214: fix Orders and Assignments without scout manager (rudaporto).
+    * Update the Dockerfile to use python 3.6.1 container and updated packages (rudaporto/ericof).
 
 2.1.6 (2017-04-13)
 ------------------
