@@ -1,5 +1,5 @@
-gunicorn==19.6.0
-gevent==1.1.2
+gunicorn==19.7.1
+gevent==1.2.1
 pycountry==16.11.27.1
 -e git+git@github.com:BriefyHQ/briefy.knack.git@develop#egg=briefy.knack
 -e git+git@github.com:BriefyHQ/briefy.common.git@develop#egg=briefy.common[db]
