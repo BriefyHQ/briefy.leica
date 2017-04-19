@@ -1,5 +1,4 @@
 -r prod.txt
-<<<<<<< HEAD
 appdirs==1.4.0
 flake8
 flake8_docstrings
