@@ -1,5 +1,5 @@
 language: python
-python: 3.5
+python: 3.6
 sudo: false
 branches:
   only:
@@ -14,7 +14,7 @@ env:
     DATABASE_URL=postgresql://briefy:briefy@127.0.0.1:9998/briefy-leica-unit_test SQS_IP=127.0.0.1
     SQS_PORT=5000 USER_SERVICE_BASE=https://api.stg.briefy.co/internal BOTO_CONFIG=/tmp/nowhere
   matrix:
-  - TOXENV=py35
+  - TOXENV=py36
 install:
 - docker run -d -p 127.0.0.1:5000:5000 --name sqs briefy/aws-test:latest sqs
 - docker run -d -p 127.0.0.1:9998:5432 -e POSTGRES_PASSWORD=briefy -e POSTGRES_USER=briefy

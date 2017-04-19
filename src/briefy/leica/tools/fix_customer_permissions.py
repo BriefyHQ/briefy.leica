@@ -97,6 +97,7 @@ def fix_wolt_permissions():
     emails = [
         'julia.ruottinen@wolt.com',
         'aku.kallonen@wolt.com',
+        'jens.lund@wolt.com',
         'jessie@wolt.com'
     ]
     users = []
@@ -168,8 +169,10 @@ if __name__ == '__main__':
     configure(Session)
 
     # fix permissions
-    fix_delivery_hero_permissions()
+    # fix_delivery_hero_permissions()
     # fix_just_eat_permissions()
     # fix_wolt_permissions()
     # fix_ehvisio_permissions()
     # fix_agoda_permissions()
+
+    transaction.commit()

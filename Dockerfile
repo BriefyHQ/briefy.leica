@@ -1,4 +1,4 @@
-FROM briefy/python3:1.2.0
+FROM briefy/python3:1.3.0
 MAINTAINER Briefy <developers@briefy.co>
 
 ADD . /app
@@ -13,7 +13,7 @@ RUN mkdir /root/.ssh && chmod 600 /root/.ssh && \
 # Add docker_entrypoint file
 RUN cp docker/docker_entrypoint.sh / && chmod +x /docker_entrypoint.sh
 
-RUN pip install -r requirements.txt
+RUN pip3 install -r requirements.txt
 
 CMD ["/docker_entrypoint.sh"]
 

@@ -6,8 +6,8 @@ from briefy.leica.db import Session
 from briefy.leica.log import tasks_logger as logger
 from briefy.leica.sync import db
 from briefy.leica.tasks.assignment import move_assignments_awaiting_assets
-from briefy.leica.tasks.order import move_order_accepted
-from briefy.leica.tasks.pool import move_assignment_to_pool
+from briefy.leica.tasks.order import move_orders_accepted
+from briefy.leica.tasks.pool import move_assignments_to_pool
 
 import transaction
 
@@ -22,7 +22,7 @@ def main():
         """Run all tasks."""
         with transaction.manager:
             logger.info('Start: moving assignments to Pool.')
-            move_assignment_to_pool()
+            move_assignments_to_pool()
             logger.info('End: moving assignments to Pool.')
 
         with transaction.manager:
@@ -32,7 +32,7 @@ def main():
 
         with transaction.manager:
             logger.info('Start: moving orders to accepted.')
-            move_order_accepted()
+            move_orders_accepted()
             logger.info('End: moving orders to accepted.')
 
     logger.info('Starting Leica Task Manager.')

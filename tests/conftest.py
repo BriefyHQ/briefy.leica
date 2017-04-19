@@ -517,6 +517,47 @@ class BaseDashboardTestView:
         # TODO: implement more checks about dashboard structure
 
 
+@pytest.mark.usefixtures('db_transaction', 'create_dependencies')
+class BaseTaskTest:
+    """Test tasks."""
+
+    dependencies = [
+        (models.Professional, 'data/professionals.json'),
+        (models.Customer, 'data/customers.json'),
+        (models.Pool, 'data/jpools.json'),
+        (models.Project, 'data/projects.json'),
+        (models.Order, 'data/orders.json'),
+        (models.Assignment, 'data/assignments.json')
+    ]
+
+    def _setup_queue(self):
+        """Return a queue instance."""
+        from briefy.common.queue.event import EventQueue
+        from briefy.common.queue import IQueue
+        from zope.component import provideUtility
+
+        import boto3
+
+        name = 'foo'
+        sqs = boto3.resource('sqs', region_name='us-east-1')
+        sqs.create_queue(QueueName=name)
+        self.queue = sqs.get_queue_by_name(QueueName=name)
+
+        for message in self.queue.receive_messages(MaxNumberOfMessages=100):
+            message.delete()
+
+        EventQueue._queue = self.queue
+        provideUtility(EventQueue, IQueue, 'events.queue')
+
+    def setup_method(self, method):
+        """Setup method."""
+        self._setup_queue()
+
+    def get_messages_from_queue(self):
+        messages = self.queue.receive_messages(MaxNumberOfMessages=100)
+        return messages
+
+
 @pytest.fixture(scope='session')
 def app():
     """Fixture to create new app instance.

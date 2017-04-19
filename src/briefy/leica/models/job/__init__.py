@@ -33,7 +33,7 @@ __listing_attributes__ = __summary_attributes__ + [
     'assignment_date', 'last_approval_date', 'submission_date', 'last_submission_date',
     'set_type', 'number_required_assets', 'category', 'availability', 'additional_compensation',
     'reason_additional_compensation', 'qa_manager', 'state_history', 'requirements', 'pool_id',
-    'location', 'project', 'closed_on_date', 'pool', 'delivery'
+    'location', 'project', 'closed_on_date', 'pool', 'delivery', 'refused_times'
 ]
 
 __colander_alchemy_config_overrides__ = \
@@ -217,6 +217,12 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
             raise Exception('Slug should not be changed.')
         else:
             self._slug = value
+
+    refused_times = sa.Column(
+        sa.Integer(),
+        default=0
+    )
+    """Number times the Assignment was refused."""
 
     set_type = sa.Column(
         sautils.ChoiceType(TypesOfSetChoices, impl=sa.String()),
@@ -537,6 +543,14 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         """Update dates from history."""
         updated_at = self.updated_at
         state_history = self.state_history
+
+        def number_of_transitions(transition_name):
+            """Return the number of times one transition happened."""
+            total = [t for t in state_history if t['transition'] == transition_name]
+            return len(total)
+
+        # updated refused times
+        self.refused_times = number_of_transitions('refuse')
 
         def updated_if_changed(attr, t_list, first=False):
             """Update only if changed."""
