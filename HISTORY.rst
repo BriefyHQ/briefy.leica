@@ -2,6 +2,11 @@
 History
 =======
 
+2.1.8 (2017-04-21)
+------------------
+    * Card #151: Added support groups to Order workflow edit_payout and compensation (rudaporto).
+    * Upgrade packages: pyramid to 1.8.3 and cornice to 2.4.0 (rudaporto).
+
 2.1.7 (2017-04-19)
 ------------------
 
