@@ -564,26 +564,32 @@ class AssignmentWorkflow(BriefyWorkflow):
         """Update payout and travel expenses of an Assignment."""
         pass
 
-    @Permission(groups=[G['finance'], G['scout'], G['pm'], G['system'], ])
+    @Permission(groups=[
+        G['finance'], G['scout'], G['pm'], G['system'],
+        G['product'], G['tech'], G['support']
+    ])
     def can_edit_payout(self):
         """Validate if user can edit payout and travel expenses of an Assignment."""
         final_states = ('cancelled', 'completed', 'perm_rejected', )
         scout_states = ('pending', 'published',)
         user = self.context
         state = self.state
+        support_groups = {G['product'], G['tech'], G['support']}
+        is_support = support_groups.intersection(set(user.groups))
+        has_permission = False
 
         if G['system'].value in user.groups:
-            permission = True
+            has_permission = True
+        elif is_support:
+            has_permission = True
         elif G['finance'].value in user.groups:
-            permission = True
+            has_permission = True
         elif G['scout'].value in user.groups and state.name not in scout_states:
-            permission = False
-        elif G['pm'].value in user.groups and state.name in final_states:
-            permission = False
-        else:
-            permission = True
+            has_permission = False
+        elif G['pm'].value in user.groups and state.name not in final_states:
+            has_permission = True
 
-        return permission
+        return has_permission
 
     @assigned.transition(
         assigned, 'can_edit_compensation', required_fields=COMPENSATION_REQUIRED_FIELDS
@@ -616,20 +622,27 @@ class AssignmentWorkflow(BriefyWorkflow):
         """Update additional compensation value and reason of an Assignment."""
         pass
 
-    @Permission(groups=[G['finance'], G['pm'], G['system'], ])
+    @Permission(groups=[
+        G['finance'], G['pm'], G['system'],
+        G['product'], G['tech'], G['support']
+    ])
     def can_edit_compensation(self):
         """Validate if user can edit additional compensation value and reason of an Assignment."""
         final_states = ('cancelled', 'completed', 'perm_rejected', )
         user = self.context
         state = self.state
+        support_groups = {G['product'], G['tech'], G['support']}
+        is_support = support_groups.intersection(set(user.groups))
+        has_permission = False
 
         if G['system'].value in user.groups:
-            return True
+            has_permission = True
+        elif is_support or G['finance'].value in user.groups:
+            has_permission = True
+        elif G['pm'].value in user.groups and state.name not in final_states:
+            has_permission = True
 
-        if G['finance'].value not in user.groups and state.name in final_states:
-            return False
-
-        return True
+        return has_permission
 
 
 class OrderLocationWorkflow(BriefyWorkflow):
