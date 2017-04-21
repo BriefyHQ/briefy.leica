@@ -7,6 +7,7 @@ from uuid import uuid4
 
 import re
 
+
 breaker = '\n------------------------------\n'
 import_replace = breaker + 'CREATED_AT Imported using a script' + breaker
 script_replace = breaker + r'\1 Imported using a script' + breaker

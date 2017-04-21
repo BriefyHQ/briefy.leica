@@ -1,7 +1,7 @@
 """Main script to import Customers."""
 from briefy.leica.db import Session
-from briefy.leica.sync.db import configure
 from briefy.leica.sync.customer import CustomerSync
+from briefy.leica.sync.db import configure
 from briefy.leica.tools import logger # noqa
 
 

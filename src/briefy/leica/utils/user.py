@@ -47,11 +47,11 @@ def create_rolleiflex_user(profile, groups=()):
     )
 
     headers = {
-        'x-locale': "en_GB",
-        'content-type': "application/json"
+        'x-locale': 'en_GB',
+        'content-type': 'application/json'
     }
 
-    response = requests.request("POST", url, data=json.dumps(payload), headers=headers)
+    response = requests.request('POST', url, data=json.dumps(payload), headers=headers)
     if response.status_code in (200, 201):
         logger.info('Success user creation. Email: {email}.'.format(email=profile.email))
         # We put this here to be serialized to sqs

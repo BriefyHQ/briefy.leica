@@ -4,7 +4,6 @@ from briefy.common.users import SystemUser
 from briefy.leica.events.task import LeicaTaskEvent
 from briefy.leica.log import tasks_logger as logger
 from briefy.leica.models import Order
-
 from workdays import workday
 
 

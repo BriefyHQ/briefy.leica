@@ -8,10 +8,10 @@ from concurrent.futures import ThreadPoolExecutor as Executor
 from pyramid.config import Configurator
 from zope.configuration.xmlconfig import XMLConfig
 
-
 import briefy.ws
 import logging
 import pkg_resources
+
 
 __version__ = pkg_resources.get_distribution(__package__).version
 

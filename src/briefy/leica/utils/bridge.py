@@ -6,6 +6,7 @@ from briefy.knack.config import KNACK_APPLICATION_ID
 import briefy.knack as K
 import logging
 
+
 logger = logging.getLogger('briefy.leica')
 logger.setLevel(logging.INFO)
 

@@ -1,8 +1,8 @@
 """User profile information."""
 from briefy.common.utils import schema
 from briefy.leica.db import Base
-from briefy.leica.models import mixins
 from briefy.leica.models import Customer
+from briefy.leica.models import mixins
 from briefy.leica.models.user import workflows
 from briefy.leica.utils.user import add_user_info_to_state_history
 from sqlalchemy.dialects.postgresql import JSONB
@@ -108,7 +108,7 @@ class UserProfile(mixins.UserProfileMixin, mixins.UserProfileBriefyRoles, Base):
     @declared_attr
     def title(cls):
         """Return the User fullname."""
-        return sa.orm.column_property(cls.first_name + " " + cls.last_name)
+        return sa.orm.column_property(cls.first_name + ' ' + cls.last_name)
 
     def to_dict(self):
         """Return a dict representation of this object."""

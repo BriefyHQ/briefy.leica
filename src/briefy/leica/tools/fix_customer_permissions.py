@@ -1,10 +1,10 @@
 """Helpers to fix user permissions."""
 from briefy.leica.db import Session
-from briefy.leica.sync.db import configure
 from briefy.leica.models import Customer
 from briefy.leica.models import CustomerUserProfile
 from briefy.leica.models import Order
 from briefy.leica.models import Project
+from briefy.leica.sync.db import configure
 
 import transaction
 

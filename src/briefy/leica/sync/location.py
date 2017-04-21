@@ -1,10 +1,11 @@
 """Deal with address cleansing and creation."""
+from briefy.knack.base import KnackEntity
 from briefy.leica import logger
 from briefy.leica.sync import Auto
 from briefy.leica.sync import PLACEHOLDERS
-from briefy.knack.base import KnackEntity
 
 import pycountry
+
 
 # Initialize pycountry
 TOTAL_COUNTRIES = len(pycountry.countries)  # noqa

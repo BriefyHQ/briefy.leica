@@ -6,10 +6,11 @@ from briefy.common.utils.transformers import to_serializable
 from briefy.leica.config import FILES_BASE
 from briefy.leica.models import Customer
 from briefy.leica.models import Project
-from briefy.leica.sync import ModelSync
 from briefy.leica.sync import category_mapping
+from briefy.leica.sync import ModelSync
 from briefy.leica.sync.project_constraints import CONSTRAINTS
 from datetime import datetime
+
 
 NOW = to_serializable(datetime_utcnow())
 ACTOR = SystemUser.id

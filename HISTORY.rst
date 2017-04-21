@@ -4,6 +4,8 @@ History
 
 2.1.8 (2017-04-21)
 ------------------
+
+    * Usage of octopus.checkstyle for Flake8 (ericof).
     * Card #151: Added support groups to Order workflow edit_payout and compensation (rudaporto).
     * Upgrade packages: pyramid to 1.8.3 and cornice to 2.4.0 (rudaporto).
     * Pined briefy.common and briefy.ws to stable releases 2.0.0 (rudaporto).

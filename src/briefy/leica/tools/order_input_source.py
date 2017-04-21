@@ -1,5 +1,4 @@
 """Re-synch Order's input source (source attribute) from Knack."""
-
 from briefy.leica.db import Session
 from briefy.leica.models import Order
 from briefy.leica.sync.db import configure
@@ -14,7 +13,7 @@ def init():
     """Preread all values from the databases."""
     global logger, Job, jobs, orders, jobs_id
     logger = getLogger(__name__)
-    Job = K.get_model("Job")
+    Job = K.get_model('Job')
     jobs = Job.query.all()
     orders = Order.query().all()
     jobs_id = {j.id: j for j in jobs}
@@ -22,7 +21,7 @@ def init():
 
 def is_briefy(kjob):
     """Check whether a Job object from Knack has briefy or custommer as input_source."""
-    return "briefy" in str(kjob.input_source).lower()
+    return 'briefy' in str(kjob.input_source).lower()
 
 
 def make_changes():

@@ -9,6 +9,7 @@ from cornice.resource import view
 
 import os
 
+
 ENV = os.environ.get('ENV', 'staging')
 
 DELIVERY_SETTINGS = {

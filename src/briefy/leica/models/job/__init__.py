@@ -5,8 +5,8 @@ from briefy.leica.models import mixins
 from briefy.leica.models.job import workflows
 from briefy.leica.models.job.order import Order
 from briefy.leica.utils.transitions import get_transition_date_from_history
-from briefy.leica.vocabularies import TypesOfSetChoices
 from briefy.leica.utils.user import add_user_info_to_state_history
+from briefy.leica.vocabularies import TypesOfSetChoices
 from datetime import datetime
 from sqlalchemy import orm
 from sqlalchemy import select
@@ -373,9 +373,9 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
 
     project = orm.relationship(
         'Project',
-        secondary="join(Order, Project, Order.project_id == Project.id)",
-        secondaryjoin="Order.project_id == Project.id",
-        primaryjoin="Order.id == Assignment.order_id",
+        secondary='join(Order, Project, Order.project_id == Project.id)',
+        secondaryjoin='Order.project_id == Project.id',
+        primaryjoin='Order.id == Assignment.order_id',
         viewonly=True,
         uselist=False
     )
@@ -387,8 +387,8 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     location = orm.relationship(
         'OrderLocation',
         secondary='orders',
-        secondaryjoin="Order.id == OrderLocation.order_id",
-        primaryjoin="Order.id == Assignment.order_id",
+        secondaryjoin='Order.id == OrderLocation.order_id',
+        primaryjoin='Order.id == Assignment.order_id',
         backref=orm.backref('assignments'),
         viewonly=True,
         uselist=False

@@ -1,17 +1,18 @@
 """Import and sync Knack Company to Leica Customer."""
 from briefy.common.db import datetime_utcnow
+from briefy.common.users import SystemUser
 from briefy.common.utils.data import generate_slug
 from briefy.common.utils.transformers import to_serializable
-from briefy.common.users import SystemUser
 from briefy.leica import logger
+from briefy.leica.models import Customer
+from briefy.leica.models import CustomerBillingAddress
+from briefy.leica.models import CustomerContact
 from briefy.leica.sync import cleanse_phone_number
 from briefy.leica.sync import ModelSync
-from briefy.leica.models import Customer
-from briefy.leica.models import CustomerContact
-from briefy.leica.models import CustomerBillingAddress
 from briefy.leica.sync.location import COUNTRY_MAPPING
 from briefy.leica.sync.location import create_location_dict
 from datetime import datetime
+
 
 NOW = to_serializable(datetime_utcnow())
 ACTOR = SystemUser.id

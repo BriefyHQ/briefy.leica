@@ -1,7 +1,6 @@
+-e git+git@github.com:BriefyHQ/octopus.checkstyle.git@master#egg=octopus.checkstyle
 -r prod.txt
 appdirs==1.4.0
-flake8
-flake8_docstrings
 alabaster==0.7.10
 coverage==4.4b1
 httmock==1.2.5
@@ -11,7 +10,6 @@ pyramid-debugtoolbar==2.4.2
 pyramid_ipython
 pytest-cov==2.4.0
 pytest==3.0.7
-pydocstyle==1.1.1
 requests_mock
 snowballstemmer==1.2.1
 sphinx-autodoc-typehints

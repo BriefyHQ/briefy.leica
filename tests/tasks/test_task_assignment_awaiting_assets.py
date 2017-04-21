@@ -1,8 +1,8 @@
 """Test Task to move assignments to awaiting_asset state."""
-from conftest import BaseTaskTest
 from briefy.leica import models
 from briefy.leica.tasks.assignment import _move_assignment_awaiting_assets
 from briefy.leica.tasks.assignment import move_assignments_awaiting_assets
+from conftest import BaseTaskTest
 from datetime import datetime
 from pytz import utc
 

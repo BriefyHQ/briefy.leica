@@ -1,8 +1,6 @@
 """Database models to work within the briefy.leica system."""
-import sqlalchemy as sa
-from briefy.common.db.models.roles import LocalRole
-from briefy.ws.listeners import register_workflow_context_listeners
 
+from briefy.common.db.models.roles import LocalRole
 from briefy.leica.db import Session
 from briefy.leica.models.asset import Asset
 from briefy.leica.models.asset import Image
@@ -38,9 +36,13 @@ from briefy.leica.models.professional.location import AdditionalWorkingLocation
 from briefy.leica.models.professional.location import MainWorkingLocation
 from briefy.leica.models.professional.location import WorkingLocation  # noQA
 from briefy.leica.models.project import Project
-from briefy.leica.models.user import UserProfile
-from briefy.leica.models.user import CustomerUserProfile
 from briefy.leica.models.user import BriefyUserProfile
+from briefy.leica.models.user import CustomerUserProfile
+from briefy.leica.models.user import UserProfile
+from briefy.ws.listeners import register_workflow_context_listeners
+
+import sqlalchemy as sa
+
 
 LocalRole.__session__ = Session
 

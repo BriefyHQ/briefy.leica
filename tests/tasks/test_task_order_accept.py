@@ -1,8 +1,8 @@
 """Test Task to move orders to accepted state."""
-from conftest import BaseTaskTest
 from briefy.leica import models
 from briefy.leica.tasks.order import _move_order_accepted
 from briefy.leica.tasks.order import move_orders_accepted
+from conftest import BaseTaskTest
 from datetime import datetime
 from pytz import utc
 

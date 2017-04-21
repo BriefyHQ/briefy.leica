@@ -1,11 +1,12 @@
 """Update gdrive link on Agoda orders that do not have the gdrive info."""
-from briefy.leica.models import Order
 from briefy.leica.db import Session
+from briefy.leica.models import Order
 from briefy.leica.sync.db import configure
 from urllib.parse import urlparse
 
 import csv
 import transaction
+
 
 FNAME = 'src/briefy/leica/tools/oneshots/data/history_delivery_sftp_agoda.txt'
 

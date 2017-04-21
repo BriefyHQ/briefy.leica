@@ -1,11 +1,11 @@
 """Order, OrderLocation, Assignment and Pool related workflow."""
 from briefy.common.db import datetime_utcnow
+from briefy.common.users import SystemUser
 from briefy.common.vocabularies.roles import Groups as G
 from briefy.common.vocabularies.roles import LocalRolesChoices as LR
-from briefy.common.users import SystemUser
+from briefy.common.workflow import WorkflowState as WS
 from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import Permission
-from briefy.common.workflow import WorkflowState as WS
 from briefy.common.workflow import WorkflowTransitionException
 from briefy.leica.config import SCHEDULE_DAYS_LIMIT
 from briefy.leica.subscribers.utils import create_new_assignment_from_order

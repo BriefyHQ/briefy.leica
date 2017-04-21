@@ -8,17 +8,17 @@ from briefy.common.db.mixins import Mixin
 from briefy.common.db.mixins import OptIn
 from briefy.common.db.mixins import PersonalInfoMixin
 from briefy.common.db.models.roles import LocalRole
-from briefy.common.utils import schema
-from briefy.common.vocabularies.roles import LocalRolesChoices
 from briefy.common.users import SystemUser
+from briefy.common.utils import schema
 from briefy.common.utils.cache import timeout_cache
-from briefy.leica.models.descriptors import LocalRolesGetSetFactory
+from briefy.common.vocabularies.roles import LocalRolesChoices
 from briefy.leica.db import Session
+from briefy.leica.models.descriptors import LocalRolesGetSetFactory
+from sqlalchemy import orm
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import orm
 from sqlalchemy_continuum.utils import count_versions
 
 import colander

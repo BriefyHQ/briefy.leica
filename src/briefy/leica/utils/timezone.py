@@ -6,6 +6,7 @@ from briefy.leica import logger
 
 import requests
 
+
 ENDPOINT = 'http://api.geonames.org/timezoneJSON?formatted=true&lat={0}&lng={1}&username=briefy'
 
 

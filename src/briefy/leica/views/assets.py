@@ -11,6 +11,7 @@ from cornice.resource import view
 from pyramid.httpexceptions import HTTPNotFound as NotFound
 from pyramid.security import Allow
 
+
 COLLECTION_PATH = '/assignments/{assignment_id}/assets'
 PATH = COLLECTION_PATH + '/{id}'
 

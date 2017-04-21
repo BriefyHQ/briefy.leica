@@ -4,7 +4,6 @@ from briefy.leica.models import mixins
 from briefy.leica.vocabularies import TaxIdTypes
 from sqlalchemy.ext.declarative import declared_attr
 
-
 import colander
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils

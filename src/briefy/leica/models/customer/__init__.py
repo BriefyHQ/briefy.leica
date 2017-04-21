@@ -5,8 +5,8 @@ from briefy.leica.models.customer import workflows
 from briefy.leica.utils.user import add_user_info_to_state_history
 from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
-from zope.interface import Interface
 from zope.interface import implementer
+from zope.interface import Interface
 
 import colander
 import sqlalchemy as sa

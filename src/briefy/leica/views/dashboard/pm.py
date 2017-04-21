@@ -1,8 +1,8 @@
 """Views to handle Pm Dashboards."""
-from briefy.leica.models.dashboard.pm import DashboardPMOrder
 from briefy.leica.models.dashboard.pm import DashboardPMDeliveredOrders
-from briefy.leica.views.dashboard import ORDER_PROJECT_COLS
+from briefy.leica.models.dashboard.pm import DashboardPMOrder
 from briefy.leica.views.dashboard import DELIVERED_ORDERS_COLS
+from briefy.leica.views.dashboard import ORDER_PROJECT_COLS
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources import RESTService
 from briefy.ws.resources.factory import BaseFactory

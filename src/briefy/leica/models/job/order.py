@@ -24,6 +24,7 @@ import sqlalchemy as sa
 import sqlalchemy_utils as sautils
 import string
 
+
 __summary_attributes__ = [
     'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
     'currency', 'price', 'number_required_assets', 'location', 'category',
@@ -78,7 +79,7 @@ __colander_alchemy_config_overrides__.update(
 def create_order_slug():
     """Create slug ID for the Order."""
     dt = datetime.now()
-    part1 = '{:s}{:02d}'.format(str(dt.year)[-2:], dt.month)
+    part1 = '{0:s}{1:02d}'.format(str(dt.year)[-2:], dt.month)
     part2 = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(3))
     part3 = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(3))
     return '-'.join((part1, part2, part3))

@@ -3,30 +3,31 @@ from briefy.common.db import datetime_utcnow
 from briefy.common.users import SystemUser
 from briefy.leica import logger
 from briefy.leica.config import FILES_BASE
-from briefy.leica.models import Comment
 from briefy.leica.models import Assignment
-from briefy.leica.models import OrderLocation
+from briefy.leica.models import Comment
 from briefy.leica.models import Order
+from briefy.leica.models import OrderLocation
 from briefy.leica.models import Pool
 from briefy.leica.models import Project
-from briefy.leica.vocabularies import OrderInputSource as ISource
-from briefy.leica.sync import get_model_and_data
-from briefy.leica.sync import PLACEHOLDERS
-from briefy.leica.sync import ModelSync
 from briefy.leica.sync import category_mapping
+from briefy.leica.sync import get_model_and_data
+from briefy.leica.sync import ModelSync
+from briefy.leica.sync import PLACEHOLDERS
 from briefy.leica.sync.job_comment import comment_format_first_line
 from briefy.leica.sync.job_comment import parse_internal_comments
 from briefy.leica.sync.job_wf_history import _build_date
 from briefy.leica.sync.job_wf_history import add_assignment_history
 from briefy.leica.sync.job_wf_history import add_order_history
 from briefy.leica.sync.location import create_location_dict
+from briefy.leica.vocabularies import OrderInputSource as ISource
 from datetime import datetime
 from dateutil import parser
-from pytz import utc
 from pytz import timezone
+from pytz import utc
 
 import re
 import uuid
+
 
 isource_mapping = {item.label: item.value for item in ISource.__members__.values()}
 

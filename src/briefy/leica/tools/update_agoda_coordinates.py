@@ -1,8 +1,8 @@
 """Script to update Agoda coordinates."""
 from briefy.leica.db import Session
 from briefy.leica.models import Customer
-from briefy.leica.models import Project
 from briefy.leica.models import Order
+from briefy.leica.models import Project
 from briefy.leica.sync import db
 from sqlalchemy.orm.attributes import flag_modified
 

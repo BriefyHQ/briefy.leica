@@ -4,6 +4,7 @@ from briefy.leica.models import Assignment
 from briefy.leica.models import Order
 from briefy.leica.sync.db import configure
 from briefy.leica.tools import logger
+
 import transaction
 
 

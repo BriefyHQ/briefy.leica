@@ -3,8 +3,8 @@ from briefy.leica import models
 
 import csv
 import json
-import pytest
 import os
+import pytest
 
 
 @pytest.mark.usefixtures('db_transaction', 'create_dependencies', 'login')

@@ -2,10 +2,10 @@
 from briefy.leica.db import Base
 from briefy.leica.models.descriptors import MultipleRelationshipWrapper
 from briefy.leica.models.descriptors import UnaryRelationshipWrapper
-from briefy.leica.models.professional.workflows import ProfessionalWorkflow
 from briefy.leica.models.professional.link import Link
-from briefy.leica.models.professional.location import WorkingLocation
 from briefy.leica.models.professional.location import MainWorkingLocation
+from briefy.leica.models.professional.location import WorkingLocation
+from briefy.leica.models.professional.workflows import ProfessionalWorkflow
 from briefy.leica.models.user import UserProfile
 from briefy.leica.utils.intercom import intercom_payload_professional
 from briefy.leica.utils.user import add_user_info_to_state_history
@@ -82,7 +82,7 @@ class Professional(UserProfile, Base):
     @declared_attr
     def title(cls):
         """Return the Professional fullname."""
-        return orm.column_property(cls.first_name + " " + cls.last_name)
+        return orm.column_property(cls.first_name + ' ' + cls.last_name)
 
     # Profile information
     photo_path = sa.Column(

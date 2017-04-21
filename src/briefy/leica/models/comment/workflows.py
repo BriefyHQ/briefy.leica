@@ -1,6 +1,6 @@
 """Comment Workflow."""
-from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import WorkflowState as WS
+from briefy.common.workflow import BriefyWorkflow
 
 import logging
 

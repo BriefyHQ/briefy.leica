@@ -1,8 +1,8 @@
 """Utils functions for subscribers."""
 from briefy.leica.events.assignment import AssignmentCreatedEvent
 from briefy.leica.models import Comment
-from sqlalchemy.orm.session import object_session
 from sqlalchemy.ext.associationproxy import _AssociationList
+from sqlalchemy.orm.session import object_session
 from zope.event import notify
 
 
