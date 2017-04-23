@@ -108,7 +108,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     __summary_attributes__ = __summary_attributes__
     __summary_attributes_relations__ = [
-        'project', 'comments', 'customer', 'assignment', 'assignments'
+        'project', 'comments', 'customer', 'assignment', 'assignments', 'location'
     ]
     __listing_attributes__ = __listing_attributes__
 
