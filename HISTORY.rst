@@ -2,6 +2,11 @@
 History
 =======
 
+2.1.9 (Unreleased)
+------------------
+
+    * Added cache layer using dogpile cache to models (Project, Order, Assignment) to_listing_dict and to_dict (rudaporto).
+
 2.1.8 (2017-04-21)
 ------------------
 
