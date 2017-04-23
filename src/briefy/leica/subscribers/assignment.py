@@ -1,12 +1,21 @@
 """Event subscribers for briefy.leica.models.job.Assignment."""
 from briefy.common.users import SystemUser
 from briefy.common.vocabularies.roles import Groups as G
+from briefy.leica.cache import region
 from briefy.leica.events.assignment import AssignmentCreatedEvent
+from briefy.leica.events.assignment import AssignmentUpdatedEvent
 from briefy.leica.models import Professional
 from briefy.leica.subscribers import safe_workflow_trigger_transitions
 from briefy.leica.subscribers.utils import apply_local_roles_from_parent
 from briefy.leica.subscribers.utils import create_comment_from_wf_transition
 from pyramid.events import subscriber
+
+
+@subscriber(AssignmentUpdatedEvent)
+def assignment_updated_handler(event):
+    """Handle Assignment updated event."""
+    assignment = event.obj
+    region.invalidate(assignment)
 
 
 @subscriber(AssignmentCreatedEvent)

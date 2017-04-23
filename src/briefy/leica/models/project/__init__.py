@@ -286,6 +286,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         data = self._apply_actors_info(data)
         return data
 
+    @region.cache_on_arguments()
     def to_dict(self):
         """Return a dict representation of this object."""
         data = super().to_dict()
