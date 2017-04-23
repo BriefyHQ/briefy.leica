@@ -3,6 +3,7 @@ from briefy.common.vocabularies.roles import Groups as G
 from briefy.common.workflow import WorkflowState as WS
 from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import Permission
+from briefy.leica.events.project import ProjectUpdatedEvent
 
 import logging
 
@@ -15,6 +16,7 @@ class ProjectWorkflow(BriefyWorkflow):
 
     entity = 'project'
     initial_state = 'created'
+    update_event = ProjectUpdatedEvent
 
     created = WS(
         'created', 'Created',
