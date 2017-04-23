@@ -22,6 +22,7 @@ requires = [
     'phonenumbers',
     'pycountry',
     'pyramid==1.8.3',
+    'pyramid_dogpile_cache2',
     'pyramid_tm',
     'pyramid_zcml',
     'requests',

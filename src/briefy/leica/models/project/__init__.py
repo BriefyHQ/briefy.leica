@@ -2,6 +2,7 @@
 from briefy.common.db.mixins import BriefyRoles
 from briefy.common.utils import schema
 from briefy.common.vocabularies.categories import CategoryChoices
+from briefy.leica.cache import region
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.project import workflows
@@ -274,6 +275,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     Relationship between a project and a Pool.
     """
 
+    @region.cache_on_arguments()
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
 

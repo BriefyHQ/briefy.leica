@@ -2,6 +2,7 @@
 from briefy.common.db.types import AwareDateTime
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica import logger
+from briefy.leica.cache import region
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.descriptors import UnaryRelationshipWrapper
@@ -616,6 +617,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         # Update all dates
         self._update_dates_from_history()
 
+    @region.cache_on_arguments()
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
 
@@ -626,6 +628,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data = self._apply_actors_info(data)
         return data
 
+    @region.cache_on_arguments()
     def to_dict(self):
         """Return a dict representation of this object."""
         data = super().to_dict(excludes=['assignment', 'assignments'])
