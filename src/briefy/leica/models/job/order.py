@@ -14,6 +14,7 @@ from briefy.leica.utils.user import add_user_info_to_state_history
 from briefy.leica.vocabularies import OrderInputSource
 from datetime import datetime
 from dateutil.parser import parse
+from sqlalchemy import event
 from sqlalchemy import orm
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import TimezoneType
@@ -658,3 +659,9 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         # Apply actor information to data
         data = self._apply_actors_info(data)
         return data
+
+
+@event.listens_for(Order, 'after_update')
+def order_after_update(mapper, connection, target):
+    """Invalidate Order cache after instance update."""
+    region.invalidate(target)

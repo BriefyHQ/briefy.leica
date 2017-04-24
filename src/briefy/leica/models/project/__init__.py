@@ -7,6 +7,7 @@ from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.project import workflows
 from briefy.leica.utils.user import add_user_info_to_state_history
+from sqlalchemy import event
 from sqlalchemy import orm
 from zope.interface import implementer
 from zope.interface import Interface
@@ -297,3 +298,9 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         # Apply actor information to data
         data = self._apply_actors_info(data)
         return data
+
+
+@event.listens_for(Project, 'after_update')
+def project_after_update(mapper, connection, target):
+    """Invalidate Project cache after instance update."""
+    region.invalidate(target)

@@ -9,6 +9,7 @@ from briefy.leica.utils.transitions import get_transition_date_from_history
 from briefy.leica.utils.user import add_user_info_to_state_history
 from briefy.leica.vocabularies import TypesOfSetChoices
 from datetime import datetime
+from sqlalchemy import event
 from sqlalchemy import orm
 from sqlalchemy import select
 from sqlalchemy.ext.declarative import declared_attr
@@ -643,3 +644,9 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         # Apply actor information to data
         data = self._apply_actors_info(data)
         return data
+
+
+@event.listens_for(Assignment, 'after_update')
+def assignment_after_update(mapper, connection, target):
+    """Invalidate Assignment cache after instance update."""
+    region.invalidate(target)
