@@ -4,13 +4,21 @@ from dogpile.cache import make_region
 
 def model_key_generator(namespace, fn, **kw):
     """Generate keys for all models objects."""
-    namespace = fn.__name__ + (namespace or '')
+    namespace = namespace or ''
+    namespace = '{fname}{namespace}'.format(
+        fname=fn.__name__,
+        namespace=namespace,
+    )
 
     def generate_key(*args):
         """Create unique key for each model using UID."""
         obj = args[0]
         name = obj.__class__.__name__
-        key = name + '.' + namespace + '-' + str(obj.id)
+        key = '{name}.{namespace}-{id}'.format(
+            name=name,
+            namespace=namespace,
+            id=obj.id,
+        )
         return key
 
     return generate_key
