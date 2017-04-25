@@ -8,6 +8,7 @@ from briefy.leica.utils import imaging
 from briefy.leica.utils.user import add_user_info_to_state_history
 from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy_utils import JSONType
 from sqlalchemy_utils import UUIDType
 
 import colander
@@ -26,7 +27,42 @@ __listing_attributes__ = [
 ]
 
 
-class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
+missing_sentinel = object()
+def ca_info(info=None, title='', validator=None, typ=None, type_=None, mandatory=False, missing=missing_sentinel):
+    """Generate dictionary to be used by colanderalchemy"""
+
+    if not info: info = {}
+    info['colanderalchemy'] = {}
+    info['colanderalchemy']['title'] = title
+    info['colanderalchemy']['typ'] = typ or type_ or colander.String
+    if validator: info['colanderalchemy']['validator'] = validator
+    if not mandatory or missing != missing_sentinel:
+        info['colanderalchemy']['missing'] = missing if missing != missing_sentinel else colander.drop
+
+    return info
+
+class AuthoredMixin:
+    owner = sa.Column(sa.String(255), nullable=False)
+    """Denormalized string with the name of the OWNER of an asset.
+
+    Owner as in under copyright law, disregarding whether them are a Briefy system user
+    """
+    ownership_notes = sa.Column(sa.JSONType,
+                                default={},
+                                info=ca_info(title='Ownership Notes'))
+    """To be filled in case ownership "is complicated".
+
+    Can be mostly left blank  - but could be used to anotate works in
+    Public Domain, or describing the form of acquisition in cases of
+    unknown authorship.
+
+    Kept as JSON, because it might be important to have hte owner contact
+    information and even physical address in some cases.
+
+    """
+
+
+class Asset(asset.Asset, mixins.LeicaVersionedMixin, AuthoredMixin, Base):
     """A deliverable asset from an Assignment."""
 
     _workflow = workflows.AssetWorkflow
@@ -54,43 +90,21 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
 
     type = sa.Column(
         sa.String(50), nullable=False,
-        info={'colanderalchemy': {
-            'title': 'Type',
-            'missing': 'image',
-            'typ': colander.String}
-        },
-    )
+        info=ca_info(title='Type', missing='image')
 
-    owner = sa.Column(sa.String(255), nullable=False)
-    """Denormalized string with the name of the OWNER of an asset.
-
-    Owner as in under copyright law, disregarding whether them are a Briefy system user
-    """
 
     professional_id = sa.Column(
         sautils.UUIDType,
         sa.ForeignKey('professionals.id'),
         index=True,
-        info={
-            'colanderalchemy': {
-                'title': 'ID',
-                'validator': colander.uuid,
-                'typ': colander.String
-            }
-        },
+        info=ca_info(title='ID', validator=colander.uuid, mandatory=True),
         nullable=False
     )
-    """Refer to a system user - reachable through microservices/redis."""
+    """Refer to a system user - to be reachable through microservices/redis."""
 
     uploaded_by = sa.Column(
         sautils.UUIDType,
-        info={
-            'colanderalchemy': {
-                'title': 'Uploaded by',
-                'validator': colander.uuid,
-                'typ': colander.String
-            }
-        },
+        info=ca_info(title='Uploaded By', validator=colander.uuid, mandatory=True),
         nullable=False
     )
     """Refer to a system user - reachable through microservices/redis.
@@ -147,8 +161,7 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
 
         :return: A dictionary with technical requirements for an asset.
         """
-        assignment = self.assignment
-        return assignment.order.tech_requirements
+        return self.assignment.order.tech_requirements
 
     @property
     def check_requirements(self) -> list:
@@ -156,7 +169,7 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
 
         :return: A list with validation failures, if any.
         """
-        return True
+        raise ValueError("""Tech requirements validation if done off-process upon transitioning the assignment to QA state""")  # noQA
 
     @property
     def is_valid(self) -> bool:
@@ -244,19 +257,7 @@ class Image(asset.ImageMixin, Asset):
                 'typ': colander.String}}
         )
 
-    @property
-    def check_requirements(self) -> list:
-        """Compare metadata with tech requirements.
 
-        :return: A list with validation failures, if any.
-        """
-        response = []
-        metadata = self.metadata_
-        tech_requirements = self.tech_requirements
-        asset_requirements = tech_requirements.get('asset') if tech_requirements else {}
-        if asset_requirements:
-            response = imaging.check_image_constraints(metadata, asset_requirements)
-        return response
 
 
 class ThreeSixtyImage(asset.ThreeSixtyImageMixin, Asset):
@@ -279,15 +280,6 @@ class ThreeSixtyImage(asset.ThreeSixtyImageMixin, Asset):
                 'typ': colander.String}}
         )
 
-    @property
-    def check_requirements(self) -> list:
-        """Compare metadata with tech requirements.
-
-        :return: A list with validation failures, if any.
-        """
-        # TODO: Check requirements
-        return True
-
 
 class Video(asset.VideoMixin, Asset):
     """A deliverable Video from an Assignment."""
@@ -309,11 +301,4 @@ class Video(asset.VideoMixin, Asset):
                 'typ': colander.String}}
         )
 
-    @property
-    def check_requirements(self) -> list:
-        """Compare metadata with tech requirements.
 
-        :return: A list with validation failures, if any.
-        """
-        # TODO: Check requirements
-        return True
