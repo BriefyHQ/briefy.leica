@@ -4,7 +4,6 @@ from briefy.leica.models import Project
 from briefy.leica.sync.db import configure
 from pprint import pprint
 
-import json
 import transaction
 
 
@@ -169,12 +168,12 @@ PROJECT_FOLDERS = {
 APPROVE_TEMPLATE = {
     'archive': {
         'driver': 'gdrive',
-         'images': True,
-         'name': 'order.customer_order_id',
-         'other': True,
-         'parentId': None,
-         'resize': [],
-         'subfolders': True
+        'images': True,
+        'name': 'order.customer_order_id',
+        'other': True,
+        'parentId': None,
+        'resize': [],
+        'subfolders': True
     },
     'gdrive': {
         'driver': 'gdrive',
