@@ -650,3 +650,4 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
 def assignment_after_update(mapper, connection, target):
     """Invalidate Assignment cache after instance update."""
     region.invalidate(target)
+    region.invalidate(target.order)

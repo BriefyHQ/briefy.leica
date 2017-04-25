@@ -665,3 +665,5 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 def order_after_update(mapper, connection, target):
     """Invalidate Order cache after instance update."""
     region.invalidate(target)
+    for assignment in target.assignments:
+        region.invalidate(assignment)
