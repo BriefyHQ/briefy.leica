@@ -2,6 +2,10 @@
 History
 =======
 
+2.1.9 (2017-04-25)
+------------------
+    * Card #260: Fix Google drive delivery and archive configuration in all Delivery Hero Projects (rudaporto).
+
 2.1.8 (2017-04-21)
 ------------------
 
