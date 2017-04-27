@@ -15,6 +15,31 @@ import sqlalchemy as sa
 import sqlalchemy_utils as sautils
 
 
+# TODO: improve this based on the project type
+DEFAULT_DELIVERY_CONFIG = {
+    'approve': {
+        'archive': {
+            'driver': 'gdrive',
+            'images': True,
+            'name': 'order.customer_order_id',
+            'other': True,
+            'parentId': None,
+            'resize': [],
+            'subfolders': True
+        },
+        'delivery': {
+            'driver': 'gdrive',
+            'images': True,
+            'name': 'order.customer_order_id',
+            'other': False,
+            'parentId': None,
+            'resize': [],
+            'subfolders': False
+        }
+    }
+}
+
+
 class IProject(Interface):
     """Marker interface for Project."""
 
@@ -135,6 +160,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
 
     delivery = sa.Column(
         sautils.JSONType,
+        default=DEFAULT_DELIVERY_CONFIG,
         info={
             'colanderalchemy': {
                 'title': 'Delivery information for this project.',
