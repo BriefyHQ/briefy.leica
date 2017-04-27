@@ -175,7 +175,7 @@ APPROVE_TEMPLATE = {
         'resize': [],
         'subfolders': True
     },
-    'gdrive': {
+    'delivery': {
         'driver': 'gdrive',
         'images': True,
         'name': 'order.customer_order_id',
@@ -187,8 +187,8 @@ APPROVE_TEMPLATE = {
 }
 
 
-def main():
-    """Update Projects delivery config."""
+def add_gdrive_delivery_config():
+    """Add gdrive delivery config to projects without config."""
     for project_id, project_folders in PROJECT_FOLDERS.items():
         folder_gdrive = project_folders.get('delivery')
         folder_archive = project_folders.get('archive')
@@ -216,7 +216,34 @@ def main():
             print('No delivery config. Status: {status}'.format(status=project.state))
 
 
+def update_project_config_delivery_gdrive():
+    """Update the delivery configuration of all projects with approve setting."""
+    for project in Project.query().all():
+        print(project.title, project.state)
+        delivery_config = project.delivery or {}
+        approve_config = delivery_config.get('approve') \
+            if delivery_config else None
+        if approve_config:
+            new_delivery_config = delivery_config.copy()
+            customer_delivery = approve_config.get('gdrive').copy() \
+                if approve_config.get('gdrive') else None
+            if customer_delivery:
+                del new_delivery_config['approve']['gdrive']
+                new_delivery_config['approve']['delivery'] = customer_delivery
+                project.delivery = new_delivery_config
+            else:
+                print('No gdrive config!')
+        else:
+            new_delivery_config = delivery_config.copy()
+            approve_config = APPROVE_TEMPLATE.copy()
+            new_delivery_config['approve'] = approve_config
+            project.delivery = new_delivery_config
+
+        pprint(project.delivery)
+
+
 if __name__ == '__main__':
     configure(Session)
     with transaction.manager:
-        main()
+        # add_gdrive_delivery_config()
+        update_project_config_delivery_gdrive()

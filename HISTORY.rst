@@ -2,6 +2,10 @@
 History
 =======
 
+2.1.10 (2017-04-26)
+-------------------
+    * Card #263: New Projects will have default delivery config and update config in all current Projects (rudaporto).
+
 2.1.9 (2017-04-25)
 ------------------
     * Card #260: Fix Google drive delivery and archive configuration in all Delivery Hero Projects (rudaporto).
