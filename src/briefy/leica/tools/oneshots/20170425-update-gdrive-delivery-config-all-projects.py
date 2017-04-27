@@ -3,6 +3,7 @@ from briefy.leica.db import Session
 from briefy.leica.models import Project
 from briefy.leica.sync.db import configure
 from pprint import pprint
+from sqlalchemy.orm.attributes import flag_modified
 
 import transaction
 
@@ -216,10 +217,11 @@ def add_gdrive_delivery_config():
             print('No delivery config. Status: {status}'.format(status=project.state))
 
 
-def update_project_config_delivery_gdrive():
+def update_project_config_delivery_gdrive(session):
     """Update the delivery configuration of all projects with approve setting."""
-    for project in Project.query().all():
-        print(project.title, project.state)
+    for project_id in session.query(Project.id).all():
+        project = Project.get(project_id)
+        print(project.title, project.state, project_id)
         delivery_config = project.delivery or {}
         approve_config = delivery_config.get('approve') \
             if delivery_config else None
@@ -230,20 +232,22 @@ def update_project_config_delivery_gdrive():
             if customer_delivery:
                 del new_delivery_config['approve']['gdrive']
                 new_delivery_config['approve']['delivery'] = customer_delivery
-                project.delivery = new_delivery_config
+                project.delivery = new_delivery_config.copy()
             else:
                 print('No gdrive config!')
         else:
             new_delivery_config = delivery_config.copy()
             approve_config = APPROVE_TEMPLATE.copy()
             new_delivery_config['approve'] = approve_config
-            project.delivery = new_delivery_config
+            project.delivery = new_delivery_config.copy()
 
+        flag_modified(project, 'delivery')
+        transaction.commit()
+        project = Project.get(project_id)
         pprint(project.delivery)
 
 
 if __name__ == '__main__':
-    configure(Session)
-    with transaction.manager:
-        # add_gdrive_delivery_config()
-        update_project_config_delivery_gdrive()
+    session = configure(Session)
+    # add_gdrive_delivery_config()
+    update_project_config_delivery_gdrive(session)
