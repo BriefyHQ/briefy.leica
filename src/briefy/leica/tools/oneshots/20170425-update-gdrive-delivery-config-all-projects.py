@@ -221,10 +221,12 @@ def update_project_config_delivery_gdrive():
     for project in Project.query().all():
         print(project.title, project.state)
         delivery_config = project.delivery or {}
-        approve_config = delivery_config.get('approve') if delivery_config else None
+        approve_config = delivery_config.get('approve') \
+            if delivery_config else None
         if approve_config:
             new_delivery_config = delivery_config.copy()
-            customer_delivery = approve_config.get('gdrive').copy() if approve_config.get('gdrive') else None
+            customer_delivery = approve_config.get('gdrive').copy() \
+                if approve_config.get('gdrive') else None
             if customer_delivery:
                 del new_delivery_config['approve']['gdrive']
                 new_delivery_config['approve']['delivery'] = customer_delivery
@@ -238,6 +240,7 @@ def update_project_config_delivery_gdrive():
             project.delivery = new_delivery_config
 
         pprint(project.delivery)
+
 
 if __name__ == '__main__':
     configure(Session)
