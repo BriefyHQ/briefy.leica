@@ -20,7 +20,7 @@ def main(items):
     """Move back to last transition and state Order and last Assignment."""
     for slug in items:
         order = Order.query().filter_by(slug=slug).one()
-        if order.state == 'completed':
+        if order.state == 'accepted':
             remove_last_transition(order)
             remove_last_transition(order.assignments[-1])
             if slug == '1701-PS9-679':
