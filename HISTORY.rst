@@ -2,6 +2,10 @@
 History
 =======
 
+2.1.11 (2017-04-28)
+-------------------
+    * Fix: Order.delivery field now has the correct colander type definition (rudaporto).
+
 2.1.10 (2017-04-26)
 -------------------
     * Card #263: New Projects will have default delivery config and update config in all current Projects (rudaporto).

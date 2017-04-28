@@ -1,5 +1,6 @@
 """Briefy Leica Order to a Job."""
 from briefy.common.db.types import AwareDateTime
+from briefy.common.utils import schema
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica import logger
 from briefy.leica.db import Base
@@ -489,7 +490,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
             'colanderalchemy': {
                 'title': 'Delivery information.',
                 'missing': colander.drop,
-                'typ': colander.String
+                'typ': schema.JSONType
             }
         }
     )
