@@ -4,7 +4,7 @@ History
 
 2.1.12 (2017-04-28)
 -------------------
-    * Fix: new script remove last transition from two orders and respective assignments (rudaporto).
+    * Fix: new script remove the last transition from two orders and respective assignments (rudaporto).
 
 2.1.11 (2017-04-28)
 -------------------
