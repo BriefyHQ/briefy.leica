@@ -2,6 +2,10 @@
 History
 =======
 
+2.1.12 (2017-04-28)
+-------------------
+    * Fix: new script remove the last transition from two orders and respective assignments (rudaporto).
+
 2.1.11 (2017-04-28)
 -------------------
     * Fix: Order.delivery field now has the correct colander type definition (rudaporto).
