@@ -5,6 +5,8 @@ from sqlalchemy.ext.associationproxy import _AssociationList
 from sqlalchemy.orm.session import object_session
 from zope.event import notify
 
+import uuid
+
 
 def apply_local_roles_from_parent(obj, parent, add_roles=()):
     """Copy local roles from parent."""
@@ -57,6 +59,7 @@ def create_new_assignment_from_order(order, request, copy_payout=False, old_assi
     payload = {
         'order_id': order.id,
         'set_type': 'new',
+        'id': uuid.uuid4()
     }
 
     if copy_payout:
@@ -73,6 +76,7 @@ def create_new_assignment_from_order(order, request, copy_payout=False, old_assi
     )
     session.add(assignment)
     session.flush()
+    order.assignments.append(assignment)
 
     # event dispatch: pyramid event
     assignment_event = AssignmentCreatedEvent(assignment, request)

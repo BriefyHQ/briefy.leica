@@ -1,7 +1,9 @@
 """Briefy Leica Assignment model."""
 from briefy.common.db.types import AwareDateTime
 from briefy.leica.cache import region
+from briefy.leica.cache import cache_manager
 from briefy.leica.db import Base
+from briefy.leica.db import Session
 from briefy.leica.models import mixins
 from briefy.leica.models.job import workflows
 from briefy.leica.models.job.order import Order
@@ -604,6 +606,19 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         return True if (self.assignment_date and self.professional_id) else False
 
     @region.cache_on_arguments()
+    def to_summary_dict(self) -> dict:
+        """Return a summarized version of the dict representation of this Class.
+
+        Used to serialize this object within a parent object serialization.
+        :returns: Dictionary with fields and values used by this Class
+        """
+        data = super().to_summary_dict()
+        data['category'] = self.category.value
+        data = self._apply_actors_info(data)
+        return data
+
+
+    @region.cache_on_arguments()
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
 
@@ -611,6 +626,8 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_listing_dict()
+        data['set_type'] = self.set_type.value
+        data['category'] = self.category.value
         data = self._apply_actors_info(data)
         return data
 
@@ -626,10 +643,11 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         data['last_submission_date'] = self.last_submission_date
         data['closed_on_date'] = self.closed_on_date
         data['slug'] = self.slug
+        data['set_type'] = self.set_type.value if isinstance(self.set_type, TypesOfSetChoices) else self.set_type
         data['timezone'] = self.timezone
         data['tech_requirements'] = self.order.tech_requirements
         data['availability'] = self.availability
-        data['category'] = self.category
+        data['category'] = self.category.value
         data['order'] = self.order.to_summary_dict() if self.order else None
         data['location'] = self.location.to_summary_dict() if self.location else None
         if data['project']:
@@ -649,5 +667,5 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
 @event.listens_for(Assignment, 'after_update')
 def assignment_after_update(mapper, connection, target):
     """Invalidate Assignment cache after instance update."""
-    region.invalidate(target)
-    region.invalidate(target.order)
+    cache_manager.refresh(target)
+    cache_manager.refresh(target.order)

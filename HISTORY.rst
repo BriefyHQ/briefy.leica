@@ -2,10 +2,27 @@
 History
 =======
 
-2.1.9 (Unreleased)
+2.1.13 (Unreleased)
 ------------------
 
     * Added cache layer using dogpile cache to models (Project, Order, Assignment) to_listing_dict and to_dict (rudaporto).
+
+2.1.12 (2017-04-28)
+-------------------
+    * Fix: new script remove the last transition from two orders and respective assignments (rudaporto).
+
+2.1.11 (2017-04-28)
+-------------------
+    * Fix: Order.delivery field now has the correct colander type definition (rudaporto).
+
+2.1.10 (2017-04-26)
+-------------------
+    * Card #263: New Projects will have default delivery config and update config in all current Projects (rudaporto).
+
+2.1.9 (2017-04-25)
+------------------
+    * Card #260: Fix Google drive delivery and archive configuration in all Delivery Hero Projects (rudaporto).
+>>>>>>> develop
 
 2.1.8 (2017-04-21)
 ------------------
