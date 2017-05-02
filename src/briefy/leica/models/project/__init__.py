@@ -310,7 +310,8 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_summary_dict()
-        data['category'] = self.category.value
+        data['category'] = self.category.value \
+            if isinstance(self.category, CategoryChoices) else self.category
         data = self._apply_actors_info(data)
         return data
 
@@ -322,17 +323,19 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_listing_dict()
-        data['category'] = self.category.value
+        data['category'] = self.category.value \
+            if isinstance(self.category, CategoryChoices) else self.category
         data = self._apply_actors_info(data)
         return data
 
     @region.cache_on_arguments()
-    def to_dict(self):
+    def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
-        data = super().to_dict()
+        data = super().to_dict(excludes=excludes, includes=includes)
         data['slug'] = self.slug
         data['price'] = self.price
-        data['category'] = self.category.value
+        data['category'] = self.category.value \
+            if isinstance(self.category, CategoryChoices) else self.category
         data = self._apply_actors_info(data)
         add_user_info_to_state_history(self.state_history)
         # Apply actor information to data

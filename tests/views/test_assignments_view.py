@@ -20,7 +20,8 @@ class TestAssignmentView(BaseVersionedTestView):
     # TODO: local role attributes are not in the colander schema and so ignored on add or update
     ignore_validation_fields = [
         'state_history', 'state', 'order', 'updated_at', 'customer', 'project', 'timezone',
-        'qa_manager', 'project_manager', 'scout_manager', 'professional', 'location', 'versions'
+        'qa_manager', 'project_manager', 'scout_manager', 'professional', 'location', 'versions',
+        'active_order'
     ]
     file_path = 'data/assignments.json'
     model = models.Assignment

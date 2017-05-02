@@ -628,7 +628,8 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_summary_dict()
-        data['category'] = self.category.value
+        data['category'] = self.category.value \
+            if isinstance(self.category, CategoryChoices) else self.category
         data = self._apply_actors_info(data)
         return data
 
@@ -640,14 +641,15 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_listing_dict()
-        data['category'] = self.category.value
+        data['category'] = self.category.value \
+            if isinstance(self.category, CategoryChoices) else self.category
         data = self._apply_actors_info(data)
         return data
 
     @region.cache_on_arguments()
-    def to_dict(self):
+    def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
-        data = super().to_dict()
+        data = super().to_dict(excludes=excludes, includes=includes)
         assignment_data = None
         if self.assignments:
             assignment = self.assignments[-1]
@@ -659,8 +661,10 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data['availability'] = self.availability
         data['price'] = self.price
         data['slug'] = self.slug
-        data['source'] = self.source.value
-        data['category'] = self.category.value
+        data['source'] = self.source.value \
+            if isinstance(self.source, OrderInputSource) else self.source
+        data['category'] = self.category.value \
+            if isinstance(self.category, CategoryChoices) else self.category
         data['deliver_date'] = self.deliver_date
         data['scheduled_datetime'] = self.deliver_date
         data['delivery'] = self.delivery

@@ -1,9 +1,9 @@
 """Briefy Leica Assignment model."""
 from briefy.common.db.types import AwareDateTime
-from briefy.leica.cache import region
+from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica.cache import cache_manager
+from briefy.leica.cache import region
 from briefy.leica.db import Base
-from briefy.leica.db import Session
 from briefy.leica.models import mixins
 from briefy.leica.models.job import workflows
 from briefy.leica.models.job.order import Order
@@ -157,7 +157,8 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
 
     __summary_attributes__ = __summary_attributes__
     __summary_attributes_relations__ = [
-        'project', 'comments', 'location', 'professional', 'customer', 'pool', 'external_id'
+        'project', 'comments', 'location', 'professional', 'customer',
+        'pool', 'external_id', 'active_order'
     ]
     __listing_attributes__ = __listing_attributes__
 
@@ -617,7 +618,6 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         data = self._apply_actors_info(data)
         return data
 
-
     @region.cache_on_arguments()
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
@@ -627,14 +627,15 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         """
         data = super().to_listing_dict()
         data['set_type'] = self.set_type.value
-        data['category'] = self.category.value
+        data['category'] = self.category.value \
+            if isinstance(self.category, CategoryChoices) else self.category
         data = self._apply_actors_info(data)
         return data
 
     @region.cache_on_arguments()
-    def to_dict(self):
+    def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
-        data = super().to_dict(excludes=['active_order'])
+        data = super().to_dict(excludes=excludes, includes=includes)
         data['title'] = self.title
         data['description'] = self.description
         data['briefing'] = self.briefing
@@ -642,8 +643,11 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         data['last_approval_date'] = self.last_approval_date
         data['last_submission_date'] = self.last_submission_date
         data['closed_on_date'] = self.closed_on_date
+        data['category'] = self.category.value \
+            if isinstance(self.category, CategoryChoices) else self.category
         data['slug'] = self.slug
-        data['set_type'] = self.set_type.value if isinstance(self.set_type, TypesOfSetChoices) else self.set_type
+        data['set_type'] = self.set_type.value \
+            if isinstance(self.set_type, TypesOfSetChoices) else self.set_type
         data['timezone'] = self.timezone
         data['tech_requirements'] = self.order.tech_requirements
         data['availability'] = self.availability
