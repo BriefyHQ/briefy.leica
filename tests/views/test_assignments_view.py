@@ -37,7 +37,6 @@ class TestAssignmentView(BaseVersionedTestView):
 
     def test_workflow(self, app, session, instance_obj):
         """Test workflow endpoints."""
-        obj_id = instance_obj.id
         payload = {
             'owner': 'Professional Name',
             'id': '264b3e66-c327-4bbd-9cc7-271716fce178',
@@ -82,7 +81,6 @@ class TestAssignmentView(BaseVersionedTestView):
 
         obj_id = instance_obj.id
         state = instance_obj.state
-
         assert state == 'pending'
 
         # Endpoints
