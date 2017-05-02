@@ -1,4 +1,5 @@
 """Briefy Leica Comment model."""
+from briefy.leica import models
 from briefy.leica.cache import cache_manager
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
@@ -144,4 +145,9 @@ class Comment(mixins.LeicaMixin, Base):
 def assignment_after_update(mapper, connection, target):
     """Invalidate Comment (and related entity) cache after instance update."""
     cache_manager.refresh(target)
-    cache_manager.refresh(target.entity)
+    model_klass = getattr(models, target.entity_type, None)
+    entity_id = target.entity_id
+    if model_klass and entity_id:
+        entity = model_klass.get(entity_id)
+        if entity:
+            cache_manager.refresh(target.entity)
