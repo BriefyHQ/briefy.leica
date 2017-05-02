@@ -25,6 +25,7 @@ requires = [
     'pyramid_dogpile_cache2',
     'pyramid_tm',
     'pyramid_zcml',
+    'redis',
     'requests',
     'setuptools',
     's3transfer==0.1.10',
