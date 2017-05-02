@@ -1,5 +1,4 @@
 """Briefy Leica Comment model."""
-from briefy.leica import models
 from briefy.leica.cache import cache_manager
 from briefy.leica.db import Base
 from briefy.leica.models import mixins

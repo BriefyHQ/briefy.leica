@@ -11,4 +11,3 @@ def comment_created_handler(event):
     cache_manager.refresh(comment)
     if comment.entity:
         cache_manager.refresh(comment.entity)
-
