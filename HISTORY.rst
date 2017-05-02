@@ -6,6 +6,7 @@ History
 ------------------
 
     * Added cache layer using dogpile cache to models (Project, Order, Assignment) to_listing_dict and to_dict (rudaporto).
+    * Lots of fixes in the to_dict serialization methods and invalidation when things change (rudaporto).
 
 2.1.12 (2017-04-28)
 -------------------
