@@ -45,16 +45,29 @@ def safe_workflow_trigger_transitions(event, transitions, state='created'):
         try:
             transition = getattr(wf, transition_name)
             transition(message=message)
-        except AttributeError:
+        except AttributeError as error:
             savepoint.rollback()
-            msg = 'Transition: {transition} not found in asset: {id} title: {title}.'
-            logger.info(msg.format(id=obj.id, title=obj.title,
-                                   transition=transition_name))
-        except WorkflowPermissionException:
+            msg = 'Transition: {transition} not found in asset: {id} title: {title}. ' \
+                  'Error: {error}'
+            logger.error(
+                msg.format(
+                    id=obj.id,
+                    title=obj.title,
+                    transition=transition_name,
+                    error=error
+                )
+            )
+        except WorkflowPermissionException as error:
             savepoint.rollback()
             msg = 'Permission denied. Could not execute transition: {transition} for ' \
-                  'asset: {id} state: {state}. user groups:{groups}'
-            logger.info(msg.format(id=obj.id, state=wf.state.name,
-                                   transition=transition_name,
-                                   groups=user.groups))
+                  'asset: {id} state: {state}. user groups:{groups} Error: {error}'
+            logger.error(
+                msg.format(
+                    id=obj.id,
+                    state=wf.state.name,
+                    transition=transition_name,
+                    groups=user.groups,
+                    error=error
+                )
+            )
     return None

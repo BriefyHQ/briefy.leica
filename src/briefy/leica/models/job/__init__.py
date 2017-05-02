@@ -635,6 +635,8 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     @region.cache_on_arguments()
     def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
+        excludes = excludes if excludes else []
+        excludes.extend('approvable_assets')
         data = super().to_dict(excludes=excludes, includes=includes)
         data['title'] = self.title
         data['description'] = self.description
