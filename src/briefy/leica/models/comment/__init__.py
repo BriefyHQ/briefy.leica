@@ -1,8 +1,10 @@
 """Briefy Leica Comment model."""
+from briefy.leica.cache import cache_manager
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.comment import workflows
 from briefy.leica.utils.user import add_user_info_to_state_history
+from sqlalchemy import event
 from zope.interface import implementer
 from zope.interface import Interface
 
@@ -136,3 +138,10 @@ class Comment(mixins.LeicaMixin, Base):
         data['author'] = self.author
         data['entity'] = self.entity
         return data
+
+
+@event.listens_for(Comment, 'after_update')
+def assignment_after_update(mapper, connection, target):
+    """Invalidate Comment (and related entity) cache after instance update."""
+    cache_manager.refresh(target)
+    cache_manager.refresh(target.entity)
