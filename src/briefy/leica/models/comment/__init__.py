@@ -145,9 +145,5 @@ class Comment(mixins.LeicaMixin, Base):
 def assignment_after_update(mapper, connection, target):
     """Invalidate Comment (and related entity) cache after instance update."""
     cache_manager.refresh(target)
-    model_klass = getattr(models, target.entity_type, None)
-    entity_id = target.entity_id
-    if model_klass and entity_id:
-        entity = model_klass.get(entity_id)
-        if entity:
-            cache_manager.refresh(target.entity)
+    if target.entity:
+        cache_manager.refresh(target.entity)
