@@ -18,6 +18,7 @@ from datetime import datetime
 from dateutil.parser import parse
 from sqlalchemy import event
 from sqlalchemy import orm
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import TimezoneType
 
@@ -127,7 +128,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', 'project', 'comments', 'customer',
+            'state_history', 'state', 'project', 'comments', 'customer', 'type',
             '_project_manager', '_scout_manager', '_customer_user', 'external_id',
             'assignment', 'assignments', '_project_managers', '_scout_managers',
             '_customer_users',
@@ -143,6 +144,20 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     By default we do not keep track of state_history and helper columns.
     """
+
+    type = sa.Column(sa.String(50))
+    """Polymorphic type name."""
+
+    @declared_attr
+    def __mapper_args__(cls):
+        """Return polymorphic identity."""
+        cls_name = cls.__name__.lower()
+        args = {
+            'polymorphic_identity': cls_name,
+        }
+        if cls_name == 'order':
+            args['polymorphic_on'] = cls.type
+        return args
 
     _slug = sa.Column('slug',
                       sa.String(255),

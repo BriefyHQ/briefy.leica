@@ -14,8 +14,8 @@ with open(os.path.join(here, 'HISTORY.rst')) as f:
 requires = [
     'apscheduler',
     'boto3',
-    'briefy.common',
-    'briefy.ws',
+    'briefy.common>=2.0.1',
+    'briefy.ws>=2.0.1',
     'colanderalchemy',
     'cornice==2.4.0',
     'newrelic',

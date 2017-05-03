@@ -9,6 +9,7 @@ from briefy.common.workflow import Permission
 from briefy.common.workflow import WorkflowTransitionException
 from briefy.leica.config import SCHEDULE_DAYS_LIMIT
 from briefy.leica.events.assignment import AssignmentUpdatedEvent
+from briefy.leica.events.leadorder import LeadOrderUpdatedEvent
 from briefy.leica.events.order import OrderUpdatedEvent
 from briefy.leica.subscribers.utils import create_new_assignment_from_order
 from briefy.leica.utils.transitions import create_comment_on_assignment_approval
@@ -987,7 +988,6 @@ class OrderWorkflow(BriefyWorkflow):
     @delivered.transition(refused, 'can_refuse', message_required=True)
     def refuse(self, **kwargs):
         """Transition: Customer refuse the Order."""
-        # TODO: fix workflow to pass message in the kwargs
         message = kwargs.get('message')
         order = self.document
         assignment = order.assignment
@@ -1173,6 +1173,105 @@ class OrderWorkflow(BriefyWorkflow):
     @Permission(groups=[G['pm'], ])
     def can_require_revision(self):
         """Permission: Validate if user can require revision of an Order."""
+        return True
+
+
+class LeadOrderWorkflow(OrderWorkflow):
+    """Workflow for a Lead."""
+
+    entity = 'lead'
+    initial_state = 'created'
+    update_event = LeadOrderUpdatedEvent
+
+    new = WS(
+        'new', 'New',
+        'LeadOrder New.'
+    )
+
+    created = OrderWorkflow.created
+    received = OrderWorkflow.received
+    assigned = OrderWorkflow.assigned
+    scheduled = OrderWorkflow.scheduled
+    cancelled = OrderWorkflow.scheduled
+
+    # Transitions
+    @created.transition(new, 'can_submit_new')
+    def submit(self, **kwargs):
+        """Submit a LeadOrder."""
+        pass
+
+    @Permission(groups=[G['customers'], G['pm'], G['bizdev'], G['system'], ])
+    def can_submit(self):
+        """Validate if user can submit a LeadOrder."""
+        return True
+
+    @scheduled.transition(
+        cancelled,
+        'can_cancel',
+        message_required=True
+    )
+    @assigned.transition(
+        cancelled,
+        'can_cancel',
+        message_required=True
+    )
+    @received.transition(
+        cancelled,
+        'can_cancel',
+        message_required=True
+    )
+    @new.transition(
+        cancelled,
+        'can_cancel',
+        message_required=True
+    )
+    def cancel(self, **kwargs):
+        """Transition: Cancel the LeadOrder."""
+        leadorder = self.document
+        assignment = leadorder.assignment
+        wkf = assignment.workflow
+        wkf.context = self.context
+        assignment.workflow.cancel()
+
+    @received.transition(
+        received,
+        'can_set_availability',
+        required_fields=('availability', )
+    )
+    @assigned.transition(
+        assigned,
+        'can_set_availability',
+        required_fields=('availability', )
+    )
+    @new.transition(
+        received,
+        'can_set_availability',
+        required_fields=('availability', )
+    )
+    def set_availability(self, **kwargs):
+        """Set Lead order availability dates."""
+        pass
+
+    @received.transition(
+        new,
+        'can_remove_availability'
+    )
+    @assigned.transition(
+        new,
+        'can_remove_availability'
+    )
+    @scheduled.transition(
+        new,
+        'can_remove_availability'
+    )
+    def remove_availability(self, **kwargs):
+        """Transition: Inform the removal of availability dates to the customer."""
+        leadorder = self.document
+        leadorder.availability = []
+        # this will handle the creation of a new Assignment
+        message = kwargs.get('message', '')
+        create_new_assignment_from_order(leadorder, leadorder.request, copy_payout=True)
+        leadorder.assignment.workflow.cancel(message=message)
         return True
 
 

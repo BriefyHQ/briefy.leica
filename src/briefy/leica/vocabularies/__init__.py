@@ -2,6 +2,13 @@
 from briefy.common.vocabularies import LabeledEnum
 
 
+order_type = [
+    ('order', 'order', 'Order'),
+    ('leadorder', 'leadorder', 'LeadOrder'),
+]
+
+OrderTypeChoices = LabeledEnum('OrderTypeChoices', order_type)
+
 order_options = [
     ('undefined', 'undefined', 'undefined'),
     ('job_received', 'job_received', 'Job received'),

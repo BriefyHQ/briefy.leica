@@ -2,6 +2,7 @@
   {
     "project_manager": "77f88fab-dbdf-4705-8da1-8512f6012a86",
     "state": "created",
+    "order_type": "order",
     "title": "Project 01",
     "id": "36d359f0-8e92-41bb-8d1c-fedfd60e7046",
     "qa_manager": "5f767bb3-125f-42d4-9ba5-af57a3d1b6d0",
@@ -28,6 +29,7 @@
   {
     "project_manager": "77f88fab-dbdf-4705-8da1-8512f6012a86",
     "state": "created",
+    "order_type": "leadorder",
     "title": "Project 02",
     "id": "0f3d99eb-0a99-40cc-9ad7-168fe77ee6ce",
     "qa_manager": "5f767bb3-125f-42d4-9ba5-af57a3d1b6d0",
@@ -54,6 +56,7 @@
   {
     "project_manager": "77f88fab-dbdf-4705-8da1-8512f6012a86",
     "state": "created",
+    "order_type": "order",
     "title": "Project 03",
     "id": "74b2090b-9cc0-4122-9455-17901b282abe",
     "qa_manager": "5f767bb3-125f-42d4-9ba5-af57a3d1b6d0",
@@ -106,6 +109,7 @@
   {
     "project_manager": "77f88fab-dbdf-4705-8da1-8512f6012a86",
     "state": "created",
+    "order_type": "leadorder",
     "title": "Project 05",
     "id": "4a068a1b-3646-4acf-937d-15563853e388",
     "qa_manager": "5f767bb3-125f-42d4-9ba5-af57a3d1b6d0",

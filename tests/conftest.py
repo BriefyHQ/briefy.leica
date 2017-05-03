@@ -1,5 +1,6 @@
 """Conftest for Leica."""
 from briefy import leica
+from briefy.common.db import datetime_utcnow
 from briefy.common.types import BaseUser
 from briefy.common.utils.transformers import to_serializable
 from briefy.leica import models
@@ -12,12 +13,14 @@ from datetime import date
 from datetime import datetime
 from prettyconf import config
 from pyramid.paster import get_app
+from pyramid.testing import DummyRequest
 from pyramid_jwt.policy import JWTAuthenticationPolicy
 from sqlalchemy_utils import PhoneNumber
 from webtest import TestApp
 from zope.configuration.xmlconfig import XMLConfig
 
 import botocore
+import briefy.common
 import configparser
 import enum
 import json
@@ -25,6 +28,10 @@ import os
 import pytest
 import requests
 import uuid
+
+
+XMLConfig('configure.zcml', briefy.common)()
+XMLConfig('configure.zcml', leica)()
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -41,8 +48,6 @@ def mock_boto():
     if not hasattr(botocore.endpoint, 'OrigEndpoint'):
         botocore.endpoint.OrigEndpoint = botocore.endpoint.Endpoint
     botocore.endpoint.Endpoint = MockEndpoint
-
-    XMLConfig('configure.zcml', leica)()
 
 
 @pytest.fixture(scope='session')
@@ -112,6 +117,26 @@ def session():
     :rtype: sqlalchemy.orm.scoped_session
     """
     return DBSession()
+
+
+@pytest.fixture(scope='function')
+def web_request():
+    """Return a web request instance.
+
+    :returns: DummyRequest
+    :rtype: pyramid.testing.DummyRequest
+    """
+    return DummyRequest()
+
+
+@pytest.fixture(scope='function')
+def now_utc():
+    """Fixture to return a datetime now instance with timezone.
+
+    :returns: datetime.now with timezone
+    :rtype: datetime.datetime
+    """
+    return datetime_utcnow
 
 
 @pytest.mark.usefixtures('db_transaction')

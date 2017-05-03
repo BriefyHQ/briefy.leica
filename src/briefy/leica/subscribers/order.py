@@ -1,5 +1,4 @@
 """Event subscribers for briefy.leica.models.job.Order."""
-from briefy.common.users import SystemUser
 from briefy.common.vocabularies.roles import Groups as G
 from briefy.leica.cache import cache_manager
 from briefy.leica.events.order import OrderCreatedEvent
@@ -36,20 +35,17 @@ def order_created_handler(event):
         # force this because sometimes the obj.id is not available before the flush
         order.location = location
 
-    # create a new assignment
-    create_new_assignment_from_order(order, request)
     # submit the order
     order.workflow.submit()
+    cache_manager.refresh(order)
 
 
 def order_submit(event):
     """Handle Order submitted event."""
-    transitions = []
-    # Impersonate the System here
-    event.user = SystemUser
-    transitions.append(
-        ('validate', 'Machine check approved')
-    )
+    order = event.obj
+    request = event.request
+    # create a new assignment
+    create_new_assignment_from_order(order, request)
 
 
 def order_cancel(event):
@@ -147,7 +143,7 @@ def order_unassign_reassign(event):
 
 
 def transition_handler(event):
-    """Handle Cancel transition events."""
+    """Handle Order transition events."""
     event_name = event.event_name
     if not event_name.startswith('order.workflow'):
         return
