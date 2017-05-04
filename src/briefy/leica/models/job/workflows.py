@@ -737,7 +737,14 @@ class OrderWorkflow(BriefyWorkflow):
     @scheduled.transition(scheduled, 'can_edit_location', required_fields=('location', ))
     def edit_location(self, **kwargs):
         """Update location in an Order."""
-        pass
+        order = self.document
+        location = order.location
+        if location:
+            payload = kwargs['fields']['location']
+            for key, value in payload.items():
+                setattr(location, key, value)
+
+            kwargs['fields'] = dict(location=location)
 
     @Permission(groups=[G['customers'], G['pm'], G['system'], ])
     def can_edit_location(self):

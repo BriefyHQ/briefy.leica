@@ -126,7 +126,9 @@ def web_request():
     :returns: DummyRequest
     :rtype: pyramid.testing.DummyRequest
     """
-    return DummyRequest()
+    req = DummyRequest()
+    req.validated = {}
+    return req
 
 
 @pytest.fixture(scope='function')
