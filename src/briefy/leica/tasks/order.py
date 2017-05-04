@@ -1,7 +1,7 @@
 """Order tasks."""
 from briefy.common.db import datetime_utcnow
 from briefy.common.users import SystemUser
-from briefy.leica.cache import region
+from briefy.leica.cache import cache_region
 from briefy.leica.events.task import LeicaTaskEvent
 from briefy.leica.log import tasks_logger as logger
 from briefy.leica.models import Order
@@ -45,7 +45,7 @@ def _move_order_accepted(order: Order) -> bool:
                 status = True
 
             # Trigger task event
-            region.invalidate(order)
+            cache_region.invalidate(order)
             event = LeicaTaskEvent(task_name=task_name, success=status, obj=order)
             event()
             logger.info(msg)
@@ -62,6 +62,6 @@ def move_orders_accepted():
     for order in orders:
         status = _move_order_accepted(order)
         total_moved += 1 if status else 0
-        region.invalidate(order)
+        cache_region.invalidate(order)
 
     logger.info('Total orders moved to accepted state: {total}'.format(total=total_moved))

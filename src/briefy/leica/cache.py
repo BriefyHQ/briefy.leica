@@ -10,4 +10,4 @@ def enable_cache(*args, **kwargs) -> bool:
 
 
 cache_manager = getUtility(ICacheManager)
-region = cache_manager.region()
+cache_region = cache_manager.region()
