@@ -332,7 +332,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
-        excludes = excludes if excludes else []
+        excludes = list(excludes) if excludes else []
         excludes.append('orders')
         data = super().to_dict(excludes=excludes, includes=includes)
         data['slug'] = self.slug
