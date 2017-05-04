@@ -4,8 +4,8 @@ from briefy.common.utils import schema
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica import logger
 from briefy.leica.cache import cache_manager
-from briefy.leica.cache import enable_cache
 from briefy.leica.cache import cache_region
+from briefy.leica.cache import enable_cache
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.descriptors import UnaryRelationshipWrapper
