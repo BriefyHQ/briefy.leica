@@ -24,7 +24,6 @@ requires = [
     'pyramid==1.8.3',
     'pyramid_tm',
     'pyramid_zcml',
-    'redis',
     'requests',
     'setuptools',
     's3transfer==0.1.10',
