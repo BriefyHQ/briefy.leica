@@ -3,7 +3,7 @@ from briefy.common.db.mixins import BriefyRoles
 from briefy.common.utils import schema
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica.cache import enable_cache
-from briefy.leica.cache import region
+from briefy.leica.cache import cache_region
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.project import workflows
@@ -303,7 +303,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     Relationship between a project and a Pool.
     """
 
-    @region.cache_on_arguments(should_cache_fn=enable_cache)
+    @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_summary_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
 
@@ -316,7 +316,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         data = self._apply_actors_info(data)
         return data
 
-    @region.cache_on_arguments(should_cache_fn=enable_cache)
+    @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
 
@@ -329,7 +329,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         data = self._apply_actors_info(data)
         return data
 
-    @region.cache_on_arguments(should_cache_fn=enable_cache)
+    @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
         excludes = excludes if excludes else []
@@ -349,4 +349,4 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
 @event.listens_for(Project, 'after_update')
 def project_after_update(mapper, connection, target):
     """Invalidate Project cache after instance update."""
-    region.invalidate(target)
+    cache_region.invalidate(target)
