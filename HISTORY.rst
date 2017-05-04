@@ -2,6 +2,23 @@
 History
 =======
 
+2.1.13 (Unreleased)
+-------------------
+
+    * Added cache layer using briefy.common.cache utility (Project, Order, Assignment) to_listing_dict, to_summary and to_dict (rudaporto).
+    * Configure default cache backend to redis (docker container also) and added invalidation in model creation and updated events (rudaporto).
+    * Update Project, Order, Assignment to_dict signature to follow the original one (rudaporto).
+    * Make sure we do not return Enum instances in the to_dict (always return the str value) (rudaporto).
+    * Added a global config to easy switch off the cache system (rudaporto).
+    * Fix: price_currency field was mistyped in Order.__summary_attributes__ (rudaporto).
+    * Added location to Order.__summary_attributes__ (rudaporto).
+    * Changed the way we get the last Order assignment in Order.to_dict (rudaporto).
+    * Added update events to Project, Order and Assignment workflow (rudaporto).
+    * Improve logging on function safe_workflow_trigger_transitions (rudaporto).
+    * Added new subscriber for CommentCreatedEvent to invalidate Comment.entity after comment creation (rudaporto).
+    * Fix: function create_new_assignment_from_order now send id in the payload and append new assignment in the Order.assignments (rudaporto).
+    * Added invalidation in all tasks and worker actions after update objects since some events will not be fired without a request (rudaporto).
+
 2.1.12 (2017-04-28)
 -------------------
     * Fix: new script remove the last transition from two orders and respective assignments (rudaporto).

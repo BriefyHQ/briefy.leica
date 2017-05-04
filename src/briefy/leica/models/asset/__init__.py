@@ -198,9 +198,11 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
         data['metadata'] = self.metadata_
         return data
 
-    def to_dict(self):
+    def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
-        data = super().to_dict(excludes=['raw_metadata'])
+        excludes = excludes if excludes else []
+        excludes.append('raw_metadata')
+        data = super().to_dict(excludes=excludes, includes=includes)
         data['image'] = self.image
         data['metadata'] = self.metadata_
         add_user_info_to_state_history(self.state_history)

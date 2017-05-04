@@ -1,5 +1,6 @@
 """Briefy Leica config."""
 from briefy.common.config import _queue_suffix
+from prettyconf import casts
 from prettyconf import config
 
 
@@ -52,3 +53,6 @@ CRON_MINUTE_JOB_TASKS = config('CRON_MINUTE_JOB_TASKS', default='*/1')
 
 # number of days before scheduled date to schedule
 SCHEDULE_DAYS_LIMIT = config('SCHEDULE_DAYS_LIMIT', default=1)
+
+# Cache
+ENABLE_CACHE = config('ENABLE_CACHE', casts.Boolean(), default=False)

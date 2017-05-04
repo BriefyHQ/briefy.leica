@@ -2,6 +2,7 @@
 from briefy.common.db import datetime_utcnow
 from briefy.common.users import SystemUser
 from briefy.common.workflow.exceptions import WorkflowTransitionException
+from briefy.leica.cache import cache_region
 from briefy.leica.events.task import LeicaTaskEvent
 from briefy.leica.log import tasks_logger as logger
 from briefy.leica.models import Assignment
@@ -40,6 +41,8 @@ def _move_assignment_awaiting_assets(assignment: Assignment) -> bool:
                 )
             )
 
+        cache_region.invalidate(assignment)
+
         event = LeicaTaskEvent(task_name=task_name, success=status, obj=assignment)
         event()
 
@@ -61,5 +64,6 @@ def move_assignments_awaiting_assets():
     for assignment in assignments:
         status = _move_assignment_awaiting_assets(assignment)
         total_moved += 1 if status else 0
+        cache_region.invalidate(assignment)
 
     logger.info('Total assignments moved to awaiting assets: {total}'.format(total=total_moved))

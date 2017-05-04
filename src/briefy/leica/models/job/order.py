@@ -3,6 +3,9 @@ from briefy.common.db.types import AwareDateTime
 from briefy.common.utils import schema
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica import logger
+from briefy.leica.cache import cache_manager
+from briefy.leica.cache import cache_region
+from briefy.leica.cache import enable_cache
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.descriptors import UnaryRelationshipWrapper
@@ -14,6 +17,7 @@ from briefy.leica.utils.user import add_user_info_to_state_history
 from briefy.leica.vocabularies import OrderInputSource
 from datetime import datetime
 from dateutil.parser import parse
+from sqlalchemy import event
 from sqlalchemy import orm
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import TimezoneType
@@ -28,7 +32,7 @@ import string
 
 __summary_attributes__ = [
     'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
-    'currency', 'price', 'number_required_assets', 'location', 'category',
+    'price_currency', 'price', 'number_required_assets', 'location', 'category',
     'timezone', 'scheduled_datetime', 'delivery', 'deliver_date', 'customer_order_id'
 ]
 
@@ -108,7 +112,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     __summary_attributes__ = __summary_attributes__
     __summary_attributes_relations__ = [
-        'project', 'comments', 'customer', 'assignment', 'assignments'
+        'project', 'comments', 'customer', 'assignment', 'assignments', 'location'
     ]
     __listing_attributes__ = __listing_attributes__
 
@@ -617,6 +621,20 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         # Update all dates
         self._update_dates_from_history()
 
+    @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
+    def to_summary_dict(self) -> dict:
+        """Return a summarized version of the dict representation of this Class.
+
+        Used to serialize this object within a parent object serialization.
+        :returns: Dictionary with fields and values used by this Class
+        """
+        data = super().to_summary_dict()
+        data['category'] = self.category.value \
+            if isinstance(self.category, CategoryChoices) else self.category
+        data = self._apply_actors_info(data)
+        return data
+
+    @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
 
@@ -624,17 +642,19 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_listing_dict()
+        data['category'] = self.category.value \
+            if isinstance(self.category, CategoryChoices) else self.category
         data = self._apply_actors_info(data)
         return data
 
-    def to_dict(self):
+    @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
+    def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
-        data = super().to_dict(excludes=['assignment', 'assignments'])
-
-        assignment = self.assignment
+        data = super().to_dict(excludes=excludes, includes=includes)
         assignment_data = None
-        if assignment:
-            assignment_data = self.assignment.to_summary_dict()
+        if self.assignments:
+            assignment = self.assignments[-1]
+            assignment_data = assignment.to_summary_dict()
             assignment_data = self._apply_actors_info(assignment_data, assignment)
 
         data['description'] = self.description
@@ -642,6 +662,10 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data['availability'] = self.availability
         data['price'] = self.price
         data['slug'] = self.slug
+        data['source'] = self.source.value \
+            if isinstance(self.source, OrderInputSource) else self.source
+        data['category'] = self.category.value \
+            if isinstance(self.category, CategoryChoices) else self.category
         data['deliver_date'] = self.deliver_date
         data['scheduled_datetime'] = self.deliver_date
         data['delivery'] = self.delivery
@@ -656,3 +680,11 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         # Apply actor information to data
         data = self._apply_actors_info(data)
         return data
+
+
+@event.listens_for(Order, 'after_update')
+def order_after_update(mapper, connection, target):
+    """Invalidate Order cache after instance update."""
+    cache_manager.refresh(target)
+    for assignment in target.assignments:
+        cache_manager.refresh(assignment)

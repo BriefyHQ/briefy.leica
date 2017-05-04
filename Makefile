@@ -142,17 +142,19 @@ restoredb_stg_local: clean_dockers create_dockers
 	pg_restore --no-owner -x -h localhost -p 9999 -U briefy -W -d briefy-leica /tmp/staging-leica.dump
 
 start_dockers:
+	docker start redis
 	docker start sqs
 	docker start briefy-leica-test
 	docker start briefy-leica-unit_test
 
 stop_dockers: ## stop and remove docker containers
-	# sqs
+	docker stop redis
 	docker stop sqs
 	docker stop briefy-leica-test
 	docker stop briefy-leica-unit_test
 
 clean_dockers: stop_dockers
+	docker rm redis
 	docker rm sqs
 	docker rm briefy-leica-test
 	docker rm briefy-leica-unit_test
@@ -162,6 +164,7 @@ export_db_env:
 	export DATABASE_TEST_URL=postgresql://briefy:briefy@127.0.0.1:9998/briefy-leica-unit_test
 
 create_dockers: export_db_env
+	docker run -d -p 127.0.0.1:6379:6379 --name redis redis
 	docker run -d -p 127.0.0.1:5000:5000 --name sqs briefy/aws-test:latest sqs
 	export SQS_IP=127.0.0.1 SQS_PORT=5000
 	docker run -d -p 127.0.0.1:9999:5432 -e POSTGRES_PASSWORD=briefy -e POSTGRES_USER=briefy -e POSTGRES_DB=briefy-leica --name briefy-leica-test mdillon/postgis:9.5

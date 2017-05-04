@@ -2,10 +2,13 @@
 from briefy.common.db.mixins import BriefyRoles
 from briefy.common.utils import schema
 from briefy.common.vocabularies.categories import CategoryChoices
+from briefy.leica.cache import cache_region
+from briefy.leica.cache import enable_cache
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.project import workflows
 from briefy.leica.utils.user import add_user_info_to_state_history
+from sqlalchemy import event
 from sqlalchemy import orm
 from zope.interface import implementer
 from zope.interface import Interface
@@ -300,6 +303,20 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     Relationship between a project and a Pool.
     """
 
+    @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
+    def to_summary_dict(self) -> dict:
+        """Return a summarized version of the dict representation of this Class.
+
+        Used to serialize this object within a parent object serialization.
+        :returns: Dictionary with fields and values used by this Class
+        """
+        data = super().to_summary_dict()
+        data['category'] = self.category.value \
+            if isinstance(self.category, CategoryChoices) else self.category
+        data = self._apply_actors_info(data)
+        return data
+
+    @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
 
@@ -307,16 +324,29 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_listing_dict()
+        data['category'] = self.category.value \
+            if isinstance(self.category, CategoryChoices) else self.category
         data = self._apply_actors_info(data)
         return data
 
-    def to_dict(self):
+    @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
+    def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
-        data = super().to_dict()
+        excludes = list(excludes) if excludes else []
+        excludes.append('orders')
+        data = super().to_dict(excludes=excludes, includes=includes)
         data['slug'] = self.slug
         data['price'] = self.price
+        data['category'] = self.category.value \
+            if isinstance(self.category, CategoryChoices) else self.category
         data = self._apply_actors_info(data)
         add_user_info_to_state_history(self.state_history)
         # Apply actor information to data
         data = self._apply_actors_info(data)
         return data
+
+
+@event.listens_for(Project, 'after_update')
+def project_after_update(mapper, connection, target):
+    """Invalidate Project cache after instance update."""
+    cache_region.invalidate(target)

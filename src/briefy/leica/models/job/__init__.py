@@ -1,5 +1,9 @@
 """Briefy Leica Assignment model."""
 from briefy.common.db.types import AwareDateTime
+from briefy.common.vocabularies.categories import CategoryChoices
+from briefy.leica.cache import cache_manager
+from briefy.leica.cache import cache_region
+from briefy.leica.cache import enable_cache
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.job import workflows
@@ -8,6 +12,7 @@ from briefy.leica.utils.transitions import get_transition_date_from_history
 from briefy.leica.utils.user import add_user_info_to_state_history
 from briefy.leica.vocabularies import TypesOfSetChoices
 from datetime import datetime
+from sqlalchemy import event
 from sqlalchemy import orm
 from sqlalchemy import select
 from sqlalchemy.ext.declarative import declared_attr
@@ -153,7 +158,8 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
 
     __summary_attributes__ = __summary_attributes__
     __summary_attributes_relations__ = [
-        'project', 'comments', 'location', 'professional', 'customer', 'pool', 'external_id'
+        'project', 'comments', 'location', 'professional', 'customer',
+        'pool', 'external_id', 'active_order'
     ]
     __listing_attributes__ = __listing_attributes__
 
@@ -601,6 +607,19 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         """Return if this Assignment is assigned or not."""
         return True if (self.assignment_date and self.professional_id) else False
 
+    @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
+    def to_summary_dict(self) -> dict:
+        """Return a summarized version of the dict representation of this Class.
+
+        Used to serialize this object within a parent object serialization.
+        :returns: Dictionary with fields and values used by this Class
+        """
+        data = super().to_summary_dict()
+        data['category'] = self.category.value
+        data = self._apply_actors_info(data)
+        return data
+
+    @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
 
@@ -608,12 +627,18 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_listing_dict()
+        data['set_type'] = self.set_type.value
+        data['category'] = self.category.value \
+            if isinstance(self.category, CategoryChoices) else self.category
         data = self._apply_actors_info(data)
         return data
 
-    def to_dict(self):
+    @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
+    def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
-        data = super().to_dict(excludes=['active_order'])
+        excludes = list(excludes) if excludes else []
+        excludes.extend('approvable_assets')
+        data = super().to_dict(excludes=excludes, includes=includes)
         data['title'] = self.title
         data['description'] = self.description
         data['briefing'] = self.briefing
@@ -621,11 +646,15 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         data['last_approval_date'] = self.last_approval_date
         data['last_submission_date'] = self.last_submission_date
         data['closed_on_date'] = self.closed_on_date
+        data['category'] = self.category.value \
+            if isinstance(self.category, CategoryChoices) else self.category
         data['slug'] = self.slug
+        data['set_type'] = self.set_type.value \
+            if isinstance(self.set_type, TypesOfSetChoices) else self.set_type
         data['timezone'] = self.timezone
         data['tech_requirements'] = self.order.tech_requirements
         data['availability'] = self.availability
-        data['category'] = self.category
+        data['category'] = self.category.value
         data['order'] = self.order.to_summary_dict() if self.order else None
         data['location'] = self.location.to_summary_dict() if self.location else None
         if data['project']:
@@ -640,3 +669,10 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         # Apply actor information to data
         data = self._apply_actors_info(data)
         return data
+
+
+@event.listens_for(Assignment, 'after_update')
+def assignment_after_update(mapper, connection, target):
+    """Invalidate Assignment cache after instance update."""
+    cache_manager.refresh(target)
+    cache_manager.refresh(target.order)

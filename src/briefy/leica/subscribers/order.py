@@ -1,11 +1,20 @@
 """Event subscribers for briefy.leica.models.job.Order."""
 from briefy.common.users import SystemUser
 from briefy.common.vocabularies.roles import Groups as G
+from briefy.leica.cache import cache_manager
 from briefy.leica.events.order import OrderCreatedEvent
+from briefy.leica.events.order import OrderUpdatedEvent
 from briefy.leica.subscribers.utils import apply_local_roles_from_parent
 from briefy.leica.subscribers.utils import create_comment_from_wf_transition
 from briefy.leica.subscribers.utils import create_new_assignment_from_order
 from pyramid.events import subscriber
+
+
+@subscriber(OrderUpdatedEvent)
+def order_updated_handler(event):
+    """Handle Order updated event."""
+    order = event.obj
+    cache_manager.refresh(order)
 
 
 @subscriber(OrderCreatedEvent)
@@ -156,3 +165,5 @@ def transition_handler(event):
     handler = handlers.get(event_name, None)
     if handler:
         handler(event)
+
+    cache_manager.refresh(event.obj)
