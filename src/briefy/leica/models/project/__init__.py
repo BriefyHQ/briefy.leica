@@ -2,6 +2,7 @@
 from briefy.common.db.mixins import BriefyRoles
 from briefy.common.utils import schema
 from briefy.common.vocabularies.categories import CategoryChoices
+from briefy.leica.cache import enable_cache
 from briefy.leica.cache import region
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
@@ -302,7 +303,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     Relationship between a project and a Pool.
     """
 
-    @region.cache_on_arguments()
+    @region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_summary_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
 
@@ -315,7 +316,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         data = self._apply_actors_info(data)
         return data
 
-    @region.cache_on_arguments()
+    @region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
 
@@ -328,7 +329,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         data = self._apply_actors_info(data)
         return data
 
-    @region.cache_on_arguments()
+    @region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
         excludes = excludes if excludes else []

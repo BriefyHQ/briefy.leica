@@ -4,6 +4,7 @@ from briefy.common.utils import schema
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica import logger
 from briefy.leica.cache import cache_manager
+from briefy.leica.cache import enable_cache
 from briefy.leica.cache import region
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
@@ -620,7 +621,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         # Update all dates
         self._update_dates_from_history()
 
-    @region.cache_on_arguments()
+    @region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_summary_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
 
@@ -633,7 +634,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data = self._apply_actors_info(data)
         return data
 
-    @region.cache_on_arguments()
+    @region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
 
@@ -646,7 +647,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data = self._apply_actors_info(data)
         return data
 
-    @region.cache_on_arguments()
+    @region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
         data = super().to_dict(excludes=excludes, includes=includes)
