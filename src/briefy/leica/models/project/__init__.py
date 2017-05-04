@@ -2,8 +2,8 @@
 from briefy.common.db.mixins import BriefyRoles
 from briefy.common.utils import schema
 from briefy.common.vocabularies.categories import CategoryChoices
-from briefy.leica.cache import enable_cache
 from briefy.leica.cache import cache_region
+from briefy.leica.cache import enable_cache
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.project import workflows
@@ -351,7 +351,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
-        excludes = excludes if excludes else []
+        excludes = list(excludes) if excludes else []
         excludes.append('orders')
         data = super().to_dict(excludes=excludes, includes=includes)
         data['slug'] = self.slug
