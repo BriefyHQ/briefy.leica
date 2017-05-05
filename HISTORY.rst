@@ -18,6 +18,7 @@ History
     * Added new subscriber for CommentCreatedEvent to invalidate Comment.entity after comment creation (rudaporto).
     * Fix: function create_new_assignment_from_order now send id in the payload and append new assignment in the Order.assignments (rudaporto).
     * Added invalidation in all tasks and worker actions after update objects since some events will not be fired without a request (rudaporto).
+    * Aded script to export professionals to a spreadsheet file (jsbueno).
 
 2.1.12 (2017-04-28)
 -------------------
