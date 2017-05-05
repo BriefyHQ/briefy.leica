@@ -52,16 +52,22 @@ def order_cancel(event):
     """Handle Order cancel workflow event."""
     order = event.obj
     user = order.workflow.context
+    internal = False
     if G['customers'].value in user.groups:
         to_role = 'project_manager'
         author_role = 'customer_user'
     elif G['pm'].value in user.groups:
         to_role = 'customer_user'
         author_role = 'project_manager'
+    else:
+        to_role = 'customer_user'
+        author_role = 'project_manager'
+        internal = True
     create_comment_from_wf_transition(
         order,
         author_role,
-        to_role
+        to_role,
+        internal=internal
     )
 
 

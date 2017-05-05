@@ -138,7 +138,7 @@ def now_utc():
     :returns: datetime.now with timezone
     :rtype: datetime.datetime
     """
-    return datetime_utcnow
+    return datetime_utcnow()
 
 
 @pytest.mark.usefixtures('db_transaction')

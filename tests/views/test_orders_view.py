@@ -1,11 +1,10 @@
 """Test Orders view."""
+from briefy.common.db import datetime_utcnow
 from briefy.leica import models
 from conftest import BaseVersionedTestView
-from datetime import datetime
 from datetime import timedelta
 
 import pytest
-import pytz
 
 
 @pytest.mark.usefixtures('create_dependencies')
@@ -33,7 +32,7 @@ class TestOrderView(BaseVersionedTestView):
         'price': 10000,
         'price_currency': 'USD',
         'availability': [
-            str(datetime.now(tz=pytz.utc) + timedelta(days=14)),
-            str(datetime.now(tz=pytz.utc) + timedelta(days=21))
+            (datetime_utcnow() + timedelta(days=14)).isoformat(),
+            (datetime_utcnow() + timedelta(days=21)).isoformat()
         ]
     }

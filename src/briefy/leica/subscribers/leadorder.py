@@ -37,7 +37,7 @@ def leadorder_created_handler(event):
     # create a new assignment
     create_new_assignment_from_order(leadorder, request)
     # submit the order
-    leadorder.workflow.submit()
+    leadorder.workflow.submit_lead()
     cache_manager.refresh(leadorder)
     for assignment in leadorder.assignments:
         cache_manager.refresh(assignment)
@@ -49,7 +49,7 @@ def transition_handler(event):
     if not event_name.startswith('leadorder.workflow'):
         return
     handlers = {
-        'leadorder.workflow.submit': order_subscribers.order_submit,
+        'leadorder.workflow.submit_lead': order_subscribers.order_submit,
         'leadorder.workflow.cancel': order_subscribers.order_cancel,
         'leadorder.workflow.perm_refuse': order_subscribers.order_perm_refuse,
         'leadorder.workflow.remove_schedule': order_subscribers.order_remove_schedule,
