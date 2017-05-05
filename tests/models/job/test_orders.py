@@ -533,11 +533,11 @@ class TestOrderModel(BaseModelTest):
 
         assignment = order.assignments[-1]
         assignment, ass_wf, request = self.prepare_obj_wf(
-                assignment,
-                web_request,
-                roles[role_name],
-                origin_state
-            )
+            assignment,
+            web_request,
+            roles[role_name],
+            origin_state
+        )
 
         message = 'Order permanently refused!'
         order.workflow.perm_refuse(message=message)
