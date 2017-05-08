@@ -37,3 +37,18 @@ class TestOrderView(BaseVersionedTestView):
             str(datetime.now(tz=pytz.utc) + timedelta(days=21))
         ]
     }
+
+    def test_put_invalid_asset_tyoe(self, app, obj_payload):
+        """Asset type should match one of the possible values."""
+        payload = obj_payload
+        del(payload['availability'])
+        obj_id = payload['id']
+        payload['asset_types'] = ['Foobar']
+        request = app.put_json('{base}/{id}'.format(base=self.base_path, id=obj_id),
+                               payload, headers=self.headers, status=400)
+        result = request.json
+        error = result['errors'][0]
+        assert result['status'] == 'error'
+        assert error['name'] == 'asset_types'
+        assert error['location'] == 'body'
+        assert 'Invalid type of asset' in error['description']
