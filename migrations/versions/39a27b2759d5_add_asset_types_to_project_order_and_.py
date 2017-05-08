@@ -36,8 +36,6 @@ def data_upgrade():
     )  #  noQA
     op.execute(stmt)
 
-    asset_types = ['Image']
-
     # Set projects with Matterport asset_type
     asset_types = ['Matterport']
     stmt = """
