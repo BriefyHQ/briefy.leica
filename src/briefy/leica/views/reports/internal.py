@@ -8,8 +8,6 @@ from cornice.resource import resource
 from pyramid.security import Allow
 from pyramid.security import Everyone
 
-import newrelic.agent
-
 
 class InternalReportFactory(BaseFactory):
     """Internal report context factory."""
