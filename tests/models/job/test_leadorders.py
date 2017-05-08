@@ -39,7 +39,7 @@ class TestLeadOrderModel(BaseModelTest):
         return obj, wf, web_request
 
     @pytest.mark.parametrize('role_name', ['pm', 'customer', 'system', 'bizdev'])
-    def test_workflow_submit_lead(self, instance_obj, roles, web_request, session, role_name):
+    def test_workflow_submit(self, instance_obj, roles, web_request, session, role_name):
         """Test workflow submit after leadorder creation."""
         leadorder, wf, request = self.prepare_obj_wf(
             instance_obj,
@@ -61,10 +61,10 @@ class TestLeadOrderModel(BaseModelTest):
         assert leadorder.price_currency
 
         received_transitions = (
-            'set_availability_lead',
-            'edit_location_lead',
-            'edit_requirements_lead',
-            'cancel_lead'
+            'set_availability',
+            'edit_location',
+            'edit_requirements',
+            'cancel'
         )
         for transition in received_transitions:
             assert transition in wf.transitions
@@ -77,13 +77,13 @@ class TestLeadOrderModel(BaseModelTest):
         session.flush()
 
         assert assignment.state == 'pending'
-        assert leadorder.state_history[-1]['transition'] == 'submit_lead'
+        assert leadorder.state_history[-1]['transition'] == 'submit'
 
     @pytest.mark.parametrize('file_path', ['data/order_locations.json'])
     @pytest.mark.parametrize('position', [0])
-    @pytest.mark.parametrize('origin_state', ['new'])
+    @pytest.mark.parametrize('origin_state', ['new', 'received', 'assigned', 'scheduled'])
     @pytest.mark.parametrize('role_name', ['pm', 'customer', 'system'])
-    def test_workflow_edit_location_lead(
+    def test_workflow_edit_location(
         self, instance_obj, session, web_request, roles, role_name, origin_state, obj_payload_other
     ):
         """Test LeadOrder workflow edit_location transition."""
@@ -96,7 +96,7 @@ class TestLeadOrderModel(BaseModelTest):
         )
 
         with pytest.raises(WorkflowTransitionException) as excinfo:
-            wf.edit_location_lead()
+            wf.edit_location()
             assert 'Field location is required for this transition' in str(excinfo)
 
         # delete previous existing order location before adding a new one
@@ -143,11 +143,11 @@ class TestLeadOrderModel(BaseModelTest):
                 ]
             }
         }
-        wf.edit_location_lead(fields=new_location_payload)
+        wf.edit_location(fields=new_location_payload)
         session.flush()
 
         assert leadorder.state == origin_state
-        assert leadorder.state_history[-1]['transition'] == 'edit_location_lead'
+        assert leadorder.state_history[-1]['transition'] == 'edit_location'
 
         location_payload = new_location_payload['location']
         for key, value in location_payload.items():
@@ -161,12 +161,12 @@ class TestLeadOrderModel(BaseModelTest):
             else:
                 assert getattr(leadorder.location, key) == value
 
-    @pytest.mark.parametrize('origin_state', ['new'])
+    @pytest.mark.parametrize('origin_state', ['new', 'received', 'assigned', 'scheduled'])
     @pytest.mark.parametrize('role_name', ['pm', 'customer', 'system'])
-    def test_workflow_edit_requirements_lead(
+    def test_workflow_edit_requirements(
         self, instance_obj, web_request, session, roles, role_name, origin_state
     ):
-        """Test LeadOrder workflow edit_requirements_lead transition."""
+        """Test LeadOrder workflow edit_requirementstransition."""
         leadorder, wf, request = self.prepare_obj_wf(
             instance_obj,
             web_request,
@@ -176,28 +176,28 @@ class TestLeadOrderModel(BaseModelTest):
 
         new_requirements = {}
         with pytest.raises(WorkflowTransitionException) as excinfo:
-            wf.edit_requirements_lead(fields=new_requirements)
+            wf.edit_requirements(fields=new_requirements)
 
         assert 'Field number_required_assets is required for this transition' in str(excinfo)
 
         new_requirements['number_required_assets'] = 20
         with pytest.raises(WorkflowTransitionException) as excinfo:
-            wf.edit_requirements_lead(fields=new_requirements)
+            wf.edit_requirements(fields=new_requirements)
 
         assert 'Field requirements is required for this transition' in str(excinfo)
 
         new_requirements['requirements'] = 'New requirements for this order!'
-        wf.edit_requirements_lead(fields=new_requirements)
+        wf.edit_requirements(fields=new_requirements)
         session.flush()
 
         assert leadorder.state == origin_state
-        assert leadorder.state_history[-1]['transition'] == 'edit_requirements_lead'
+        assert leadorder.state_history[-1]['transition'] == 'edit_requirements'
         for key, value in new_requirements.items():
             assert getattr(leadorder, key) == value
 
-    @pytest.mark.parametrize('origin_state', ['new'])
+    @pytest.mark.parametrize('origin_state', ['new', 'received', 'assigned'])
     @pytest.mark.parametrize('role_name', ['pm', 'customer', 'system'])
-    def test_workflow_set_availability_lead(
+    def test_workflow_set_availability(
         self, instance_obj, web_request, session, roles, role_name, now_utc, origin_state
     ):
         """Test LeadOrder workflow set_availability transition."""
@@ -211,7 +211,7 @@ class TestLeadOrderModel(BaseModelTest):
 
         new_availability = {}
         with pytest.raises(WorkflowTransitionException) as excinfo:
-            wf.set_availability_lead(fields=new_availability)
+            wf.set_availability(fields=new_availability)
 
         assert 'Field availability is required for this transition' in str(excinfo)
 
@@ -225,7 +225,7 @@ class TestLeadOrderModel(BaseModelTest):
         # PMs can set any date but others do not
         if role_name != 'pm':
             with pytest.raises(WorkflowTransitionException) as excinfo:
-                wf.set_availability_lead(fields=new_availability)
+                wf.set_availability(fields=new_availability)
 
             assert 'Both availability dates must be at least 7 days from now' in str(excinfo)
 
@@ -236,10 +236,15 @@ class TestLeadOrderModel(BaseModelTest):
             availability_1.isoformat(),
             availability_2.isoformat()
         ]
-        wf.set_availability_lead(fields=new_availability)
+        wf.set_availability(fields=new_availability)
         session.flush()
-        assert leadorder.state == 'received'
-        assert leadorder.state_history[-1]['transition'] == 'set_availability_lead'
+        if origin_state == 'new':
+            destination_state = 'received'
+        else:
+            destination_state = origin_state
+
+        assert leadorder.state == destination_state
+        assert leadorder.state_history[-1]['transition'] == 'set_availability'
         for key, value in new_availability.items():
             assert getattr(leadorder, key) == value
 
@@ -254,10 +259,44 @@ class TestLeadOrderModel(BaseModelTest):
             roles[role_name],
             origin_state
         )
-        wf.set_availability_lead(fields=new_availability)
+        wf.set_availability(fields=new_availability)
         session.flush()
 
-        assert leadorder.state == 'received'
+        assert leadorder.state == destination_state
         for key, value in new_availability.items():
             assert getattr(leadorder, key)[0] == value[0].isoformat()
             assert getattr(leadorder, key)[1] == value[1].isoformat()
+
+    @pytest.mark.parametrize('origin_state', ['new', 'received', 'assigned', 'scheduled'])
+    @pytest.mark.parametrize('role_name', ['pm', 'customer', 'system'])
+    def test_workflow_cancel(
+        self, instance_obj, web_request, session, roles, role_name, origin_state
+    ):
+        """Test LeadOrder workflow cancel transition."""
+        leadorder, wf, request = self.prepare_obj_wf(
+            instance_obj,
+            web_request,
+            roles[role_name],
+            origin_state,
+        )
+
+        assignment = leadorder.assignments[-1]
+        assignment, ass_wf, request = self.prepare_obj_wf(
+            assignment,
+            web_request,
+            roles[role_name],
+            'pending'
+        )
+
+        message = 'Order cancelled'
+        leadorder.workflow.cancel(message=message)
+        session.flush()
+
+        assert leadorder.state == 'cancelled'
+        assert leadorder.state_history[-1]['transition'] == 'cancel'
+        assert leadorder.state_history[-1]['message'] == message
+        assert leadorder.comments[-1].content == message
+        assert assignment.state == 'cancelled'
+        assert assignment.state_history[-1]['transition'] == 'cancel'
+        assert assignment.payout_value == 0
+        assert assignment.scheduled_datetime is None

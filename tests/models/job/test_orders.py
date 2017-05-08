@@ -340,8 +340,6 @@ class TestOrderModel(BaseModelTest):
         self, instance_obj, web_request, session, roles, role_name, origin_state
     ):
         """Test Order workflow cancel transition."""
-        # TODO: transition in the Order is pointing to the LeadOrder cancel hook
-
         order, wf, request = self.prepare_obj_wf(
             instance_obj,
             web_request,

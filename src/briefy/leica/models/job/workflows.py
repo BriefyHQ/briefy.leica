@@ -1193,23 +1193,28 @@ class LeadOrderWorkflow(OrderWorkflow):
     initial_state = 'created'
     update_event = LeadOrderUpdatedEvent
 
+    # States
+    created = WS(
+        'created', 'Created',
+        'Order created.'
+    )
+
     new = WS(
         'new', 'New',
         'LeadOrder New.'
     )
 
-    created = OrderWorkflow.created
     received = OrderWorkflow.received
     cancelled = OrderWorkflow.cancelled
 
     # Transitions
-    @created.transition(new, 'can_submit_lead')
-    def submit_lead(self, **kwargs):
+    @created.transition(new, 'can_submit')
+    def submit(self, **kwargs):
         """Submit a LeadOrder."""
         pass
 
     @Permission(groups=[G['customers'], G['pm'], G['bizdev'], G['system'], ])
-    def can_submit_lead(self):
+    def can_submit(self):
         """Validate if user can submit a LeadOrder."""
         return True
 
@@ -1218,7 +1223,7 @@ class LeadOrderWorkflow(OrderWorkflow):
         'can_cancel',
         message_required=True
     )
-    def cancel_lead(self, **kwargs):
+    def cancel(self, **kwargs):
         """Transition: Cancel the LeadOrder."""
         leadorder = self.document
         assignment = leadorder.assignments[-1]
@@ -1231,7 +1236,7 @@ class LeadOrderWorkflow(OrderWorkflow):
         'can_set_availability',
         required_fields=('availability', )
     )
-    def set_availability_lead(self, **kwargs):
+    def set_availability(self, **kwargs):
         """Set Lead order availability dates."""
         pass
 
@@ -1240,7 +1245,7 @@ class LeadOrderWorkflow(OrderWorkflow):
         'can_edit_location',
         required_fields=('location', )
     )
-    def edit_location_lead(self, **kwargs):
+    def edit_location(self, **kwargs):
         """Update location of a LeadOrder."""
         order = self.document
         location = order.location
@@ -1256,7 +1261,7 @@ class LeadOrderWorkflow(OrderWorkflow):
         'can_edit_requirements',
         required_fields=REQUIREMENTS_REQUIRED_FIELDS
     )
-    def edit_requirements_lead(self, **kwargs):
+    def edit_requirements(self, **kwargs):
         """Update requirements in an LeadOrder."""
         pass
 
