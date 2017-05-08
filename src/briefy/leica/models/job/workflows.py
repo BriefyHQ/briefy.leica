@@ -1200,18 +1200,16 @@ class LeadOrderWorkflow(OrderWorkflow):
 
     created = OrderWorkflow.created
     received = OrderWorkflow.received
-    assigned = OrderWorkflow.assigned
-    scheduled = OrderWorkflow.scheduled
     cancelled = OrderWorkflow.cancelled
 
     # Transitions
-    @created.transition(new, 'can_submit_new')
+    @created.transition(new, 'can_submit_lead')
     def submit_lead(self, **kwargs):
         """Submit a LeadOrder."""
         pass
 
     @Permission(groups=[G['customers'], G['pm'], G['bizdev'], G['system'], ])
-    def can_submit(self):
+    def can_submit_lead(self):
         """Validate if user can submit a LeadOrder."""
         return True
 
