@@ -32,11 +32,9 @@ class MsOphelieAssignments(BaseReport):
     def get_report_data(self, filename: str):
         """Execute the report, return a tuple with data and metadata."""
         content_type = self.mime_type
-        application = newrelic.agent.application()
-        with newrelic.agent.BackgroundTask(application, name=filename, group='Reports'):
-            csv_file = export_assignment()
-            data = csv_file.getvalue()
-            return filename, content_type, data
+        csv_file = export_assignment()
+        data = csv_file.getvalue()
+        return filename, content_type, data
 
 
 @resource(
@@ -52,8 +50,6 @@ class MsOphelieOrders(BaseReport):
     def get_report_data(self, filename: str):
         """Execute the report, return a tuple with data and metadata."""
         content_type = self.mime_type
-        application = newrelic.agent.application()
-        with newrelic.agent.BackgroundTask(application, name=filename, group='Reports'):
-            csv_file = export_order()
-            data = csv_file.getvalue()
-            return filename, content_type, data
+        csv_file = export_order()
+        data = csv_file.getvalue()
+        return filename, content_type, data
