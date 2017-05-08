@@ -12,6 +12,7 @@ from briefy.leica.models.project import Project
 from briefy.leica.utils.transitions import get_transition_date_from_history
 from briefy.leica.utils.user import add_user_info_to_state_history
 from briefy.leica.vocabularies import OrderInputSource
+from briefy.ws.errors import ValidationError
 from datetime import datetime
 from dateutil.parser import parse
 from sqlalchemy import orm
@@ -461,7 +462,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
         if value and len(value) != len(set(value)):
             msg = 'Availability dates should be different.'
-            raise ValueError(msg)
+            raise ValidationError(message=msg, name='availability')
 
         if value and timezone and project:
             if not_pm:
@@ -477,7 +478,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
                 if date_diff.days < availability_window:
                     msg = 'Both availability dates must be at least {window} days from now.'
                     msg = msg.format(window=availability_window)
-                    raise ValueError(msg)
+                    raise ValidationError(message=msg, name='availability')
         elif value:
             logger.warn('Could not check availability dates. Order {id}'.format(id=self.id))
 
