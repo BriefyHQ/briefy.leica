@@ -226,7 +226,6 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
             }
           }
         }
-
     """
 
     cancellation_window = sa.Column(sa.Integer, default=1)

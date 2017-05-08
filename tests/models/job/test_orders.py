@@ -13,40 +13,6 @@ import pytz
 import uuid
 
 
-LOCATION_PAYLOAD = {
-    'order_id': '011418fa-f450-4deb-b6ea-7f8e103a66d1',
-    'updated_at': '2016-09-18T18:55:20.226722+00:00',
-    'created_at': '2016-09-18T18:55:20.226696+00:00',
-    'state': 'created',
-    'locality': 'Berlin',
-    'country': 'DE',
-    'timezone': 'Europe/Berlin',
-    'first_name': 'Jhon',
-    'last_name': 'Wayne',
-    'mobile': '+4917628607522',
-    'info': {
-        'additional_info': 'House 3, Entry C, 1st. floor, c/o GLG',
-        'province': 'Berlin',
-        'locality': 'Berlin',
-        'sublocality': 'Kreuzberg',
-        'route': 'Schlesische Straße',
-        'street_number': '27',
-        'country': 'DE',
-        'postal_code': '10997'
-    },
-    'state_history': [
-        {
-            'to': 'created',
-            'transition': '',
-            'actor': None,
-            'message': None,
-            'date': '2016-09-18T18:55:20.224411+00:00',
-            'from': ''
-        }
-    ]
-}
-
-
 @pytest.mark.usefixtures('create_dependencies')
 class TestOrderModel(BaseModelTest):
     """Test Order."""
@@ -94,7 +60,9 @@ class TestOrderModel(BaseModelTest):
         assert order.price
         assert order.price_currency
 
-        received_transitions = ('set_availability', 'edit_location', 'edit_requirements',)
+        received_transitions = (
+            'cancel', 'set_availability', 'edit_location', 'edit_requirements',
+        )
         for transition in received_transitions:
             assert transition in wf.transitions
 
@@ -108,12 +76,15 @@ class TestOrderModel(BaseModelTest):
         assert assignment.state == 'pending'
         assert order.state_history[-1]['transition'] == 'submit'
 
+    @pytest.mark.parametrize('file_path', ['data/order_locations.json'])
+    @pytest.mark.parametrize('position', [0])
     @pytest.mark.parametrize('origin_state', ['received', 'assigned', 'scheduled'])
     @pytest.mark.parametrize('role_name', ['pm', 'customer', 'system'])
     def test_workflow_edit_location(
-        self, instance_obj, session, web_request, roles, role_name, origin_state
+        self, instance_obj, session, web_request, roles, role_name, origin_state, obj_payload_other
     ):
         """Test Order workflow edit_location transition."""
+        location_payload = obj_payload_other
         order, wf, request = self.prepare_obj_wf(
             instance_obj,
             web_request,
@@ -131,9 +102,9 @@ class TestOrderModel(BaseModelTest):
             session.flush()
 
         # add a new location to the order
-        LOCATION_PAYLOAD['order_id'] = order.id
-        LOCATION_PAYLOAD['id'] = str(uuid.uuid4())
-        location = models.OrderLocation(**LOCATION_PAYLOAD)
+        location_payload['order_id'] = order.id
+        location_payload['id'] = str(uuid.uuid4())
+        location = models.OrderLocation(**location_payload)
         order.location = location
         session.add(location)
         session.flush()
@@ -162,7 +133,7 @@ class TestOrderModel(BaseModelTest):
                 },
                 'locality': 'Berlin',
                 'country': 'DE',
-                'id': LOCATION_PAYLOAD['id'],
+                'id': location_payload['id'],
                 'coordinates': [
                     52.4907727,
                     13.432224399999996

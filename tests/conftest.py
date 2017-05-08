@@ -270,6 +270,18 @@ def obj_payload(request):
         return data[cls.payload_position]
 
 
+@pytest.fixture
+def obj_payload_other(file_path, position):
+    """Return from file the payload in the informed position.
+
+    :return: dict with payload for object instance.
+    """
+    abs_path = os.path.join(__file__.rsplit('/', 1)[0], file_path)
+    with open(abs_path) as file:
+        data = json.load(file)
+    return data[position]
+
+
 @pytest.fixture(scope='class')
 def create_dependencies(request, session):
     cls = request.cls

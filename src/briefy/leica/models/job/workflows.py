@@ -921,7 +921,7 @@ class OrderWorkflow(BriefyWorkflow):
         wkf.context = self.context
         assignment.workflow.cancel()
 
-    @Permission(groups=[G['pm'], G['customers'], G['system'], ])
+    @Permission(groups=[G['pm'], G['customers'], G['bizdev'], G['system'], ])
     def can_cancel(self):
         """Permission: Validate if user can move the Order to the cancelled state.
 
@@ -929,7 +929,7 @@ class OrderWorkflow(BriefyWorkflow):
         """
         order = self.document
         project = order.project
-        assignment = order.assignment
+        assignment = order.assignments[-1]
         user = self.context
         allowed = True
         uploaded = False
@@ -1202,7 +1202,7 @@ class LeadOrderWorkflow(OrderWorkflow):
     received = OrderWorkflow.received
     assigned = OrderWorkflow.assigned
     scheduled = OrderWorkflow.scheduled
-    cancelled = OrderWorkflow.scheduled
+    cancelled = OrderWorkflow.cancelled
 
     # Transitions
     @created.transition(new, 'can_submit_new')
@@ -1215,21 +1215,6 @@ class LeadOrderWorkflow(OrderWorkflow):
         """Validate if user can submit a LeadOrder."""
         return True
 
-    @scheduled.transition(
-        cancelled,
-        'can_cancel',
-        message_required=True
-    )
-    @assigned.transition(
-        cancelled,
-        'can_cancel',
-        message_required=True
-    )
-    @received.transition(
-        cancelled,
-        'can_cancel',
-        message_required=True
-    )
     @new.transition(
         cancelled,
         'can_cancel',
@@ -1243,16 +1228,6 @@ class LeadOrderWorkflow(OrderWorkflow):
         wkf.context = self.context
         assignment.workflow.cancel()
 
-    @received.transition(
-        received,
-        'can_set_availability',
-        required_fields=('availability', )
-    )
-    @assigned.transition(
-        assigned,
-        'can_set_availability',
-        required_fields=('availability', )
-    )
     @new.transition(
         received,
         'can_set_availability',
@@ -1262,27 +1237,30 @@ class LeadOrderWorkflow(OrderWorkflow):
         """Set Lead order availability dates."""
         pass
 
-    @received.transition(
+    @new.transition(
         new,
-        'can_remove_availability'
+        'can_edit_location',
+        required_fields=('location', )
     )
-    @assigned.transition(
+    def edit_location_lead(self, **kwargs):
+        """Update location of a LeadOrder."""
+        order = self.document
+        location = order.location
+        if location:
+            payload = kwargs['fields']['location']
+            for key, value in payload.items():
+                setattr(location, key, value)
+
+            kwargs['fields'] = dict(location=location)
+
+    @new.transition(
         new,
-        'can_remove_availability'
+        'can_edit_requirements',
+        required_fields=REQUIREMENTS_REQUIRED_FIELDS
     )
-    @scheduled.transition(
-        new,
-        'can_remove_availability'
-    )
-    def remove_availability_lead(self, **kwargs):
-        """Transition: Inform the removal of availability dates to the customer."""
-        leadorder = self.document
-        leadorder.availability = []
-        # this will handle the creation of a new Assignment
-        message = kwargs.get('message', '')
-        create_new_assignment_from_order(leadorder, leadorder.request, copy_payout=True)
-        leadorder.assignment.workflow.cancel(message=message)
-        return True
+    def edit_requirements_lead(self, **kwargs):
+        """Update requirements in an LeadOrder."""
+        pass
 
 
 class PoolWorkflow(BriefyWorkflow):

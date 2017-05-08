@@ -22,5 +22,5 @@ Database diagram for the Order data model:
 
 .. sadisplay::
     :module: briefy.leica.models.job.order
-    :alt: JobOrder data model
+    :alt: Order data model
     :render: graphviz
