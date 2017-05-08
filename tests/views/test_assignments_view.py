@@ -20,7 +20,8 @@ class TestAssignmentView(BaseVersionedTestView):
     # TODO: local role attributes are not in the colander schema and so ignored on add or update
     ignore_validation_fields = [
         'state_history', 'state', 'order', 'updated_at', 'customer', 'project', 'timezone',
-        'qa_manager', 'project_manager', 'scout_manager', 'professional', 'location'
+        'qa_manager', 'project_manager', 'scout_manager', 'professional', 'location', 'versions',
+        'active_order'
     ]
     file_path = 'data/assignments.json'
     model = models.Assignment
@@ -36,7 +37,6 @@ class TestAssignmentView(BaseVersionedTestView):
 
     def test_workflow(self, app, session, instance_obj):
         """Test workflow endpoints."""
-        obj_id = instance_obj.id
         payload = {
             'owner': 'Professional Name',
             'id': '264b3e66-c327-4bbd-9cc7-271716fce178',
@@ -81,7 +81,6 @@ class TestAssignmentView(BaseVersionedTestView):
 
         obj_id = instance_obj.id
         state = instance_obj.state
-
         assert state == 'pending'
 
         # Endpoints

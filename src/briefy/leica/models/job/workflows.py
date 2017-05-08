@@ -8,6 +8,8 @@ from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import Permission
 from briefy.common.workflow import WorkflowTransitionException
 from briefy.leica.config import SCHEDULE_DAYS_LIMIT
+from briefy.leica.events.assignment import AssignmentUpdatedEvent
+from briefy.leica.events.order import OrderUpdatedEvent
 from briefy.leica.subscribers.utils import create_new_assignment_from_order
 from briefy.leica.utils.transitions import create_comment_on_assignment_approval
 
@@ -50,6 +52,7 @@ class AssignmentWorkflow(BriefyWorkflow):
 
     entity = 'assignment'
     initial_state = 'created'
+    update_event = AssignmentUpdatedEvent
 
     # States
     created = WS(
@@ -663,6 +666,7 @@ class OrderWorkflow(BriefyWorkflow):
 
     entity = 'order'
     initial_state = 'created'
+    update_event = OrderUpdatedEvent
 
     # States
     created = WS(

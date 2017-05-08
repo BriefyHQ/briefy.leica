@@ -1,5 +1,6 @@
 """Briefy Leica worker."""
 from briefy.common.users import SystemUser
+from briefy.leica.cache import cache_region
 from briefy.leica.log import worker_logger as logger
 from briefy.leica.models import Assignment
 from briefy.leica.models import Comment
@@ -41,6 +42,8 @@ def validate_assignment(laure_data: object, session: object) -> (bool, dict):
             )
         logger.info('''Assignment {0} state set to {1}'''.format(assignment.slug, assignment.state))
 
+        cache_region.invalidate(assignment)
+
     return True, {}
 
 
@@ -77,6 +80,8 @@ def ignored_assignment(laure_data: object, session: object) -> (bool, dict):
                 message='Ignored validation.'
             )
         logger.info('''Assignment {0} state set to {1}'''.format(assignment.slug, assignment.state))
+
+        cache_region.invalidate(assignment)
 
     return True, {}
 
@@ -183,6 +188,9 @@ def approve_assignment(
             logger.error(msg)
             raise Exception(msg)
 
+        cache_region.invalidate(assignment)
+        cache_region.invalidate(order)
+
     return True, {}
 
 
@@ -241,5 +249,7 @@ def asset_copy_malfunction(laure_data: object, session: object) -> (bool, dict):
         comment.workflow_context = SystemUser
         assignment.workflow_context = SystemUser
         assignment.comments.append(comment)
+
+        cache_region.invalidate(assignment)
 
     return True, {}
