@@ -8,6 +8,8 @@ from cornice.resource import resource
 from pyramid.security import Allow
 from pyramid.security import Everyone
 
+import newrelic.agent
+
 
 class InternalReportFactory(BaseFactory):
     """Internal report context factory."""
@@ -30,9 +32,11 @@ class MsOphelieAssignments(BaseReport):
     def get_report_data(self, filename: str):
         """Execute the report, return a tuple with data and metadata."""
         content_type = self.mime_type
-        csv_file = export_assignment()
-        data = csv_file.getvalue()
-        return filename, content_type, data
+        application = newrelic.agent.application()
+        with newrelic.agent.BackgroundTask(application, name=filename, group='Reports'):
+            csv_file = export_assignment()
+            data = csv_file.getvalue()
+            return filename, content_type, data
 
 
 @resource(
@@ -48,6 +52,8 @@ class MsOphelieOrders(BaseReport):
     def get_report_data(self, filename: str):
         """Execute the report, return a tuple with data and metadata."""
         content_type = self.mime_type
-        csv_file = export_order()
-        data = csv_file.getvalue()
-        return filename, content_type, data
+        application = newrelic.agent.application()
+        with newrelic.agent.BackgroundTask(application, name=filename, group='Reports'):
+            csv_file = export_order()
+            data = csv_file.getvalue()
+            return filename, content_type, data
