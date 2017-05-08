@@ -1041,7 +1041,6 @@ class OrderWorkflow(BriefyWorkflow):
         old_assignment.travel_expenses = post_fields.get('travel_expenses')
         old_assignment.workflow.complete(message=message)
         # after complete the old assignment the new one can be assigned
-        # TODO: workaround for test (no event dispatch)
         if new_assignment.state == 'created':
             new_assignment.workflow.context = order.workflow.context
             new_assignment.workflow.submit()
