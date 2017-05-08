@@ -28,6 +28,7 @@ class TestProjectView(BaseTestView):
         'customer_id': 'c2034c1b-0a40-4b84-9ace-54b958f64ed4',
         'title': 'Other Name'
     }
+
     def test_put_invalid_asset_tyoe(self, app, obj_payload):
         """Asset type should match one of the possible values."""
         payload = obj_payload
