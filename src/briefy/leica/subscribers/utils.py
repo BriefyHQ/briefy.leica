@@ -64,7 +64,7 @@ def create_new_assignment_from_order(order, request, copy_payout=False, old_assi
 
     if copy_payout:
         payout_fields = ('payout_value', 'payout_currency', 'travel_expenses')
-        old_assignment = old_assignment or order.assignment
+        old_assignment = old_assignment or order.assignments[-1]
         for key in payout_fields:
             payload[key] = getattr(old_assignment, key)
 

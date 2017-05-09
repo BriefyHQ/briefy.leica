@@ -9,6 +9,7 @@ from briefy.common.workflow import Permission
 from briefy.common.workflow import WorkflowTransitionException
 from briefy.leica.config import SCHEDULE_DAYS_LIMIT
 from briefy.leica.events.assignment import AssignmentUpdatedEvent
+from briefy.leica.events.leadorder import LeadOrderUpdatedEvent
 from briefy.leica.events.order import OrderUpdatedEvent
 from briefy.leica.subscribers.utils import create_new_assignment_from_order
 from briefy.leica.utils.transitions import create_comment_on_assignment_approval
@@ -127,7 +128,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         # Assignment creation handled by Order creation event subscriber
         pass
 
-    @Permission(groups=[G['customers'], G['pm'], G['bizdev'], G['system'], ])
+    @Permission(groups=[G['customers'], G['pm'], G['qa'], G['bizdev'], G['system'], ])
     def can_submit(self):
         """Validate if user can submit an Assignment."""
         return True
@@ -153,7 +154,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         # force explicit here but it will also be set by the workflow engine
         assignment.professional_id = professional_id
 
-    @Permission(groups=[G['scout'], G['pm'], ])
+    @Permission(groups=[G['scout'], G['pm'], G['qa'], G['system'], ])
     def can_assign(self):
         """Validate if user can set the Professional in the Assignment."""
         return True
@@ -532,7 +533,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         # this should be only executed only from the order
         pass
 
-    @Permission(groups=[G['customers'], G['pm'], G['finance'], G['system']])
+    @Permission(groups=[G['customers'], G['pm'], G['qa'], G['finance'], G['system']])
     def can_complete(self):
         """Validate if user can move an Assignment to completed."""
         return True
@@ -543,7 +544,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         # this should be only executed only from the order
         pass
 
-    @Permission(groups=[G['customers'], G['pm'], ])
+    @Permission(groups=[G['customers'], G['pm'], G['system'], ])
     def can_refuse(self):
         """Validate if user can refuse an Assignment Set."""
         return True
@@ -736,9 +737,16 @@ class OrderWorkflow(BriefyWorkflow):
     @scheduled.transition(scheduled, 'can_edit_location', required_fields=('location', ))
     def edit_location(self, **kwargs):
         """Update location in an Order."""
-        pass
+        order = self.document
+        location = order.location
+        if location:
+            payload = kwargs['fields']['location']
+            for key, value in payload.items():
+                setattr(location, key, value)
 
-    @Permission(groups=[G['customers'], G['pm'], G['system'], ])
+            kwargs['fields'] = dict(location=location)
+
+    @Permission(groups=[G['customers'], G['pm'], G['bizdev'], G['system'], ])
     def can_edit_location(self):
         """Validate if user can edit a location of an Order."""
         return True
@@ -760,7 +768,7 @@ class OrderWorkflow(BriefyWorkflow):
         """Update requirements in an Order."""
         pass
 
-    @Permission(groups=[G['customers'], G['pm'], G['system'], ])
+    @Permission(groups=[G['customers'], G['pm'], G['bizdev'], G['system'], ])
     def can_edit_requirements(self):
         """Validate if user can edit requirements of an Order."""
         return True
@@ -779,7 +787,7 @@ class OrderWorkflow(BriefyWorkflow):
         """Set order availability dates in the Order."""
         pass
 
-    @Permission(groups=[G['customers'], G['pm'], G['system'], ])
+    @Permission(groups=[G['customers'], G['pm'], G['bizdev'], G['system'], ])
     def can_set_availability(self):
         """Validate if user can set availability dates of an Order."""
         return True
@@ -794,11 +802,11 @@ class OrderWorkflow(BriefyWorkflow):
         # should be only used by the Assignment workflow
         return True
 
-    @Permission(groups=[LR['project_manager'], G['pm'], G['scout'], G['system'], ])
+    @Permission(groups=[G['pm'], G['qa'], G['scout'], G['system'], ])
     def can_assign(self):
         """Permission: Validate if user can assign an Order.
 
-        Groups: g:pm, g:scout, r:project_manager
+        Groups: g:pm, g:scout, g:qa, g:system
         """
         return True
 
@@ -807,7 +815,7 @@ class OrderWorkflow(BriefyWorkflow):
     def unassign(self, **kwargs):
         """Transition: Un-assign the Order by cancel the Assignment and create a new one."""
         order = self.document
-        old_assignment = order.assignment
+        old_assignment = order.assignments[-1]
         if not old_assignment.workflow.can_cancel:
             upload = True if old_assignment.submission_path else False
             if upload:
@@ -831,7 +839,7 @@ class OrderWorkflow(BriefyWorkflow):
         old_assignment.workflow.cancel(message=message)
         return True
 
-    @Permission(groups=[LR['project_manager'], G['pm'], ])
+    @Permission(groups=[G['pm'], G['system']])
     def can_unassign(self):
         """Permission: Validate if user can unassign an Order.
 
@@ -845,19 +853,19 @@ class OrderWorkflow(BriefyWorkflow):
         """Transition: Inform the removal of availability dates to the customer."""
         order = self.document
         order.availability = []
+        old_assignment = order.assignments[-1]
         # this will handle the creation of a new Assignment
         message = kwargs.get('message', '')
         create_new_assignment_from_order(order, order.request, copy_payout=True)
-        order.assignment.workflow.cancel(message=message)
+        old_assignment.workflow.cancel(message=message)
         return True
 
-    @Permission(groups=[LR['project_manager'], G['pm'], LR['customer_user'], G['customers'], ])
+    @Permission(groups=[G['pm'], G['customers'], G['system'], ])
     def can_remove_availability(self):
         """Permission: Validate if user can remove availability dates of an Order.
 
         Groups: g:pm, r:project_manager, g:customers, r:customer_user
         """
-        # TODO: make sure customer only unassign
         return True
 
     @assigned.transition(
@@ -908,12 +916,12 @@ class OrderWorkflow(BriefyWorkflow):
     def cancel(self, **kwargs):
         """Transition: Cancel the Order."""
         order = self.document
-        assignment = order.assignment
+        assignment = order.assignments[-1]
         wkf = assignment.workflow
         wkf.context = self.context
         assignment.workflow.cancel()
 
-    @Permission(groups=[G['pm'], G['customers'], G['system'], ])
+    @Permission(groups=[G['pm'], G['customers'], G['bizdev'], G['system'], ])
     def can_cancel(self):
         """Permission: Validate if user can move the Order to the cancelled state.
 
@@ -921,7 +929,7 @@ class OrderWorkflow(BriefyWorkflow):
         """
         order = self.document
         project = order.project
-        assignment = order.assignment
+        assignment = order.assignments[-1]
         user = self.context
         allowed = True
         uploaded = False
@@ -945,12 +953,11 @@ class OrderWorkflow(BriefyWorkflow):
         # this should be executed from the assignment
         pass
 
-    @Permission(groups=[LR['project_manager'], LR['professional_user'],
-                        G['pm'], G['scout'], G['system'], ])
+    @Permission(groups=[G['pm'], G['scout'], G['system'], ])
     def can_schedule(self):
         """Permission: Validate if user can schedule an Order.
 
-        Groups: g:pm, g:scout, r:project_manager, r:professional_user
+        Groups: g:pm, g:scout, g:system
         """
         return True
 
@@ -976,28 +983,27 @@ class OrderWorkflow(BriefyWorkflow):
         """Transition: Inform the deliver of the Order to the customer."""
         pass
 
-    @Permission(groups=[LR['qa_manager'], G['qa'], G['system'], ])
+    @Permission(groups=[G['qa'], G['system'], ])
     def can_deliver(self):
         """Permission: Validate if user can deliver the Order.
 
-        Groups: g:qa, g:system, r:qa_manager
+        Groups: g:qa, g:system
         """
         return True
 
     @delivered.transition(refused, 'can_refuse', message_required=True)
     def refuse(self, **kwargs):
         """Transition: Customer refuse the Order."""
-        # TODO: fix workflow to pass message in the kwargs
         message = kwargs.get('message')
         order = self.document
-        assignment = order.assignment
+        assignment = order.assignments[-1]
         assignment.workflow.refuse(message=message)
 
-    @Permission(groups=[G['pm'], G['customers'], LR['project_manager'], LR['customer_user'], ])
+    @Permission(groups=[G['pm'], G['customers'], G['system'], ])
     def can_refuse(self):
         """Permission: Validate if user can refuse an Order.
 
-        Groups: g:pm, g:customers, r:customer_user, r:project_manager
+        Groups: g:pm, g:customers, g:system
         """
         return True
 
@@ -1016,7 +1022,7 @@ class OrderWorkflow(BriefyWorkflow):
         message = kwargs.get('message', '')
         order = self.document
         order.availability = []
-        old_assignment = order.assignment
+        old_assignment = order.assignments[-1]
         # copy payout is not necessary in this case
         new_assignment = create_new_assignment_from_order(order, order.request)
         # prepare kwargs to assign the new assignment
@@ -1035,13 +1041,16 @@ class OrderWorkflow(BriefyWorkflow):
         old_assignment.travel_expenses = post_fields.get('travel_expenses')
         old_assignment.workflow.complete(message=message)
         # after complete the old assignment the new one can be assigned
+        if new_assignment.state == 'created':
+            new_assignment.workflow.context = order.workflow.context
+            new_assignment.workflow.submit()
         new_assignment.workflow.assign(**kwargs)
 
-    @Permission(groups=[LR['project_manager'], G['pm'], G['qa'], ])
+    @Permission(groups=[G['pm'], G['qa'], G['system'], ])
     def can_reshoot(self):
         """Permission: Validate if user can reshoot an Order.
 
-        Groups: g:pm, r:project_manager
+        Groups: g:pm, g:qa, g:system
         """
         return True
 
@@ -1094,7 +1103,7 @@ class OrderWorkflow(BriefyWorkflow):
         message = kwargs.get('message', '')
         order = self.document
         order.availability = []
-        old_assignment = order.assignment
+        old_assignment = order.assignments[-1]
         create_new_assignment_from_order(
             order,
             order.request,
@@ -1107,11 +1116,11 @@ class OrderWorkflow(BriefyWorkflow):
         old_assignment.workflow.complete(message=message)
         return True
 
-    @Permission(groups=[LR['project_manager'], G['pm'], G['qa'], ])
+    @Permission(groups=[G['pm'], G['qa'], G['system'], ])
     def can_new_shoot(self):
         """Permission: Validate if user can reshoot an Order.
 
-        Groups: g:pm, g:customers, r:project_manager, r:customer_user
+        Groups: g:pm, g:customers, g:system
         """
         return True
 
@@ -1147,7 +1156,7 @@ class OrderWorkflow(BriefyWorkflow):
     def perm_refuse(self, **kwargs):
         """Transition: PM permanently refuse an Order."""
         order = self.document
-        assignment = order.assignment
+        assignment = order.assignments[-1]
         assignment.workflow.context = self.context
         assignment.workflow.complete()
 
@@ -1174,6 +1183,86 @@ class OrderWorkflow(BriefyWorkflow):
     def can_require_revision(self):
         """Permission: Validate if user can require revision of an Order."""
         return True
+
+
+class LeadOrderWorkflow(OrderWorkflow):
+    """Workflow for a Lead."""
+
+    entity = 'lead'
+    initial_state = 'created'
+    update_event = LeadOrderUpdatedEvent
+
+    # States
+    created = WS(
+        'created', 'Created',
+        'Order created.'
+    )
+
+    new = WS(
+        'new', 'New',
+        'LeadOrder New.'
+    )
+
+    received = OrderWorkflow.received
+    cancelled = OrderWorkflow.cancelled
+
+    # Transitions
+    @created.transition(new, 'can_submit')
+    def submit(self, **kwargs):
+        """Submit a LeadOrder."""
+        pass
+
+    @Permission(groups=[G['customers'], G['pm'], G['bizdev'], G['system'], ])
+    def can_submit(self):
+        """Validate if user can submit a LeadOrder."""
+        return True
+
+    @new.transition(
+        cancelled,
+        'can_cancel',
+        message_required=True
+    )
+    def cancel(self, **kwargs):
+        """Transition: Cancel the LeadOrder."""
+        leadorder = self.document
+        assignment = leadorder.assignments[-1]
+        wkf = assignment.workflow
+        wkf.context = self.context
+        assignment.workflow.cancel()
+
+    @new.transition(
+        received,
+        'can_set_availability',
+        required_fields=('availability', )
+    )
+    def confirm(self, **kwargs):
+        """Confirm LeadOrder and set availability dates."""
+        pass
+
+    @new.transition(
+        new,
+        'can_edit_location',
+        required_fields=('location', )
+    )
+    def edit_location(self, **kwargs):
+        """Update location of a LeadOrder."""
+        order = self.document
+        location = order.location
+        if location:
+            payload = kwargs['fields']['location']
+            for key, value in payload.items():
+                setattr(location, key, value)
+
+            kwargs['fields'] = dict(location=location)
+
+    @new.transition(
+        new,
+        'can_edit_requirements',
+        required_fields=REQUIREMENTS_REQUIRED_FIELDS
+    )
+    def edit_requirements(self, **kwargs):
+        """Update requirements in an LeadOrder."""
+        pass
 
 
 class PoolWorkflow(BriefyWorkflow):

@@ -163,7 +163,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     __summary_attributes__ = __summary_attributes__
     __summary_attributes_relations__ = [
         'project', 'comments', 'location', 'professional', 'customer',
-        'pool', 'external_id', 'active_order'
+        'pool', 'external_id',
     ]
     __listing_attributes__ = __listing_attributes__
 
@@ -665,7 +665,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
         excludes = list(excludes) if excludes else []
-        excludes.extend('approvable_assets')
+        excludes.extend(['approvable_assets', 'active_order', ])
         data = super().to_dict(excludes=excludes, includes=includes)
         data['title'] = self.title
         data['description'] = self.description

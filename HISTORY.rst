@@ -18,6 +18,16 @@ History
     * Added new subscriber for CommentCreatedEvent to invalidate Comment.entity after comment creation (rudaporto).
     * Fix: function create_new_assignment_from_order now send id in the payload and append new assignment in the Order.assignments (rudaporto).
     * Added invalidation in all tasks and worker actions after update objects since some events will not be fired without a request (rudaporto).
+    * Implement Order.workflow.edit_location transition (rudaporto).
+    * New model type: LeadOrder (rudaporto).
+    * New field for Project to set the type of order the project will use: order or leadorder (rudaporto).
+    * Change in the /orders endpoint to create Order or LeadOrder based in the Project setting (rudaporto).
+    * New unittest to cover all transitions for the OrderWorkflow and fixes to permissions (rudaporto).
+    * New unittest for LeadOrder model and transitions (rudaporto).
+    * New unittest for LeadOrder view (/orders with different project) (rudaporto).
+    * Documentation small fixes and new document for LeadOrder type (rudaporto).
+    * Refactor Order workflow and subscribers to use order.assingmnets[-1] and not order.assignment (rudaporto).
+    * New leadorder subscriber module to handle LeadOrder created, updated and workflow transitions (rudaporto).
     * Aded script to export professionals to a spreadsheet file (jsbueno).
     * Card #272: Add asset_types to Project, Order, Assignment (ericof).
 

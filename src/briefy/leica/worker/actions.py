@@ -12,7 +12,7 @@ def validate_assignment(laure_data: object, session: object) -> (bool, dict):
     """Perform necessary transition after photo set validation.
 
     :param laure_data: Python object representing Laure data after assignment validation
-    :return: Flag indicating whether operation was sucessful, empty dict
+    :return: Flag indicating whether operation was successful, empty dict
     """
     with transaction.manager:
         assignment_id = laure_data.assignment.id
@@ -51,7 +51,7 @@ def ignored_assignment(laure_data: object, session: object) -> (bool, dict):
     """Perform necessary transition after photo set validation.
 
     :param laure_data: Python object representing Laure data after assignment validation
-    :return: Flag indicating whether operation was sucessful, empty dict
+    :return: Flag indicating whether operation was successful, empty dict
     """
     with transaction.manager:
         assignment_id = laure_data.assignment.id
@@ -137,7 +137,7 @@ def approve_assignment(
 
     :param laure_data: Python object representing Laure data after assignment approval
     :param copy_ignored: Set when copying assets was ignored on ms.laure
-    :return: Flag indicating wether operation was successfull, empty dict
+    :return: Flag indicating if the operation was successful, empty dict
     """
     with transaction.manager:
         assignment_id = laure_data.guid
@@ -197,9 +197,9 @@ def approve_assignment(
 def approve_previously_refused_assignment(laure_data: object, session: object,) -> (bool, dict):
     """Change assignment state, without updating folder information.
 
-    Called when copyng assets have been ignored on ms.laure
+    Called when copying assets have been ignored on ms.laure
     :param laure_data: Python object representing Laure data after assignment approval
-    :return: Flag indicating wether operation was successfull, empty dict
+    :return: Flag indicating if the operation was successfull, empty dict
     """
     return approve_assignment(laure_data, session, copy_ignored=True)
 
@@ -208,7 +208,7 @@ def asset_copy_malfunction(laure_data: object, session: object) -> (bool, dict):
     """Perform necessary transition and field update after photo set was deemed invalid.
 
     :param laure_data: Python object representing Laure data after assignment validation
-    :return: Flag indicating whether operation was successful, empty dict
+    :return: Flag indicating if the operation was successful, empty dict
     """
     with transaction.manager:
         assignment_id = laure_data.assignment.id

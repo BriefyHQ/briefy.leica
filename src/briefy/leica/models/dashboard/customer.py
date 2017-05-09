@@ -87,7 +87,7 @@ delivered_orders_customer = select([
                 Order.state == 'delivered',
                 Order.accept_date.is_(None)
             ), 1)], else_=0)
-    ).label('newly-delivered'),
+    ).label('newly_delivered'),
     func.sum(
         case([(
             and_(
@@ -101,7 +101,7 @@ delivered_orders_customer = select([
                 Order.state == 'delivered',
                 Order.accept_date.isnot(None)
             ), 1)], else_=0)
-    ).label('re-delivered'),
+    ).label('re_delivered'),
     func.sum(
         case([(Order.state == 'accepted', 1)], else_=0)
     ).label('completed'),

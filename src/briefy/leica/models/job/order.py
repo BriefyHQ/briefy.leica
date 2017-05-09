@@ -22,11 +22,13 @@ from dateutil.parser import parse
 from sqlalchemy import event
 from sqlalchemy import orm
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import TimezoneType
 
 import colander
 import copy
+import pytz
 import random
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils
@@ -131,7 +133,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', 'project', 'comments', 'customer',
+            'state_history', 'state', 'project', 'comments', 'customer', 'type',
             '_project_manager', '_scout_manager', '_customer_user', 'external_id',
             'assignment', 'assignments', '_project_managers', '_scout_managers',
             '_customer_users',
@@ -147,6 +149,20 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     By default we do not keep track of state_history and helper columns.
     """
+
+    type = sa.Column(sa.String(50))
+    """Polymorphic type name."""
+
+    @declared_attr
+    def __mapper_args__(cls):
+        """Return polymorphic identity."""
+        cls_name = cls.__name__.lower()
+        args = {
+            'polymorphic_identity': cls_name,
+        }
+        if cls_name == 'order':
+            args['polymorphic_on'] = cls.type
+        return args
 
     _slug = sa.Column('slug',
                       sa.String(255),
@@ -487,8 +503,11 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         """Set availabilities for an Order."""
         project = self.project
         timezone = self.timezone
+        if isinstance(timezone, str):
+            timezone = pytz.timezone(timezone)
         user = self.workflow.context
         not_pm = 'g:briefy_pm' not in user.groups if user else True
+        validated_value = []
 
         if value and len(value) != len(set(value)):
             msg = 'Availability dates should be different.'
@@ -502,17 +521,20 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
                 availability_window = 0
             now = datetime.now(tz=timezone)
             for availability in value:
-                availability = parse(availability)
-                availability = availability.astimezone(timezone)
-                date_diff = availability - now
+                if isinstance(availability, str):
+                    availability = parse(availability)
+                tz_availability = availability.astimezone(timezone)
+                date_diff = tz_availability - now
                 if date_diff.days < availability_window:
                     msg = 'Both availability dates must be at least {window} days from now.'
                     msg = msg.format(window=availability_window)
                     raise ValidationError(message=msg, name='availability')
+
+                validated_value.append(availability.isoformat())
         elif value:
             logger.warn('Could not check availability dates. Order {id}'.format(id=self.id))
 
-        self._availability = value
+        self._availability = validated_value if validated_value else value
 
     _delivery = sa.Column(
         'delivery',

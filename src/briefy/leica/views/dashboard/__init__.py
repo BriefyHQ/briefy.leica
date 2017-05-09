@@ -49,7 +49,7 @@ DELIVERED_ORDERS_COLS = (
         'type': 'text', 'url': 'absolute_url', 'filter': ''
     },
     {
-        'field': 'newly-delivered', 'label': 'Newly Delivered',
+        'field': 'newly_delivered', 'label': 'Newly Delivered',
         'type': 'integer', 'url': '', 'filter': ''
     },
     {
@@ -57,7 +57,7 @@ DELIVERED_ORDERS_COLS = (
         'type': 'integer', 'url': '', 'filter': ''
     },
     {
-        'field': 're-delivered', 'label': 'Re-delivered',
+        'field': 're_delivered', 'label': 'Re-delivered',
         'type': 'integer', 'url': '', 'filter': ''
     },
     {

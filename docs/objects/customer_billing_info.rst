@@ -21,6 +21,6 @@ Database model
 Database diagram for the CustomerBillingInfo data model:
 
 .. sadisplay::
-    :module: briefy.leica.models.billing_info.customer.CustomerBillingInfo
+    :module: briefy.leica.models.billing_info.customer
     :alt: Customer Billing Info data model
     :render: graphviz

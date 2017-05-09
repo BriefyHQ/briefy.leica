@@ -9,6 +9,7 @@ from briefy.leica.models import mixins
 from briefy.leica.models.project import workflows
 from briefy.leica.utils.user import add_user_info_to_state_history
 from briefy.leica.vocabularies import AssetTypes
+from briefy.leica.vocabularies import OrderTypeChoices
 from briefy.ws.errors import ValidationError
 from sqlalchemy import event
 from sqlalchemy import orm
@@ -136,6 +137,20 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     Used to store Bizdev comments.
     """
 
+    order_type = sa.Column(
+        sautils.ChoiceType(OrderTypeChoices, impl=sa.String()),
+        default='order',
+        nullable=False,
+        info={
+            'colanderalchemy': {
+                'title': 'Type of Order',
+                'missing': colander.drop,
+                'typ': colander.String
+            }
+        }
+    )
+    """Type of order the project support."""
+
     number_required_assets = sa.Column(sa.Integer(), default=10)
     """Number of required assets of a Project to be used in the Order as default value."""
 
@@ -238,7 +253,6 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
             }
           }
         }
-
     """
 
     cancellation_window = sa.Column(sa.Integer, default=1)
@@ -340,6 +354,8 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         data = super().to_summary_dict()
         data['category'] = self.category.value \
             if isinstance(self.category, CategoryChoices) else self.category
+        data['order_type'] = self.order_type.value \
+            if isinstance(self.order_type, OrderTypeChoices) else self.order_type
         data = self._apply_actors_info(data)
         return data
 
@@ -353,6 +369,8 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         data = super().to_listing_dict()
         data['category'] = self.category.value \
             if isinstance(self.category, CategoryChoices) else self.category
+        data['order_type'] = self.order_type.value \
+            if isinstance(self.order_type, OrderTypeChoices) else self.order_type
         data = self._apply_actors_info(data)
         return data
 
@@ -366,6 +384,8 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         data['price'] = self.price
         data['category'] = self.category.value \
             if isinstance(self.category, CategoryChoices) else self.category
+        data['order_type'] = self.order_type.value \
+            if isinstance(self.order_type, OrderTypeChoices) else self.order_type
         data = self._apply_actors_info(data)
         add_user_info_to_state_history(self.state_history)
         # Apply actor information to data

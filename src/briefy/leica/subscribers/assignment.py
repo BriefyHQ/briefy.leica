@@ -1,5 +1,4 @@
 """Event subscribers for briefy.leica.models.job.Assignment."""
-from briefy.common.users import SystemUser
 from briefy.common.vocabularies.roles import Groups as G
 from briefy.leica.cache import cache_manager
 from briefy.leica.events.assignment import AssignmentCreatedEvent
@@ -16,6 +15,7 @@ def assignment_updated_handler(event):
     """Handle Assignment updated event."""
     assignment = event.obj
     cache_manager.refresh(assignment)
+    cache_manager.refresh(assignment.order)
 
 
 @subscriber(AssignmentCreatedEvent)
@@ -31,12 +31,7 @@ def assignment_created_handler(event):
 
 def assignment_submit(event):
     """Handle Assignment submitted event."""
-    transitions = []
-    # Impersonate the System here
-    event.user = SystemUser
-    transitions.append(
-        ('validate', 'Machine check approved')
-    )
+    pass
 
 
 def assignment_perm_reject(event):
