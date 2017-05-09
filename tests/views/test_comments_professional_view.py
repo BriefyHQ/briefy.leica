@@ -7,7 +7,7 @@ import pytest
 
 @pytest.mark.usefixtures('create_dependencies')
 class TestProfessionalComments(BaseTestView):
-    """Test Comments for an order."""
+    """Test Comments for a Professional."""
 
     base_path = '/professionals/23d94a43-3947-42fc-958c-09245ecca5f2/comments'
     dependencies = [
