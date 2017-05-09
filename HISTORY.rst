@@ -31,6 +31,8 @@ History
     * Aded script to export professionals to a spreadsheet file (jsbueno).
     * Card #272: Add asset_types to Project, Order, Assignment (ericof).
     * Card #67: Add Comment support to Professional profile (ericof).
+    * Change LeadOrder workflow to only create the assignment when the LeadOrder is confirmed (rudaporto).
+    * Improve LeadOrder model unittests (rudaporto).
 
 2.1.12 (2017-04-28)
 -------------------

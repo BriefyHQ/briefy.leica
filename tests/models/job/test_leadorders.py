@@ -27,6 +27,21 @@ class TestLeadOrderModel(BaseModelTest):
     initial_wf_state = 'new'
 
     @staticmethod
+    def delete_assigment_created(assignment, session):
+        """Delete assignment created."""
+        session.execute("DELETE from assignments_version where id = '{0}'".format(assignment.id))
+        session.flush()
+        session.query(models.Assignment).filter_by(id=assignment.id).delete()
+
+    @staticmethod
+    def notify_assigment_created(assignment, request, session):
+        """Notify event of assignment created out of a web request context."""
+        event = AssignmentCreatedEvent(assignment, request)
+        assignment_created_handler(event)
+        event()
+        session.flush()
+
+    @staticmethod
     def prepare_obj_wf(obj, web_request, role=None, state=None):
         """Prepare the instance obj to transition test."""
         if state:
@@ -69,15 +84,7 @@ class TestLeadOrderModel(BaseModelTest):
         for transition in received_transitions:
             assert transition in wf.transitions
 
-        # Check if assignment was created
-        assignment = leadorder.assignments[-1]
-        event = AssignmentCreatedEvent(assignment, request)
-        assignment_created_handler(event)
-        event()
-        session.flush()
-
-        assert assignment.state == 'pending'
-        assert leadorder.state_history[-1]['transition'] == 'submit'
+        assert len(leadorder.assignments) == 0
 
     @pytest.mark.parametrize('file_path', ['data/order_locations.json'])
     @pytest.mark.parametrize('position', [0])
@@ -157,7 +164,11 @@ class TestLeadOrderModel(BaseModelTest):
                     assert leadorder.location.info[ikey] == ivalue
             elif key == 'coordinates':
                 coordinates = getattr(leadorder.location, key)
-                coordinates['coordinates'] == value
+                value = {
+                    'type': 'Point',
+                    'coordinates': [value[1], value[0]]
+                }
+                assert coordinates == value
             else:
                 assert getattr(leadorder.location, key) == value
 
@@ -221,33 +232,37 @@ class TestLeadOrderModel(BaseModelTest):
             availability_1.isoformat(),
             availability_2.isoformat()
         ]
-
         # PMs can set any date but others do not
         if role_name != 'pm':
             with pytest.raises(WorkflowTransitionException) as excinfo:
                 wf.confirm(fields=new_availability)
-
             assert 'Both availability dates must be at least 7 days from now' in str(excinfo)
 
         availability_1 = now_utc + timedelta(8)
         availability_2 = now_utc + timedelta(10)
-
         new_availability['availability'] = [
             availability_1.isoformat(),
             availability_2.isoformat()
         ]
-        wf.confirm(fields=new_availability)
+        message = 'Lead confirmed!'
+        wf.confirm(fields=new_availability, message=message)
         session.flush()
-        if origin_state == 'new':
-            destination_state = 'received'
-        else:
-            destination_state = origin_state
+        assignment = leadorder.assignments[-1]
+        self.notify_assigment_created(assignment, request, session)
+        assert assignment.state == 'pending'
+        assert assignment.state_history[-1]['transition'] == 'submit'
 
-        assert leadorder.state == destination_state
+        # remove last created assignment
+        self.delete_assigment_created(assignment, session)
+
         assert leadorder.state_history[-1]['transition'] == 'confirm'
+        assert leadorder.state == 'received'
+        assert leadorder.state_history[-1]['message'] == message
         for key, value in new_availability.items():
             assert getattr(leadorder, key) == value
 
+        leadorder.availability = None
+        session.flush()
         # should work also with normal python datetime instances
         new_availability['availability'] = [
             availability_1,
@@ -261,11 +276,16 @@ class TestLeadOrderModel(BaseModelTest):
         )
         wf.confirm(fields=new_availability)
         session.flush()
+        assignment = leadorder.assignments[-1]
+        self.notify_assigment_created(assignment, request, session)
 
-        assert leadorder.state == destination_state
+        assert leadorder.state == 'received'
         for key, value in new_availability.items():
             assert getattr(leadorder, key)[0] == value[0].isoformat()
             assert getattr(leadorder, key)[1] == value[1].isoformat()
+
+        leadorder.availability = None
+        session.flush()
 
     @pytest.mark.parametrize('origin_state', ['new', 'received', 'assigned', 'scheduled'])
     @pytest.mark.parametrize('role_name', ['pm', 'customer', 'system'])
