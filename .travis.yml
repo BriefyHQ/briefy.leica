@@ -41,7 +41,7 @@ deploy:
     repo: BriefyHQ/briefy.leica
     branch: develop
   after_deploy:
-    - ./notify_newrelic_deploy.sh develop
+  - ./notify_newrelic_deploy.sh develop
 addons:
   apt:
     packages:

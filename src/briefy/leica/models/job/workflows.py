@@ -853,19 +853,19 @@ class OrderWorkflow(BriefyWorkflow):
         """Transition: Inform the removal of availability dates to the customer."""
         order = self.document
         order.availability = []
+        old_assignment = order.assignments[-1]
         # this will handle the creation of a new Assignment
         message = kwargs.get('message', '')
         create_new_assignment_from_order(order, order.request, copy_payout=True)
-        order.assignment.workflow.cancel(message=message)
+        old_assignment.workflow.cancel(message=message)
         return True
 
-    @Permission(groups=[LR['project_manager'], G['pm'], LR['customer_user'], G['customers'], ])
+    @Permission(groups=[G['pm'], G['customers'], G['system'], ])
     def can_remove_availability(self):
         """Permission: Validate if user can remove availability dates of an Order.
 
         Groups: g:pm, r:project_manager, g:customers, r:customer_user
         """
-        # TODO: make sure customer only unassign
         return True
 
     @assigned.transition(
@@ -1235,8 +1235,8 @@ class LeadOrderWorkflow(OrderWorkflow):
         'can_set_availability',
         required_fields=('availability', )
     )
-    def set_availability(self, **kwargs):
-        """Set Lead order availability dates."""
+    def confirm(self, **kwargs):
+        """Confirm LeadOrder and set availability dates."""
         pass
 
     @new.transition(

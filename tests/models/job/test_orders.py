@@ -27,6 +27,21 @@ class TestOrderModel(BaseModelTest):
     initial_wf_state = 'received'
 
     @staticmethod
+    def delete_assigment_created(assignment, session):
+        """Delete assignment created."""
+        session.execute("DELETE from assignments_version where id = '{0}'".format(assignment.id))
+        session.flush()
+        session.query(models.Assignment).filter_by(id=assignment.id).delete()
+
+    @staticmethod
+    def notify_assigment_created(assignment, request, session):
+        """Notify event of assignment created out of a web request context."""
+        event = AssignmentCreatedEvent(assignment, request)
+        assignment_created_handler(event)
+        event()
+        session.flush()
+
+    @staticmethod
     def prepare_obj_wf(obj, web_request, role=None, state=None):
         """Prepare the instance obj to transition test."""
         if state:
@@ -66,15 +81,11 @@ class TestOrderModel(BaseModelTest):
         for transition in received_transitions:
             assert transition in wf.transitions
 
-        # Check if assignment was created
         assignment = order.assignments[-1]
-        event = AssignmentCreatedEvent(assignment, request)
-        assignment_created_handler(event)
-        event()
-        session.flush()
-
+        self.notify_assigment_created(assignment, request, session)
         assert assignment.state == 'pending'
         assert order.state_history[-1]['transition'] == 'submit'
+        self.delete_assigment_created(assignment, session)
 
     @pytest.mark.parametrize('file_path', ['data/order_locations.json'])
     @pytest.mark.parametrize('position', [0])
@@ -154,7 +165,11 @@ class TestOrderModel(BaseModelTest):
                     assert order.location.info[ikey] == ivalue
             elif key == 'coordinates':
                 coordinates = getattr(order.location, key)
-                coordinates['coordinates'] == value
+                value = {
+                    'type': 'Point',
+                    'coordinates': [value[1], value[0]]
+                }
+                assert coordinates == value
             else:
                 assert getattr(order.location, key) == value
 
@@ -253,6 +268,52 @@ class TestOrderModel(BaseModelTest):
             assert getattr(order, key)[0] == value[0].isoformat()
             assert getattr(order, key)[1] == value[1].isoformat()
 
+    @pytest.mark.parametrize('origin_state', ['assigned', 'scheduled'])
+    @pytest.mark.parametrize('role_name', ['pm', 'customer', 'system'])
+    def test_workflow_remove_availability(
+        self, instance_obj, web_request, session, roles, role_name, now_utc, origin_state
+    ):
+        """Test Order workflow remove_availability transition."""
+        order, wf, request = self.prepare_obj_wf(
+            instance_obj,
+            web_request,
+            roles[role_name],
+            origin_state
+        )
+
+        availability_1 = now_utc + timedelta(10)
+        availability_2 = now_utc + timedelta(11)
+        new_availability = [
+            availability_1.isoformat(),
+            availability_2.isoformat()
+        ]
+        order.availability = new_availability
+        session.flush()
+
+        old_assignment = order.assignments[-1]
+        old_assignment, ass_wf, request = self.prepare_obj_wf(
+            old_assignment,
+            web_request,
+            roles[role_name],
+            origin_state,
+        )
+        message = 'Remove availability!'
+        wf.remove_availability(message=message)
+        session.flush()
+
+        new_assignment = order.assignments[-1]
+        self.notify_assigment_created(new_assignment, request, session)
+
+        assert order.state == 'received'
+        assert order.state_history[-1]['transition'] == 'remove_availability'
+        assert order.state_history[-1]['message'] == message
+        assert len(order.availability) == 0
+        assert old_assignment.state == 'cancelled'
+        assert old_assignment.state_history[-1]['transition'] == 'cancel'
+        assert new_assignment.state == 'pending'
+        assert new_assignment.state_history[-1]['transition'] == 'submit'
+        self.delete_assigment_created(new_assignment, session)
+
     @pytest.mark.parametrize('role_name', ['pm', 'scout', 'system'])
     def test_workflow_assign(self, instance_obj, web_request, session, roles, role_name):
         """Test Order workflow assign transition."""
@@ -308,10 +369,14 @@ class TestOrderModel(BaseModelTest):
         wf.unassign()
         session.flush()
 
+        new_assignment = order.assignments[-1]
+        self.notify_assigment_created(new_assignment, request, session)
+
         assert order.state == 'received'
         assert order.state_history[-1]['transition'] == 'unassign'
-        new_assignment = order.assignments[-1]
-        new_assignment.state == 'pending'
+        assert new_assignment.state == 'pending'
+        assert new_assignment.state_history[-1]['transition'] == 'submit'
+        self.delete_assigment_created(new_assignment, session)
 
     @pytest.mark.parametrize('origin_state', ['received', 'assigned'])
     @pytest.mark.parametrize('role_name', ['pm', 'scout', 'system'])
@@ -558,10 +623,7 @@ class TestOrderModel(BaseModelTest):
         session.flush()
 
         new_assignment = order.assignments[-1]
-        event = AssignmentCreatedEvent(new_assignment, request)
-        assignment_created_handler(event)
-        event()
-        session.flush()
+        self.notify_assigment_created(new_assignment, request, session)
 
         assert order.state == 'received'
         assert order.state_history[-1]['transition'] == 'new_shoot'
@@ -572,6 +634,7 @@ class TestOrderModel(BaseModelTest):
         assert old_assignment.payout_value == fields['payout_value']
         assert new_assignment.state == 'pending'
         assert new_assignment.state_history[-1]['transition'] == 'submit'
+        self.delete_assigment_created(new_assignment, session)
 
     @pytest.mark.parametrize('ass_origin_state', ['in_qa', 'refused', 'approved', ])
     @pytest.mark.parametrize('origin_state', ['in_qa', 'refused', ])
@@ -617,10 +680,7 @@ class TestOrderModel(BaseModelTest):
         session.flush()
 
         new_assignment = order.assignments[-1]
-        event = AssignmentCreatedEvent(new_assignment, request)
-        assignment_created_handler(event)
-        event()
-        session.flush()
+        self.notify_assigment_created(new_assignment, request, session)
 
         assert order.state == 'assigned'
         assert order.state_history[-1]['transition'] == 'reshoot'

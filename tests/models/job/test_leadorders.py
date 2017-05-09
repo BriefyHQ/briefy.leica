@@ -55,13 +55,13 @@ class TestLeadOrderModel(BaseModelTest):
         session.flush()
 
         assert leadorder.assignment is None
-        assert 'submit_lead' not in wf.transitions
+        assert 'submit' not in wf.transitions
         assert leadorder.state == 'new'
         assert leadorder.price
         assert leadorder.price_currency
 
         received_transitions = (
-            'set_availability',
+            'confirm',
             'edit_location',
             'edit_requirements',
             'cancel'
@@ -195,12 +195,12 @@ class TestLeadOrderModel(BaseModelTest):
         for key, value in new_requirements.items():
             assert getattr(leadorder, key) == value
 
-    @pytest.mark.parametrize('origin_state', ['new', 'received', 'assigned'])
+    @pytest.mark.parametrize('origin_state', ['new'])
     @pytest.mark.parametrize('role_name', ['pm', 'customer', 'system'])
-    def test_workflow_set_availability(
+    def test_workflow_confirm(
         self, instance_obj, web_request, session, roles, role_name, now_utc, origin_state
     ):
-        """Test LeadOrder workflow set_availability transition."""
+        """Test LeadOrder workflow confirm transition."""
         leadorder, wf, request = self.prepare_obj_wf(
             instance_obj,
             web_request,
@@ -211,7 +211,7 @@ class TestLeadOrderModel(BaseModelTest):
 
         new_availability = {}
         with pytest.raises(WorkflowTransitionException) as excinfo:
-            wf.set_availability(fields=new_availability)
+            wf.confirm(fields=new_availability)
 
         assert 'Field availability is required for this transition' in str(excinfo)
 
@@ -225,7 +225,7 @@ class TestLeadOrderModel(BaseModelTest):
         # PMs can set any date but others do not
         if role_name != 'pm':
             with pytest.raises(WorkflowTransitionException) as excinfo:
-                wf.set_availability(fields=new_availability)
+                wf.confirm(fields=new_availability)
 
             assert 'Both availability dates must be at least 7 days from now' in str(excinfo)
 
@@ -236,7 +236,7 @@ class TestLeadOrderModel(BaseModelTest):
             availability_1.isoformat(),
             availability_2.isoformat()
         ]
-        wf.set_availability(fields=new_availability)
+        wf.confirm(fields=new_availability)
         session.flush()
         if origin_state == 'new':
             destination_state = 'received'
@@ -244,7 +244,7 @@ class TestLeadOrderModel(BaseModelTest):
             destination_state = origin_state
 
         assert leadorder.state == destination_state
-        assert leadorder.state_history[-1]['transition'] == 'set_availability'
+        assert leadorder.state_history[-1]['transition'] == 'confirm'
         for key, value in new_availability.items():
             assert getattr(leadorder, key) == value
 
@@ -259,7 +259,7 @@ class TestLeadOrderModel(BaseModelTest):
             roles[role_name],
             origin_state
         )
-        wf.set_availability(fields=new_availability)
+        wf.confirm(fields=new_availability)
         session.flush()
 
         assert leadorder.state == destination_state
