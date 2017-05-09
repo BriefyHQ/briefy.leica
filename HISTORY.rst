@@ -29,6 +29,7 @@ History
     * Refactor Order workflow and subscribers to use order.assingmnets[-1] and not order.assignment (rudaporto).
     * New leadorder subscriber module to handle LeadOrder created, updated and workflow transitions (rudaporto).
     * Aded script to export professionals to a spreadsheet file (jsbueno).
+    * Card #272: Add asset_types to Project, Order, Assignment (ericof).
 
 2.1.12 (2017-04-28)
 -------------------

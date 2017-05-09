@@ -14,11 +14,14 @@ from briefy.leica.models.job.location import OrderLocation
 from briefy.leica.models.project import Project
 from briefy.leica.utils.transitions import get_transition_date_from_history
 from briefy.leica.utils.user import add_user_info_to_state_history
+from briefy.leica.vocabularies import AssetTypes
 from briefy.leica.vocabularies import OrderInputSource
+from briefy.ws.errors import ValidationError
 from datetime import datetime
 from dateutil.parser import parse
 from sqlalchemy import event
 from sqlalchemy import orm
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import TimezoneType
@@ -40,7 +43,7 @@ __summary_attributes__ = [
 
 __listing_attributes__ = __summary_attributes__ + [
     'accept_date', 'availability', 'assignment', 'requirements', 'project',
-    'customer', 'refused_times'
+    'customer', 'refused_times', 'asset_types'
 ]
 
 __colander_alchemy_config_overrides__ = \
@@ -386,6 +389,30 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     Access to it should be done using the hybrid_property availability.
     """
 
+    asset_types = sa.Column(
+        JSONB,
+        info={
+            'colanderalchemy': {
+                'title': 'Asset types.',
+                'missing': colander.drop,
+                'typ': schema.List(),
+            }
+        }
+    )
+    """Asset types supported by this order.
+
+    Options come from :mod:`briefy.leica.vocabularies.AssetTypes`.
+    """
+
+    @orm.validates('asset_types')
+    def validate_asset_types(self, key, value):
+        """Validate if values for asset_types are correct."""
+        members = AssetTypes.__members__
+        for item in value:
+            if item not in members:
+                raise ValidationError(message='Invalid type of asset', name=key)
+        return value
+
     comments = orm.relationship(
         'Comment',
         foreign_keys='Comment.entity_id',
@@ -484,7 +511,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
         if value and len(value) != len(set(value)):
             msg = 'Availability dates should be different.'
-            raise ValueError(msg)
+            raise ValidationError(message=msg, name='availability')
 
         if value and timezone and project:
             if not_pm:
@@ -501,10 +528,9 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
                 if date_diff.days < availability_window:
                     msg = 'Both availability dates must be at least {window} days from now.'
                     msg = msg.format(window=availability_window)
-                    raise ValueError(msg)
+                    raise ValidationError(message=msg, name='availability')
 
                 validated_value.append(availability.isoformat())
-
         elif value:
             logger.warn('Could not check availability dates. Order {id}'.format(id=self.id))
 

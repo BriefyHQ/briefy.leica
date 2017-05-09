@@ -8,9 +8,12 @@ from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.project import workflows
 from briefy.leica.utils.user import add_user_info_to_state_history
+from briefy.leica.vocabularies import AssetTypes
 from briefy.leica.vocabularies import OrderTypeChoices
+from briefy.ws.errors import ValidationError
 from sqlalchemy import event
 from sqlalchemy import orm
+from sqlalchemy.dialects.postgresql import JSONB
 from zope.interface import implementer
 from zope.interface import Interface
 
@@ -81,7 +84,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
 
     __listing_attributes__ = [
         'id', 'title', 'description', 'created_at', 'updated_at', 'state',
-        'external_id', 'total_orders', 'slug', 'customer'
+        'external_id', 'total_orders', 'slug', 'customer', 'asset_types'
     ]
 
     __raw_acl__ = (
@@ -151,12 +154,36 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     number_required_assets = sa.Column(sa.Integer(), default=10)
     """Number of required assets of a Project to be used in the Order as default value."""
 
+    asset_types = sa.Column(
+        JSONB,
+        info={
+            'colanderalchemy': {
+                'title': 'Asset types.',
+                'missing': colander.drop,
+                'typ': schema.List()
+            }
+        }
+    )
+    """Asset types supported by this project.
+
+    Options come from :mod:`briefy.leica.vocabularies.AssetTypes`.
+    """
+
+    @orm.validates('asset_types')
+    def validate_asset_types(self, key, value):
+        """Validate if values for asset_types are correct."""
+        members = AssetTypes.__members__
+        for item in value:
+            if item not in members:
+                raise ValidationError(message='Invalid type of asset', name=key)
+        return value
+
     category = sa.Column(
         sautils.ChoiceType(CategoryChoices, impl=sa.String()),
         default='undefined',
         nullable=False
     )
-    """Category of this Order.
+    """Category of this Project.
 
     Options come from :mod:`briefy.common.vocabularies.categories`.
     """
