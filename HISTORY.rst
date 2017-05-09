@@ -20,6 +20,7 @@ History
     * Added invalidation in all tasks and worker actions after update objects since some events will not be fired without a request (rudaporto).
     * Aded script to export professionals to a spreadsheet file (jsbueno).
     * Card #272: Add asset_types to Project, Order, Assignment (ericof).
+    * Card #67: Add Comment support to Professional profile (ericof).
 
 2.1.12 (2017-04-28)
 -------------------
