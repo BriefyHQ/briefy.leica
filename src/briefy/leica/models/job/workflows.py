@@ -929,7 +929,7 @@ class OrderWorkflow(BriefyWorkflow):
         """
         order = self.document
         project = order.project
-        assignment = order.assignments[-1]
+        assignment = order.assignments[-1] if order.assignments else None
         user = self.context
         allowed = True
         uploaded = False
@@ -1168,8 +1168,8 @@ class OrderWorkflow(BriefyWorkflow):
         """
         order = self.document
         result = True
-        assignment = order.assignments[-1]
-        if assignment.state != 'refused':
+        assignment = order.assignments[-1] if order.assignments else None
+        if not assignment or assignment.state != 'refused':
             result = False
         return result
 
@@ -1232,12 +1232,17 @@ class LeadOrderWorkflow(OrderWorkflow):
 
     @new.transition(
         received,
-        'can_set_availability',
+        'can_confirm',
         required_fields=('availability', )
     )
     def confirm(self, **kwargs):
         """Confirm LeadOrder and set availability dates."""
         pass
+
+    @Permission(groups=[G['customers'], G['pm'], G['bizdev'], G['system'], ])
+    def can_confirm(self):
+        """Validate if user can confirm an LeadOrder."""
+        return True
 
     @new.transition(
         new,

@@ -4,7 +4,6 @@ from briefy.leica.events.leadorder import LeadOrderCreatedEvent
 from briefy.leica.events.leadorder import LeadOrderUpdatedEvent
 from briefy.leica.subscribers import order as order_subscribers
 from briefy.leica.subscribers.utils import apply_local_roles_from_parent
-from briefy.leica.subscribers.utils import create_new_assignment_from_order
 from pyramid.events import subscriber
 
 
@@ -34,13 +33,9 @@ def leadorder_created_handler(event):
         # force this because sometimes the obj.id is not available before the flush
         leadorder.location = location
 
-    # create a new assignment
-    create_new_assignment_from_order(leadorder, request)
-    # submit the order
+    # submit the lead order
     leadorder.workflow.submit()
     cache_manager.refresh(leadorder)
-    for assignment in leadorder.assignments:
-        cache_manager.refresh(assignment)
 
 
 def transition_handler(event):
@@ -49,7 +44,7 @@ def transition_handler(event):
     if not event_name.startswith('leadorder.workflow'):
         return
     handlers = {
-        'leadorder.workflow.submit': order_subscribers.order_submit,
+        'leadorder.workflow.confirm': order_subscribers.order_submit,
         'leadorder.workflow.cancel': order_subscribers.order_cancel,
         'leadorder.workflow.perm_refuse': order_subscribers.order_perm_refuse,
         'leadorder.workflow.remove_schedule': order_subscribers.order_remove_schedule,
