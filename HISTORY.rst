@@ -30,6 +30,9 @@ History
     * New leadorder subscriber module to handle LeadOrder created, updated and workflow transitions (rudaporto).
     * Aded script to export professionals to a spreadsheet file (jsbueno).
     * Card #272: Add asset_types to Project, Order, Assignment (ericof).
+    * Change LeadOrder workflow to only create the assignment when the LeadOrder is confirmed (rudaporto).
+    * Improve LeadOrder model unittests (rudaporto).
+
 
 2.1.12 (2017-04-28)
 -------------------
