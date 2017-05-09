@@ -1,5 +1,6 @@
 [
   {
+    "asset_types": ["Image"],
     "project_manager": "77f88fab-dbdf-4705-8da1-8512f6012a86",
     "state": "created",
     "title": "Project 01",
@@ -26,6 +27,7 @@
     "scout_manager": null
   },
   {
+    "asset_types": ["Image"],
     "project_manager": "77f88fab-dbdf-4705-8da1-8512f6012a86",
     "state": "created",
     "title": "Project 02",
@@ -52,6 +54,7 @@
     "scout_manager": null
   },
   {
+    "asset_types": ["Image"],
     "project_manager": "77f88fab-dbdf-4705-8da1-8512f6012a86",
     "state": "created",
     "title": "Project 03",
@@ -78,6 +81,7 @@
     "scout_manager": null
   },
   {
+    "asset_types": ["Image"],
     "project_manager": "77f88fab-dbdf-4705-8da1-8512f6012a86",
     "state": "created",
     "title": "Project 04",
@@ -104,6 +108,7 @@
     "scout_manager": null
   },
   {
+    "asset_types": ["Image"],
     "project_manager": "77f88fab-dbdf-4705-8da1-8512f6012a86",
     "state": "created",
     "title": "Project 05",

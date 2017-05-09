@@ -1,5 +1,6 @@
 [
   {
+    "asset_types": ["Image"],
     "project_manager": "1c0fdfaf-84ae-4a36-8957-e5d1dc084690",
     "qa_manager": "f1f6d2b1-519c-462b-9b31-73d82ee2ac97",
     "additional_compensation": 5000,
@@ -27,6 +28,7 @@
     ]
   },
   {
+    "asset_types": ["Image"],
     "project_manager": "1c0fdfaf-84ae-4a36-8957-e5d1dc084690",
     "qa_manager": "f1f6d2b1-519c-462b-9b31-73d82ee2ac97",
     "additional_compensation": 5000,
@@ -53,6 +55,7 @@
     ]
   },
   {
+    "asset_types": ["Image"],
     "project_manager": "1c0fdfaf-84ae-4a36-8957-e5d1dc084690",
     "qa_manager": "f1f6d2b1-519c-462b-9b31-73d82ee2ac97",
     "additional_compensation": 5000,
@@ -79,6 +82,7 @@
     ]
   },
   {
+    "asset_types": ["Image"],
     "project_manager": "1c0fdfaf-84ae-4a36-8957-e5d1dc084690",
     "qa_manager": "f1f6d2b1-519c-462b-9b31-73d82ee2ac97",
     "additional_compensation": 5000,
@@ -105,6 +109,7 @@
     ]
   },
   {
+    "asset_types": ["Image"],
     "project_manager": "1c0fdfaf-84ae-4a36-8957-e5d1dc084690",
     "qa_manager": "f1f6d2b1-519c-462b-9b31-73d82ee2ac97",
     "additional_compensation": 5000,

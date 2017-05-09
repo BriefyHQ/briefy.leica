@@ -1,5 +1,6 @@
 """Briefy Leica Assignment model."""
 from briefy.common.db.types import AwareDateTime
+from briefy.common.utils import schema
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica.cache import cache_manager
 from briefy.leica.cache import cache_region
@@ -10,11 +11,14 @@ from briefy.leica.models.job import workflows
 from briefy.leica.models.job.order import Order
 from briefy.leica.utils.transitions import get_transition_date_from_history
 from briefy.leica.utils.user import add_user_info_to_state_history
+from briefy.leica.vocabularies import AssetTypes
 from briefy.leica.vocabularies import TypesOfSetChoices
+from briefy.ws.errors import ValidationError
 from datetime import datetime
 from sqlalchemy import event
 from sqlalchemy import orm
 from sqlalchemy import select
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import TimezoneType
@@ -38,7 +42,7 @@ __listing_attributes__ = __summary_attributes__ + [
     'assignment_date', 'last_approval_date', 'submission_date', 'last_submission_date',
     'set_type', 'number_required_assets', 'category', 'availability', 'additional_compensation',
     'reason_additional_compensation', 'qa_manager', 'state_history', 'requirements', 'pool_id',
-    'location', 'project', 'closed_on_date', 'pool', 'delivery', 'refused_times'
+    'location', 'project', 'closed_on_date', 'pool', 'delivery', 'refused_times', 'asset_types'
 ]
 
 __colander_alchemy_config_overrides__ = \
@@ -344,6 +348,30 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
 
     Collection of :class:`briefy.leica.models.asset.Asset`.
     """
+
+    asset_types = sa.Column(
+        JSONB,
+        info={
+            'colanderalchemy': {
+                'title': 'Asset types.',
+                'missing': colander.drop,
+                'typ': schema.List(),
+            }
+        }
+    )
+    """Asset types supported by this order.
+
+    Options come from :mod:`briefy.leica.vocabularies.AssetTypes`.
+    """
+
+    @orm.validates('asset_types')
+    def validate_asset_types(self, key, value):
+        """Validate if values for asset_types are correct."""
+        members = AssetTypes.__members__
+        for item in value:
+            if item not in members:
+                raise ValidationError(message='Invalid type of asset', name=key)
+        return value
 
     comments = orm.relationship(
         'Comment',
