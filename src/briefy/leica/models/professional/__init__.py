@@ -37,7 +37,8 @@ class Professional(UserProfile, Base):
 
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', 'profiles', 'type', 'external_id', '_owner', 'billing_info'
+            'state_history', 'state', 'profiles', 'type', 'external_id',
+            'comments', '_owner', 'billing_info'
         ],
         'overrides': {
             'pools_ids': {
@@ -125,6 +126,19 @@ class Professional(UserProfile, Base):
     )
     """Descriptor to handle multiple links get, set and delete."""
 
+    # Comments
+    comments = orm.relationship(
+        'Comment',
+        foreign_keys='Comment.entity_id',
+        order_by='desc(Comment.created_at)',
+        primaryjoin='Comment.entity_id == Professional.id',
+        lazy='dynamic'
+    )
+    """Comments connected to this professional.
+
+    Collection of :class:`briefy.leica.models.comment.Comment`.
+    """
+
     # Locations
     _locations = orm.relationship(
         'WorkingLocation',
@@ -158,9 +172,9 @@ class Professional(UserProfile, Base):
             }
         }
     )
-    """Order Location.
+    """Professional Main working Location.
 
-    Relationship with :class:`briefy.leica.models.job.location.OrderLocation`.
+    Relationship with :class:`briefy.leica.models.professional.location.MainWorkingLocation`.
     """
 
     main_location = UnaryRelationshipWrapper(
@@ -187,6 +201,7 @@ class Professional(UserProfile, Base):
         data['slug'] = self.slug
         data['locations'] = self.locations
         data['links'] = self.links
+        data['comments'] = [c.to_summary_dict() for c in self.comments]
         data['billing_info_id'] = self.billing_info.id if self.billing_info else ''
         data['intercom'] = intercom_payload_professional(self)
 

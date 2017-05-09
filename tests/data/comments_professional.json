@@ -1,0 +1,26 @@
+[
+  {
+    "comment_order": 0,
+    "state": "created",
+    "author_role": "scout_manager",
+    "to_role": "scout_manager",
+    "entity_id": "23d94a43-3947-42fc-958c-09245ecca5f2",
+    "id": "1d26ac6a-b64b-4f9a-ba1f-f48f9851c7bc",
+    "in_reply_to": null,
+    "state_history": [
+      {
+        "to": "created",
+        "transition": "",
+        "actor": null,
+        "message": null,
+        "date": "2016-09-18T18:55:21.144051+00:00",
+        "from": ""
+      }
+    ],
+    "updated_at": "2016-09-18T18:55:21.145763+00:00",
+    "entity_type": "Professional",
+    "author_id": "a90a4275-a83b-45ca-a869-9a387504cfb9",
+    "created_at": "2016-09-18T18:55:21.145741+00:00",
+    "content": "Good professional, reliable and focused."
+  }
+]

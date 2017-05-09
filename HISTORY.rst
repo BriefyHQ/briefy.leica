@@ -30,6 +30,7 @@ History
     * New leadorder subscriber module to handle LeadOrder created, updated and workflow transitions (rudaporto).
     * Aded script to export professionals to a spreadsheet file (jsbueno).
     * Card #272: Add asset_types to Project, Order, Assignment (ericof).
+    * Card #67: Add Comment support to Professional profile (ericof).
 
 2.1.12 (2017-04-28)
 -------------------
