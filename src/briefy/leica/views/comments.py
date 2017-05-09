@@ -6,6 +6,7 @@ from briefy.ws.resources import RESTService
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
 from pyramid.security import Allow
+from pyramid.security import Deny
 
 
 class CommentFactory(BaseFactory):
@@ -92,3 +93,29 @@ PATH = COLLECTION_PATH + '/{id}'
 )
 class OrderCommentService(CommentService):
     """Comments for an Order."""
+
+
+COLLECTION_PATH = '/professionals/{entity_id}/comments'
+PATH = COLLECTION_PATH + '/{id}'
+
+
+class ProfessionalsCommentFactory(BaseFactory):
+    """Comment context factory."""
+
+    model = Comment
+
+    __base_acl__ = [
+        (Allow, 'g:briefy', ['create', 'list', 'view']),
+        (Deny, 'g:professionals', ['create', 'list', 'view']),
+        (Deny, 'g:customers', ['create', 'list', 'view']),
+    ]
+
+
+@resource(
+    collection_path=COLLECTION_PATH,
+    path=PATH,
+    cors_policy=CORS_POLICY,
+    factory=ProfessionalsCommentFactory
+)
+class ProfessionalCommentService(CommentService):
+    """Comments for a Professional."""
