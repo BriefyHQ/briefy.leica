@@ -5,6 +5,7 @@ from io import StringIO
 from pyramid.request import Response
 
 import csv
+import newrelic.agent
 
 
 class BaseReport(BaseResource):
@@ -14,6 +15,11 @@ class BaseReport(BaseResource):
     filename = ''
     mime_type = 'text/csv'
     column_order = ()
+
+    def __init__(self, context, request):
+        """Initialize the report view."""
+        super().__init__(context, request)
+        newrelic.agent.set_background_task(flag=True)
 
     @staticmethod
     def _format_datetime(raw_value: datetime, timezone, as_local: bool=False) -> str:
