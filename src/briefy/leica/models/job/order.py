@@ -407,6 +407,9 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     @orm.validates('asset_types')
     def validate_asset_types(self, key, value):
         """Validate if values for asset_types are correct."""
+        max_types = 1
+        if len(value) > max_types:
+            raise ValidationError(message='Invalid number of type of assets', name=key)
         members = AssetTypes.__members__
         for item in value:
             if item not in members:
