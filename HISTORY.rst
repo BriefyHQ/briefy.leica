@@ -33,6 +33,8 @@ History
     * Card #67: Add Comment support to Professional profile (ericof).
     * Change LeadOrder workflow to only create the assignment when the LeadOrder is confirmed (rudaporto).
     * Improve LeadOrder model unittests (rudaporto).
+    * Card #273: Added new state to Assignment: post_processing (rudaporto).
+    * Card #273: Added new transitions to move to and back in_qa to post_processing and to approve from post_processing (rudaporto).
 
 2.1.12 (2017-04-28)
 -------------------

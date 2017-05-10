@@ -96,6 +96,11 @@ class AssignmentWorkflow(BriefyWorkflow):
         'Assignment is under quality assurance.'
     )
 
+    post_processing = WS(
+        'post_processing', 'Post Processing',
+        'Assignment is in post processing.'
+    )
+
     approved = WS(
         'approved', 'Content approved',
         'Content was approved by Briefy quality assurance team.'
@@ -407,6 +412,11 @@ class AssignmentWorkflow(BriefyWorkflow):
         'can_approve',
         required_fields=('customer_message',)
     )
+    @post_processing.transition(
+        approved,
+        'can_approve',
+        required_fields=('customer_message',)
+    )
     def approve(self, **kwargs):
         """QA approves the Assignment Set."""
         # TODO: return this validation when Mr.C is back
@@ -438,6 +448,32 @@ class AssignmentWorkflow(BriefyWorkflow):
         """QA rejects Assignment Set."""
         assignment = self.document
         assignment.set_type = 'returned_photographer'
+        return True
+
+    @in_qa.transition(
+        post_processing,
+        'can_start_post_process',
+    )
+    def start_post_process(self, **kwargs):
+        """QA start post processing the Assignment Set."""
+        return True
+
+    @Permission(groups=[G['qa'], G['system'], ])
+    def can_start_post_process(self):
+        """Validate if user can start post processing an Assignment Set."""
+        return True
+
+    @post_processing.transition(
+        in_qa,
+        'can_retract_post_process',
+    )
+    def retract_post_process(self, **kwargs):
+        """QA retract post processing the Assignment Set."""
+        return True
+
+    @Permission(groups=[G['qa'], G['system'], ])
+    def can_retract_post_process(self):
+        """Validate if user can retract post processing an Assignment Set."""
         return True
 
     @in_qa.transition(
