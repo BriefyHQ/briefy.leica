@@ -219,6 +219,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     It stores a dictionary of configurations to be used by the delivery mechanism.
 
     i.e::
+
         {
           "approve": {
             "archive": {
@@ -253,6 +254,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
             }
           }
         }
+
     """
 
     cancellation_window = sa.Column(sa.Integer, default=1)

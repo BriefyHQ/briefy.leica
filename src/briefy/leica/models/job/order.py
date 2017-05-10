@@ -563,6 +563,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
                 'sftp': 'sftp://agoda@delivery.briefy.co/bali/3456/',
                 'gdrive': 'https://drive.google.com/foo/bar',
             }
+
         (Do not confuse this attribute with project.delivery which contains information on
         how to deliver the assets)
         """
