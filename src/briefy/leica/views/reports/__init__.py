@@ -79,7 +79,7 @@ class BaseReport(BaseResource):
 
     def get(self) -> Response:
         """Return CSV with reports."""
+        self.set_transaction_name('get')
         filename = self.filename
         filename, content_type, data = self.get_report_data(filename)
-
         return self.get_response(filename, content_type, data)

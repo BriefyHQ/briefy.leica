@@ -13,6 +13,7 @@ from briefy.leica.events.leadorder import LeadOrderUpdatedEvent
 from briefy.leica.events.order import OrderUpdatedEvent
 from briefy.leica.subscribers.utils import create_new_assignment_from_order
 from briefy.leica.utils.transitions import create_comment_on_assignment_approval
+from briefy.leica.utils.transitions import get_transition_date_from_history
 
 import logging
 
@@ -1277,8 +1278,37 @@ class LeadOrderWorkflow(OrderWorkflow):
 
     @Permission(groups=[G['customers'], G['pm'], G['bizdev'], G['system'], ])
     def can_confirm(self):
-        """Validate if user can confirm an LeadOrder."""
+        """Validate if user can confirm a LeadOrder."""
         return True
+
+    @received.transition(
+        new,
+        'can_remove_confirmation',
+    )
+    def remove_confirmation(self, **kwargs):
+        """Remove LeadOrder confirmation and clean availability dates."""
+        order = self.document
+        order.availability = None
+
+    @Permission(groups=[
+        G['customers'], G['pm'], G['bizdev'], G['tech'], G['product'], G['support'], G['system'],
+    ])
+    def can_remove_confirmation(self):
+        """Validate if user can remove_confirmation of a LeadOrder."""
+        leadorder = self.document
+        permission = True
+        for assignment in leadorder.assignments:
+            transitions = ('assign', 'self_assign', 'assign_pool', )
+            date = get_transition_date_from_history(
+                transitions,
+                assignment.state_history,
+                first=True
+            )
+            if date:
+                permission = False
+                break
+
+        return permission
 
     @new.transition(
         new,
@@ -1287,8 +1317,8 @@ class LeadOrderWorkflow(OrderWorkflow):
     )
     def edit_location(self, **kwargs):
         """Update location of a LeadOrder."""
-        order = self.document
-        location = order.location
+        leadorder = self.document
+        location = leadorder.location
         if location:
             payload = kwargs['fields']['location']
             for key, value in payload.items():
