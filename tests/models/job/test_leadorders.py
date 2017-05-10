@@ -287,6 +287,26 @@ class TestLeadOrderModel(BaseModelTest):
         leadorder.availability = None
         session.flush()
 
+    @pytest.mark.parametrize('origin_state', ['received'])
+    @pytest.mark.parametrize('role_name', ['pm', 'customer', 'bizdev', 'support', 'tech', 'product', 'system'])
+    def test_workflow_remove_confirmation(
+        self, instance_obj, web_request, session, roles, role_name, now_utc, origin_state
+    ):
+        """Test LeadOrder workflow remove confirmation transition."""
+        leadorder, wf, request = self.prepare_obj_wf(
+            instance_obj,
+            web_request,
+            roles[role_name],
+            origin_state
+        )
+        message = 'Remove lead order confirmation!'
+        wf.remove_confirmation(message=message)
+        session.flush()
+
+        assert leadorder.state == 'new'
+        assert leadorder.state_history[-1]['transition'] == 'remove_confirmation'
+        assert leadorder.state_history[-1]['message'] == message
+
     @pytest.mark.parametrize('origin_state', ['new', 'received', 'assigned', 'scheduled'])
     @pytest.mark.parametrize('role_name', ['pm', 'customer', 'system'])
     def test_workflow_cancel(
