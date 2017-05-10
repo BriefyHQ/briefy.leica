@@ -25,6 +25,7 @@ class TestOrderModel(BaseModelTest):
     file_path = 'data/orders.json'
     model = models.Order
     initial_wf_state = 'received'
+    number_of_wf_transtions = 1
 
     @staticmethod
     def delete_assigment_created(assignment, session):

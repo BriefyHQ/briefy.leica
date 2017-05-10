@@ -288,7 +288,9 @@ class TestLeadOrderModel(BaseModelTest):
         session.flush()
 
     @pytest.mark.parametrize('origin_state', ['received'])
-    @pytest.mark.parametrize('role_name', ['pm', 'customer', 'bizdev', 'support', 'tech', 'product', 'system'])
+    @pytest.mark.parametrize(
+        'role_name', ['pm', 'customer', 'bizdev', 'support', 'tech', 'product', 'system']
+    )
     def test_workflow_remove_confirmation(
         self, instance_obj, web_request, session, roles, role_name, now_utc, origin_state
     ):
