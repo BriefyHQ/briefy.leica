@@ -76,7 +76,7 @@ class TestLeadOrderModel(BaseModelTest):
         project = leadorder.project
         assert leadorder.price
         assert leadorder.price_currency
-        assert leadorder.asset_types == project.asset_types
+        assert leadorder.asset_types == project.asset_types[:1]
 
         received_transitions = (
             'confirm',

@@ -77,7 +77,7 @@ class TestOrderModel(BaseModelTest):
         project = order.project
         assert order.price == project.price
         assert order.price_currency == project.price_currency
-        assert order.asset_types == project.asset_types
+        assert order.asset_types == project.asset_types[:1]
 
         received_transitions = (
             'cancel', 'set_availability', 'edit_location', 'edit_requirements',
