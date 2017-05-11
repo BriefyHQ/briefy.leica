@@ -27,6 +27,7 @@ def order_created_handler(event):
     order.price = price
     price_currency = project.price_currency
     order.price_currency = price_currency
+    order.asset_types = project.asset_types
 
     add_roles = ('customer_users', 'project_managers')
     apply_local_roles_from_parent(order, project, add_roles)

@@ -11,7 +11,7 @@ import sqlalchemy_utils as sautils
 class LeadOrder(Order):
     """A Lead order from the customer."""
 
-    __tablename__ = 'leadorder'
+    __tablename__ = 'leadorders'
 
     _workflow = workflows.LeadOrderWorkflow
 

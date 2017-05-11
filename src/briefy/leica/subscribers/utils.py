@@ -59,7 +59,8 @@ def create_new_assignment_from_order(order, request, copy_payout=False, old_assi
     payload = {
         'order_id': order.id,
         'set_type': 'new',
-        'id': uuid.uuid4()
+        'id': uuid.uuid4(),
+        'asset_types': order.asset_types
     }
 
     if copy_payout:

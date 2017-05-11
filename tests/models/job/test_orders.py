@@ -73,8 +73,11 @@ class TestOrderModel(BaseModelTest):
         assert order.assignment is None
         assert 'submit' not in wf.transitions
         assert order.state == 'received'
-        assert order.price
-        assert order.price_currency
+        assert order.state_history[-1]['transition'] == 'submit'
+        project = order.project
+        assert order.price == project.price
+        assert order.price_currency == project.price_currency
+        assert order.asset_types == project.asset_types
 
         received_transitions = (
             'cancel', 'set_availability', 'edit_location', 'edit_requirements',
@@ -85,7 +88,8 @@ class TestOrderModel(BaseModelTest):
         assignment = order.assignments[-1]
         self.notify_assigment_created(assignment, request, session)
         assert assignment.state == 'pending'
-        assert order.state_history[-1]['transition'] == 'submit'
+        assert assignment.state_history[-1]['transition'] == 'submit'
+        assert assignment.asset_types == order.asset_types
         self.delete_assigment_created(assignment, session)
 
     @pytest.mark.parametrize('file_path', ['data/order_locations.json'])

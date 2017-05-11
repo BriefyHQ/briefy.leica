@@ -25,6 +25,7 @@ def leadorder_created_handler(event):
     leadorder.price = price
     price_currency = project.price_currency
     leadorder.price_currency = price_currency
+    leadorder.asset_types = project.asset_types
 
     add_roles = ('customer_users', 'project_managers')
     apply_local_roles_from_parent(leadorder, project, add_roles)
