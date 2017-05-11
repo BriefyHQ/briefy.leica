@@ -1,6 +1,6 @@
 [
   {
-    "asset_types": ["Image"],
+    "asset_types": ["Image", "Image360"],
     "project_manager": "77f88fab-dbdf-4705-8da1-8512f6012a86",
     "state": "created",
     "price": 10000,
