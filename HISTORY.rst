@@ -37,7 +37,9 @@ History
     * Card #273: Added new transitions to move to and back in_qa to post_processing and to approve from post_processing (rudaporto).
     * Reclassify Report views to be marked as background tasks in newrelic agent (rudaporto).
     * Card #286: Added remove_confirmation transition to LeadOrder workflow (rudaporto).
+    * Card #300: Enable Workflow transitions for CustomerUserProfile and BriefyUserProfile (ericof).
     * Card #293: Set asset_types value using Project value when adding new Order, LeadOrder and new Assignments (rudaoporto).
+
 
 2.1.12 (2017-04-28)
 -------------------

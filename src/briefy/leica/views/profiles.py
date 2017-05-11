@@ -5,6 +5,7 @@ from briefy.leica.models import CustomerUserProfile
 from briefy.leica.models import UserProfile
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources import RESTService
+from briefy.ws.resources import WorkflowAwareResource
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
 from pyramid.security import Allow
@@ -144,6 +145,19 @@ class CustomerProfileService(RESTService):
             self.raise_invalid(name='email', description=EMAIL_IN_USE_MESSAGE)
 
 
+@resource(
+    collection_path=PATH + '/transitions',
+    path=PATH + '/transitions/{transition_id}',
+    cors_policy=CORS_POLICY,
+    factory=CustomerProfileFactory
+)
+class CustomerProfileWorkflowService(WorkflowAwareResource):
+    """CustomerUserProfile workflow resource."""
+
+    model = CustomerUserProfile
+    friendly_name = CustomerUserProfile.__name__
+
+
 class InternalProfileFactory(BaseFactory):
     """InternalProfile context factory."""
 
@@ -195,3 +209,16 @@ class InternalProfileService(RESTService):
         """Email validation."""
         if not email_in_use(request):
             self.raise_invalid(name='email', description=EMAIL_IN_USE_MESSAGE)
+
+
+@resource(
+    collection_path=PATH + '/transitions',
+    path=PATH + '/transitions/{transition_id}',
+    cors_policy=CORS_POLICY,
+    factory=InternalProfileFactory
+)
+class InternalProfileWorkflowService(WorkflowAwareResource):
+    """InternalProfile workflow resource."""
+
+    model = BriefyUserProfile
+    friendly_name = BriefyUserProfile.__name__
