@@ -72,8 +72,11 @@ class TestLeadOrderModel(BaseModelTest):
         assert leadorder.assignment is None
         assert 'submit' not in wf.transitions
         assert leadorder.state == 'new'
+        assert leadorder.state_history[-1]['transition'] == 'submit'
+        project = leadorder.project
         assert leadorder.price
         assert leadorder.price_currency
+        assert leadorder.asset_types == project.asset_types[:1]
 
         received_transitions = (
             'confirm',
@@ -251,6 +254,7 @@ class TestLeadOrderModel(BaseModelTest):
         self.notify_assigment_created(assignment, request, session)
         assert assignment.state == 'pending'
         assert assignment.state_history[-1]['transition'] == 'submit'
+        assert assignment.asset_types == leadorder.asset_types
 
         # remove last created assignment
         self.delete_assigment_created(assignment, session)
