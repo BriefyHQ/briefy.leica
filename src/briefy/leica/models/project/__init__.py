@@ -231,7 +231,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
                 "minimum_number": 2
             }
             "asset": {
-                "duration": "30"
+                "duration": {"value": "30", "operator" :"min"}
             }
             actions: [
                 {
