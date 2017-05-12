@@ -118,7 +118,7 @@ class ProfessionalWorkflow(BriefyWorkflow):
             pools = Pool.query().filter(Pool.id.in_(pool_ids)).all()
         professional.pools = pools
 
-    @Permission(groups=[LR['owner'], G['scout'], ])
+    @Permission(groups=[LR['owner'], G['scout'], G['support'], ])
     def can_delete(self):
         """Validate if user can delete this professional."""
         return True

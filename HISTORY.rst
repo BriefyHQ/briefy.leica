@@ -39,6 +39,7 @@ History
     * Card #286: Added remove_confirmation transition to LeadOrder workflow (rudaporto).
     * Card #300: Enable Workflow transitions for CustomerUserProfile and BriefyUserProfile (ericof).
     * Card #293: Set asset_types value using Project value when adding new Order, LeadOrder and new Assignments (rudaoporto).
+    * Support group also can move a Professional to deleted state (ericof).
 
 
 2.1.12 (2017-04-28)
