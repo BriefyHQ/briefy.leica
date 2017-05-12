@@ -1274,7 +1274,8 @@ class LeadOrderWorkflow(OrderWorkflow):
     )
     def confirm(self, **kwargs):
         """Confirm LeadOrder and set availability dates."""
-        pass
+        leadorder = self.document
+        create_new_assignment_from_order(leadorder, leadorder.request)
 
     @Permission(groups=[G['customers'], G['pm'], G['bizdev'], G['system'], ])
     def can_confirm(self):
