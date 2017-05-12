@@ -133,7 +133,8 @@ def fix_agoda_permissions():
         'danie.montenegro@agoda.com',
         'kitty.qiu@agoda.com',
         'nasita.lobunchongsook@agoda.com',
-        'naina.chugh@agoda.com'
+        'naina.chugh@agoda.com',
+        'nina.suthamjariya@agoda.com'
     ]
     users = []
     for email in emails:
