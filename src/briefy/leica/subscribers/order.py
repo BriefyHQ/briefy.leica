@@ -39,15 +39,8 @@ def order_created_handler(event):
 
     # submit the order
     order.workflow.submit()
-    cache_manager.refresh(order)
-
-
-def order_submit(event):
-    """Handle Order submitted event."""
-    order = event.obj
-    request = event.request
-    # create a new assignment
     create_new_assignment_from_order(order, request)
+    cache_manager.refresh(order)
 
 
 def order_cancel(event):
@@ -156,7 +149,6 @@ def transition_handler(event):
     if not event_name.startswith('order.workflow'):
         return
     handlers = {
-        'order.workflow.submit': order_submit,
         'order.workflow.cancel': order_cancel,
         'order.workflow.perm_refuse': order_perm_refuse,
         'order.workflow.remove_schedule': order_remove_schedule,

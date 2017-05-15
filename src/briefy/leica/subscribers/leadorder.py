@@ -46,7 +46,6 @@ def transition_handler(event):
     if not event_name.startswith('leadorder.workflow'):
         return
     handlers = {
-        'leadorder.workflow.confirm': order_subscribers.order_submit,
         'leadorder.workflow.cancel': order_subscribers.order_cancel,
         'leadorder.workflow.perm_refuse': order_subscribers.order_perm_refuse,
         'leadorder.workflow.remove_schedule': order_subscribers.order_remove_schedule,

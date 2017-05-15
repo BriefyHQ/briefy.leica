@@ -41,6 +41,7 @@ History
     * Card #293: Set asset_types value using Project value when adding new Order, LeadOrder and new Assignments (rudaoporto).
     * Support group also can move a Professional to deleted state (ericof).
     * Return asset_type on Project summary (ericof).
+    * Card #302 Fix: Assignment duplication when create a new Order (rudaporto).
 
 
 2.1.12 (2017-04-28)
