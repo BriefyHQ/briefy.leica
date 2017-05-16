@@ -77,7 +77,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     _workflow = workflows.ProjectWorkflow
 
     __summary_attributes__ = [
-        'id', 'title', 'description', 'created_at', 'updated_at', 'state', 'slug'
+        'id', 'title', 'description', 'created_at', 'updated_at', 'state', 'slug', 'asset_types'
     ]
 
     __summary_attributes_relations__ = ['customer', 'pool']
