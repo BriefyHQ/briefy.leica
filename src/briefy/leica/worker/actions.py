@@ -3,10 +3,39 @@ from briefy.common.users import SystemUser
 from briefy.leica.cache import cache_region
 from briefy.leica.log import worker_logger as logger
 from briefy.leica.models import Assignment
+from briefy.leica.models import Order
 from briefy.leica.models import Comment
 from sqlalchemy.orm.attributes import flag_modified
 
 import transaction
+
+
+def update_delivery(order: Order, laure_data: object) -> dict:
+    """Update the delivery information of an order using event data.
+
+    :param order: instance of Order model
+    :return: true if delivery was updated
+    """
+    delivery_info = order.delivery if order.delivery else {}
+    delivery_url = laure_data._get('delivery_url', None)
+    if delivery_url:
+        delivery_info['gdrive'] = laure_data.delivery_url
+    archive_url = laure_data._get('archive_url', None)
+    if archive_url:
+        delivery_info['archive'] = laure_data.archive_url
+
+    logger.info(
+        '''Delivery will be update for assignment '{0}' Delivery: '{1}' '''.format(
+            laure_data.guid,
+            delivery_info
+        )
+    )
+    if delivery_info and delivery_info != order.delivery:
+        order.delivery = delivery_info
+        # Ensure the correct key is updated and object is set as dirty
+        flag_modified(order, 'delivery')
+
+    return delivery_info
 
 
 def validate_assignment(laure_data: object, session: object) -> (bool, dict):
@@ -149,23 +178,8 @@ def approve_assignment(
             return False, {}
 
         order = assignment.order
-        delivery_info = order.delivery.copy() if order.delivery else {}
         if not copy_ignored:
-            # Ensure the correct key is updated and object is set as dirty
-            delivery_url = laure_data._get('delivery_url', None)
-            if delivery_url:
-                delivery_info['gdrive'] = laure_data.delivery_url
-            archive_url = laure_data._get('archive_url', None)
-            if archive_url:
-                delivery_info['archive'] = laure_data.archive_url
-
-            logger.info(
-                '''Delivery will be update for assignment '{0}' Delivery: '{1}' '''.format(
-                    assignment_id,
-                    delivery_info
-                )
-            )
-
+            delivery_info = update_delivery(order, laure_data)
             msg = '''Assets copied over on laure - committing delivery URL to order '{order_id}' '''
         else:
             # We need to get the existing delivery to execute the proper transition
@@ -176,6 +190,7 @@ def approve_assignment(
                 order_id=assignment.order.id
             )
         )
+
         if order.state == 'in_qa':
             fields = dict(delivery=delivery_info)
             wf = order.workflow
@@ -184,13 +199,6 @@ def approve_assignment(
                 fields=fields,
                 message='Assets automatic delivered.'
             )
-        elif order.state == 'delivered':
-            order.delivery = delivery_info
-            flag_modified(order, 'delivery')
-        else:
-            msg = 'Order in incorrect state: {state}'.format(state=order.state)
-            logger.error(msg)
-            raise Exception(msg)
 
         cache_region.invalidate(assignment)
         cache_region.invalidate(order)
@@ -218,7 +226,7 @@ def asset_copy_malfunction(laure_data: object, session: object) -> (bool, dict):
         assignment_id = laure_data.assignment.id
         assignment = Assignment.get(assignment_id)
         if not assignment:
-            logger.warn('Got assignment approval message for non existing assignment {0}'.format(
+            logger.warn('Got assignment message for non existing assignment {0}'.format(
                 assignment_id))
             return False, {}
 
@@ -246,7 +254,7 @@ def asset_copy_malfunction(laure_data: object, session: object) -> (bool, dict):
         session.add(comment)
 
         logger.warn(
-            '''There was a problem copying assets to delivery folders.'''
+            '''There was a problem copying assets to delivery or archive folders.'''
             '''Adding comment to assignment {0}'''.format(assignment_id)
         )
 

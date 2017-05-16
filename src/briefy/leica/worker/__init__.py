@@ -47,6 +47,18 @@ MESSAGE_DISPATCH = {
         'action': actions.asset_copy_malfunction,
         'success_notification': None,
         'failure_notification': None,
+    },
+    'laure.assignment.post_processing_complete': {
+        'name': 'handling post processing copy to archive success',
+        'action': actions.approve_assignment,
+        'success_notification': None,
+        'failure_notification': None,
+    },
+    'laure.assignment.laure.assignment.post_processing_failed': {
+        'name': 'handling post processing copy to archive failed',
+        'action': actions.asset_copy_malfunction,
+        'success_notification': None,
+        'failure_notification': None,
     }
 }
 

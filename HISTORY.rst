@@ -43,6 +43,7 @@ History
     * Return asset_type on Project summary (ericof).
     * Card #302 Fix: Assignment duplication when create a new Order (rudaporto).
     * Card #322: Update leica worker to process delivery or archive not necessary to both at same time (rudaporto).
+    * Adding event handlers to leica work to deal with messages from ms.laure post processing copying (rudaporto).
 
 
 2.1.12 (2017-04-28)
