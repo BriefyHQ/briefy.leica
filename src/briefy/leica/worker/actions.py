@@ -151,8 +151,12 @@ def approve_assignment(
         delivery_info = order.delivery.copy() if order.delivery else {}
         if not copy_ignored:
             # Ensure the correct key is updated and object is set as dirty
-            delivery_info['gdrive'] = laure_data.delivery_url
-            delivery_info['archive'] = laure_data.archive_url
+            delivery_url = laure_data._get('delivery_url', None)
+            if delivery_url:
+                delivery_info['gdrive'] = laure_data.delivery_url
+            archive_url = laure_data._get('archive_url', None)
+            if archive_url:
+                delivery_info['archive'] = laure_data.archive_url
 
             # TODO: Unless google drive is phased out soon, this URL should be
             # stored on the model.

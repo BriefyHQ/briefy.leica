@@ -42,6 +42,7 @@ History
     * Support group also can move a Professional to deleted state (ericof).
     * Return asset_type on Project summary (ericof).
     * Card #302 Fix: Assignment duplication when create a new Order (rudaporto).
+    * Card #322: Update leica worker to process delivery or archive not necessary to both at same time (rudaporto).
 
 
 2.1.12 (2017-04-28)
