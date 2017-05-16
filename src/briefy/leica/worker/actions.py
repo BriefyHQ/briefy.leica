@@ -4,6 +4,7 @@ from briefy.leica.cache import cache_region
 from briefy.leica.log import worker_logger as logger
 from briefy.leica.models import Assignment
 from briefy.leica.models import Comment
+from sqlalchemy.orm.attributes import flag_modified
 
 import transaction
 
@@ -185,6 +186,7 @@ def approve_assignment(
             )
         elif order.state == 'delivered':
             order.delivery = delivery_info
+            flag_modified(order, 'delivery')
         else:
             msg = 'Order in incorrect state: {state}'.format(state=order.state)
             logger.error(msg)
