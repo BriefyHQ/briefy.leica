@@ -200,7 +200,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     )
     """Technical requirements for orders in this project.
 
-    It stores a dictionary of requirements to be fullfiled by each asset of each Assignment.
+    It stores a dictionary of requirements to be fulfilled by each asset of each Assignment.
 
     i.e.  - for a project delivering only photos, its value might be:
 
@@ -229,11 +229,11 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
             "asset_type": "Video",
             "set": {
                 "minimum_number": 2
-            }
+            },
             "asset": {
                 "duration": {"value": "30", "operator" :"min"}
-            }
-            actions: [
+            },
+            "actions": [
                 {
                     "state": "post_processing",
                     "action": "copy",
@@ -255,7 +255,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
 
 
     If there is a single asset type for the project, the outermost list may be omitted -
-    and a single copy of the inner dictionary is used. The inner dicionary should
+    and a single copy of the inner dictionary is used. The inner dictionary should
     have the keys "asset_type", "set" for validation constraints that apply to
     all assets of that type   taken together,
     and "asset" for denoting constraints for each asset of that type.
