@@ -158,12 +158,10 @@ def approve_assignment(
             if archive_url:
                 delivery_info['archive'] = laure_data.archive_url
 
-            # TODO: Unless google drive is phased out soon, this URL should be
-            # stored on the model.
             logger.info(
-                '''Assets for assignment '{0}' are archived at '{1}' '''.format(
+                '''Delivery will be update for assignment '{0}' Delivery: '{1}' '''.format(
                     assignment_id,
-                    delivery_info['archive']
+                    delivery_info
                 )
             )
 
