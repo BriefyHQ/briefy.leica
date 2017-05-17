@@ -197,6 +197,7 @@ def approve_assignment(
         else:
             # We need to get the existing delivery to execute the proper transition
             msg = '''Assets were a result of previous manual review and were not touched on ms.laure. Order '{order_id} ' unchanged!'''  # noQA
+            status = True
 
         logger.info(
             msg.format(
