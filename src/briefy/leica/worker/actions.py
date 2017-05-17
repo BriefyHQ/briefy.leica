@@ -170,7 +170,7 @@ def approve_assignment(
     :return: Flag indicating if the operation was successful, empty dict
     """
     with transaction.manager:
-        assignment_id = laure_data.guid
+        assignment_id = laure_data.assignment.id
         assignment = Assignment.get(assignment_id)
         if not assignment:
             logger.warn('Got assignment approval message for non existing assignment {0}'.format(
