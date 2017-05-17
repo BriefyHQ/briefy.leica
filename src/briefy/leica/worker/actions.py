@@ -33,7 +33,7 @@ def update_delivery(order: Order, laure_data: object) -> dict:
         )
         order.delivery = delivery_info
         # Ensure the correct key is updated and object is set as dirty
-        flag_modified(order, 'delivery')
+        flag_modified(order, '_delivery')
 
     return delivery_info
 
