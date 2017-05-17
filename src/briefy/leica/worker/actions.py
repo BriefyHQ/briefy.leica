@@ -3,8 +3,8 @@ from briefy.common.users import SystemUser
 from briefy.leica.cache import cache_region
 from briefy.leica.log import worker_logger as logger
 from briefy.leica.models import Assignment
-from briefy.leica.models import Order
 from briefy.leica.models import Comment
+from briefy.leica.models import Order
 from sqlalchemy.orm.attributes import flag_modified
 
 import transaction
