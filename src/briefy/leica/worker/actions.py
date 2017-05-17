@@ -24,13 +24,13 @@ def update_delivery(order: Order, laure_data: object) -> dict:
     if archive_url:
         delivery_info['archive'] = laure_data.archive_url
 
-    logger.info(
-        '''Delivery will be update for assignment '{0}' Delivery: '{1}' '''.format(
-            laure_data.guid,
-            delivery_info
-        )
-    )
     if delivery_info and delivery_info != order.delivery:
+        logger.info(
+            '''Delivery will be update for assignment '{0}' Delivery: '{1}' '''.format(
+                laure_data.guid,
+                delivery_info
+            )
+        )
         order.delivery = delivery_info
         # Ensure the correct key is updated and object is set as dirty
         flag_modified(order, 'delivery')
