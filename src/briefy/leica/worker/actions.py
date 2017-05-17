@@ -5,7 +5,6 @@ from briefy.leica.log import worker_logger as logger
 from briefy.leica.models import Assignment
 from briefy.leica.models import Comment
 from briefy.leica.models import Order
-from sqlalchemy.orm.attributes import flag_modified
 
 import transaction
 
@@ -32,8 +31,6 @@ def update_delivery(order: Order, laure_data: object) -> dict:
             )
         )
         order.delivery = delivery_info
-        # Ensure the correct key is updated and object is set as dirty
-        flag_modified(order, '_delivery')
 
     return delivery_info
 
@@ -169,6 +166,7 @@ def approve_assignment(
     :param copy_ignored: Set when copying assets was ignored on ms.laure
     :return: Flag indicating if the operation was successful, empty dict
     """
+    status = False
     with transaction.manager:
         assignment_id = laure_data.assignment.id
         assignment = Assignment.get(assignment_id)
@@ -181,6 +179,21 @@ def approve_assignment(
         if not copy_ignored:
             delivery_info = update_delivery(order, laure_data)
             msg = '''Assets copied over on laure - committing delivery URL to order '{order_id}' '''
+
+            if order.state == 'in_qa':
+                # force new instance object to make sure sqlalchemy will detect the change
+                delivery = delivery_info.copy()
+                fields = dict(delivery=delivery)
+                wf = order.workflow
+                wf.context = SystemUser
+                wf.deliver(
+                    fields=fields,
+                    message='Assets automatic delivered.'
+                )
+
+            cache_region.invalidate(assignment)
+            cache_region.invalidate(order)
+            status = True
         else:
             # We need to get the existing delivery to execute the proper transition
             msg = '''Assets were a result of previous manual review and were not touched on ms.laure. Order '{order_id} ' unchanged!'''  # noQA
@@ -191,19 +204,7 @@ def approve_assignment(
             )
         )
 
-        if order.state == 'in_qa':
-            fields = dict(delivery=delivery_info)
-            wf = order.workflow
-            wf.context = SystemUser
-            wf.deliver(
-                fields=fields,
-                message='Assets automatic delivered.'
-            )
-
-        cache_region.invalidate(assignment)
-        cache_region.invalidate(order)
-
-    return True, {}
+    return status, {}
 
 
 def approve_previously_refused_assignment(laure_data: object, session: object,) -> (bool, dict):

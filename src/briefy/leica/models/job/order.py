@@ -24,6 +24,7 @@ from sqlalchemy import orm
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy_utils import TimezoneType
 
 import colander
@@ -577,6 +578,8 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     def delivery(self, value: dict):
         """Set delivery information for an Order."""
         self._delivery = value
+        # Ensure the correct key is updated and object is set as dirty
+        flag_modified(self, '_delivery')
 
     # TODO: If on the future there is the need to override project.delivery
     # for specific orders, create an order.delivery_info JSON field
