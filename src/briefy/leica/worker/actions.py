@@ -230,15 +230,6 @@ def asset_copy_malfunction(laure_data: object, session: object) -> (bool, dict):
                 assignment_id))
             return False, {}
 
-        if assignment.state != 'asset_validation':
-            logger.error(
-                '''Got message to invalidate '{0}' which is in state '{1}' '''.format(
-                    assignment_id,
-                    assignment.state
-                )
-            )
-            return False, {}
-
         text = ('''This assignment's assets could not be copied automatically!\n'''
                 '''Please take manual actions that may be needed.''')
 
