@@ -52,5 +52,50 @@
         "last_name": "Scout",
         "id": "a99a99c2-9bb3-443f-8891-e600a15e3c12",
         "groups": ["g:briefy_scout"]
+    },
+    "bizdev": {
+        "locale": "en_GB",
+        "fullname": "Briefy Bizdev",
+        "first_name": "Briefy",
+        "email": "bizdev@briefy.co",
+        "last_name": "Bizdev",
+        "id": "3ac99488-3d47-4c50-934c-6e48504c84e8",
+        "groups": ["g:briefy_bizdev"]
+    },
+    "finance": {
+        "locale": "en_GB",
+        "fullname": "Briefy Finance",
+        "first_name": "Briefy",
+        "email": "finance@briefy.co",
+        "last_name": "Finance",
+        "id": "88273400-a637-4c91-8741-c01ee5cc63ae",
+        "groups": ["g:briefy_finance"]
+    },
+    "support": {
+        "locale": "en_GB",
+        "fullname": "Briefy Support",
+        "first_name": "Briefy",
+        "email": "support@briefy.co",
+        "last_name": "Support",
+        "id": "a56f170c-41a5-4c4f-8b14-bae702e8bbf7",
+        "groups": ["g:briefy_support"]
+    },
+    "tech": {
+        "locale": "en_GB",
+        "fullname": "Briefy Tech",
+        "first_name": "Briefy",
+        "email": "tech@briefy.co",
+        "last_name": "Tech",
+        "id": "4e786dc5-7c6c-4d5a-926f-bbc931b889ab",
+        "groups": ["g:briefy_tech"]
+    },
+    "product": {
+        "locale": "en_GB",
+        "fullname": "Briefy Product",
+        "first_name": "Briefy",
+        "email": "product@briefy.co",
+        "last_name": "Product",
+        "id": "8e9990d4-a7bb-4b78-a388-ea7021875c67",
+        "groups": ["g:briefy_product"]
     }
 }

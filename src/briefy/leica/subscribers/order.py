@@ -1,11 +1,19 @@
 """Event subscribers for briefy.leica.models.job.Order."""
-from briefy.common.users import SystemUser
 from briefy.common.vocabularies.roles import Groups as G
+from briefy.leica.cache import cache_manager
 from briefy.leica.events.order import OrderCreatedEvent
+from briefy.leica.events.order import OrderUpdatedEvent
 from briefy.leica.subscribers.utils import apply_local_roles_from_parent
 from briefy.leica.subscribers.utils import create_comment_from_wf_transition
 from briefy.leica.subscribers.utils import create_new_assignment_from_order
 from pyramid.events import subscriber
+
+
+@subscriber(OrderUpdatedEvent)
+def order_updated_handler(event):
+    """Handle Order updated event."""
+    order = event.obj
+    cache_manager.refresh(order)
 
 
 @subscriber(OrderCreatedEvent)
@@ -19,6 +27,8 @@ def order_created_handler(event):
     order.price = price
     price_currency = project.price_currency
     order.price_currency = price_currency
+    if not order.asset_types:
+        order.asset_types = project.asset_types[:1]
 
     add_roles = ('customer_users', 'project_managers')
     apply_local_roles_from_parent(order, project, add_roles)
@@ -27,36 +37,32 @@ def order_created_handler(event):
         # force this because sometimes the obj.id is not available before the flush
         order.location = location
 
-    # create a new assignment
-    create_new_assignment_from_order(order, request)
     # submit the order
     order.workflow.submit()
-
-
-def order_submit(event):
-    """Handle Order submitted event."""
-    transitions = []
-    # Impersonate the System here
-    event.user = SystemUser
-    transitions.append(
-        ('validate', 'Machine check approved')
-    )
+    create_new_assignment_from_order(order, request)
+    cache_manager.refresh(order)
 
 
 def order_cancel(event):
     """Handle Order cancel workflow event."""
     order = event.obj
     user = order.workflow.context
+    internal = False
     if G['customers'].value in user.groups:
         to_role = 'project_manager'
         author_role = 'customer_user'
     elif G['pm'].value in user.groups:
         to_role = 'customer_user'
         author_role = 'project_manager'
+    else:
+        to_role = 'customer_user'
+        author_role = 'project_manager'
+        internal = True
     create_comment_from_wf_transition(
         order,
         author_role,
-        to_role
+        to_role,
+        internal=internal
     )
 
 
@@ -138,12 +144,11 @@ def order_unassign_reassign(event):
 
 
 def transition_handler(event):
-    """Handle Cancel transition events."""
+    """Handle Order transition events."""
     event_name = event.event_name
     if not event_name.startswith('order.workflow'):
         return
     handlers = {
-        'order.workflow.submit': order_submit,
         'order.workflow.cancel': order_cancel,
         'order.workflow.perm_refuse': order_perm_refuse,
         'order.workflow.remove_schedule': order_remove_schedule,
@@ -156,3 +161,5 @@ def transition_handler(event):
     handler = handlers.get(event_name, None)
     if handler:
         handler(event)
+
+    cache_manager.refresh(event.obj)

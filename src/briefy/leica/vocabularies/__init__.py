@@ -2,6 +2,13 @@
 from briefy.common.vocabularies import LabeledEnum
 
 
+order_type = [
+    ('order', 'order', 'Order'),
+    ('leadorder', 'leadorder', 'LeadOrder'),
+]
+
+OrderTypeChoices = LabeledEnum('OrderTypeChoices', order_type)
+
 order_options = [
     ('undefined', 'undefined', 'undefined'),
     ('job_received', 'job_received', 'Job received'),
@@ -111,3 +118,15 @@ tax_id_customer_statuses = [
 ]
 
 TaxIdStatusCustomers = LabeledEnum('TaxIdStatusCustomers', tax_id_customer_statuses)
+
+
+asset_types = [
+    ('Image', 'Image', 'Image'),
+    ('ImageRaw', 'ImageRaw', 'Raw Image'),
+    ('Image360', 'Image360', '360 Image'),
+    ('Video', 'Video', 'Video'),
+    ('Cinemagraph', 'Cinemagraph', 'Cinemagraph'),
+    ('Matterport', 'Matterport', 'Matterport'),
+]
+
+AssetTypes = LabeledEnum('AssetTypes', asset_types)

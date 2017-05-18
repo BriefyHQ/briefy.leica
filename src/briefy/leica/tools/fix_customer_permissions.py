@@ -111,13 +111,24 @@ def fix_wolt_permissions():
     fix_customers_and_project_permissions(users, customer_id, projects)
 
 
-def fix_ehvisio_permissions():
-    """Fix eH Vision permissions."""
-    customer_id = '83006d14-c78b-4969-9624-c1b704897877'
+def fix_all_permissions(customer_id):
+    """All permissions to all users from a customer."""
     customer = Customer.get(customer_id)
     projects = customer.projects
     users = [CustomerUserProfile.get(u) for u in customer.customer_users]
     fix_customers_and_project_permissions(users, customer_id, projects)
+
+
+def fix_ehvisio_permissions():
+    """Fix eH Vision permissions."""
+    customer_id = '83006d14-c78b-4969-9624-c1b704897877'
+    fix_all_permissions(customer_id)
+
+
+def fix_croove_permissions():
+    """Fix eH Vision permissions."""
+    customer_id = 'f7cd2755-479d-4a4a-90e2-c9787124cffe'
+    fix_all_permissions(customer_id)
 
 
 def fix_agoda_permissions():
@@ -133,7 +144,8 @@ def fix_agoda_permissions():
         'danie.montenegro@agoda.com',
         'kitty.qiu@agoda.com',
         'nasita.lobunchongsook@agoda.com',
-        'naina.chugh@agoda.com'
+        'naina.chugh@agoda.com',
+        'nina.suthamjariya@agoda.com'
     ]
     users = []
     for email in emails:
@@ -174,5 +186,5 @@ if __name__ == '__main__':
     # fix_wolt_permissions()
     # fix_ehvisio_permissions()
     # fix_agoda_permissions()
-
+    # fix_croove_permissions()
     transaction.commit()

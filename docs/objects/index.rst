@@ -15,6 +15,7 @@ Objects defined in this package.
    customer_billing_info
    project
    order
+   leadorder
    order_location
    assignment
    pool

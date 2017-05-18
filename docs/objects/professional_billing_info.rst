@@ -21,6 +21,6 @@ Database model
 Database diagram for the ProfessionalBillingInfo data model:
 
 .. sadisplay::
-    :module: briefy.leica.models.billing_info.professional.ProfessionalBillingInfo
+    :module: briefy.leica.models.billing_info.professional
     :alt: Professional Billing Info data model
     :render: graphviz

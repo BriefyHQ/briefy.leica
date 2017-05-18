@@ -193,6 +193,17 @@ class TestAssignmentModel(BaseModelTest):
         # TODO: remove this after automatic Assignment validation
         wf.validate_assets(message='Assets validate.')
 
+        assert 'approve' in wf.transitions
+        assert 'start_post_process' in wf.transitions
+
+        wf.start_post_process()
+        assert 'approve' in wf.transitions
+        assert 'retract_post_process' in wf.transitions
+        assert assignment.state == 'post_processing'
+
+        wf.retract_post_process()
+        assert assignment.state == 'in_qa'
+
         wf.approve(
             fields={
                 'customer_message': ''

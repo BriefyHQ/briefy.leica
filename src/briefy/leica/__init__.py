@@ -8,6 +8,7 @@ from concurrent.futures import ThreadPoolExecutor as Executor
 from pyramid.config import Configurator
 from zope.configuration.xmlconfig import XMLConfig
 
+import briefy.common
 import briefy.ws
 import logging
 import pkg_resources
@@ -22,6 +23,7 @@ logger.setLevel(logging.INFO)
 internal_actions = Executor(max_workers=2)
 
 
+XMLConfig('configure.zcml', briefy.common)()
 XMLConfig('configure.zcml', leica)()
 
 

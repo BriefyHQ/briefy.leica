@@ -1,6 +1,8 @@
 """Views to handle Orders creation."""
 from briefy.leica.events import order as events
+from briefy.leica.models import LeadOrder
 from briefy.leica.models import Order
+from briefy.leica.models import Project
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources import BaseResource
 from briefy.ws.resources import RESTService
@@ -58,6 +60,21 @@ class OrderService(RESTService):
         'GET': events.OrderLoadedEvent,
         'DELETE': events.OrderDeletedEvent,
     }
+
+    @view(validators='_run_validators', permission='create')
+    def collection_post(self, model=None):
+        """Add a new instance of LeadOrder or Order depending of Project.order_type.
+
+        :returns: Newly created instance of model Order or LeadOrder.
+        """
+        request = self.request
+        payload = request.validated
+        project = Project.get(payload.get('project_id'))
+        if project.order_type.value == 'leadorder':
+            model = LeadOrder
+        else:
+            model = model if model else Order
+        return super().collection_post(model=model)
 
     def default_filters(self, query) -> object:
         """Default filters to be applied to every query.

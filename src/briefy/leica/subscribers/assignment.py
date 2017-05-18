@@ -1,12 +1,21 @@
 """Event subscribers for briefy.leica.models.job.Assignment."""
-from briefy.common.users import SystemUser
 from briefy.common.vocabularies.roles import Groups as G
+from briefy.leica.cache import cache_manager
 from briefy.leica.events.assignment import AssignmentCreatedEvent
+from briefy.leica.events.assignment import AssignmentUpdatedEvent
 from briefy.leica.models import Professional
 from briefy.leica.subscribers import safe_workflow_trigger_transitions
 from briefy.leica.subscribers.utils import apply_local_roles_from_parent
 from briefy.leica.subscribers.utils import create_comment_from_wf_transition
 from pyramid.events import subscriber
+
+
+@subscriber(AssignmentUpdatedEvent)
+def assignment_updated_handler(event):
+    """Handle Assignment updated event."""
+    assignment = event.obj
+    cache_manager.refresh(assignment)
+    cache_manager.refresh(assignment.order)
 
 
 @subscriber(AssignmentCreatedEvent)
@@ -22,12 +31,7 @@ def assignment_created_handler(event):
 
 def assignment_submit(event):
     """Handle Assignment submitted event."""
-    transitions = []
-    # Impersonate the System here
-    event.user = SystemUser
-    transitions.append(
-        ('validate', 'Machine check approved')
-    )
+    pass
 
 
 def assignment_perm_reject(event):
@@ -294,3 +298,4 @@ def transition_handler(event):
     handler = handlers.get(event_name, None)
     if handler:
         handler(event)
+    cache_manager.refresh(event.obj)

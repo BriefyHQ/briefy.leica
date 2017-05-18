@@ -2,6 +2,51 @@
 History
 =======
 
+2.1.13 (2017-05-18)
+-------------------
+
+    * Added cache layer using briefy.common.cache utility (Project, Order, Assignment) to_listing_dict, to_summary and to_dict (rudaporto).
+    * Configure default cache backend to redis (docker container also) and added invalidation in model creation and updated events (rudaporto).
+    * Update Project, Order, Assignment to_dict signature to follow the original one (rudaporto).
+    * Make sure we do not return Enum instances in the to_dict (always return the str value) (rudaporto).
+    * Added a global config to easy switch off the cache system (rudaporto).
+    * Fix: price_currency field was mistyped in Order.__summary_attributes__ (rudaporto).
+    * Added location to Order.__summary_attributes__ (rudaporto).
+    * Changed the way we get the last Order assignment in Order.to_dict (rudaporto).
+    * Added update events to Project, Order and Assignment workflow (rudaporto).
+    * Improve logging on function safe_workflow_trigger_transitions (rudaporto).
+    * Added new subscriber for CommentCreatedEvent to invalidate Comment.entity after comment creation (rudaporto).
+    * Fix: function create_new_assignment_from_order now send id in the payload and append new assignment in the Order.assignments (rudaporto).
+    * Added invalidation in all tasks and worker actions after update objects since some events will not be fired without a request (rudaporto).
+    * Implement Order.workflow.edit_location transition (rudaporto).
+    * New model type: LeadOrder (rudaporto).
+    * New field for Project to set the type of order the project will use: order or leadorder (rudaporto).
+    * Change in the /orders endpoint to create Order or LeadOrder based in the Project setting (rudaporto).
+    * New unittest to cover all transitions for the OrderWorkflow and fixes to permissions (rudaporto).
+    * New unittest for LeadOrder model and transitions (rudaporto).
+    * New unittest for LeadOrder view (/orders with different project) (rudaporto).
+    * Documentation small fixes and new document for LeadOrder type (rudaporto).
+    * Refactor Order workflow and subscribers to use order.assingmnets[-1] and not order.assignment (rudaporto).
+    * New leadorder subscriber module to handle LeadOrder created, updated and workflow transitions (rudaporto).
+    * Aded script to export professionals to a spreadsheet file (jsbueno).
+    * Card #272: Add asset_types to Project, Order, Assignment (ericof).
+    * Card #67: Add Comment support to Professional profile (ericof).
+    * Change LeadOrder workflow to only create the assignment when the LeadOrder is confirmed (rudaporto).
+    * Improve LeadOrder model unittests (rudaporto).
+    * Card #273: Added new state to Assignment: post_processing (rudaporto).
+    * Card #273: Added new transitions to move to and back in_qa to post_processing and to approve from post_processing (rudaporto).
+    * Reclassify Report views to be marked as background tasks in newrelic agent (rudaporto).
+    * Card #286: Added remove_confirmation transition to LeadOrder workflow (rudaporto).
+    * Card #300: Enable Workflow transitions for CustomerUserProfile and BriefyUserProfile (ericof).
+    * Card #293: Set asset_types value using Project value when adding new Order, LeadOrder and new Assignments (rudaoporto).
+    * Support group also can move a Professional to deleted state (ericof).
+    * Return asset_type on Project summary (ericof).
+    * Card #302 Fix: Assignment duplication when create a new Order (rudaporto).
+    * Card #322: Update leica worker to process delivery or archive not necessary to both at same time (rudaporto).
+    * Adding event handlers to leica work to deal with messages from ms.laure post processing copying (rudaporto).
+    * Card #330: fixed (briefy.ws) bug were unassign an Order will create a new assignment without submit transition (rudaporto).
+    * Card #336: fixed leica worker approve_assignment action was not moving order from in_qa to delivered when copy did not happen (rudaporto).
+
 2.1.12 (2017-04-28)
 -------------------
     * Fix: new script remove the last transition from two orders and respective assignments (rudaporto).

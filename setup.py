@@ -14,8 +14,8 @@ with open(os.path.join(here, 'HISTORY.rst')) as f:
 requires = [
     'apscheduler',
     'boto3',
-    'briefy.common',
-    'briefy.ws',
+    'briefy.common>=2.0.2',
+    'briefy.ws>=2.0.2',
     'colanderalchemy',
     'cornice==2.4.0',
     'newrelic',
@@ -45,7 +45,7 @@ test_requirements = [
 
 setup(
     name='briefy.leica',
-    version='2.1.12',
+    version='2.1.13',
     description='Image Handling System',
     long_description=README + '\n\n' + CHANGES,
     classifiers=[

@@ -3,6 +3,9 @@ from briefy.common.db.types import AwareDateTime
 from briefy.common.utils import schema
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica import logger
+from briefy.leica.cache import cache_manager
+from briefy.leica.cache import cache_region
+from briefy.leica.cache import enable_cache
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.descriptors import UnaryRelationshipWrapper
@@ -11,15 +14,22 @@ from briefy.leica.models.job.location import OrderLocation
 from briefy.leica.models.project import Project
 from briefy.leica.utils.transitions import get_transition_date_from_history
 from briefy.leica.utils.user import add_user_info_to_state_history
+from briefy.leica.vocabularies import AssetTypes
 from briefy.leica.vocabularies import OrderInputSource
+from briefy.ws.errors import ValidationError
 from datetime import datetime
 from dateutil.parser import parse
+from sqlalchemy import event
 from sqlalchemy import orm
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy_utils import TimezoneType
 
 import colander
 import copy
+import pytz
 import random
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils
@@ -28,13 +38,13 @@ import string
 
 __summary_attributes__ = [
     'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
-    'currency', 'price', 'number_required_assets', 'location', 'category',
+    'price_currency', 'price', 'number_required_assets', 'location', 'category',
     'timezone', 'scheduled_datetime', 'delivery', 'deliver_date', 'customer_order_id'
 ]
 
 __listing_attributes__ = __summary_attributes__ + [
     'accept_date', 'availability', 'assignment', 'requirements', 'project',
-    'customer', 'refused_times'
+    'customer', 'refused_times', 'asset_types'
 ]
 
 __colander_alchemy_config_overrides__ = \
@@ -108,7 +118,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     __summary_attributes__ = __summary_attributes__
     __summary_attributes_relations__ = [
-        'project', 'comments', 'customer', 'assignment', 'assignments'
+        'project', 'comments', 'customer', 'assignment', 'assignments', 'location'
     ]
     __listing_attributes__ = __listing_attributes__
 
@@ -124,7 +134,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', 'project', 'comments', 'customer',
+            'state_history', 'state', 'project', 'comments', 'customer', 'type',
             '_project_manager', '_scout_manager', '_customer_user', 'external_id',
             'assignment', 'assignments', '_project_managers', '_scout_managers',
             '_customer_users',
@@ -140,6 +150,20 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     By default we do not keep track of state_history and helper columns.
     """
+
+    type = sa.Column(sa.String(50))
+    """Polymorphic type name."""
+
+    @declared_attr
+    def __mapper_args__(cls):
+        """Return polymorphic identity."""
+        cls_name = cls.__name__.lower()
+        args = {
+            'polymorphic_identity': cls_name,
+        }
+        if cls_name == 'order':
+            args['polymorphic_on'] = cls.type
+        return args
 
     _slug = sa.Column('slug',
                       sa.String(255),
@@ -366,6 +390,33 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     Access to it should be done using the hybrid_property availability.
     """
 
+    asset_types = sa.Column(
+        JSONB,
+        info={
+            'colanderalchemy': {
+                'title': 'Asset types.',
+                'missing': colander.drop,
+                'typ': schema.List(),
+            }
+        }
+    )
+    """Asset types supported by this order.
+
+    Options come from :mod:`briefy.leica.vocabularies.AssetTypes`.
+    """
+
+    @orm.validates('asset_types')
+    def validate_asset_types(self, key, value):
+        """Validate if values for asset_types are correct."""
+        max_types = 1
+        if len(value) > max_types:
+            raise ValidationError(message='Invalid number of type of assets', name=key)
+        members = AssetTypes.__members__
+        for item in value:
+            if item not in members:
+                raise ValidationError(message='Invalid type of asset', name=key)
+        return value
+
     comments = orm.relationship(
         'Comment',
         foreign_keys='Comment.entity_id',
@@ -456,12 +507,15 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         """Set availabilities for an Order."""
         project = self.project
         timezone = self.timezone
+        if isinstance(timezone, str):
+            timezone = pytz.timezone(timezone)
         user = self.workflow.context
         not_pm = 'g:briefy_pm' not in user.groups if user else True
+        validated_value = []
 
         if value and len(value) != len(set(value)):
             msg = 'Availability dates should be different.'
-            raise ValueError(msg)
+            raise ValidationError(message=msg, name='availability')
 
         if value and timezone and project:
             if not_pm:
@@ -471,17 +525,20 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
                 availability_window = 0
             now = datetime.now(tz=timezone)
             for availability in value:
-                availability = parse(availability)
-                availability = availability.astimezone(timezone)
-                date_diff = availability - now
+                if isinstance(availability, str):
+                    availability = parse(availability)
+                tz_availability = availability.astimezone(timezone)
+                date_diff = tz_availability - now
                 if date_diff.days < availability_window:
                     msg = 'Both availability dates must be at least {window} days from now.'
                     msg = msg.format(window=availability_window)
-                    raise ValueError(msg)
+                    raise ValidationError(message=msg, name='availability')
+
+                validated_value.append(availability.isoformat())
         elif value:
             logger.warn('Could not check availability dates. Order {id}'.format(id=self.id))
 
-        self._availability = value
+        self._availability = validated_value if validated_value else value
 
     _delivery = sa.Column(
         'delivery',
@@ -510,6 +567,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
                 'sftp': 'sftp://agoda@delivery.briefy.co/bali/3456/',
                 'gdrive': 'https://drive.google.com/foo/bar',
             }
+
         (Do not confuse this attribute with project.delivery which contains information on
         how to deliver the assets)
         """
@@ -520,6 +578,8 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     def delivery(self, value: dict):
         """Set delivery information for an Order."""
         self._delivery = value
+        # Ensure the correct key is updated and object is set as dirty
+        flag_modified(self, '_delivery')
 
     # TODO: If on the future there is the need to override project.delivery
     # for specific orders, create an order.delivery_info JSON field
@@ -617,6 +677,20 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         # Update all dates
         self._update_dates_from_history()
 
+    @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
+    def to_summary_dict(self) -> dict:
+        """Return a summarized version of the dict representation of this Class.
+
+        Used to serialize this object within a parent object serialization.
+        :returns: Dictionary with fields and values used by this Class
+        """
+        data = super().to_summary_dict()
+        data['category'] = self.category.value \
+            if isinstance(self.category, CategoryChoices) else self.category
+        data = self._apply_actors_info(data)
+        return data
+
+    @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
 
@@ -624,17 +698,19 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_listing_dict()
+        data['category'] = self.category.value \
+            if isinstance(self.category, CategoryChoices) else self.category
         data = self._apply_actors_info(data)
         return data
 
-    def to_dict(self):
+    @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
+    def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
-        data = super().to_dict(excludes=['assignment', 'assignments'])
-
-        assignment = self.assignment
+        data = super().to_dict(excludes=excludes, includes=includes)
         assignment_data = None
-        if assignment:
-            assignment_data = self.assignment.to_summary_dict()
+        if self.assignments:
+            assignment = self.assignments[-1]
+            assignment_data = assignment.to_summary_dict()
             assignment_data = self._apply_actors_info(assignment_data, assignment)
 
         data['description'] = self.description
@@ -642,6 +718,10 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data['availability'] = self.availability
         data['price'] = self.price
         data['slug'] = self.slug
+        data['source'] = self.source.value \
+            if isinstance(self.source, OrderInputSource) else self.source
+        data['category'] = self.category.value \
+            if isinstance(self.category, CategoryChoices) else self.category
         data['deliver_date'] = self.deliver_date
         data['scheduled_datetime'] = self.deliver_date
         data['delivery'] = self.delivery
@@ -656,3 +736,11 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         # Apply actor information to data
         data = self._apply_actors_info(data)
         return data
+
+
+@event.listens_for(Order, 'after_update')
+def order_after_update(mapper, connection, target):
+    """Invalidate Order cache after instance update."""
+    cache_manager.refresh(target)
+    for assignment in target.assignments:
+        cache_manager.refresh(assignment)

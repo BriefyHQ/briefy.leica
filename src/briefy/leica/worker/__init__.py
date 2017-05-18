@@ -47,6 +47,18 @@ MESSAGE_DISPATCH = {
         'action': actions.asset_copy_malfunction,
         'success_notification': None,
         'failure_notification': None,
+    },
+    'laure.assignment.post_processing_complete': {
+        'name': 'handling post processing copy to archive success',
+        'action': actions.approve_assignment,
+        'success_notification': None,
+        'failure_notification': None,
+    },
+    'laure.assignment.post_processing_failed': {
+        'name': 'handling post processing copy to archive failed',
+        'action': actions.asset_copy_malfunction,
+        'success_notification': None,
+        'failure_notification': None,
     }
 }
 
@@ -54,13 +66,15 @@ MESSAGE_DISPATCH = {
 Dictionary for event dispatching. Expected format:
 each key is the event name itself - each value being another dictionary
 with the following keys:
- 'name': String with the action name for purposes of logging and creating other messages
- 'action': A callable that will process the event 'objectified' payload,
-           and return a tuple with a boolean and a dict the boolean indicates wether
-           the action succeeded or failed; the dict is to be used
-           as payload for the response event.
- 'success_notification': briefy.BaseEvent subclass to be created when the action suceeds
- 'failure_notification': briefy.BaseEvent subclass to be created when the action fails
+
+ * 'name': String with the action name for purposes of logging and creating other messages
+ * 'action': A callable that will process the event 'objectified' payload,
+             and return a tuple with a boolean and a dict the boolean indicates wether
+             the action succeeded or failed; the dict is to be used
+             as payload for the response event.
+ * 'success_notification': briefy.BaseEvent subclass to be created when the action suceeds
+ * 'failure_notification': briefy.BaseEvent subclass to be created when the action fails
+
 """
 
 

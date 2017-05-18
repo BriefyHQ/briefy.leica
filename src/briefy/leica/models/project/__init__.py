@@ -2,11 +2,18 @@
 from briefy.common.db.mixins import BriefyRoles
 from briefy.common.utils import schema
 from briefy.common.vocabularies.categories import CategoryChoices
+from briefy.leica.cache import cache_region
+from briefy.leica.cache import enable_cache
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.project import workflows
 from briefy.leica.utils.user import add_user_info_to_state_history
+from briefy.leica.vocabularies import AssetTypes
+from briefy.leica.vocabularies import OrderTypeChoices
+from briefy.ws.errors import ValidationError
+from sqlalchemy import event
 from sqlalchemy import orm
+from sqlalchemy.dialects.postgresql import JSONB
 from zope.interface import implementer
 from zope.interface import Interface
 
@@ -70,14 +77,14 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     _workflow = workflows.ProjectWorkflow
 
     __summary_attributes__ = [
-        'id', 'title', 'description', 'created_at', 'updated_at', 'state', 'slug'
+        'id', 'title', 'description', 'created_at', 'updated_at', 'state', 'slug', 'asset_types'
     ]
 
     __summary_attributes_relations__ = ['customer', 'pool']
 
     __listing_attributes__ = [
         'id', 'title', 'description', 'created_at', 'updated_at', 'state',
-        'external_id', 'total_orders', 'slug', 'customer'
+        'external_id', 'total_orders', 'slug', 'customer', 'asset_types'
     ]
 
     __raw_acl__ = (
@@ -130,15 +137,53 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     Used to store Bizdev comments.
     """
 
+    order_type = sa.Column(
+        sautils.ChoiceType(OrderTypeChoices, impl=sa.String()),
+        default='order',
+        nullable=False,
+        info={
+            'colanderalchemy': {
+                'title': 'Type of Order',
+                'missing': colander.drop,
+                'typ': colander.String
+            }
+        }
+    )
+    """Type of order the project support."""
+
     number_required_assets = sa.Column(sa.Integer(), default=10)
     """Number of required assets of a Project to be used in the Order as default value."""
+
+    asset_types = sa.Column(
+        JSONB,
+        info={
+            'colanderalchemy': {
+                'title': 'Asset types.',
+                'missing': colander.drop,
+                'typ': schema.List()
+            }
+        }
+    )
+    """Asset types supported by this project.
+
+    Options come from :mod:`briefy.leica.vocabularies.AssetTypes`.
+    """
+
+    @orm.validates('asset_types')
+    def validate_asset_types(self, key, value):
+        """Validate if values for asset_types are correct."""
+        members = AssetTypes.__members__
+        for item in value:
+            if item not in members:
+                raise ValidationError(message='Invalid type of asset', name=key)
+        return value
 
     category = sa.Column(
         sautils.ChoiceType(CategoryChoices, impl=sa.String()),
         default='undefined',
         nullable=False
     )
-    """Category of this Order.
+    """Category of this Project.
 
     Options come from :mod:`briefy.common.vocabularies.categories`.
     """
@@ -155,7 +200,70 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     )
     """Technical requirements for orders in this project.
 
-    It stores a dictionary of requirements to be full filed by each asset of each Assignment.
+    It stores a dictionary of requirements to be fulfilled by each asset of each Assignment.
+
+    i.e.  - for a project delivering only photos, its value might be:
+
+    [
+        {
+            "asset_type": "Image",
+            "set": {
+                "minimum_number": 10  # (aliased to 'minimum_number_of_photos' (deprecated))
+            },
+            "asset": {
+                "dimensions": [
+                {
+                    "value": "4000x3000",
+                    "operator": "min"
+                }
+                ],
+                "orientation": [
+                {
+                    "value": "landscape",
+                    "operator": "eq"
+                }
+                ]
+            }
+        },
+        {
+            "asset_type": "Video",
+            "set": {
+                "minimum_number": 2
+            },
+            "asset": {
+                "duration": {"value": "30", "operator" :"min"}
+            },
+            "actions": [
+                {
+                    "state": "post_processing",
+                    "action": "copy",
+                    "settings": {
+                        "driver": "gdrive",
+                        "parentId": "",
+                        "subfolders": true,
+                        "images": true,
+                        "other": true,
+                        "name": "order.customer_order_id",
+                        "resize": []
+                    }
+                },
+                ...
+            ]
+        },
+        ...
+    ]
+
+
+    If there is a single asset type for the project, the outermost list may be omitted -
+    and a single copy of the inner dictionary is used. The inner dictionary should
+    have the keys "asset_type", "set" for validation constraints that apply to
+    all assets of that type   taken together,
+    and "asset" for denoting constraints for each asset of that type.
+
+    (Deprecated: for compatibility reasons, ms.laure code will understand a
+    missing "asset_type" key will default it to "Image".)
+
+
     """
 
     delivery = sa.Column(
@@ -174,6 +282,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     It stores a dictionary of configurations to be used by the delivery mechanism.
 
     i.e::
+
         {
           "approve": {
             "archive": {
@@ -300,6 +409,22 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     Relationship between a project and a Pool.
     """
 
+    @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
+    def to_summary_dict(self) -> dict:
+        """Return a summarized version of the dict representation of this Class.
+
+        Used to serialize this object within a parent object serialization.
+        :returns: Dictionary with fields and values used by this Class
+        """
+        data = super().to_summary_dict()
+        data['category'] = self.category.value \
+            if isinstance(self.category, CategoryChoices) else self.category
+        data['order_type'] = self.order_type.value \
+            if isinstance(self.order_type, OrderTypeChoices) else self.order_type
+        data = self._apply_actors_info(data)
+        return data
+
+    @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
 
@@ -307,16 +432,33 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_listing_dict()
+        data['category'] = self.category.value \
+            if isinstance(self.category, CategoryChoices) else self.category
+        data['order_type'] = self.order_type.value \
+            if isinstance(self.order_type, OrderTypeChoices) else self.order_type
         data = self._apply_actors_info(data)
         return data
 
-    def to_dict(self):
+    @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
+    def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
-        data = super().to_dict()
+        excludes = list(excludes) if excludes else []
+        excludes.append('orders')
+        data = super().to_dict(excludes=excludes, includes=includes)
         data['slug'] = self.slug
         data['price'] = self.price
+        data['category'] = self.category.value \
+            if isinstance(self.category, CategoryChoices) else self.category
+        data['order_type'] = self.order_type.value \
+            if isinstance(self.order_type, OrderTypeChoices) else self.order_type
         data = self._apply_actors_info(data)
         add_user_info_to_state_history(self.state_history)
         # Apply actor information to data
         data = self._apply_actors_info(data)
         return data
+
+
+@event.listens_for(Project, 'after_update')
+def project_after_update(mapper, connection, target):
+    """Invalidate Project cache after instance update."""
+    cache_region.invalidate(target)
