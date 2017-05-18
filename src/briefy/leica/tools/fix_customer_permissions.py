@@ -126,8 +126,14 @@ def fix_ehvisio_permissions():
 
 
 def fix_croove_permissions():
-    """Fix eH Vision permissions."""
+    """Fix croove permissions."""
     customer_id = 'f7cd2755-479d-4a4a-90e2-c9787124cffe'
+    fix_all_permissions(customer_id)
+
+
+def fix_booking_permissions():
+    """Fix booking permissions."""
+    customer_id = '24133818-7090-4167-a2ac-306871d5e70a'
     fix_all_permissions(customer_id)
 
 
