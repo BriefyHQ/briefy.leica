@@ -179,25 +179,25 @@ def approve_assignment(
         if not copy_ignored:
             delivery_info = update_delivery(order, laure_data)
             msg = '''Assets copied over on laure - committing delivery URL to order '{order_id}' '''
-
-            if order.state == 'in_qa':
-                # force new instance object to make sure sqlalchemy will detect the change
-                delivery = delivery_info.copy()
-                fields = dict(delivery=delivery)
-                wf = order.workflow
-                wf.context = SystemUser
-                wf.deliver(
-                    fields=fields,
-                    message='Assets automatic delivered.'
-                )
-
-            cache_region.invalidate(assignment)
-            cache_region.invalidate(order)
             status = True
         else:
             # We need to get the existing delivery to execute the proper transition
             msg = '''Assets were a result of previous manual review and were not touched on ms.laure. Order '{order_id} ' unchanged!'''  # noQA
             status = True
+
+        if order.state == 'in_qa' and assignment.state == 'approved':
+            # force new instance object to make sure sqlalchemy will detect the change
+            delivery = delivery_info.copy()
+            fields = dict(delivery=delivery)
+            wf = order.workflow
+            wf.context = SystemUser
+            wf.deliver(
+                fields=fields,
+                message='Assets automatic delivered.'
+            )
+
+        cache_region.invalidate(assignment)
+        cache_region.invalidate(order)
 
         logger.info(
             msg.format(

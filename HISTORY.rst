@@ -45,6 +45,7 @@ History
     * Card #322: Update leica worker to process delivery or archive not necessary to both at same time (rudaporto).
     * Adding event handlers to leica work to deal with messages from ms.laure post processing copying (rudaporto).
     * Card #330: fixed (briefy.ws) bug were unassign an Order will create a new assignment without submit transition (rudaporto).
+    * Card #336: fixed leica worker approve_assignment action was not moving order from in_qa to delivered when copy did not happen (rudaporto).
 
 2.1.12 (2017-04-28)
 -------------------
