@@ -2,7 +2,7 @@
 History
 =======
 
-2.1.13 (Unreleased)
+2.1.13 (2017-05-18)
 -------------------
 
     * Added cache layer using briefy.common.cache utility (Project, Order, Assignment) to_listing_dict, to_summary and to_dict (rudaporto).
