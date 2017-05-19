@@ -2,6 +2,11 @@
 History
 =======
 
+2.1.14 (2017-05-19)
+-------------------
+
+    * Card #338: fixed leica worker failure when assets were not copied but order should be moved back to delivered (rudaporto).
+
 2.1.13 (2017-05-18)
 -------------------
 
