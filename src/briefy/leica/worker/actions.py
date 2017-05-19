@@ -184,6 +184,7 @@ def approve_assignment(
             # We need to get the existing delivery to execute the proper transition
             msg = '''Assets were a result of previous manual review and were not touched on ms.laure. Order '{order_id} ' unchanged!'''  # noQA
             status = True
+            delivery_info = order.delivery
 
         if order.state == 'in_qa' and assignment.state == 'approved':
             # force new instance object to make sure sqlalchemy will detect the change
