@@ -21,7 +21,7 @@ depends_on = None
 def upgrade():
     """Upgrade database model."""
     op.create_table(
-        'leadorders_version',
+        'leadorder_version',
         sa.Column('id', types.uuid.UUIDType(), autoincrement=False, nullable=False),
         sa.Column('transaction_id', sa.BigInteger(), autoincrement=False, nullable=False),
         sa.Column('end_transaction_id', sa.BigInteger(), nullable=True),
@@ -40,7 +40,7 @@ def upgrade():
     op.create_index(
         op.f('ix_leadorder_version_transaction_id'),
         'leadorder_version', ['transaction_id'], unique=False)
-    op.create_table('leadorders',
+    op.create_table('leadorder',
         sa.Column('id', types.uuid.UUIDType(), nullable=False),
         sa.ForeignKeyConstraint(['id'], ['orders.id'], ),
         sa.PrimaryKeyConstraint('id')
