@@ -441,6 +441,14 @@ class AssignmentWorkflow(BriefyWorkflow):
             assignment = self.document
             create_comment_on_assignment_approval(assignment, actor, customer_message)
 
+        if self.state == self.post_processing:
+            assignment = self.document
+            order = assignment.order
+            # TODO: change this to use new configuration when avaiable
+            delivery = order.delivery
+            if not delivery or not delivery.get('archive', None):
+                raise WorkflowTransitionException('Can not approve without Archive URL.')
+
     @in_qa.transition(
         awaiting_assets, 'can_approve',
         require_message=True,
