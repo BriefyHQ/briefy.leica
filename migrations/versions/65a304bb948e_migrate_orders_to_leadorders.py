@@ -13,7 +13,22 @@ branch_labels = None
 depends_on = None
 
 INSERTS = '''INSERT INTO leadorders (id) SELECT id from orders where type = 'leadorder';'''
-UPDATE = '''UPDATE
+UPDATES = '''
+UPDATE
+    PROJECTS
+SET
+    order_type = 'leadorder'
+WHERE
+    id in (
+        '0e0dd21a-d948-4212-aaae-dedb5f8efb8d',
+        '51549a8e-918e-4cc3-ad21-ffd4ead0a74e',
+        '78246086-ae6d-424c-b77e-aa7a8cb81035',
+        '6bc29461-8a6e-4d10-bd54-f48d498f7776',
+        '1dafb433-9431-4295-a349-92c4ad61c59e',
+        '2edf1e7b-b7f0-4ca4-8d1b-9a8baf05662c',
+        '4e7976d5-1a7f-4cfa-b6ba-08356bc7f162'
+    );
+UPDATE
     ORDERS
 SET
     type = 'leadorder',
@@ -53,7 +68,7 @@ def data_upgrade():
     """Update data."""
     print(revision)
     # Update existing Orders
-    op.execute(UPDATE)
+    op.execute(UPDATES)
     # Create entries in LeadOrder table
     op.execute(INSERTS)
 

@@ -8,6 +8,7 @@ History
     * Card #282: Allow filtering Order/LeadOrder by type on /orders endpoint (ericof).
     * Card #196: Migrate Delivery Hero project Orders to LeadOrders (ericof).
     * Card #197: Migrate Agoda project Orders to LeadOrders (ericof).
+    * Card #358: Set Agoda and Delivery Hero projects to order_type = 'leadorder' (ericof).
 
 2.1.15 (2017-05-22)
 -------------------
