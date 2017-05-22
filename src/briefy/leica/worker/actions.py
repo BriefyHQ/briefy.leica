@@ -25,7 +25,7 @@ def update_delivery(order: Order, laure_data: object) -> dict:
 
     if delivery_info and delivery_info != order.delivery:
         logger.info(
-            '''Delivery will be update for assignment '{0}' Delivery: '{1}' '''.format(
+            "Delivery will be update for assignment '{0}' Delivery: '{1}'".format(
                 laure_data.guid,
                 delivery_info
             )
@@ -46,12 +46,12 @@ def validate_assignment(laure_data: object, session: object) -> (bool, dict):
         assignment = Assignment.get(assignment_id)
 
         if not assignment:
-            logger.error('''Got message with unexisting assignment id {0}'''.format(assignment_id))
+            logger.error('Got a message for non-existing assignment id {0}'.format(assignment_id))
             return False, {}
 
         if assignment.state != 'asset_validation':
             logger.error(
-                '''Got message to validate assignment '{0}' which is in state '{1}' '''.format(
+                "Got message to validate assignment '{0}' which is in state '{1}'".format(
                     assignment_id,
                     assignment.state
                 )
@@ -59,7 +59,7 @@ def validate_assignment(laure_data: object, session: object) -> (bool, dict):
             return False, {}
 
         logger.info(
-            '''Assignment '{0}' assets reported as ok. Transitioning to 'in_qa' '''.format(
+            "Assignment '{0}' assets reported as ok. Transitioning to 'in_qa'".format(
                 assignment_id
             )
         )
@@ -67,7 +67,7 @@ def validate_assignment(laure_data: object, session: object) -> (bool, dict):
         assignment.workflow.validate_assets(
                 message='Validated submission.'
             )
-        logger.info('''Assignment {0} state set to {1}'''.format(assignment.slug, assignment.state))
+        logger.info('Assignment {0} state set to {1}'.format(assignment.slug, assignment.state))
 
         cache_region.invalidate(assignment)
 
@@ -85,12 +85,12 @@ def ignored_assignment(laure_data: object, session: object) -> (bool, dict):
         assignment = Assignment.get(assignment_id)
 
         if not assignment:
-            logger.error('''Got message for unknown assignment id {0}'''.format(assignment_id))
+            logger.error('Got message for unknown assignment id {0}'.format(assignment_id))
             return False, {}
 
         if assignment.state != 'asset_validation':
             logger.error(
-                '''Got message to transition assignment '{0}' which is in state '{1}' '''.format(
+                "Got message to transition assignment '{0}' which is in state '{1}'".format(
                     assignment_id,
                     assignment.state
                 )
@@ -98,7 +98,7 @@ def ignored_assignment(laure_data: object, session: object) -> (bool, dict):
             return False, {}
 
         logger.info(
-            '''Assignment '{0}' assets validation ignored. Transitioning to 'in_qa' '''.format(
+            "Assignment '{0}' assets validation ignored. Transitioning to 'in_qa'".format(
                 assignment_id
             )
         )
@@ -106,7 +106,7 @@ def ignored_assignment(laure_data: object, session: object) -> (bool, dict):
         assignment.workflow.validate_assets(
                 message='Ignored validation.'
             )
-        logger.info('''Assignment {0} state set to {1}'''.format(assignment.slug, assignment.state))
+        logger.info('Assignment {0} state set to {1}'.format(assignment.slug, assignment.state))
 
         cache_region.invalidate(assignment)
 
@@ -124,11 +124,11 @@ def invalidate_assignment(laure_data: object, session: object) -> (bool, dict):
         assignment = Assignment.get(assignment_id)
 
         if not assignment:
-            logger.error('''Got message with unexisting assignment id {0}'''.format(assignment_id))
+            logger.error('Got a message for non-existing assignment id {0}'.format(assignment_id))
             return False, {}
 
         if assignment.state != 'asset_validation':
-            logger.error('''Got message to invalidate '{0}' which is in state '{1}' '''.format(
+            logger.error("Got message to invalidate '{0}' which is in state '{1}'".format(
                 assignment_id,
                 assignment.state
             ))
@@ -139,8 +139,8 @@ def invalidate_assignment(laure_data: object, session: object) -> (bool, dict):
         )
 
         logger.info(
-            '''Assignment '{0}' assets reported as not sufficient. Transitioning back '''
-            ''' to 'waiting_assets' and adding comments to assignment.'''.format(
+            'Assignment "{0}" assets reported as not sufficient. Transitioning back '
+            'to "waiting_assets" and adding comments to assignment.'.format(
                 assignment_id
             )
         )
@@ -150,7 +150,7 @@ def invalidate_assignment(laure_data: object, session: object) -> (bool, dict):
         assignment.workflow.invalidate_assets(
             message=feedback_text
         )
-        logger.info('''Assignment {0} state set to {1}'''.format(assignment.slug, assignment.state))
+        logger.info('Assignment {0} state set to {1}'.format(assignment.slug, assignment.state))
 
         return True, {}
 
@@ -178,11 +178,12 @@ def approve_assignment(
         order = assignment.order
         if not copy_ignored:
             delivery_info = update_delivery(order, laure_data)
-            msg = '''Assets copied over on laure - committing delivery URL to order '{order_id}' '''
+            msg = 'Assets copied over on laure - committing delivery URL to order "{order_id}"'
             status = True
         else:
             # We need to get the existing delivery to execute the proper transition
-            msg = '''Assets were a result of previous manual review and were not touched on ms.laure. Order '{order_id} ' unchanged!'''  # noQA
+            msg = 'Assets were a result of previous manual review and were not ' \
+                  'touched on ms.laure. Order "{order_id}" unchanged!'
             status = True
             delivery_info = order.delivery
 
@@ -233,8 +234,8 @@ def asset_copy_malfunction(laure_data: object, session: object) -> (bool, dict):
                 assignment_id))
             return False, {}
 
-        text = ('''This assignment's assets could not be copied automatically!\n'''
-                '''Please take manual actions that may be needed.''')
+        text = ('This assignment\'s assets could not be copied automatically!\n'
+                'Please take manual actions that may be needed.')
 
         comment = Comment(
             entity_id=assignment_id,
@@ -248,8 +249,8 @@ def asset_copy_malfunction(laure_data: object, session: object) -> (bool, dict):
         session.add(comment)
 
         logger.warn(
-            '''There was a problem copying assets to delivery or archive folders.'''
-            '''Adding comment to assignment {0}'''.format(assignment_id)
+            'There was a problem copying assets to delivery or archive folders.'
+            'Adding comment to assignment {0}'.format(assignment_id)
         )
 
         comment.workflow_context = SystemUser

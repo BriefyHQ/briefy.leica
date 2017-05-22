@@ -176,9 +176,9 @@ def add_order_history(session, obj, kobj):
         extra_message = ''
         if kobj.rescheduled:
             extra_message += (
-                '''\nThis job was re-scheduled and may have been re-assigned/shot'''
-                '''again. The old platform could not save this information. This transition'''
-                '''refers to the last valid scheduling'''
+                '\nThis job was re-scheduled and may have been re-assigned/shot'
+                'again. The old platform could not save this information. This transition'
+                'refers to the last valid scheduling'
             )
 
         # actor should be professional_user

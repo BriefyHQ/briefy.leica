@@ -329,10 +329,10 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
 
     approvable_assets = orm.relationship(
         'Asset',
-        primaryjoin='''and_(
+        primaryjoin="""and_(
             Asset.assignment_id == Assignment.id,
             Asset.state.in_(('approved', 'pending', 'delivered'))
-        )''',
+        )""",
         viewonly=True
 
     )

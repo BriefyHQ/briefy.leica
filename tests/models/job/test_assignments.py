@@ -201,6 +201,16 @@ class TestAssignmentModel(BaseModelTest):
         assert 'retract_post_process' in wf.transitions
         assert assignment.state == 'post_processing'
 
+        # try to approve without archive URL will be blocked
+        assignment.order.delivery = None
+        with pytest.raises(WorkflowTransitionException) as excinfo:
+            wf.approve(
+                fields={
+                    'customer_message': ''
+                }
+            )
+            assert 'Can not approve without Archive URL' in str(excinfo)
+
         wf.retract_post_process()
         assert assignment.state == 'in_qa'
 
