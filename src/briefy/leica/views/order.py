@@ -76,6 +76,18 @@ class OrderService(RESTService):
             model = model if model else Order
         return super().collection_post(model=model)
 
+    @property
+    def filter_allowed_fields(self) -> list:
+        """List of fields allowed in filtering and sorting.
+
+        For Orders/LeadOrders, we add support to filter by type.
+
+        :returns: List of field names supported in filtering and sorting.
+        """
+        allowed_filters = super().filter_allowed_fields
+        allowed_filters.append('type')
+        return allowed_filters
+
     def default_filters(self, query) -> object:
         """Default filters to be applied to every query.
 
