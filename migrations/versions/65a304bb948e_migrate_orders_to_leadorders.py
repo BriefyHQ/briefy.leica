@@ -31,6 +31,7 @@ WHERE
 UPDATE
     ORDERS
 SET
+    state = 'new',
     type = 'leadorder',
     state_history=array_to_json(
         array(
