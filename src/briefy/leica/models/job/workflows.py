@@ -435,12 +435,6 @@ class AssignmentWorkflow(BriefyWorkflow):
         # is not instant.  Maybe we could have a transitory state
         # somewhat along "delivering_process" before "approved"
 
-        customer_message = kwargs['fields'].get('customer_message', '').strip()
-        if customer_message:
-            actor = self.context.id
-            assignment = self.document
-            create_comment_on_assignment_approval(assignment, actor, customer_message)
-
         if self.state == self.post_processing:
             assignment = self.document
             order = assignment.order
@@ -448,6 +442,12 @@ class AssignmentWorkflow(BriefyWorkflow):
             delivery = order.delivery
             if not delivery or not delivery.get('archive', None):
                 raise WorkflowTransitionException('Can not approve without Archive URL.')
+
+        customer_message = kwargs['fields'].get('customer_message', '').strip()
+        if customer_message:
+            actor = self.context.id
+            assignment = self.document
+            create_comment_on_assignment_approval(assignment, actor, customer_message)
 
     @in_qa.transition(
         awaiting_assets, 'can_approve',
