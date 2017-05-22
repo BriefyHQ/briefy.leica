@@ -444,7 +444,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         if self.state == self.post_processing:
             assignment = self.document
             order = assignment.order
-            # TODO: change this to use new configuration when avaiable
+            # TODO: change this to use new configuration when available
             delivery = order.delivery
             if not delivery or not delivery.get('archive', None):
                 raise WorkflowTransitionException('Can not approve without Archive URL.')
