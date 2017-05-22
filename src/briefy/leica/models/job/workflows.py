@@ -865,13 +865,13 @@ class OrderWorkflow(BriefyWorkflow):
             upload = True if old_assignment.submission_path else False
             if upload:
                 msg = (
-                    '''It is not possible to unassign this order because the '''
-                    '''assignment already have a submission.'''
+                    'It is not possible to unassign this order because the '
+                    'assignment already have a submission.'
                 )
             else:
                 msg = (
-                    '''It is not possible to unassign this order because the '''
-                    '''current assignment does not support a cancellation.'''
+                    'It is not possible to unassign this order because the '
+                    'current assignment does not support a cancellation.'
                 )
             raise WorkflowTransitionException(msg)
         message = kwargs.get('message', '')

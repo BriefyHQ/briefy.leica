@@ -89,11 +89,11 @@ class LeicaBriefyRoles(BaseBriefyRoles):
             foreign_keys='LocalRole.entity_id',
             viewonly=viewonly,
             uselist=uselist,
-            primaryjoin='''and_(
+            primaryjoin="""and_(
                         LocalRole.entity_id=={entity}.id,
                         LocalRole.entity_type=="{entity}",
                         LocalRole.role_name=="{role_name}"
-                    )'''.format(
+                    )""".format(
                 entity=cls.__name__,
                 role_name=role_name
             )

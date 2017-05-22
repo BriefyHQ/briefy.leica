@@ -346,10 +346,10 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         viewonly=True,
         order_by='desc(Assignment.created_at)',
         backref=orm.backref('active_order'),
-        primaryjoin='''and_(
+        primaryjoin="""and_(
             Order.id == Assignment.order_id,
             not_(Assignment.state.in_(('cancelled', 'perm_reject')))
-        )''',
+        )""",
     )
     """Current Assignment connect to this order.
 

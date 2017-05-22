@@ -120,10 +120,10 @@ class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
 
     business_contact = orm.relationship(
         'CustomerContact',
-        primaryjoin='''and_(
+        primaryjoin="""and_(
             Customer.id == CustomerContact.customer_id,
             CustomerContact.type == "business"
-        )''',
+        )""",
         viewonly=True,
         uselist=False,
         info={
@@ -141,10 +141,10 @@ class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
 
     billing_contact = orm.relationship(
         'CustomerContact',
-        primaryjoin='''and_(
+        primaryjoin="""and_(
             Customer.id == CustomerContact.customer_id,
             CustomerContact.type == "billing"
-        )''',
+        )""",
         viewonly=True,
         uselist=False,
         info={
