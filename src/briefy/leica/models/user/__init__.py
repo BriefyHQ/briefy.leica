@@ -158,11 +158,11 @@ class CustomerUserProfile(UserProfile):
             foreign_keys='LocalRole.user_id',
             viewonly=True,
             uselist=True,
-            primaryjoin='''and_(
+            primaryjoin="""and_(
                         LocalRole.user_id == CustomerUserProfile.id,
                         LocalRole.entity_type=="{entity}",
                         LocalRole.role_name=="{role_name}"
-                    )'''.format(
+                    )""".format(
                 entity='Customer',
                 role_name='customer_user',
             )
@@ -200,11 +200,11 @@ class CustomerUserProfile(UserProfile):
             foreign_keys='LocalRole.user_id',
             viewonly=True,
             uselist=True,
-            primaryjoin='''and_(
+            primaryjoin="""and_(
                         LocalRole.user_id == CustomerUserProfile.id,
                         LocalRole.entity_type=="{entity}",
                         LocalRole.role_name=="{role_name}"
-                    )'''.format(
+                    )""".format(
                 entity='Project',
                 role_name='customer_user',
             )

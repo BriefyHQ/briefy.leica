@@ -157,8 +157,8 @@ class Worker(QueueWorker):
         elif not status and dispatch.failure_notification:
             event = dispatch.failure_notification(payload)
         elif not status:
-                logger.warning('''Could not proccess message, and there are no '''
-                               '''further actions on failure: {0}'''.format(body))
+                logger.warning('Could not process message, and there are no '
+                               'further actions on failure: {0}'.format(body))
         if event:
             event()
         return status

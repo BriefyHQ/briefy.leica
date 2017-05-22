@@ -435,6 +435,14 @@ class AssignmentWorkflow(BriefyWorkflow):
         # is not instant.  Maybe we could have a transitory state
         # somewhat along "delivering_process" before "approved"
 
+        if self.state == self.post_processing:
+            assignment = self.document
+            order = assignment.order
+            # TODO: change this to use new configuration when available
+            delivery = order.delivery
+            if not delivery or not delivery.get('archive', None):
+                raise WorkflowTransitionException('Can not approve without Archive URL.')
+
         customer_message = kwargs['fields'].get('customer_message', '').strip()
         if customer_message:
             actor = self.context.id
@@ -857,13 +865,13 @@ class OrderWorkflow(BriefyWorkflow):
             upload = True if old_assignment.submission_path else False
             if upload:
                 msg = (
-                    '''It is not possible to unassign this order because the '''
-                    '''assignment already have a submission.'''
+                    'It is not possible to unassign this order because the '
+                    'assignment already have a submission.'
                 )
             else:
                 msg = (
-                    '''It is not possible to unassign this order because the '''
-                    '''current assignment does not support a cancellation.'''
+                    'It is not possible to unassign this order because the '
+                    'current assignment does not support a cancellation.'
                 )
             raise WorkflowTransitionException(msg)
         message = kwargs.get('message', '')

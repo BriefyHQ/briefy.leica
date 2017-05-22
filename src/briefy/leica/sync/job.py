@@ -436,7 +436,7 @@ class JobSync(ModelSync):
         qa_manager_roles = self.get_local_roles(kobj, 'qa_manager')
         if last_approval_date and not qa_manager_roles:
             id_ = '0efa2980-07f9-4add-a8bf-1882a2e988e1'  # Laure
-            kobj.qa_manager = [{'id': id_, 'identifier': '''Laure d'Utruy'''}]
+            kobj.qa_manager = [{'id': id_, 'identifier': 'Laure d\'Utruy'}]
             qa_manager_roles = [
                 id_
             ]
