@@ -112,7 +112,6 @@ class TestAssignmentModel(BaseModelTest):
         )
         assert assignment.state == 'scheduled'
         assert assignment.scheduled_datetime == scheduled_datetime
-
         assert order.scheduled_datetime == scheduled_datetime
 
         # Customer can still cancel the assignment

@@ -291,6 +291,7 @@ class AssignmentWorkflow(BriefyWorkflow):
             msg = SHOOT_TIME_FUTURE_MSG
             raise WorkflowTransitionException(msg)
 
+        # force update in the transition
         assignment = self.document
         order = assignment.order
         order.scheduled_datetime = scheduled_datetime
