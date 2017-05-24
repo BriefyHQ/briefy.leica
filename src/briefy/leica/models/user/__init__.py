@@ -168,7 +168,7 @@ class CustomerUserProfile(UserProfile):
             )
         )
 
-    @property
+    @hybrid_property
     def customer_roles(self):
         """Return roles related to this customer user profile."""
         return self._customer_roles
@@ -216,7 +216,7 @@ class CustomerUserProfile(UserProfile):
         customer_ids = self.customer_ids
         return Customer.query().filter(Customer.id.in_(customer_ids)).all()
 
-    @property
+    @hybrid_property
     def project_roles(self):
         """Return roles related to this project user profile."""
         return self._project_roles
