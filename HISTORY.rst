@@ -2,7 +2,7 @@
 History
 =======
 
-2.1.17 (Unreleased)
+2.1.18 (Unreleased)
 -------------------
 
     * Card #282: Allow filtering Order/LeadOrder by type on /orders endpoint (ericof).
@@ -11,6 +11,10 @@ History
     * Card #358: Set Agoda and Delivery Hero projects to order_type = 'leadorder' (ericof).
     * Card #283: New dashboard for customer: Leads (ericof).
     * Card #364: Fix leadorder confirm workflow transition to only create the assignment after creation (rudaporto).
+
+2.1.17 (2017-05-24)
+-------------------
+    * Card #362: add a comment to Order after workflow 'accept' transition using transition message (rudaporto).
 
 2.1.16 (2017-05-24)
 -------------------

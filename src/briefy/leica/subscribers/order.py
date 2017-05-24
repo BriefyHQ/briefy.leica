@@ -117,6 +117,24 @@ def order_refuse(event):
     )
 
 
+def order_accept(event):
+    """Handle Order accept workflow event."""
+    order = event.obj
+    user = order.workflow.context
+    if G['customers'].value in user.groups:
+        author_role = 'customer_user'
+        to_role = 'project_manager'
+    else:
+        author_role = 'project_manager'
+        to_role = 'customer_user'
+    create_comment_from_wf_transition(
+        order,
+        author_role,
+        to_role,
+        internal=False
+    )
+
+
 def order_new_shoot_or_reshoot(event):
     """Handle Order new_shoot and reshoot workflow event."""
     order = event.obj
@@ -149,6 +167,7 @@ def transition_handler(event):
     if not event_name.startswith('order.workflow'):
         return
     handlers = {
+        'order.workflow.accept': order_accept,
         'order.workflow.cancel': order_cancel,
         'order.workflow.perm_refuse': order_perm_refuse,
         'order.workflow.remove_schedule': order_remove_schedule,

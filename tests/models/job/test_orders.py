@@ -371,7 +371,8 @@ class TestOrderModel(BaseModelTest):
         assert 'assignment already have a submission' in str(excinfo)
 
         assignment.submission_path = None
-        wf.unassign()
+        message = 'Un-assign Order!'
+        wf.unassign(message=message)
         session.flush()
 
         new_assignment = order.assignments[-1]
@@ -379,6 +380,7 @@ class TestOrderModel(BaseModelTest):
 
         assert order.state == 'received'
         assert order.state_history[-1]['transition'] == 'unassign'
+        assert order.comments[0].content == message
         assert new_assignment.state == 'pending'
         assert new_assignment.state_history[-1]['transition'] == 'submit'
         self.delete_assigment_created(new_assignment, session)
@@ -443,7 +445,7 @@ class TestOrderModel(BaseModelTest):
         assert order.state == 'cancelled'
         assert order.state_history[-1]['transition'] == 'cancel'
         assert order.state_history[-1]['message'] == message
-        assert order.comments[-1].content == message
+        assert order.comments[0].content == message
         assert assignment.state == 'cancelled'
         assert assignment.state_history[-1]['transition'] == 'cancel'
         assert assignment.payout_value == 0
@@ -561,6 +563,7 @@ class TestOrderModel(BaseModelTest):
         assert order.state == 'accepted'
         assert order.state_history[-1]['transition'] == 'accept'
         assert order.state_history[-1]['message'] == message
+        assert order.comments[0].content == message
 
         ass_message = 'Assignment complete by Order accept transition.'
         for assignment in order.assignments:
@@ -644,6 +647,7 @@ class TestOrderModel(BaseModelTest):
         assert order.state == 'received'
         assert order.state_history[-1]['transition'] == 'new_shoot'
         assert order.state_history[-1]['message'] == message
+        assert order.comments[0].content == message
         assert old_assignment.state == 'completed'
         assert old_assignment.state_history[-1]['transition'] == 'complete'
         assert old_assignment.travel_expenses == fields['travel_expenses']
@@ -701,6 +705,7 @@ class TestOrderModel(BaseModelTest):
         assert order.state == 'assigned'
         assert order.state_history[-1]['transition'] == 'reshoot'
         assert order.state_history[-1]['message'] == message
+        assert order.comments[0].content == message
         assert old_assignment.state == 'completed'
         assert old_assignment.state_history[-1]['transition'] == 'complete'
         assert old_assignment.travel_expenses == fields['travel_expenses']
