@@ -667,7 +667,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     def _scheduled_datetime_observer(self, scheduled_datetime):
         """Update scheduled_datetime on this object."""
         existing = self.scheduled_datetime
-        if scheduled_datetime != existing:
+        if scheduled_datetime and scheduled_datetime != existing:
             self.scheduled_datetime = scheduled_datetime
 
     # Relevant dates

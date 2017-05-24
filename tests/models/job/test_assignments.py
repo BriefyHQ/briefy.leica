@@ -106,10 +106,14 @@ class TestAssignmentModel(BaseModelTest):
         # assignment will still be assigned
         assert assignment.state == 'assigned'
 
+        scheduled_datetime = now + timedelta(10)
         wf.schedule(
-            fields={'scheduled_datetime': now + timedelta(10)}
+            fields={'scheduled_datetime': scheduled_datetime}
         )
         assert assignment.state == 'scheduled'
+        assert assignment.scheduled_datetime == scheduled_datetime
+
+        assert order.scheduled_datetime == scheduled_datetime
 
         # Customer can still cancel the assignment
         wf.context = roles['customer']

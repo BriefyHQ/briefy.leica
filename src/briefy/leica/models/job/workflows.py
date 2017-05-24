@@ -264,13 +264,6 @@ class AssignmentWorkflow(BriefyWorkflow):
         if date_diff.days < int(SCHEDULE_DAYS_LIMIT) and not is_internal:
             msg = SHOOT_TIME_FUTURE_MSG
             raise WorkflowTransitionException(msg)
-        else:
-            order = self.document.order
-            if order.state == 'assigned':
-                order.workflow.context = SystemUser
-                # Hack to get this date on the SQS
-                order.scheduled_datetime = fields.get('scheduled_datetime')
-                order.workflow.schedule()
 
     @Permission(groups=[G['professionals'], G['pm'], G['scout'], G['system']])
     def can_schedule(self):
@@ -292,10 +285,15 @@ class AssignmentWorkflow(BriefyWorkflow):
         fields = kwargs.get('fields')
         now = datetime_utcnow()
         is_internal = 'g:briefy' in self.context.groups
-        date_diff = fields.get('scheduled_datetime') - now
+        scheduled_datetime = fields.get('scheduled_datetime')
+        date_diff = scheduled_datetime - now
         if date_diff.days < int(SCHEDULE_DAYS_LIMIT) and not is_internal:
             msg = SHOOT_TIME_FUTURE_MSG
             raise WorkflowTransitionException(msg)
+
+        assignment = self.document
+        order = assignment.order
+        order.scheduled_datetime = scheduled_datetime
 
     @assigned.transition(
         assigned,
@@ -324,6 +322,8 @@ class AssignmentWorkflow(BriefyWorkflow):
         if assignment.submission_path:
             return False
         assignment.scheduled_datetime = None
+        order = assignment.order
+        order.scheduled_datetime = None
 
     @Permission(groups=[G['professionals'], G['customers'], G['pm']])
     def can_remove_reschedule(self):
@@ -340,6 +340,8 @@ class AssignmentWorkflow(BriefyWorkflow):
         assignment = self.document
         assignment.payout_value = 0
         assignment.scheduled_datetime = None
+        order = assignment.order
+        order.scheduled_datetime = None
 
     @Permission(groups=[G['customers'], G['pm'], G['system'], ])
     def can_cancel(self):
@@ -991,11 +993,18 @@ class OrderWorkflow(BriefyWorkflow):
 
         return allowed and not uploaded
 
-    @received.transition(scheduled, 'can_schedule')
-    @assigned.transition(scheduled, 'can_schedule')
+    @received.transition(
+        scheduled,
+        'can_schedule',
+        required_fields=('scheduled_datetime', )
+    )
+    @assigned.transition(
+        scheduled,
+        'can_schedule',
+        required_fields=('scheduled_datetime', )
+    )
     def schedule(self, **kwargs):
         """Transition: Inform the schedule to the customer."""
-        # this should be executed from the assignment
         pass
 
     @Permission(groups=[G['pm'], G['scout'], G['system'], ])

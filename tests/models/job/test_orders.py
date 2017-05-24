@@ -386,7 +386,7 @@ class TestOrderModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['received', 'assigned'])
     @pytest.mark.parametrize('role_name', ['pm', 'scout', 'system'])
     def test_workflow_schedule(
-        self, instance_obj, web_request, session, roles, role_name, origin_state
+        self, instance_obj, web_request, session, roles, role_name, origin_state, now_utc
     ):
         """Test Order workflow schedule transition."""
         order, wf, request = self.prepare_obj_wf(
@@ -396,13 +396,24 @@ class TestOrderModel(BaseModelTest):
             origin_state,
         )
 
+        assignment = order.assignments[-1]
+        assignment, ass_wf, request = self.prepare_obj_wf(
+            assignment,
+            web_request,
+            roles[role_name],
+            'assigned',
+        )
+        assignment.scheduled_datetime = now_utc
+
         message = 'Order scheduled'
-        wf.schedule(message=message)
+        wf.schedule(message=message, fields={'scheduled_datetime': now_utc})
         session.flush()
 
         assert order.state == 'scheduled'
         assert order.state_history[-1]['transition'] == 'schedule'
         assert order.state_history[-1]['message'] == message
+        assert order.scheduled_datetime is not None
+        assert order.scheduled_datetime == assignment.scheduled_datetime
 
     @pytest.mark.parametrize('origin_state', ['received', 'assigned', 'scheduled'])
     @pytest.mark.parametrize('role_name', ['pm', 'customer', 'system'])
