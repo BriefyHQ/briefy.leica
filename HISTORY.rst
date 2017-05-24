@@ -4,7 +4,7 @@ History
 
 2.1.17 (2017-05-24)
 -------------------
-    * Card #362: add comment to Order after workflow accept transition using transition message (rudaporto).
+    * Card #362: add a comment to Order after workflow 'accept' transition using transition message (rudaporto).
 
 2.1.16 (2017-05-24)
 -------------------
