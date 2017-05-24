@@ -2,6 +2,10 @@
 History
 =======
 
+2.1.16 (2017-05-24)
+-------------------
+    * Card #47: order.schedule_datetime should be in the payload after schedule transition (rudaporto).
+
 2.1.15 (2017-05-22)
 -------------------
     * Card #355: block approve from post processing when there is no archive url (rudaporto).
