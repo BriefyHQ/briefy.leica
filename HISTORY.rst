@@ -2,7 +2,7 @@
 History
 =======
 
-2.1.17 (2017-05-24)
+2.1.16 (2017-05-24)
 -------------------
     * Card #47: order.schedule_datetime should be in the payload after schedule transition (rudaporto).
 
