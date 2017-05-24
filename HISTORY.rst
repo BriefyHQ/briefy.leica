@@ -11,6 +11,7 @@ History
     * Card #358: Set Agoda and Delivery Hero projects to order_type = 'leadorder' (ericof).
     * Card #283: New dashboard for customer: Leads (ericof).
     * Card #364: Fix leadorder confirm workflow transition to only create the assignment after creation (rudaporto).
+    * Add new related filter to CustomerProfileService to be able to filter by customer or project (rudaporto).
 
 2.1.17 (2017-05-24)
 -------------------
