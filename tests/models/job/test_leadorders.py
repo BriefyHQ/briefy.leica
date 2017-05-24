@@ -89,6 +89,88 @@ class TestLeadOrderModel(BaseModelTest):
 
         assert len(leadorder.assignments) == 0
 
+    @pytest.mark.parametrize('origin_state', ['new'])
+    @pytest.mark.parametrize('role_name', ['pm', 'customer', 'system'])
+    def test_workflow_confirm(
+        self, instance_obj, web_request, session, roles, role_name, now_utc, origin_state
+    ):
+        """Test LeadOrder workflow confirm transition."""
+        leadorder, wf, request = self.prepare_obj_wf(
+            instance_obj,
+            web_request,
+            roles[role_name],
+            origin_state
+        )
+        now_utc = now_utc.astimezone(pytz.timezone(leadorder.timezone))
+
+        new_availability = {}
+        with pytest.raises(WorkflowTransitionException) as excinfo:
+            wf.confirm(fields=new_availability)
+
+        assert 'Field availability is required for this transition' in str(excinfo)
+
+        availability_1 = now_utc + timedelta(1)
+        availability_2 = now_utc + timedelta(2)
+        new_availability['availability'] = [
+            availability_1.isoformat(),
+            availability_2.isoformat()
+        ]
+        # PMs can set any date but others do not
+        if role_name != 'pm':
+            with pytest.raises(WorkflowTransitionException) as excinfo:
+                wf.confirm(fields=new_availability)
+            assert 'Both availability dates must be at least 7 days from now' in str(excinfo)
+
+        availability_1 = now_utc + timedelta(8)
+        availability_2 = now_utc + timedelta(10)
+        new_availability['availability'] = [
+            availability_1.isoformat(),
+            availability_2.isoformat()
+        ]
+        message = 'Lead confirmed!'
+        wf.confirm(fields=new_availability, message=message)
+        session.flush()
+        assignment = leadorder.assignments[-1]
+        self.notify_assigment_created(assignment, request, session)
+        assert assignment.state == 'pending'
+        assert assignment.state_history[-1]['transition'] == 'submit'
+        assert assignment.asset_types == leadorder.asset_types
+
+        assert leadorder.state_history[-1]['transition'] == 'confirm'
+        assert leadorder.state == 'received'
+        assert leadorder.state_history[-1]['message'] == message
+        for key, value in new_availability.items():
+            assert getattr(leadorder, key) == value
+
+        leadorder.availability = None
+        session.flush()
+        # should work also with normal python datetime instances
+        new_availability['availability'] = [
+            availability_1,
+            availability_2,
+        ]
+        leadorder, wf, request = self.prepare_obj_wf(
+            instance_obj,
+            web_request,
+            roles[role_name],
+            origin_state
+        )
+        # remove previous transition
+        leadorder.state_history.pop()
+
+        wf.confirm(fields=new_availability)
+        session.flush()
+        assignment = leadorder.assignments[-1]
+        self.notify_assigment_created(assignment, request, session)
+
+        assert leadorder.state == 'received'
+        for key, value in new_availability.items():
+            assert getattr(leadorder, key)[0] == value[0].isoformat()
+            assert getattr(leadorder, key)[1] == value[1].isoformat()
+
+        leadorder.availability = None
+        session.flush()
+
     @pytest.mark.parametrize('file_path', ['data/order_locations.json'])
     @pytest.mark.parametrize('position', [0])
     @pytest.mark.parametrize('origin_state', ['new', 'received', 'assigned', 'scheduled'])
@@ -208,88 +290,6 @@ class TestLeadOrderModel(BaseModelTest):
         assert leadorder.state_history[-1]['transition'] == 'edit_requirements'
         for key, value in new_requirements.items():
             assert getattr(leadorder, key) == value
-
-    @pytest.mark.parametrize('origin_state', ['new'])
-    @pytest.mark.parametrize('role_name', ['pm', 'customer', 'system'])
-    def test_workflow_confirm(
-        self, instance_obj, web_request, session, roles, role_name, now_utc, origin_state
-    ):
-        """Test LeadOrder workflow confirm transition."""
-        leadorder, wf, request = self.prepare_obj_wf(
-            instance_obj,
-            web_request,
-            roles[role_name],
-            origin_state
-        )
-        now_utc = now_utc.astimezone(pytz.timezone(leadorder.timezone))
-
-        new_availability = {}
-        with pytest.raises(WorkflowTransitionException) as excinfo:
-            wf.confirm(fields=new_availability)
-
-        assert 'Field availability is required for this transition' in str(excinfo)
-
-        availability_1 = now_utc + timedelta(1)
-        availability_2 = now_utc + timedelta(2)
-        new_availability['availability'] = [
-            availability_1.isoformat(),
-            availability_2.isoformat()
-        ]
-        # PMs can set any date but others do not
-        if role_name != 'pm':
-            with pytest.raises(WorkflowTransitionException) as excinfo:
-                wf.confirm(fields=new_availability)
-            assert 'Both availability dates must be at least 7 days from now' in str(excinfo)
-
-        availability_1 = now_utc + timedelta(8)
-        availability_2 = now_utc + timedelta(10)
-        new_availability['availability'] = [
-            availability_1.isoformat(),
-            availability_2.isoformat()
-        ]
-        message = 'Lead confirmed!'
-        wf.confirm(fields=new_availability, message=message)
-        session.flush()
-        assignment = leadorder.assignments[-1]
-        self.notify_assigment_created(assignment, request, session)
-        assert assignment.state == 'pending'
-        assert assignment.state_history[-1]['transition'] == 'submit'
-        assert assignment.asset_types == leadorder.asset_types
-
-        # remove last created assignment
-        self.delete_assigment_created(assignment, session)
-
-        assert leadorder.state_history[-1]['transition'] == 'confirm'
-        assert leadorder.state == 'received'
-        assert leadorder.state_history[-1]['message'] == message
-        for key, value in new_availability.items():
-            assert getattr(leadorder, key) == value
-
-        leadorder.availability = None
-        session.flush()
-        # should work also with normal python datetime instances
-        new_availability['availability'] = [
-            availability_1,
-            availability_2,
-        ]
-        leadorder, wf, request = self.prepare_obj_wf(
-            instance_obj,
-            web_request,
-            roles[role_name],
-            origin_state
-        )
-        wf.confirm(fields=new_availability)
-        session.flush()
-        assignment = leadorder.assignments[-1]
-        self.notify_assigment_created(assignment, request, session)
-
-        assert leadorder.state == 'received'
-        for key, value in new_availability.items():
-            assert getattr(leadorder, key)[0] == value[0].isoformat()
-            assert getattr(leadorder, key)[1] == value[1].isoformat()
-
-        leadorder.availability = None
-        session.flush()
 
     @pytest.mark.parametrize('origin_state', ['received'])
     @pytest.mark.parametrize(
