@@ -10,6 +10,7 @@ History
     * Card #197: Migrate Agoda project Orders to LeadOrders (ericof).
     * Card #358: Set Agoda and Delivery Hero projects to order_type = 'leadorder' (ericof).
     * Card #283: New dashboard for customer: Leads (ericof).
+    * Card #364: Fix leadorder confirm workflow transition to only create the assignment after creation (rudaporto).
 
 2.1.15 (2017-05-22)
 -------------------
