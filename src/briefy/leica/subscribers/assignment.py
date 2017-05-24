@@ -1,4 +1,5 @@
 """Event subscribers for briefy.leica.models.job.Assignment."""
+from briefy.common.users import SystemUser
 from briefy.common.vocabularies.roles import Groups as G
 from briefy.leica.cache import cache_manager
 from briefy.leica.events.assignment import AssignmentCreatedEvent
@@ -139,6 +140,16 @@ def assignment_reschedule(event):
 def assignment_schedule(event):
     """Handle Assignment schedule workflow event."""
     assignment = event.obj
+    order = assignment.order
+    if order.state in ('assigned', 'received'):
+        order.workflow.context = SystemUser
+        kwargs = {
+            'fields': {
+                'scheduled_datetime': assignment.scheduled_datetime
+            }
+        }
+        order.workflow.schedule(**kwargs)
+
     user = assignment.workflow.context
     if G['pm'].value in user.groups:
         to_role = 'professional_user'

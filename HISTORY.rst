@@ -2,7 +2,7 @@
 History
 =======
 
-2.1.16 (Unreleased)
+2.1.17 (Unreleased)
 -------------------
 
     * Card #282: Allow filtering Order/LeadOrder by type on /orders endpoint (ericof).
@@ -10,6 +10,11 @@ History
     * Card #197: Migrate Agoda project Orders to LeadOrders (ericof).
     * Card #358: Set Agoda and Delivery Hero projects to order_type = 'leadorder' (ericof).
     * Card #283: New dashboard for customer: Leads (ericof).
+
+2.1.16 (2017-05-24)
+-------------------
+    * Card #47: order.schedule_datetime should be in the payload after schedule transition (rudaporto).
+
 
 2.1.15 (2017-05-22)
 -------------------
