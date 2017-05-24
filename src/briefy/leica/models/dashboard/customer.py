@@ -1,6 +1,7 @@
 """Customer Dashboard models."""
 from briefy.leica.db import Base
 from briefy.leica.db import Session
+from briefy.leica.models import LeadOrder
 from briefy.leica.models import Order
 from briefy.leica.models import Project
 from sqlalchemy import and_
@@ -126,5 +127,53 @@ class DashboardCustomerDeliveredOrders(Base):
     __table__ = delivered_orders_customer
     __mapper_args__ = {
         'primary_key': [delivered_orders_customer.c.absolute_url]
+    }
+    __session__ = Session
+
+
+all_leads_customer = select(
+    [
+        func.CONCAT('/projects/', expression.cast(Project.id, types.Unicode)).label('absolute_url'),
+        Project.title,
+        func.count(distinct(LeadOrder.id)).label('total'),
+        func.sum(case([(LeadOrder.state == 'new', 1)], else_=0)).label('open'),
+        func.sum(case([(LeadOrder.state == 'cancelled', 1)], else_=0)).label('cancelled'),
+        func.sum(case([(LeadOrder.state.notin_(['new', 'cancelled']), 1)], else_=0)).label(
+            'confirmed'
+        ),
+    ]
+).group_by(
+    Project.title,
+    Project.id
+).where(
+    and_(
+        LeadOrder.state.in_(
+            (
+                'new',
+                'received',
+                'assigned',
+                'scheduled',
+                'cancelled',
+                'delivered',
+                'accepted',
+                'in_qa',
+                'refused',
+                'perm_refused'
+            )
+        ),
+        Project.id == Order.project_id,
+        Project.order_type == 'leadorder',
+        LeadOrder.id == Order.id,
+        Project.local_roles.any(role_name='customer_user', user_id=':user_id'),
+    )
+).alias('all_leads_customer')
+
+
+class DashboardCustomerAllLeads(Base):
+    """Dashboard Customer: Total of Leads by workflow state."""
+
+    __table__ = all_leads_customer
+    __mapper_args__ = {
+        'primary_key': [all_leads_customer.c.absolute_url]
     }
     __session__ = Session

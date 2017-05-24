@@ -9,6 +9,7 @@ History
     * Card #196: Migrate Delivery Hero project Orders to LeadOrders (ericof).
     * Card #197: Migrate Agoda project Orders to LeadOrders (ericof).
     * Card #358: Set Agoda and Delivery Hero projects to order_type = 'leadorder' (ericof).
+    * Card #283: New dashboard for customer: Leads (ericof).
 
 2.1.15 (2017-05-22)
 -------------------

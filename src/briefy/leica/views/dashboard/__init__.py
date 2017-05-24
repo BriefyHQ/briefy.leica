@@ -69,3 +69,26 @@ DELIVERED_ORDERS_COLS = (
         'type': 'integer', 'url': '', 'filter': ''
     },
 )
+
+LEAD_PROJECT_COLS = (
+    {
+        'field': 'absolute_url', 'label': 'url',
+        'type': 'hidden', 'url': '', 'filter': ''
+    },
+    {
+        'field': 'title', 'label': 'Project',
+        'type': 'text', 'url': 'absolute_url', 'filter': ''
+    },
+    {
+        'field': 'open', 'label': 'Open Leads',
+        'type': 'integer', 'url': '', 'filter': ''
+    },
+    {
+        'field': 'cancelled', 'label': 'Cancelled Leads',
+        'type': 'integer', 'url': '', 'filter': ''
+    },
+    {
+        'field': 'confirmed', 'label': 'Confirmed Leads',
+        'type': 'integer', 'url': '', 'filter': ''
+    },
+)
