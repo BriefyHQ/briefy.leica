@@ -1,14 +1,17 @@
 """User profile information."""
 from briefy.common.utils import schema
+from briefy.leica import logger
 from briefy.leica.db import Base
 from briefy.leica.models import Customer
 from briefy.leica.models import mixins
 from briefy.leica.models.user import workflows
+from briefy.leica.utils import ensure_uid
 from briefy.leica.utils.user import add_user_info_to_state_history
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm.session import object_session
 from sqlalchemy_utils import UUIDType
 from uuid import UUID
 
@@ -223,20 +226,46 @@ class CustomerUserProfile(UserProfile):
 
     @project_roles.setter
     def project_roles(self, project_ids):
-        """Add project_user role for this project user profile."""
-        from briefy.leica.models import Project
+        """Update the Projects that this user has customer_user role."""
+        project_ids = set(project_ids)
+        current_projects = {role.entity_id for role in self._project_roles}
+        to_add = project_ids - current_projects
+        to_remove = current_projects - project_ids
 
-        for project_id in project_ids:
+        def validate_project(project_id):
+            """Get project instance and validate."""
+            from briefy.leica.models import Project
             project = Project.get(project_id)
-            id_ = self.id
             if not project:
-                raise ValueError('Invalid project ID')
-            if not id_:
-                return
-            if isinstance(id_, str):
-                id_ = UUID(id_)
-            if id_ not in project.customer_users:
-                project.customer_users.append(id_)
+                raise ValueError('There is not Project with ID: {0}'.format(project_id))
+
+            if project.customer_id not in self.customer_ids:
+                msg = 'Project "{0}" is not linked ot the Customer the user belongs.'
+                # TODO: this can not be validated here, it must be before commit the transaction
+                logger.warn(msg.format(project.title))
+            return project
+
+        def remove_project(project, user_id):
+            """Remove customer_user LocalRole from the Project."""
+            from briefy.leica.models import LocalRole
+
+            session = object_session(project)
+            local_roles = session.query(LocalRole).filter_by(
+                entity_id=project.id,
+                user_id=user_id,
+                role_name='customer_user'
+            ).all()
+            for item in local_roles:
+                session.delete(item)
+                session.flush()
+
+        for project_id in to_add:
+            project = validate_project(project_id)
+            project.customer_users.append(ensure_uid(self.id))
+
+        for project_id in to_remove:
+            project = validate_project(project_id)
+            remove_project(project, ensure_uid(self.id))
 
     @property
     def projects(self):
