@@ -29,5 +29,8 @@ class TestCustomerUserProfileslView(BaseTestView):
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {
-        'project_roles': [],
+        'company_name': 'Outro nome',
+        'internal': False,
+        'partners': False,
+        'gender': 'm',
     }

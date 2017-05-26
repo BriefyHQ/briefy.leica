@@ -250,14 +250,12 @@ class CustomerUserProfile(UserProfile):
             from briefy.leica.models import LocalRole
 
             session = object_session(project)
-            local_roles = session.query(LocalRole).filter_by(
+            local_role = session.query(LocalRole).filter_by(
                 entity_id=project.id,
                 user_id=user_id,
                 role_name='customer_user'
-            ).all()
-            for item in local_roles:
-                session.delete(item)
-                session.flush()
+            ).first()
+            session.delete(local_role)
 
         for project_id in to_add:
             project = validate_project(project_id)
