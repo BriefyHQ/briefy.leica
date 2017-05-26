@@ -103,20 +103,25 @@ def db_transaction(request, sql_engine):
     def teardown():
         transaction.rollback()
         connection.close()
-        DBSession.remove()
 
     request.addfinalizer(teardown)
     return connection
 
 
-@pytest.fixture(scope='module')
-def session():
+@pytest.fixture(scope='class')
+def session(request):
     """Return session from database.
 
     :returns: A SQLAlchemy scoped session
     :rtype: sqlalchemy.orm.scoped_session
     """
-    return DBSession()
+    db_session = DBSession()
+
+    def teardown():
+        DBSession.remove()
+
+    request.addfinalizer(teardown)
+    return db_session
 
 
 @pytest.fixture(scope='function')
