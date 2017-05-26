@@ -5,6 +5,7 @@ from briefy.leica.db import Base
 from briefy.leica.models import Customer
 from briefy.leica.models import mixins
 from briefy.leica.models.user import workflows
+from briefy.leica.utils import ensure_uid
 from briefy.leica.utils.user import add_user_info_to_state_history
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -240,14 +241,9 @@ class CustomerUserProfile(UserProfile):
 
             if project.customer_id not in self.customer_ids:
                 msg = 'Project "{0}" is not linked ot the Customer the user belongs.'
-                # TODO: this can not be validate here, it must be before commit the transaction
+                # TODO: this can not be validated here, it must be before commit the transaction
                 logger.warn(msg.format(project.title))
             return project
-
-        def get_uid():
-            """Get local uid."""
-            id_ = self.id
-            return id_ if isinstance(id_, UUID) else UUID(id_)
 
         def remove_project(project, user_id):
             """Remove customer_user LocalRole from the Project."""
@@ -265,11 +261,11 @@ class CustomerUserProfile(UserProfile):
 
         for project_id in to_add:
             project = validate_project(project_id)
-            project.customer_users.append(get_uid())
+            project.customer_users.append(ensure_uid(self.id))
 
         for project_id in to_remove:
             project = validate_project(project_id)
-            remove_project(project, get_uid())
+            remove_project(project, ensure_uid(self.id))
 
     @property
     def projects(self):
