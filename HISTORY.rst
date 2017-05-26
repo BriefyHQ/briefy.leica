@@ -12,6 +12,7 @@ History
     * Card #283: New dashboard for customer: Leads (ericof).
     * Card #364: Fix leadorder confirm workflow transition to only create the assignment after creation (rudaporto).
     * Add new related filter to CustomerProfileService to be able to filter by customer or project (rudaporto).
+    * Card #368: CustomerUserProfile.project_roles setter now correct remove or add projects based in the received list (rudaporto).
 
 2.1.17 (2017-05-24)
 -------------------
