@@ -14,6 +14,7 @@ History
     * Add new related filter to CustomerProfileService to be able to filter by customer or project (rudaporto).
     * Card #368: CustomerUserProfile.project_roles setter now correct remove or add projects based on the received list (rudaporto).
     * Card #231: Add Actual Order Price field to Order and LeadOrder(ericof).
+    * Card #231: Add Actual Order Price to finance export (ericof).
 
 2.1.17 (2017-05-24)
 -------------------
