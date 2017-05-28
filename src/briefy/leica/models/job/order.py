@@ -110,7 +110,7 @@ def get_category_from_project(context):
     return project.category
 
 
-def set_default_actual_order_price(context):
+def default_actual_order_price(context):
     """Get category for Order from the Project.category."""
     order_type = context.current_parameters.get('type')
     actual_order_price = 0
@@ -323,7 +323,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         'actual_order_price',
         sa.Integer,
         nullable=True,
-        default=set_default_actual_order_price,
+        default=default_actual_order_price,
         info={
             'colanderalchemy': {
                 'title': 'Acutal Order Price',
