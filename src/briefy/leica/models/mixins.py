@@ -928,25 +928,25 @@ class OrderFinancialInfo:
             }
         }
     )
-    """Price to be paid, by the customer, for this job.
+    """Order Price as stated on the agreement with the customer.
 
-    Amount to be paid by the customer for this job.
+    Default amount to be applied to this order.
     This value is expressed in cents.
     """
 
     @hybrid_property
     def price(self) -> int:
-        """Price of this job.
+        """Order Price as stated on the agreement with the customer.
 
-        :return: Return the price, in cents, of this job.
+        :return: Return the price, in cents, of this order.
         """
         return self._price
 
     @price.setter
     def price(self, value: int):
-        """Set Price of this job.
+        """Order Price of this job.
 
-        :return: Set the price, in cents, of this job.
+        :value: Price, in cents, of this order.
         """
         self._price = value
 

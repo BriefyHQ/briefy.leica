@@ -1294,6 +1294,8 @@ class LeadOrderWorkflow(OrderWorkflow):
         """Confirm LeadOrder and set availability dates."""
         leadorder = self.document
         state_history = leadorder.state_history
+        # Set actual_order_price
+        leadorder.actual_order_price = leadorder.price
         if state_history[-1]['from'] == 'created':
             create_new_assignment_from_order(leadorder, leadorder.request)
 
@@ -1310,6 +1312,9 @@ class LeadOrderWorkflow(OrderWorkflow):
         """Remove LeadOrder confirmation and clean availability dates."""
         order = self.document
         order.availability = None
+
+        # Set actual_order_price
+        order.actual_order_price = 0
 
     @Permission(groups=[
         G['customers'], G['pm'], G['bizdev'], G['tech'], G['product'], G['support'], G['system'],

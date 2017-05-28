@@ -27,6 +27,10 @@ class TestOrderModel(BaseModelTest):
     initial_wf_state = 'received'
     number_of_wf_transtions = 1
 
+    def test_actual_order_price_is_equal_to_price(self, instance_obj):
+        """Test if the created object actual_order_price is equal to price."""
+        assert instance_obj.actual_order_price == instance_obj.price
+
     @staticmethod
     def delete_assigment_created(assignment, session):
         """Delete assignment created."""

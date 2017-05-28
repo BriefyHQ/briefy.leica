@@ -26,6 +26,10 @@ class TestLeadOrderModel(BaseModelTest):
     model = models.LeadOrder
     initial_wf_state = 'new'
 
+    def test_actual_order_price_is_equal_to_zero(self, instance_obj):
+        """Test if the created object actual_order_price is equal to 0."""
+        assert instance_obj.actual_order_price == 0
+
     @staticmethod
     def delete_assigment_created(assignment, session):
         """Delete assignment created."""
@@ -102,6 +106,7 @@ class TestLeadOrderModel(BaseModelTest):
             origin_state
         )
         now_utc = now_utc.astimezone(pytz.timezone(leadorder.timezone))
+        leadorder.actual_order_price = 0
 
         new_availability = {}
         with pytest.raises(WorkflowTransitionException) as excinfo:
@@ -164,6 +169,7 @@ class TestLeadOrderModel(BaseModelTest):
         self.notify_assigment_created(assignment, request, session)
 
         assert leadorder.state == 'received'
+        assert leadorder.actual_order_price == leadorder.price
         for key, value in new_availability.items():
             assert getattr(leadorder, key)[0] == value[0].isoformat()
             assert getattr(leadorder, key)[1] == value[1].isoformat()
@@ -312,6 +318,7 @@ class TestLeadOrderModel(BaseModelTest):
         assert leadorder.state == 'new'
         assert leadorder.state_history[-1]['transition'] == 'remove_confirmation'
         assert leadorder.state_history[-1]['message'] == message
+        assert leadorder.actual_order_price == 0
 
     @pytest.mark.parametrize('origin_state', ['new', 'received', 'assigned', 'scheduled'])
     @pytest.mark.parametrize('role_name', ['pm', 'customer', 'system'])

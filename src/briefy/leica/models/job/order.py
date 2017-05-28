@@ -110,6 +110,15 @@ def get_category_from_project(context):
     return project.category
 
 
+def set_default_actual_order_price(context):
+    """Get category for Order from the Project.category."""
+    order_type = context.current_parameters.get('type')
+    actual_order_price = 0
+    if order_type == 'order':
+        actual_order_price = context.current_parameters.get('price', 0)
+    return actual_order_price
+
+
 class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
             mixins.KLeicaVersionedMixin, Base):
     """An Order from the customer."""
@@ -309,6 +318,28 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     requirements = sa.Column(sa.Text, default='')
     """Human-readable requirements for an Order."""
+
+    actual_order_price = sa.Column(
+        'actual_order_price',
+        sa.Integer,
+        nullable=True,
+        default=set_default_actual_order_price,
+        info={
+            'colanderalchemy': {
+                'title': 'Acutal Order Price',
+                'missing': None,
+                'typ': colander.Integer
+            }
+        }
+    )
+    """Price to be paid, by the customer, for this order.
+
+    Amount to be paid by the customer for this order.
+    For Orders this value will be the same of Order.price, on creation.
+    For LeadOrders this value will be 0.
+
+    This value is expressed in cents.
+    """
 
     _location = orm.relationship(
         'OrderLocation',
