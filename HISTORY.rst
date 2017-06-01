@@ -5,7 +5,7 @@ History
 2.1.18 (2017-06-01)
 -------------------
     * Card #385: fix order location field in the order payload after order creation (rudaporto).
-    * Fix: professionals view tests now have a proper main_location in original payload (rudaporto).
+    * Fix: professionals view tests now have a proper main_location in the original payload (rudaporto).
     * Fix: professionals main_location update test now is really updating the existing location (rudaporto).
 
 2.1.17 (2017-05-24)
