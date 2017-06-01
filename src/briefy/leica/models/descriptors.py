@@ -16,6 +16,7 @@ class UnaryRelationshipWrapper:
         self._model = model
         self._field_name = field_name
         self._fk_attr = fk_attr
+        self._attr_created = {}
 
     def __get__(self, obj, obj_type=None) -> Base:
         """Get the data from the field.
@@ -24,7 +25,13 @@ class UnaryRelationshipWrapper:
         :param obj_type: not used
         :return: instance of the related object
         """
-        return getattr(obj, self._field_name, None)
+        value = None
+        if obj:
+            value = getattr(obj, self._field_name)
+            if not value:
+                attr_instance_id = self._attr_created.get(obj.id)
+                value = self._model.get(attr_instance_id) if attr_instance_id else None
+        return value
 
     def __set__(self, obj, value) -> None:
         """Set the new instance of the related object.
@@ -69,13 +76,17 @@ class UnaryRelationshipWrapper:
         value[self._fk_attr] = fk_id
         sub_object = self._model(**value)
         session.add(sub_object)
+        session.flush()
+        self._attr_created[obj.id] = sub_object.id
+        setattr(obj, self._field_name, sub_object)
 
     def update_sub_object(self, obj, value):
         """Update an existing sub object instance."""
-        sub_object = self.__get__(obj)
-        if sub_object:
-            for k, v in value.items():
-                setattr(sub_object, k, v)
+        if obj and value:
+            sub_object = self.__get__(obj)
+            if sub_object:
+                for k, v in value.items():
+                    setattr(sub_object, k, v)
 
 
 class MultipleRelationshipWrapper(UnaryRelationshipWrapper):

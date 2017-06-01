@@ -14,8 +14,9 @@ class TestProfessionalView(BaseTestView):
     file_path = 'data/professionals.json'
     model = models.Professional
     initial_wf_state = 'pending'
-    ignore_validation_fields = ['state_history', 'state', 'intercom']
-
+    ignore_validation_fields = [
+        'state_history', 'state', 'intercom', 'locations', 'main_location'
+    ]
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {
@@ -49,16 +50,17 @@ class TestProfessionalView(BaseTestView):
     def test_successful_main_location_update(self, obj_payload, app):
         """Test creation and update of main_location of a Professional."""
         obj_id = obj_payload['id']
+        updated_obj = self.model.get(obj_id)
         payload = self.main_location_map
+        payload['main_location']['id'] = str(updated_obj._main_location.id)
 
         request = app.put_json('{base}/{id}'.format(base=self.base_path, id=obj_id),
                                payload, headers=self.headers, status=200)
         result = request.json
         assert 'application/json' == request.content_type
-        updated_obj = self.model.get(obj_id)
-        assert updated_obj._main_location is not None
-        assert updated_obj._main_location.country == result['main_location']['country']
-        assert updated_obj._main_location.locality == result['main_location']['locality']
+        assert updated_obj.main_location is not None
+        assert updated_obj.main_location.country == result['main_location']['country']
+        assert updated_obj.main_location.locality == result['main_location']['locality']
 
         # Update the same location
         payload['main_location']['id'] = str(updated_obj._main_location.id)
