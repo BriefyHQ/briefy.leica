@@ -646,7 +646,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_summary_dict()
-        data['category'] = self.category.value
+        data['category'] = self.category
         data = self._apply_actors_info(data)
         return data
 
@@ -659,9 +659,9 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         """
         data = super().to_listing_dict()
         set_type = self.set_type
-        data['set_type'] = set_type.value if isinstance(set_type, TypesOfSetChoices) else set_type
         category = self.category
-        data['category'] = category.value if isinstance(category, CategoryChoices) else category
+        data['set_type'] = set_type
+        data['category'] = category
         data = self._apply_actors_info(data)
         return data
 
@@ -686,9 +686,9 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         data['location'] = self.location.to_summary_dict() if self.location else None
 
         set_type = self.set_type
-        data['set_type'] = set_type.value if isinstance(set_type, TypesOfSetChoices) else set_type
         category = self.category
-        data['category'] = category.value if isinstance(category, CategoryChoices) else category
+        data['set_type'] = set_type
+        data['category'] = category
 
         if data['project']:
             # Project delivery data used on the 'approve' transition
