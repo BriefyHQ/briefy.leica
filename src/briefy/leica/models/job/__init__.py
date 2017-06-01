@@ -1,7 +1,6 @@
 """Briefy Leica Assignment model."""
 from briefy.common.db.types import AwareDateTime
 from briefy.common.utils import schema
-from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica.cache import cache_manager
 from briefy.leica.cache import cache_region
 from briefy.leica.cache import enable_cache
