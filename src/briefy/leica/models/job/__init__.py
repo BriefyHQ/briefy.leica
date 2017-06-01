@@ -658,7 +658,8 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_listing_dict()
-        data['set_type'] = self.set_type.value
+        data['set_type'] = self.set_type.value \
+            if isinstance(self.set_type, TypesOfSetChoices) else self.set_type
         data['category'] = self.category.value \
             if isinstance(self.category, CategoryChoices) else self.category
         data = self._apply_actors_info(data)

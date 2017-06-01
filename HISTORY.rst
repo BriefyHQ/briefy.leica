@@ -15,6 +15,7 @@ History
     * Card #368: CustomerUserProfile.project_roles setter now correct remove or add projects based on the received list (rudaporto).
     * Card #231: Add Actual Order Price field to Order and LeadOrder(ericof).
     * Card #231: Add Actual Order Price to finance export (ericof).
+    * Card #378: Fix serialization of an Assignment if set_type is None (ericof).
 
 2.1.17 (2017-05-24)
 -------------------
