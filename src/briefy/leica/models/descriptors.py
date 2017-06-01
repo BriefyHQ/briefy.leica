@@ -1,5 +1,6 @@
 """Custom descriptors to handle get, set and delete of special attributes."""
 from briefy.common.db import Base
+from sqlalchemy.orm.collections import InstrumentedList
 from sqlalchemy.orm.session import object_session
 
 
@@ -78,7 +79,11 @@ class UnaryRelationshipWrapper:
         session.add(sub_object)
         session.flush()
         self._attr_created[obj.id] = sub_object.id
-        setattr(obj, self._field_name, sub_object)
+        actual_value = getattr(obj, self._field_name)
+        if isinstance(actual_value, InstrumentedList):
+            actual_value.append(sub_object)
+        else:
+            setattr(obj, self._field_name, sub_object)
 
     def update_sub_object(self, obj, values):
         """Update an existing sub object instance."""
