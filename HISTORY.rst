@@ -16,6 +16,7 @@ History
     * Card #231: Add Actual Order Price field to Order and LeadOrder(ericof).
     * Card #231: Add Actual Order Price to finance export (ericof).
     * Card #378: Fix serialization of an Assignment if set_type is None (ericof).
+    * Integrate change in briefy.common to log when we create the cache region (rudaporto).
 
 2.1.17 (2017-05-24)
 -------------------
