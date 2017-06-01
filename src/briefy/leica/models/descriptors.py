@@ -80,13 +80,12 @@ class UnaryRelationshipWrapper:
         self._attr_created[obj.id] = sub_object.id
         setattr(obj, self._field_name, sub_object)
 
-    def update_sub_object(self, obj, value):
+    def update_sub_object(self, obj, values):
         """Update an existing sub object instance."""
-        if obj and value:
+        if obj and isinstance(values, dict):
             sub_object = self.__get__(obj)
             if sub_object:
-                for k, v in value.items():
-                    setattr(sub_object, k, v)
+                sub_object.update(values)
 
 
 class MultipleRelationshipWrapper(UnaryRelationshipWrapper):
