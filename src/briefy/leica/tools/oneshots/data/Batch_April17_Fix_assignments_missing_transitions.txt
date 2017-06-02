@@ -1,7 +1,0 @@
-assignment_uid	previous_assignment_status	transition_name	new_assignment_status	user_role	date_time	comment
-00324df8-2a44-4237-ba3a-620601c57cac	in_qa	approve	approved	qa	2016-10-28 14:02:00	first approval
-9af86901-33e0-4700-85ac-a08f71f188f3	in_qa	approve	approved	qa	2016-12-28 17:07:00	first approval
-77d6af8e-eb72-44a7-a040-c8985cf1bb74	in_qa	approve	approved	qa	2016-10-31 17:05:00	first approval
-a1a0ada5-8885-464e-b708-f9fd7d913e53	in_qa	approve	approved	qa	2016-10-27 12:58:00	first approval
-6af9199f-e5cc-44bd-a5e9-5687414ff073	in_qa	approve	approved	qa	2016-11-01 17:24:00	first approval
-544ea791-95f8-4a4c-afca-506965f82618	in_qa	approve	approved	qa	2016-10-31 16:07:00	first approval

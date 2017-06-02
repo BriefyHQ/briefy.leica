@@ -1,5 +1,6 @@
 """This module contains SQLAlchemy helpers and connectivity."""
 from briefy.common.db import Base  # noQA
+from briefy.leica import config
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
@@ -32,3 +33,10 @@ def get_engine(settings):
     """
     engine = create_engine(settings['sqlalchemy.url'], pool_recycle=3600)
     return engine
+
+
+def db_configure(session):
+    """Bind session for 'stand alone' DB usage."""
+    engine = create_engine(config.DATABASE_URL, pool_recycle=3600)
+    session.configure(bind=engine)
+    return session
