@@ -2,6 +2,7 @@
 from briefy.leica.db import Base
 from briefy.leica.db import Session
 from briefy.leica.models import Customer
+from briefy.leica.models import LeadOrder
 from briefy.leica.models import Order
 from briefy.leica.models import Project
 from briefy.leica.models.dashboard.base import total_order_project
@@ -77,5 +78,56 @@ class DashboardPMDeliveredOrders(Base):
     __table__ = delivered_orders_pm
     __mapper_args__ = {
         'primary_key': [delivered_orders_pm.c.absolute_url]
+    }
+    __session__ = Session
+
+
+all_leads_pm = select(
+    [
+        func.CONCAT('/projects/', expression.cast(Project.id, types.Unicode)).label('absolute_url'),
+        Project.title,
+        func.count(distinct(LeadOrder.id)).label('total'),
+        func.sum(case([(LeadOrder.state == 'new', 1)], else_=0)).label('open'),
+        func.sum(case([(LeadOrder.state == 'cancelled', 1)], else_=0)).label('cancelled'),
+        func.sum(case([(LeadOrder.state.notin_(['new', 'cancelled']), 1)], else_=0)).label(
+            'confirmed'
+        ),
+    ]
+).group_by(
+    Project.title,
+    Project.id
+).where(
+    and_(
+        LeadOrder.state.in_(
+            (
+                'new',
+                'received',
+                'assigned',
+                'scheduled',
+                'cancelled',
+                'delivered',
+                'accepted',
+                'in_qa',
+                'refused',
+                'perm_refused'
+            )
+        ),
+        Project.id == Order.project_id,
+        Project.order_type == 'leadorder',
+        LeadOrder.id == Order.id,
+        or_(
+            Project.local_roles.any(user_id=':user_id', can_view=True),
+            Customer.local_roles.any(user_id=':user_id', can_view=True)
+        )
+    )
+).alias('all_leads_pm')
+
+
+class DashboardPMAllLeads(Base):
+    """Dashboard PM: Total of Leads by workflow state."""
+
+    __table__ = all_leads_pm
+    __mapper_args__ = {
+        'primary_key': [all_leads_pm.c.absolute_url]
     }
     __session__ = Session
