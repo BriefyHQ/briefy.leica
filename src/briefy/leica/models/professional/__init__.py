@@ -8,7 +8,6 @@ from briefy.leica.models.professional.location import WorkingLocation
 from briefy.leica.models.professional.workflows import ProfessionalWorkflow
 from briefy.leica.models.user import UserProfile
 from briefy.leica.utils.intercom import intercom_payload_professional
-from briefy.leica.utils.user import add_user_info_to_state_history
 from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy_utils import UUIDType
