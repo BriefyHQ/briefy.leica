@@ -195,19 +195,17 @@ class Professional(UserProfile, Base):
         """Name of the model on Knack."""
         return 'Photographer'
 
-    def to_dict(self):
+    def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
-        data = super().to_dict()
+        excludes = list(excludes) if excludes else []
+        excludes.extend(['assets', 'assignments'])
+        data = super().to_dict(excludes=excludes, includes=includes)
         data['slug'] = self.slug
-        data['locations'] = self.locations
-        data['links'] = self.links
+        data['locations'] = [c.to_dict() for c in self.locations or []]
+        data['links'] = [c.to_dict() for c in self.links or []]
         data['comments'] = [c.to_summary_dict() for c in self.comments]
         data['billing_info_id'] = self.billing_info.id if self.billing_info else ''
         data['intercom'] = intercom_payload_professional(self)
-
-        # Workflow history
-        add_user_info_to_state_history(self.state_history)
-
         return data
 
 
