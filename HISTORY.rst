@@ -2,7 +2,7 @@
 History
 =======
 
-2.1.18 (Unreleased)
+2.1.19 (Unreleased)
 -------------------
 
     * Card #282: Allow filtering Order/LeadOrder by type on /orders endpoint (ericof).
@@ -17,6 +17,15 @@ History
     * Card #231: Add Actual Order Price to finance export (ericof).
     * Card #378: Fix serialization of an Assignment if set_type is None (ericof).
     * Integrate change in briefy.common to log when we create the cache region (rudaporto).
+
+
+2.1.18 (2017-06-02)
+-------------------
+    * Card #385: fix order location field in the order payload after order creation (rudaporto).
+    * Fix: professionals view tests now have a proper main_location in the original payload (rudaporto).
+    * Fix: professionals main_location update test now is really updating the existing location (rudaporto).
+    * Fix: professional to_dict to never return 'assets' and 'assignments' collections (rudaporto).
+
 
 2.1.17 (2017-05-24)
 -------------------
