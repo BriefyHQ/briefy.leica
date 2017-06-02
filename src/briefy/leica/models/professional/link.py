@@ -16,6 +16,8 @@ class Link(mixins.LeicaMixin, Base):
 
     _workflow = workflows.LinkWorkflow
 
+    __summary_attributes_relations__ = ['professional']
+
     __colanderalchemy_config__ = {
         'excludes': ['state_history', 'state']
     }

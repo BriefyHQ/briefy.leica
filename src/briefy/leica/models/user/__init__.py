@@ -110,9 +110,9 @@ class UserProfile(mixins.UserProfileMixin, mixins.UserProfileBriefyRoles, Base):
         """Return the User fullname."""
         return sa.orm.column_property(cls.first_name + ' ' + cls.last_name)
 
-    def to_dict(self):
+    def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
-        data = super().to_dict()
+        data = super().to_dict(excludes=excludes, includes=includes)
         add_user_info_to_state_history(self.state_history)
         return data
 

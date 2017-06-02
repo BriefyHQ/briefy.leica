@@ -23,7 +23,28 @@
     "state": "created",
     "mobile": "+49 176 37755722",
     "description": "Sebastião Salgado (born February 8, 1944) is a Brazilian social documentary photographer.",
-    "email": "salgado@professional.briefy.co"
+    "email": "salgado@professional.briefy.co",
+    "main_location": {
+      "coordinates": {"coordinates": [9.732010400000036, 52.3758916],
+                       "type": "Point"},
+       "country": "DE",
+       "created_at": "2017-06-01T11:02:42.334841+00:00",
+       "formatted_address": "Hanover, Germany",
+       "info": {"coordinates": [52.3758916, 9.732010400000036],
+                "country": "DE",
+                "formatted_address": "Hanover, Germany",
+                "locality": "Hanover",
+                "place_id": "ChIJhU9JTVELsEcRIEeslG2sJQQ",
+                "postal_code": "",
+                "province": "Lower Saxony",
+                "route": "",
+                "street_number": ""},
+       "latlng": [52.3758916, 9.732010400000036],
+       "locality": "Hanover",
+       "state": "created",
+       "timezone": "UTC",
+       "updated_at": "2017-06-01T11:02:42.334865+00:00"
+    }
   },
   {
     "internal": true,
@@ -49,7 +70,41 @@
     "state": "created",
     "mobile": "+4917637755722",
     "description": "Sebastião Salgado (born February 8, 1944) is a Brazilian social documentary photographer.",
-    "email": "salgado1@professional.briefy.co"
+    "email": "salgado1@professional.briefy.co",
+    "main_location": {
+      "coordinates": {
+        "coordinates": [
+          9.732010400000036,
+          52.3758916
+        ],
+        "type": "Point"
+      },
+      "country": "DE",
+      "created_at": "2017-06-01T11:02:42.334841+00:00",
+      "formatted_address": "Hanover, Germany",
+      "info": {
+        "coordinates": [
+          52.3758916,
+          9.732010400000036
+        ],
+        "country": "DE",
+        "formatted_address": "Hanover, Germany",
+        "locality": "Hanover",
+        "place_id": "ChIJhU9JTVELsEcRIEeslG2sJQQ",
+        "postal_code": "",
+        "province": "Lower Saxony",
+        "route": "",
+        "street_number": ""
+      },
+      "latlng": [
+        52.3758916,
+        9.732010400000036
+      ],
+      "locality": "Hanover",
+      "state": "created",
+      "timezone": "UTC",
+      "updated_at": "2017-06-01T11:02:42.334865+00:00"
+    }
   },
   {
     "internal": true,
@@ -77,22 +132,25 @@
     "description": "A genius.",
     "email": "steve@professional.briefy.co",
     "main_location": {
-      "coordinates": [52.3758916, 9.732010400000036],
-      "country": "DE",
-      "formatted_address": "Hanover, Germany",
-      "id": "1c5b32d8-eb28-407a-9d92-abe59ddbb99b",
-      "info": {
-        "coordinates": [52.3758916, 9.732010400000036],
-               "country": "DE",
-               "formatted_address": "Hanover, Germany",
-               "locality": "Hanover",
-               "place_id": "ChIJhU9JTVELsEcRIEeslG2sJQQ",
-               "postal_code": "",
-               "province": "Lower Saxony",
-               "route": "",
-               "street_number": ""
-      },
-      "locality": "Hanover"
+      "coordinates": {"coordinates": [9.732010400000036, 52.3758916],
+                       "type": "Point"},
+       "country": "DE",
+       "created_at": "2017-06-01T11:02:42.334841+00:00",
+       "formatted_address": "Hanover, Germany",
+       "info": {"coordinates": [52.3758916, 9.732010400000036],
+                "country": "DE",
+                "formatted_address": "Hanover, Germany",
+                "locality": "Hanover",
+                "place_id": "ChIJhU9JTVELsEcRIEeslG2sJQQ",
+                "postal_code": "",
+                "province": "Lower Saxony",
+                "route": "",
+                "street_number": ""},
+       "latlng": [52.3758916, 9.732010400000036],
+       "locality": "Hanover",
+       "state": "created",
+       "timezone": "UTC",
+       "updated_at": "2017-06-01T11:02:42.334865+00:00"
     }
   }
 ]
