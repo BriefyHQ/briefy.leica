@@ -1280,10 +1280,12 @@ class LeadOrderWorkflow(OrderWorkflow):
     def cancel(self, **kwargs):
         """Transition: Cancel the LeadOrder."""
         leadorder = self.document
-        assignment = leadorder.assignments[-1]
-        wkf = assignment.workflow
-        wkf.context = self.context
-        assignment.workflow.cancel()
+        assignments = leadorder.assignments
+        if assignments:
+            assignment = leadorder.assignments[-1]
+            wkf = assignment.workflow
+            wkf.context = self.context
+            assignment.workflow.cancel()
 
     @new.transition(
         received,
