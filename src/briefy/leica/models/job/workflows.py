@@ -1281,6 +1281,9 @@ class LeadOrderWorkflow(OrderWorkflow):
         """Transition: Cancel the LeadOrder."""
         leadorder = self.document
         assignments = leadorder.assignments
+        availability = leadorder.availability
+        if not availability:
+            leadorder.current_type = 'leadorder'
         if assignments:
             assignment = leadorder.assignments[-1]
             wkf = assignment.workflow
@@ -1298,6 +1301,8 @@ class LeadOrderWorkflow(OrderWorkflow):
         state_history = leadorder.state_history
         # Set actual_order_price
         leadorder.actual_order_price = leadorder.price
+        # Set the current type to order
+        leadorder.current_type = 'order'
         if state_history[-1]['from'] == 'created':
             create_new_assignment_from_order(leadorder, leadorder.request)
 

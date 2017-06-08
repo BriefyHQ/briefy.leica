@@ -170,6 +170,7 @@ class TestLeadOrderModel(BaseModelTest):
 
         assert leadorder.state == 'received'
         assert leadorder.actual_order_price == leadorder.price
+        assert leadorder.current_type == 'order'
         for key, value in new_availability.items():
             assert getattr(leadorder, key)[0] == value[0].isoformat()
             assert getattr(leadorder, key)[1] == value[1].isoformat()

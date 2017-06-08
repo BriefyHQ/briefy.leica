@@ -44,7 +44,7 @@ __summary_attributes__ = [
 
 __listing_attributes__ = __summary_attributes__ + [
     'accept_date', 'availability', 'assignment', 'requirements', 'project',
-    'customer', 'refused_times', 'asset_types', 'type'
+    'customer', 'refused_times', 'asset_types', 'type', 'current_type'
 ]
 
 __colander_alchemy_config_overrides__ = \
@@ -119,6 +119,11 @@ def default_actual_order_price(context):
     return actual_order_price
 
 
+def default_current_type(context):
+    """Get current type ."""
+    return context.current_parameters.get('type')
+
+
 class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
             mixins.KLeicaVersionedMixin, Base):
     """An Order from the customer."""
@@ -173,6 +178,13 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         if cls_name == 'order':
             args['polymorphic_on'] = cls.type
         return args
+
+    current_type = sa.Column(
+        sa.String(50),
+        index=True,
+        default=default_current_type,
+    )
+    """Type of the Order during its life cycle."""
 
     _slug = sa.Column('slug',
                       sa.String(255),
