@@ -58,7 +58,8 @@ from
                 json_typeof(availability) = 'array' AND
                 json_array_length(availability) = 0
             )
-        )
+        ) AND
+        json_array_length(state_history) > 2
 ) as temp1
 where
    orders.id = temp1.id
