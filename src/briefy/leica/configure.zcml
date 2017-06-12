@@ -5,4 +5,7 @@
 	<include package=".subscribers" />
 	<include package=".queue" />
 
+	<!-- Include overrides -->
+	<includeOverrides package=".utilities" file="overrides.zcml" />
+
 </configure>

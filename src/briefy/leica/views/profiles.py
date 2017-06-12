@@ -174,7 +174,8 @@ class CustomerProfileVersionsService(VersionsService):
 
 
 @resource(
-    path=PATH + '/history',
+    collection_path=PATH + '/history',
+    path=PATH + '/history/{item_id}',
     cors_policy=CORS_POLICY,
     factory=CustomerProfileFactory
 )
@@ -261,7 +262,8 @@ class InternalProfileVersionsService(VersionsService):
 
 
 @resource(
-    path=PATH + '/history',
+    collection_path=PATH + '/history',
+    path=PATH + '/history/{item_id}',
     cors_policy=CORS_POLICY,
     factory=InternalProfileFactory
 )

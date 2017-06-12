@@ -1,0 +1,10 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+    <!-- Leica UserProfileQuery Utility -->
+    <utility
+        factory="briefy.leica.utilities.userprofile.get_user_profile_service"
+        provides="briefy.common.utilities.interfaces.IUserProfileQuery"
+        />
+
+
+</configure>
