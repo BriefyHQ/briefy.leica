@@ -2,7 +2,7 @@
 History
 =======
 
-2.1.19 (Unreleased)
+2.1.19 (2017-06-12)
 -------------------
 
     * Card #282: Allow filtering Order/LeadOrder by type on /orders endpoint (ericof).
