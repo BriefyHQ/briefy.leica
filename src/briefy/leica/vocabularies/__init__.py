@@ -121,12 +121,12 @@ TaxIdStatusCustomers = LabeledEnum('TaxIdStatusCustomers', tax_id_customer_statu
 
 
 asset_types = [
-    ('Image', 'Image', 'Image'),
-    ('ImageRaw', 'ImageRaw', 'Raw Image'),
-    ('Image360', 'Image360', '360 Image'),
+    ('Image', 'Image', 'Photograph'),
+    ('ImageRaw', 'ImageRaw', 'Photograph (RAW)'),
+    ('Image360', 'Image360', '360 degree Photograph'),
     ('Video', 'Video', 'Video'),
     ('Cinemagraph', 'Cinemagraph', 'Cinemagraph'),
-    ('Matterport', 'Matterport', 'Matterport'),
+    ('Matterport', 'Matterport', '3D Scan'),
 ]
 
 AssetTypes = LabeledEnum('AssetTypes', asset_types)

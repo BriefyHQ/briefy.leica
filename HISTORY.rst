@@ -2,12 +2,32 @@
 History
 =======
 
+2.1.19 (2017-06-12)
+-------------------
+
+    * Card #282: Allow filtering Order/LeadOrder by type on /orders endpoint (ericof).
+    * Card #196: Migrate Delivery Hero project Orders to LeadOrders (ericof).
+    * Card #197: Migrate Agoda project Orders to LeadOrders (ericof).
+    * Card #358: Set Agoda and Delivery Hero projects to order_type = 'leadorder' (ericof).
+    * Card #283: New dashboard for customer: Leads (ericof).
+    * Card #364: Fix leadorder confirm workflow transition to only create the assignment after creation (rudaporto).
+    * Add new related filter to CustomerProfileService to be able to filter by customer or project (rudaporto).
+    * Card #368: CustomerUserProfile.project_roles setter now correct remove or add projects based on the received list (rudaporto).
+    * Card #231: Add Actual Order Price field to Order and LeadOrder(ericof).
+    * Card #231: Add Actual Order Price to finance export (ericof).
+    * Card #378: Fix serialization of an Assignment if set_type is None (ericof).
+    * Integrate change in briefy.common to log when we create the cache region (rudaporto).
+    * Card #377: Add Leads dashboard to PM (ericof).
+    * Card #392: Remove dependencies to briefy.knack (ericof).
+
+
 2.1.18 (2017-06-02)
 -------------------
     * Card #385: fix order location field in the order payload after order creation (rudaporto).
     * Fix: professionals view tests now have a proper main_location in the original payload (rudaporto).
     * Fix: professionals main_location update test now is really updating the existing location (rudaporto).
     * Fix: professional to_dict to never return 'assets' and 'assignments' collections (rudaporto).
+
 
 2.1.17 (2017-05-24)
 -------------------

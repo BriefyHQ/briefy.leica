@@ -44,7 +44,7 @@ __summary_attributes__ = [
 
 __listing_attributes__ = __summary_attributes__ + [
     'accept_date', 'availability', 'assignment', 'requirements', 'project',
-    'customer', 'refused_times', 'asset_types'
+    'customer', 'refused_times', 'asset_types', 'type', 'current_type'
 ]
 
 __colander_alchemy_config_overrides__ = \
@@ -110,6 +110,20 @@ def get_category_from_project(context):
     return project.category
 
 
+def default_actual_order_price(context):
+    """Get category for Order from the Project.category."""
+    order_type = context.current_parameters.get('type')
+    actual_order_price = 0
+    if order_type == 'order':
+        actual_order_price = context.current_parameters.get('price', 0)
+    return actual_order_price
+
+
+def default_current_type(context):
+    """Get current type ."""
+    return context.current_parameters.get('type')
+
+
 class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
             mixins.KLeicaVersionedMixin, Base):
     """An Order from the customer."""
@@ -164,6 +178,13 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         if cls_name == 'order':
             args['polymorphic_on'] = cls.type
         return args
+
+    current_type = sa.Column(
+        sa.String(50),
+        index=True,
+        default=default_current_type,
+    )
+    """Type of the Order during its life cycle."""
 
     _slug = sa.Column('slug',
                       sa.String(255),
@@ -309,6 +330,28 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     requirements = sa.Column(sa.Text, default='')
     """Human-readable requirements for an Order."""
+
+    actual_order_price = sa.Column(
+        'actual_order_price',
+        sa.Integer,
+        nullable=True,
+        default=default_actual_order_price,
+        info={
+            'colanderalchemy': {
+                'title': 'Acutal Order Price',
+                'missing': None,
+                'typ': colander.Integer
+            }
+        }
+    )
+    """Price to be paid, by the customer, for this order.
+
+    Amount to be paid by the customer for this order.
+    For Orders this value will be the same of Order.price, on creation.
+    For LeadOrders this value will be 0.
+
+    This value is expressed in cents.
+    """
 
     _location = orm.relationship(
         'OrderLocation',

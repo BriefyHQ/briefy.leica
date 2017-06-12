@@ -1,8 +1,8 @@
 """Export all data for finance invoice."""
+from briefy.leica.db import db_configure
 from briefy.leica.db import Session
 from briefy.leica.models import Assignment
 from briefy.leica.models import Order
-from briefy.leica.sync import db
 from briefy.leica.utils.transitions import get_transition_date_from_history
 from datetime import datetime
 from decimal import Decimal
@@ -88,6 +88,8 @@ def export_order(state=None, customer_comments=False):
         'price_currency',
         'price',
         'delivery_sftp_link',
+        'type',
+        'actual_order_price',
     ]
 
     query = Order.query()
@@ -146,7 +148,9 @@ def export_order(state=None, customer_comments=False):
             accept_date=export_datetime(accept_date),
             price_currency=item.price_currency,
             price=export_integer(item.price),
-            delivery_sftp_link=delivery_sftp_link
+            delivery_sftp_link=delivery_sftp_link,
+            type=item.type,
+            actual_order_price=export_integer(item.actual_order_price)
         )
 
         if customer_comments:
@@ -249,7 +253,7 @@ def save_data_to_file(buffer: StringIO, filename: str) -> bool:
 
 
 if __name__ == '__main__':
-    db.configure(Session)
+    db_configure(Session)
     # Assignment
     assignment_data = export_assignment()
     save_data_to_file(assignment_data, ASSIGNMENT_CSV)

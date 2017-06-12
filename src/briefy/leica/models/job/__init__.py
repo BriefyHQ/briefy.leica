@@ -1,7 +1,6 @@
 """Briefy Leica Assignment model."""
 from briefy.common.db.types import AwareDateTime
 from briefy.common.utils import schema
-from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica.cache import cache_manager
 from briefy.leica.cache import cache_region
 from briefy.leica.cache import enable_cache
@@ -646,7 +645,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_summary_dict()
-        data['category'] = self.category.value
+        data['category'] = self.category
         data = self._apply_actors_info(data)
         return data
 
@@ -658,9 +657,10 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_listing_dict()
-        data['set_type'] = self.set_type.value
-        data['category'] = self.category.value \
-            if isinstance(self.category, CategoryChoices) else self.category
+        set_type = self.set_type
+        category = self.category
+        data['set_type'] = set_type
+        data['category'] = category
         data = self._apply_actors_info(data)
         return data
 
@@ -677,17 +677,18 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
         data['last_approval_date'] = self.last_approval_date
         data['last_submission_date'] = self.last_submission_date
         data['closed_on_date'] = self.closed_on_date
-        data['category'] = self.category.value \
-            if isinstance(self.category, CategoryChoices) else self.category
         data['slug'] = self.slug
-        data['set_type'] = self.set_type.value \
-            if isinstance(self.set_type, TypesOfSetChoices) else self.set_type
         data['timezone'] = self.timezone
         data['tech_requirements'] = self.order.tech_requirements
         data['availability'] = self.availability
-        data['category'] = self.category.value
         data['order'] = self.order.to_summary_dict() if self.order else None
         data['location'] = self.location.to_summary_dict() if self.location else None
+
+        set_type = self.set_type
+        category = self.category
+        data['set_type'] = set_type
+        data['category'] = category
+
         if data['project']:
             # Project delivery data used on the 'approve' transition
             # to deliver assets. (copying over and renaming - takes place

@@ -1280,10 +1280,15 @@ class LeadOrderWorkflow(OrderWorkflow):
     def cancel(self, **kwargs):
         """Transition: Cancel the LeadOrder."""
         leadorder = self.document
-        assignment = leadorder.assignments[-1]
-        wkf = assignment.workflow
-        wkf.context = self.context
-        assignment.workflow.cancel()
+        assignments = leadorder.assignments
+        availability = leadorder.availability
+        if not availability:
+            leadorder.current_type = 'leadorder'
+        if assignments:
+            assignment = leadorder.assignments[-1]
+            wkf = assignment.workflow
+            wkf.context = self.context
+            assignment.workflow.cancel()
 
     @new.transition(
         received,
@@ -1293,7 +1298,13 @@ class LeadOrderWorkflow(OrderWorkflow):
     def confirm(self, **kwargs):
         """Confirm LeadOrder and set availability dates."""
         leadorder = self.document
-        create_new_assignment_from_order(leadorder, leadorder.request)
+        state_history = leadorder.state_history
+        # Set actual_order_price
+        leadorder.actual_order_price = leadorder.price
+        # Set the current type to order
+        leadorder.current_type = 'order'
+        if state_history[-1]['from'] == 'created':
+            create_new_assignment_from_order(leadorder, leadorder.request)
 
     @Permission(groups=[G['customers'], G['pm'], G['bizdev'], G['system'], ])
     def can_confirm(self):
@@ -1308,6 +1319,9 @@ class LeadOrderWorkflow(OrderWorkflow):
         """Remove LeadOrder confirmation and clean availability dates."""
         order = self.document
         order.availability = None
+
+        # Set actual_order_price
+        order.actual_order_price = 0
 
     @Permission(groups=[
         G['customers'], G['pm'], G['bizdev'], G['tech'], G['product'], G['support'], G['system'],

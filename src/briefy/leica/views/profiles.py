@@ -124,7 +124,11 @@ class CustomerProfileService(RESTService):
     model = CustomerUserProfile
     friendly_name = model.__name__
     default_order_by = 'title'
-    filter_related_fields = ['title']
+    filter_related_fields = [
+        'title',
+        'customer_roles.entity_id',
+        'project_roles.entity_id'
+    ]
 
     _validators = (
         ('GET', ('validate_id', )),
