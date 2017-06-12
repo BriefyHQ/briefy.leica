@@ -2,7 +2,9 @@
 from briefy.leica.events import professional as events
 from briefy.leica.models import Professional
 from briefy.ws import CORS_POLICY
+from briefy.ws.resources import HistoryService
 from briefy.ws.resources import RESTService
+from briefy.ws.resources import VersionsService
 from briefy.ws.resources import WorkflowAwareResource
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
@@ -41,7 +43,6 @@ class ProfessionalService(RESTService):
     """Professionals Service."""
 
     model = Professional
-    friendly_name = model.__name__
     default_order_by = 'title'
     filter_related_fields = [
         'title', '_main_location.formatted_address', '_main_location.country',
@@ -66,4 +67,26 @@ class ProfessionalWorkflowService(WorkflowAwareResource):
     """Professional workflow resource."""
 
     model = Professional
-    friendly_name = Professional.__name__
+
+
+@resource(
+    collection_path=PATH + '/versions',
+    path=PATH + '/versions/{version_id}',
+    cors_policy=CORS_POLICY,
+    factory=ProfessionalFactory
+)
+class ProfessionalVersionsService(VersionsService):
+    """Versioning of Professionals."""
+
+    model = Professional
+
+
+@resource(
+    path=PATH + '/history',
+    cors_policy=CORS_POLICY,
+    factory=ProfessionalFactory
+)
+class ProfessionalHistory(HistoryService):
+    """Workflow history of Professionals."""
+
+    model = Professional

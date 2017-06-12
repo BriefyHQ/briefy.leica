@@ -31,7 +31,6 @@ class DashboardScoutingCountryService(RESTService):
     """Dashboard Scouting: Country Service."""
 
     model = DashboardScoutingCountry
-    friendly_name = model.__name__
     default_order_by = 'country'
 
     _columns_map = (
@@ -84,7 +83,6 @@ class DashboardScoutingProjectService(RESTService):
     """Dashboard Scouting: Project Service."""
 
     model = DashboardScoutingProject
-    friendly_name = model.__name__
     default_order_by = 'title'
 
     _columns_map = (
@@ -137,7 +135,6 @@ class DashboardScoutingPoolService(RESTService):
     """Dashboard Scouting: Pool Service."""
 
     model = Pool
-    friendly_name = model.__name__
     default_order_by = 'title'
 
     _columns_map = (

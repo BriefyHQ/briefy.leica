@@ -29,7 +29,6 @@ class DashboardProfessionalAssignmentService(RESTService):
     """Dashboard Professional: Assignment Service."""
 
     model = DashboardProfessionalAssignment
-    friendly_name = model.__name__
     default_order_by = 'total'
 
     _columns_map = (

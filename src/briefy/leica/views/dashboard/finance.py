@@ -30,7 +30,6 @@ class DashboardFinanceOrderService(RESTService):
     """Dashboard Finance: Order Service."""
 
     model = DashboardFinanceOrder
-    friendly_name = model.__name__
     default_order_by = 'title'
 
     _columns_map = ORDER_PROJECT_COLS

@@ -4,7 +4,9 @@ from briefy.leica.models import BriefyUserProfile
 from briefy.leica.models import CustomerUserProfile
 from briefy.leica.models import UserProfile
 from briefy.ws import CORS_POLICY
+from briefy.ws.resources import HistoryService
 from briefy.ws.resources import RESTService
+from briefy.ws.resources import VersionsService
 from briefy.ws.resources import WorkflowAwareResource
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
@@ -63,7 +65,6 @@ class ProfileService(RESTService):
     """CustomerUserProfile Service."""
 
     model = UserProfile
-    friendly_name = model.__name__
     default_order_by = 'title'
     filter_related_fields = ['title']
 
@@ -122,7 +123,6 @@ class CustomerProfileService(RESTService):
     """CustomerUserProfile Service."""
 
     model = CustomerUserProfile
-    friendly_name = model.__name__
     default_order_by = 'title'
     filter_related_fields = [
         'title',
@@ -159,7 +159,29 @@ class CustomerProfileWorkflowService(WorkflowAwareResource):
     """CustomerUserProfile workflow resource."""
 
     model = CustomerUserProfile
-    friendly_name = CustomerUserProfile.__name__
+
+
+@resource(
+    collection_path=PATH + '/versions',
+    path=PATH + '/versions/{version_id}',
+    cors_policy=CORS_POLICY,
+    factory=CustomerProfileFactory
+)
+class CustomerProfileVersionsService(VersionsService):
+    """Versioning of CustomerProfiles."""
+
+    model = CustomerUserProfile
+
+
+@resource(
+    path=PATH + '/history',
+    cors_policy=CORS_POLICY,
+    factory=CustomerProfileFactory
+)
+class CustomerProfileHistory(HistoryService):
+    """Workflow history of CustomerProfiles."""
+
+    model = CustomerUserProfile
 
 
 class InternalProfileFactory(BaseFactory):
@@ -192,7 +214,6 @@ class InternalProfileService(RESTService):
     """InternalUserProfile Service."""
 
     model = BriefyUserProfile
-    friendly_name = model.__name__
     default_order_by = 'title'
     filter_related_fields = ['title']
 
@@ -225,4 +246,26 @@ class InternalProfileWorkflowService(WorkflowAwareResource):
     """InternalProfile workflow resource."""
 
     model = BriefyUserProfile
-    friendly_name = BriefyUserProfile.__name__
+
+
+@resource(
+    collection_path=PATH + '/versions',
+    path=PATH + '/versions/{version_id}',
+    cors_policy=CORS_POLICY,
+    factory=InternalProfileFactory
+)
+class InternalProfileVersionsService(VersionsService):
+    """Versioning of InternalProfiles."""
+
+    model = BriefyUserProfile
+
+
+@resource(
+    path=PATH + '/history',
+    cors_policy=CORS_POLICY,
+    factory=InternalProfileFactory
+)
+class InternalProfileHistory(HistoryService):
+    """Workflow history of InternalProfiles."""
+
+    model = BriefyUserProfile

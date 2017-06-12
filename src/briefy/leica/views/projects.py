@@ -2,7 +2,9 @@
 from briefy.leica.events import project as events
 from briefy.leica.models import Project
 from briefy.ws import CORS_POLICY
+from briefy.ws.resources import HistoryService
 from briefy.ws.resources import RESTService
+from briefy.ws.resources import VersionsService
 from briefy.ws.resources import WorkflowAwareResource
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
@@ -39,7 +41,6 @@ class ProjectService(RESTService):
     """Projects Service."""
 
     model = Project
-    friendly_name = model.__name__
     default_order_by = 'title'
 
     _default_notify_events = {
@@ -64,4 +65,26 @@ class ProjectWorkflowService(WorkflowAwareResource):
     """Project workflow resource."""
 
     model = Project
-    friendly_name = Project.__name__
+
+
+@resource(
+    collection_path=PATH + '/versions',
+    path=PATH + '/versions/{version_id}',
+    cors_policy=CORS_POLICY,
+    factory=ProjectFactory
+)
+class ProjectVersionsService(VersionsService):
+    """Versioning of Projects."""
+
+    model = Project
+
+
+@resource(
+    path=PATH + '/history',
+    cors_policy=CORS_POLICY,
+    factory=ProjectFactory
+)
+class ProjectHistory(HistoryService):
+    """Workflow history of Projects."""
+
+    model = Project

@@ -30,7 +30,6 @@ class DashboardBizDevOrderService(RESTService):
     """Dashboard BizDev: Order Service."""
 
     model = DashboardBizDevOrder
-    friendly_name = model.__name__
     default_order_by = 'title'
 
     _columns_map = ORDER_PROJECT_COLS
