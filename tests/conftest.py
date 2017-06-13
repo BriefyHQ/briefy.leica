@@ -251,9 +251,9 @@ def instance_obj(request, session, obj_payload):
         if isinstance(obj_id, list):
             new_payload = dict(payload.items())
             new_payload.pop('id')
-            obj = cls.model(**new_payload)
+            obj = cls.model.create(new_payload)
         else:
-            obj = cls.model(**payload)
+            obj = cls.model.create(payload)
         session.add(obj)
         session.flush()
     return obj
@@ -297,7 +297,7 @@ def create_dependencies(request, session):
         for payload in data:
             obj = model.get(payload['id'])
             if not obj:
-                obj = model(**payload)
+                obj = model.create(payload)
                 session.add(obj)
     session.flush()
 

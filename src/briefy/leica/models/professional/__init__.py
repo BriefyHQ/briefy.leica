@@ -97,6 +97,7 @@ class Professional(UserProfile, Base):
     # assignments
     assignments = orm.relationship(
         'Assignment',
+        foreign_keys='Assignment.professional_id',
         lazy='dynamic'
     )
 

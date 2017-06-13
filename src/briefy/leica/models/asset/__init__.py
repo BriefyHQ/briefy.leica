@@ -1,6 +1,6 @@
 """Briefy Leica Asset model."""
 from briefy.common.db.mixins import asset
-from briefy.leica.db import Base
+from briefy.common.db.models import Item
 from briefy.leica.models import mixins
 from briefy.leica.models.asset import workflows
 from briefy.leica.models.mixins import get_public_user_info
@@ -26,7 +26,7 @@ __listing_attributes__ = [
 ]
 
 
-class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
+class Asset(asset.Asset, mixins.LeicaVersionedMixin, Item):
     """A deliverable asset from an Assignment."""
 
     _workflow = workflows.AssetWorkflow
@@ -43,7 +43,7 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
     )
 
     __actors__ = (
-        'professional_id',
+        'professional_user',
         'uploaded_by'
     )
 
@@ -174,18 +174,6 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
         """
         return self.assignment.qa_manager
 
-    def _apply_actors_info(self, data: dict) -> dict:
-        """Apply actors information for a given data dictionary.
-
-        :param data: Data dictionary.
-        :return: Data dictionary.
-        """
-        actors = [(k, k) for k in self.__actors__]
-        info = self._actors_info()
-        for key, attr in actors:
-            value = info.get(attr, None)
-            data[key] = get_public_user_info(value) if value else None
-        return data
 
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.

@@ -1,4 +1,5 @@
 """Briefy Leica Assignment model."""
+from briefy.common.db.models import Item
 from briefy.common.db.types import AwareDateTime
 from briefy.common.utils import schema
 from briefy.leica.cache import cache_manager
@@ -45,7 +46,7 @@ __listing_attributes__ = __summary_attributes__ + [
 ]
 
 __colander_alchemy_config_overrides__ = \
-    copy.copy(mixins.AssignmentBriefyRoles.__colanderalchemy_config__['overrides'])
+    copy.copy(mixins.AssignmentRolesMixin.__colanderalchemy_config__['overrides'])
 
 __colander_alchemy_config_overrides__.update(
     dict(
@@ -152,9 +153,9 @@ class AssignmentDates:
 
 
 @implementer(IAssignment)
-class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
+class Assignment(AssignmentDates, mixins.AssignmentRolesMixin,
                  mixins.AssignmentFinancialInfo, mixins.LeicaMixin,
-                 mixins.VersionMixin, Base):
+                 mixins.VersionMixin, Item):
     """An Assignment within an Order."""
 
     _workflow = workflows.AssignmentWorkflow
@@ -309,6 +310,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
 
     professional = orm.relationship(
         'Professional',
+        foreign_keys='Assignment.professional_id',
     )
     """Relationship with :class:`briefy.leica.models.professional.Professional`.
 
@@ -318,6 +320,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
     # Assets for this Assignment
     assets = orm.relationship(
         'Asset',
+        foreign_keys='Asset.assignment_id',
         backref=orm.backref('assignment'),
         lazy='dynamic'
     )

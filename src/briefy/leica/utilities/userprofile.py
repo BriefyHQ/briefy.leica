@@ -60,6 +60,23 @@ class LeicaUserProfileQuery:
 
         return state_history
 
+    def apply_actors_info(self, data: dict, actors) -> dict:
+        """Apply actors information for a given data dictionary.
+
+        :param data: Data dictionary.
+        :param actors: list of local roles to update user info
+        :return: Data dictionary.
+        """
+        for local_role in actors:
+            values = data.get(local_role, [])
+            results = []
+            for item in values:
+                user_info = self.get_data(item) if item else None
+                results.append(user_info)
+            if results and values:
+                data[local_role] = results
+        return data
+
 
 def get_user_profile_service():
     """Create a new instance of IUserProfileQuery service."""

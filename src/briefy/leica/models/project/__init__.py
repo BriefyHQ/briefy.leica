@@ -1,5 +1,5 @@
 """Briefy Leica Project model."""
-from briefy.common.db.mixins import BriefyRoles
+from briefy.common.db.models import Item
 from briefy.common.utils import schema
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica.cache import cache_region
@@ -51,7 +51,7 @@ class IProject(Interface):
     """Marker interface for Project."""
 
 
-class CommercialInfoMixin(mixins.ProfessionalPayoutInfo, mixins.ProjectBriefyRoles,
+class CommercialInfoMixin(mixins.ProfessionalPayoutInfo, mixins.ProjectRolesMixin,
                           mixins.OrderFinancialInfo):
     """Commercial details about a project."""
 
@@ -71,7 +71,8 @@ class CommercialInfoMixin(mixins.ProfessionalPayoutInfo, mixins.ProjectBriefyRol
 
 
 @implementer(IProject)
-class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Base):
+class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
+              mixins.KLeicaVersionedMixin, Item):
     """A Project in Briefy."""
 
     _workflow = workflows.ProjectWorkflow
@@ -102,7 +103,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
             'state_history', 'state', 'customer', '_customer_user', 'pool',
             '_project_manager', 'external_id', '_customer_users', '_project_managers'
         ],
-        'overrides': mixins.ProjectBriefyRoles.__colanderalchemy_config__['overrides']
+        'overrides': mixins.ProjectRolesMixin.__colanderalchemy_config__['overrides']
     }
 
     customer_id = sa.Column(sautils.UUIDType,
@@ -344,6 +345,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
 
     orders = orm.relationship(
         'Order',
+        foreign_keys='Order.project_id',
         backref=orm.backref('project'),
         lazy='dynamic'
     )

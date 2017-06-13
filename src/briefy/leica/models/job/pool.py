@@ -1,5 +1,6 @@
 """Briefy Leica Pool."""
 from briefy.common.db.mixins import Timestamp
+from briefy.common.db.models import Item
 from briefy.leica.db import Base
 from briefy.leica.db import Session
 from briefy.leica.models import Assignment
@@ -18,7 +19,7 @@ import sqlalchemy_utils as sautils
 
 
 class ProfessionalsInPool(mixins.VersionMixin, Timestamp, Base):
-    """Relationshiop between Professional and Pool."""
+    """Relationship between Professional and Pool."""
 
     __session__ = Session
     __tablename__ = 'professionals_in_pool'
@@ -77,7 +78,7 @@ class ProfessionalsInPool(mixins.VersionMixin, Timestamp, Base):
     """
 
 
-class Pool(mixins.KLeicaVersionedMixin, Base):
+class Pool(mixins.LeicaVersionedMixin, Item):
     """A Pool."""
 
     _workflow = workflows.PoolWorkflow
@@ -112,6 +113,7 @@ class Pool(mixins.KLeicaVersionedMixin, Base):
     # Assignments
     assignments = orm.relationship(
         'Assignment',
+        foreign_keys='Assignment.pool_id',
         backref=orm.backref('pool')
     )
     """Assignments.
@@ -128,6 +130,7 @@ class Pool(mixins.KLeicaVersionedMixin, Base):
     # Projects
     projects = orm.relationship(
         'Project',
+        foreign_keys='Project.pool_id',
         backref=orm.backref('pool')
     )
     """Projects.

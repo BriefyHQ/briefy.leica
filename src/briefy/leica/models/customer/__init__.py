@@ -1,5 +1,5 @@
 """Briefy Leica Customer model."""
-from briefy.leica.db import Base
+from briefy.common.db.models import Item
 from briefy.leica.models import mixins
 from briefy.leica.models.customer import workflows
 from briefy.leica.utils.user import add_user_info_to_state_history
@@ -18,8 +18,8 @@ class ICustomer(Interface):
 
 
 @implementer(ICustomer)
-class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
-               mixins.KLeicaVersionedMixin, Base):
+class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerRolesMixin,
+               mixins.LeicaVersionedMixin, Item):
     """A Customer for Briefy."""
 
     _workflow = workflows.CustomerWorkflow
@@ -39,7 +39,7 @@ class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
             '_customer_users', '_account_managers', 'business_contact',
             'billing_contact', 'external_id', 'billing_info'
         ],
-        'overrides': mixins.CustomerBriefyRoles.__colanderalchemy_config__['overrides']
+        'overrides': mixins.CustomerRolesMixin.__colanderalchemy_config__['overrides']
     }
 
     __raw_acl__ = (
@@ -162,6 +162,7 @@ class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
 
     projects = orm.relationship(
         'Project',
+        foreign_keys='Project.customer_id',
         backref=orm.backref('customer'),
         lazy='dynamic',
         info={
@@ -178,6 +179,7 @@ class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
 
     orders = orm.relationship(
         'Order',
+        foreign_keys='Order.customer_id',
         backref=orm.backref('customer'),
         lazy='dynamic',
         info={

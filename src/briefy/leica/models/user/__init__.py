@@ -1,4 +1,7 @@
 """User profile information."""
+from briefy.common.db.models import Item
+from briefy.common.db.models.local_role import LocalRole
+from briefy.common.db.mixins import SubItemMixin
 from briefy.common.utils import schema
 from briefy.leica import logger
 from briefy.leica.db import Base
@@ -21,7 +24,7 @@ import sqlalchemy as sa
 
 
 __colander_alchemy_config_overrides__ = \
-    copy.copy(mixins.UserProfileBriefyRoles.__colanderalchemy_config__['overrides'])
+    copy.copy(mixins.UserProfileRolesMixin.__colanderalchemy_config__['overrides'])
 
 __colander_alchemy_config_overrides__.update(
     {
@@ -39,7 +42,7 @@ __colander_alchemy_config_overrides__.update(
 )
 
 
-class UserProfile(mixins.UserProfileMixin, mixins.UserProfileBriefyRoles, Base):
+class UserProfile(mixins.UserProfileMixin, mixins.UserProfileRolesMixin, Item):
     """A Professional on our system."""
 
     __tablename__ = 'userprofiles'
@@ -63,17 +66,6 @@ class UserProfile(mixins.UserProfileMixin, mixins.UserProfileBriefyRoles, Base):
         ],
         'overrides': __colander_alchemy_config_overrides__
     }
-
-    id = sa.Column(
-        UUIDType(),
-        unique=True,
-        primary_key=True,
-        info={'colanderalchemy': {
-              'title': 'User id',
-              'validator': colander.uuid,
-              'missing': colander.drop,
-              'typ': colander.String}}
-    )
 
     messengers = sa.Column(
         'messengers',
@@ -148,6 +140,17 @@ class CustomerUserProfile(UserProfile):
               'typ': colander.String}}
     )
 
+    customer_id = sa.Column(
+        UUIDType(),
+        sa.ForeignKey('customers.id'),
+        index=True,
+        info={'colanderalchemy': {
+              'title': 'User id',
+              'validator': colander.uuid,
+              'missing': colander.drop,
+              'typ': colander.String}}
+    )
+
     @declared_attr
     def customer_ids(cls):
         """Return a list of customer ids related to this CustomerUserProfile."""
@@ -158,17 +161,13 @@ class CustomerUserProfile(UserProfile):
         """Local roles of this user in the Customer context as customer_user."""
         return sa.orm.relationship(
             'LocalRole',
-            foreign_keys='LocalRole.user_id',
+            foreign_keys='LocalRole.principal_id',
             viewonly=True,
-            uselist=True,
             primaryjoin="""and_(
-                        LocalRole.user_id == CustomerUserProfile.id,
-                        LocalRole.entity_type=="{entity}",
-                        LocalRole.role_name=="{role_name}"
-                    )""".format(
-                entity='Customer',
-                role_name='customer_user',
-            )
+                        LocalRole.principal_id==CustomerUserProfile.id,
+                        LocalRole.item_id==CustomerUserProfile.customer_id,
+                        LocalRole.role_name=="customer_user"
+                    )"""
         )
 
     @hybrid_property
@@ -200,17 +199,14 @@ class CustomerUserProfile(UserProfile):
         """Local roles of this user in the Customer context as project_user."""
         return sa.orm.relationship(
             'LocalRole',
-            foreign_keys='LocalRole.user_id',
+            foreign_keys='LocalRole.principal_id',
             viewonly=True,
             uselist=True,
             primaryjoin="""and_(
-                        LocalRole.user_id == CustomerUserProfile.id,
-                        LocalRole.entity_type=="{entity}",
-                        LocalRole.role_name=="{role_name}"
-                    )""".format(
-                entity='Project',
-                role_name='customer_user',
-            )
+                        LocalRole.principal_id == CustomerUserProfile.id,
+                        LocalRole.item_id==CustomerUserProfile.customer_id,
+                        LocalRole.role_name=="customer_user"
+                    )"""
         )
 
     @property
@@ -247,8 +243,6 @@ class CustomerUserProfile(UserProfile):
 
         def remove_project(project, user_id):
             """Remove customer_user LocalRole from the Project."""
-            from briefy.leica.models import LocalRole
-
             session = object_session(project)
             local_role = session.query(LocalRole).filter_by(
                 entity_id=project.id,

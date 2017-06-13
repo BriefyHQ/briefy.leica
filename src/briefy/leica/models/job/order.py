@@ -1,4 +1,5 @@
 """Briefy Leica Order to a Job."""
+from briefy.common.db.models import Item
 from briefy.common.db.types import AwareDateTime
 from briefy.common.utils import schema
 from briefy.common.vocabularies.categories import CategoryChoices
@@ -48,7 +49,7 @@ __listing_attributes__ = __summary_attributes__ + [
 ]
 
 __colander_alchemy_config_overrides__ = \
-    copy.copy(mixins.OrderBriefyRoles.__colanderalchemy_config__['overrides'])
+    copy.copy(mixins.OrderRolesMixin.__colanderalchemy_config__['overrides'])
 
 # added to be able pass professional_id to the Order reassign transition
 __colander_alchemy_config_overrides__.update(
@@ -124,8 +125,8 @@ def default_current_type(context):
     return context.current_parameters.get('type')
 
 
-class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
-            mixins.KLeicaVersionedMixin, Base):
+class Order(mixins.OrderFinancialInfo, mixins.OrderRolesMixin,
+            mixins.LeicaVersionedMixin, Item):
     """An Order from the customer."""
 
     _workflow = workflows.OrderWorkflow
@@ -375,6 +376,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     # Assignments
     assignments = orm.relationship(
         'Assignment',
+        foreign_keys='Assignment.order_id',
         order_by='asc(Assignment.created_at)',
         backref=orm.backref('order')
     )
