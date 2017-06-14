@@ -22,8 +22,10 @@ class TestAssetView(BaseVersionedTestView):
     model = models.Image
     initial_wf_state = 'pending'
     # TODO: author_id and uploaded_by should be validated
-    ignore_validation_fields = ['state_history', 'state', 'updated_at', 'assignment',
-                                'raw_metadata', 'uploaded_by', 'professional']
+    ignore_validation_fields = [
+        'state_history', 'state', 'updated_at', 'assignment',
+        'raw_metadata', 'uploaded_by', 'professional', 'professional_user'
+    ]
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {

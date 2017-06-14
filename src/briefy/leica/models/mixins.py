@@ -332,8 +332,8 @@ class VersionMixin:
         pass
 
 
-class LeicaMixin(Mixin):
-    """Base  mixin for Leica objects."""
+class BaseLeicaMixin:
+    """Base mixin for all leica models."""
 
     __session__ = Session
 
@@ -359,9 +359,12 @@ class LeicaMixin(Mixin):
         return tablename
 
 
-class LeicaSubMixin(SubItemMixin, LeicaMixin):
+class LeicaMixin(BaseLeicaMixin, Mixin):
+    """Base  mixin for Leica objects."""
+
+
+class LeicaSubMixin(BaseLeicaMixin, SubItemMixin):
     """Base mixin for Leica sub Item objects."""
-    pass
 
 
 class LeicaSubVersionedMixin(VersionMixin, BaseMetadata, LeicaSubMixin):

@@ -1,6 +1,6 @@
 gunicorn==19.7.1
 gevent==1.2.1
 pycountry==16.11.27.1
--e git+git@github.com:BriefyHQ/briefy.ws.git@92a4df5235f362609bc45b0fc8f620f707322403#egg=briefy.ws
--e git+git@github.com:BriefyHQ/briefy.common.git@a01bab3b14c2aff4432992c6803c2072c909e8ee#egg=briefy.common[db]
+-e git+git@github.com:BriefyHQ/briefy.ws.git@refactor\/change-permission-model#egg=briefy.ws
+-e git+git@github.com:BriefyHQ/briefy.common.git@develop#egg=briefy.common[db]
 -e .

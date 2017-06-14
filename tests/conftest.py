@@ -348,7 +348,8 @@ class BaseTestView:
         assert 'application/json' == request.content_type
         result = request.json
 
-        db_obj = self.model.query().get(payload['id'])
+        db_obj = self.model.get(payload['id'])
+        self.ignore_validation_fields.extend(self.model.__actors__)
 
         # validate response payload against sent payload
         for key, value in payload.items():
