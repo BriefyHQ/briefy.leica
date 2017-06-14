@@ -773,8 +773,11 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         data['assignment'] = assignment_data
         data['assignments'] = [item.to_summary_dict() for item in self.assignments]
         data['tech_requirements'] = self.tech_requirements
-        # Workflow history
+
         add_user_info_to_state_history(self.state_history)
+        if includes and 'state_history' in includes:
+            # Workflow history
+            add_user_info_to_state_history(self.state_history)
 
         # Apply actor information to data
         data = self._apply_actors_info(data)
