@@ -25,7 +25,7 @@ class TestPoolModel(BaseModelTest):
 
         for prof in professionals:
             instance_obj.professionals.append(prof)
-            assert instance_obj.id == str(prof.pools[0].id)
+            assert instance_obj.id == prof.pools[0].id
             assert len(prof.pools) == 1
 
         session.flush()

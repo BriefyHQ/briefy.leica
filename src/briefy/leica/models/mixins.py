@@ -2,7 +2,6 @@
 from briefy.common.db.mixins import BaseMetadata
 from briefy.common.db.mixins import ContactInfoMixin
 from briefy.common.db.mixins import KnackMixin
-from briefy.common.db.mixins import LocalRolesMixin
 from briefy.common.db.mixins import Mixin
 from briefy.common.db.mixins import OptIn
 from briefy.common.db.mixins import PersonalInfoMixin
@@ -47,7 +46,7 @@ _ID_COLANDER_LIST = {
 }
 
 
-class UserProfileRolesMixin(LocalRolesMixin):
+class UserProfileRolesMixin:
     """Local roles for the UserProfile context."""
 
     __actors__ = (
@@ -61,7 +60,7 @@ class UserProfileRolesMixin(LocalRolesMixin):
     }
 
 
-class CustomerRolesMixin(LocalRolesMixin):
+class CustomerRolesMixin:
     """Local roles for the Customer context."""
 
     __actors__ = (
@@ -81,7 +80,7 @@ class CustomerRolesMixin(LocalRolesMixin):
     }
 
 
-class ProjectRolesMixin(LocalRolesMixin):
+class ProjectRolesMixin:
     """Local roles for the Project context."""
 
     __actors__ = (
@@ -103,7 +102,7 @@ class ProjectRolesMixin(LocalRolesMixin):
     }
 
 
-class OrderRolesMixin(LocalRolesMixin):
+class OrderRolesMixin:
     """Local roles for the Order context."""
 
     __actors__ = (
@@ -117,7 +116,7 @@ class OrderRolesMixin(LocalRolesMixin):
     }
 
 
-class AssignmentRolesMixin(LocalRolesMixin):
+class AssignmentRolesMixin:
     """Local roles for the Assignment context."""
 
     __actors__ = (
