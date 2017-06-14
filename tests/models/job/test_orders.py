@@ -10,6 +10,7 @@ from datetime import timedelta
 
 import pytest
 import pytz
+import transaction
 import uuid
 
 
@@ -34,9 +35,10 @@ class TestOrderModel(BaseModelTest):
     @staticmethod
     def delete_assigment_created(assignment, session):
         """Delete assignment created."""
-        session.execute("DELETE from assignments_version where id = '{0}'".format(assignment.id))
-        session.flush()
-        session.query(models.Assignment).filter_by(id=assignment.id).delete()
+        # TODO: improve performance deleting assignments
+        # session.flush()
+        # session.execute("DELETE from assignments_version where id = '{0}'".format(assignment.id))
+        # session.query(models.Assignment).filter_by(id=assignment.id).delete()
 
     @staticmethod
     def notify_assigment_created(assignment, request, session):
@@ -94,7 +96,6 @@ class TestOrderModel(BaseModelTest):
         assert assignment.state == 'pending'
         assert assignment.state_history[-1]['transition'] == 'submit'
         assert assignment.asset_types == order.asset_types
-        self.delete_assigment_created(assignment, session)
 
     @pytest.mark.parametrize('file_path', ['data/order_locations.json'])
     @pytest.mark.parametrize('position', [0])
@@ -124,7 +125,7 @@ class TestOrderModel(BaseModelTest):
         # add a new location to the order
         location_payload['order_id'] = order.id
         location_payload['id'] = str(uuid.uuid4())
-        location = models.OrderLocation(**location_payload)
+        location = models.OrderLocation.create(location_payload)
         order.location = location
         session.add(location)
         session.flush()

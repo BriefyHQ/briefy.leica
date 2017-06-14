@@ -230,7 +230,7 @@ class BaseLinkTest(BaseModelTest):
         assert instance_obj.is_social is self.social
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope='function')
 def instance_obj(request, session, obj_payload):
     """Create instance object an dependencies using hook methods.
 
@@ -244,7 +244,8 @@ def instance_obj(request, session, obj_payload):
         cls.create_dependencies(session)
 
     payload = obj_payload
-    obj_id = uuid.UUID(payload['id'])
+    obj_id = payload['id']
+    obj_id = uuid.UUID(obj_id) if isinstance(obj_id, str) else obj_id
     obj = model.get(obj_id)
     if not obj:
         # composed primary keys
