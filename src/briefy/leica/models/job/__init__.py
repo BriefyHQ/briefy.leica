@@ -20,6 +20,7 @@ from sqlalchemy import orm
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import TimezoneType
 from zope.interface import implementer
@@ -410,14 +411,7 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin,
     This will be deprecated when assets upload is handled also using Leica.
     """
 
-    project = orm.relationship(
-        'Project',
-        secondary='join(Order, Project, Order.project_id == Project.id)',
-        secondaryjoin='Order.project_id == Project.id',
-        primaryjoin='Order.id == Assignment.order_id',
-        viewonly=True,
-        uselist=False
-    )
+    project = association_proxy('order', 'project')
     """Project related to this Assignment.
 
     Instance of :class:`briefy.leica.models.project.Project`.

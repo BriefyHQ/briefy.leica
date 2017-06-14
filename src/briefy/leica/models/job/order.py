@@ -7,6 +7,7 @@ from briefy.leica import logger
 from briefy.leica.cache import cache_manager
 from briefy.leica.cache import cache_region
 from briefy.leica.cache import enable_cache
+from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.descriptors import UnaryRelationshipWrapper
 from briefy.leica.models.job import workflows
@@ -753,7 +754,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderRolesMixin,
         if self.assignments:
             assignment = self.assignments[-1]
             assignment_data = assignment.to_summary_dict()
-            assignment_data = self._apply_actors_info(assignment_data, assignment)
+            assignment_data = assignment._apply_actors_info(assignment_data)
 
         data['description'] = self.description
         data['briefing'] = self.project.briefing
