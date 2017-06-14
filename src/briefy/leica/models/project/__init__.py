@@ -4,7 +4,6 @@ from briefy.common.utils import schema
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.leica.cache import cache_region
 from briefy.leica.cache import enable_cache
-from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.project import workflows
 from briefy.leica.utils.user import add_user_info_to_state_history
@@ -72,7 +71,7 @@ class CommercialInfoMixin(mixins.ProfessionalPayoutInfo, mixins.ProjectRolesMixi
 
 @implementer(IProject)
 class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
-              mixins.KLeicaVersionedMixin, Item):
+              mixins.LeicaSubVersionedMixin, Item):
     """A Project in Briefy."""
 
     _workflow = workflows.ProjectWorkflow

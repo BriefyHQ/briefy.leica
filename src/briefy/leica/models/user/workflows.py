@@ -42,7 +42,7 @@ class UserProfileWorkflow(BriefyWorkflow):
         groups = ()
         if profile.type == 'customeruserprofile':
             groups = ('g:customers', )
-        elif profile.type == 'briefyuserprofile':
+        elif profile.type == 'internaluserprofile':
             groups = ('g:briefy',)
         create_rolleiflex_user(self.document, groups=groups)
 
@@ -69,7 +69,7 @@ class CustomerUserProfileWorkflow(UserProfileWorkflow):
     entity = 'customeruserprofile'
 
 
-class BriefyUserProfileWorkflow(UserProfileWorkflow):
-    """Workflow for a Briefy user profile."""
+class InternalUserProfileWorkflow(UserProfileWorkflow):
+    """Workflow for a internal user profile."""
 
-    entity = 'briefyuserprofile'
+    entity = 'internaluserprofile'

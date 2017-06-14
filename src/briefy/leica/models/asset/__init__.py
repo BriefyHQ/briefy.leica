@@ -26,7 +26,7 @@ __listing_attributes__ = [
 ]
 
 
-class Asset(asset.Asset, mixins.LeicaVersionedMixin, Item):
+class Asset(asset.Asset, mixins.LeicaSubVersionedMixin, Item):
     """A deliverable asset from an Assignment."""
 
     _workflow = workflows.AssetWorkflow
@@ -51,15 +51,6 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Item):
         'state_history', 'state', 'history', 'raw_metadata', 'professional',
         'comments', 'assignment'
     ]}
-
-    type = sa.Column(
-        sa.String(50), nullable=False,
-        info={'colanderalchemy': {
-            'title': 'Type',
-            'missing': 'image',
-            'typ': colander.String}
-        },
-    )
 
     owner = sa.Column(sa.String(255), nullable=False)
     """Denormalized string with the name of the OWNER of an asset.
@@ -172,8 +163,7 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Item):
 
         :return: ID of the qa_manager.
         """
-        return self.assignment.qa_manager
-
+        return self.assignment.assignment_internal_qa
 
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
@@ -201,17 +191,6 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Item):
             c['check'] for c in self.check_requirements
         ]
         return data
-
-    @declared_attr
-    def __mapper_args__(cls):
-        """Return polymorphic identity."""
-        cls_name = cls.__name__.lower()
-        args = {
-            'polymorphic_identity': cls_name,
-        }
-        if cls_name == 'asset':
-            args['polymorphic_on'] = cls.type
-        return args
 
 
 class Image(asset.ImageMixin, Asset):

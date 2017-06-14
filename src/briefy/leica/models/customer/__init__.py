@@ -19,7 +19,7 @@ class ICustomer(Interface):
 
 @implementer(ICustomer)
 class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerRolesMixin,
-               mixins.LeicaVersionedMixin, Item):
+               mixins.LeicaSubVersionedMixin, Item):
     """A Customer for Briefy."""
 
     _workflow = workflows.CustomerWorkflow

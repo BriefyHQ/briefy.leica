@@ -12,9 +12,9 @@ Inheritance diagram for the CustomerProfile class:
 
 .. inheritance-diagram:: briefy.leica.models.user.CustomerUserProfile
 
-Inheritance diagram for the BriefyProfile class:
+Inheritance diagram for the InternalProfile class:
 
-.. inheritance-diagram:: briefy.leica.models.user.BriefyUserProfile
+.. inheritance-diagram:: briefy.leica.models.user.InternalUserProfile
 
 
 Workflow

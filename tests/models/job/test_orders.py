@@ -70,6 +70,7 @@ class TestOrderModel(BaseModelTest):
 
         # manually execute the order created handler
         event = OrderCreatedEvent(order, web_request)
+        import pdb; pdb.set_trace()
         order_created_handler(event)
         event()
         session.flush()

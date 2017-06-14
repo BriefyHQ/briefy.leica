@@ -7,7 +7,6 @@ from briefy.common.db.mixins import Mixin
 from briefy.common.db.mixins import OptIn
 from briefy.common.db.mixins import PersonalInfoMixin
 from briefy.common.db.mixins import SubItemMixin
-from briefy.common.db.models import Item
 from briefy.common.utilities.interfaces import IUserProfileQuery
 from briefy.common.utils import schema
 from briefy.common.utils.cache import timeout_cache
@@ -66,16 +65,18 @@ class CustomerRolesMixin(LocalRolesMixin):
     """Local roles for the Customer context."""
 
     __actors__ = (
-        'customer_managers',
-        'customer_users',
-        'account_managers',
+        'customer_manager',
+        'customer_pm',
+        'customer_qa',
+        'internal_account',
     )
 
     __colanderalchemy_config__ = {
         'overrides': {
-            'customer_users': _ID_COLANDER_LIST,
-            'customer_managers': _ID_COLANDER_LIST,
-            'account_managers': _ID_COLANDER_LIST,
+            'customer_manager': _ID_COLANDER_LIST,
+            'customer_pm': _ID_COLANDER_LIST,
+            'customer_qa': _ID_COLANDER_LIST,
+            'internal_account': _ID_COLANDER_LIST,
         }
     }
 
@@ -84,20 +85,20 @@ class ProjectRolesMixin(LocalRolesMixin):
     """Local roles for the Project context."""
 
     __actors__ = (
-        'qa_managers',
-        'project_managers',
-        'scout_managers',
-        'customer_pms',
-        'customer_qas',
+        'internal_qa',
+        'internal_pm',
+        'internal_scout',
+        'project_customer_pm',
+        'project_customer_qa',
     )
 
     __colanderalchemy_config__ = {
         'overrides': {
-            'qa_managers': _ID_COLANDER_LIST,
-            'project_managers': _ID_COLANDER_LIST,
-            'scout_managers': _ID_COLANDER_LIST,
-            'customer_pms': _ID_COLANDER_LIST,
-            'customer_qas': _ID_COLANDER_LIST,
+            'internal_qa': _ID_COLANDER_LIST,
+            'internal_pm': _ID_COLANDER_LIST,
+            'internal_scout': _ID_COLANDER_LIST,
+            'project_customer_pm': _ID_COLANDER_LIST,
+            'project_customer_qa': _ID_COLANDER_LIST,
         }
     }
 
@@ -106,12 +107,12 @@ class OrderRolesMixin(LocalRolesMixin):
     """Local roles for the Order context."""
 
     __actors__ = (
-        'customer_qa',
+        'order_customer_qa',
     )
 
     __colanderalchemy_config__ = {
         'overrides': {
-            'customer_qa': _ID_COLANDER_LIST,
+            'order_customer_qa': _ID_COLANDER_LIST,
         }
     }
 
@@ -121,15 +122,15 @@ class AssignmentRolesMixin(LocalRolesMixin):
 
     __actors__ = (
         'professional_user',
-        'scout_manager',
-        'qa_manager',
+        'assignment_internal_scout',
+        'assignment_internal_qa',
     )
 
     __colanderalchemy_config__ = {
         'overrides': {
             'professional_user': _ID_COLANDER_LIST,
-            'scout_manager': _ID_COLANDER_LIST,
-            'qa_manager': _ID_COLANDER_LIST,
+            'assignment_internal_scout': _ID_COLANDER_LIST,
+            'assignment_internal_qa': _ID_COLANDER_LIST,
         }
     }
 
@@ -332,10 +333,19 @@ class VersionMixin:
         pass
 
 
-class LeicaMixin(SubItemMixin, Mixin):
+class LeicaMixin(Mixin):
     """Base  mixin for Leica objects."""
 
     __session__ = Session
+
+    def _apply_actors_info(self, data: dict) -> dict:
+        """Add actors info to data payload.
+
+        :param data: payload with all data from a model
+        :return: Dictionary with data payload updated.
+        """
+        profile_service = getUtility(IUserProfileQuery)
+        return profile_service.apply_actors_info(data, self.__actors__)
 
     @declared_attr
     def __tablename__(cls):
@@ -348,6 +358,20 @@ class LeicaMixin(SubItemMixin, Mixin):
             klass=cls.__name__.lower()
         )
         return tablename
+
+
+class LeicaSubMixin(SubItemMixin, LeicaMixin):
+    """Base mixin for Leica sub Item objects."""
+    pass
+
+
+class LeicaSubVersionedMixin(VersionMixin, BaseMetadata, LeicaSubMixin):
+    """Base mixin for Leica Objects supporting versioning and sub item of Item.
+
+    Used on objects that require Version support and Base metadata.
+    """
+
+    pass
 
 
 class LeicaVersionedMixin(VersionMixin, BaseMetadata, LeicaMixin):
@@ -374,7 +398,7 @@ class PolaroidMixin:
     pass
 
 
-class UserProfileMixin(ContactInfoMixin, PersonalInfoMixin, OptIn, LeicaVersionedMixin):
+class UserProfileMixin(ContactInfoMixin, PersonalInfoMixin, OptIn, LeicaSubVersionedMixin):
     """A user profile on our system."""
 
     email = sa.Column(

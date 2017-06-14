@@ -12,14 +12,14 @@ from briefy.leica.models.professional.workflows import LinkWorkflow
 from briefy.leica.models.professional.workflows import LocationWorkflow
 from briefy.leica.models.professional.workflows import ProfessionalWorkflow
 from briefy.leica.models.project.workflows import ProjectWorkflow
-from briefy.leica.models.user.workflows import BriefyUserProfileWorkflow
+from briefy.leica.models.user.workflows import InternalUserProfileWorkflow
 from briefy.leica.models.user.workflows import CustomerUserProfileWorkflow
 
 
 entities = [
     'asset',
     'assignment',
-    'briefyuserprofile',
+    'internaluserprofile',
     'comment',
     'customer',
     'customeruserprofile',
@@ -50,7 +50,7 @@ workflows = [
     LocationWorkflow,
     LinkWorkflow,
     ProjectWorkflow,
-    BriefyUserProfileWorkflow,
+    InternalUserProfileWorkflow,
     CustomerUserProfileWorkflow,
 ]
 

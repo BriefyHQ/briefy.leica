@@ -5,7 +5,6 @@
     "birth_date": "1975-03-16T00:00:00",
     "company_name": "Client 01",
     "mobile": "+49 176 23456788",
-    "external_id": null,
     "additional_phone": null,
     "first_name": "Maike",
     "internal": true,
@@ -26,11 +25,6 @@
         "to": "active",
         "transition": "activate"
       }
-    ],
-    "customer_roles": "c2034c1b-0a40-4b84-9ace-54b958f64ed4",
-    "project_roles": [
-      "36d359f0-8e92-41bb-8d1c-fedfd60e7046",
-      "4a068a1b-3646-4acf-937d-15563853e388"
     ]
   }
 ]

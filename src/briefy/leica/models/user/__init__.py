@@ -81,20 +81,6 @@ class UserProfile(mixins.UserProfileMixin, mixins.UserProfileRolesMixin, Item):
     )
     """Messenger applications used by this person."""
 
-    type = sa.Column(sa.String(50))
-    """Polymorphic type."""
-
-    @declared_attr
-    def __mapper_args__(cls):
-        """Return polymorphic identity."""
-        cls_name = cls.__name__.lower()
-        args = {
-            'polymorphic_identity': cls_name,
-        }
-        if cls_name == 'userprofile':
-            args['polymorphic_on'] = cls.type
-        return args
-
     @hybrid_property
     def user_id(self):
         """User id."""
@@ -288,12 +274,12 @@ class CustomerUserProfile(UserProfile):
         return data
 
 
-class BriefyUserProfile(UserProfile):
+class InternalUserProfile(UserProfile):
     """A Briefy user on our system."""
 
-    __tablename__ = 'briefyuserprofiles'
+    __tablename__ = 'internaluserprofiles'
 
-    _workflow = workflows.BriefyUserProfileWorkflow
+    _workflow = workflows.InternalUserProfileWorkflow
 
     __raw_acl__ = (
         ('create', ('g:briefy_finance', 'g:briefy_tech', 'g:system')),

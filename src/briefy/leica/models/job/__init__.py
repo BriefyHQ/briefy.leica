@@ -154,7 +154,7 @@ class AssignmentDates:
 
 @implementer(IAssignment)
 class Assignment(AssignmentDates, mixins.AssignmentRolesMixin,
-                 mixins.AssignmentFinancialInfo, mixins.LeicaMixin,
+                 mixins.AssignmentFinancialInfo, mixins.LeicaSubMixin,
                  mixins.VersionMixin, Item):
     """An Assignment within an Order."""
 

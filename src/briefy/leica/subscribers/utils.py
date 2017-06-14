@@ -48,7 +48,7 @@ def create_comment_from_wf_transition(obj, author_role, to_role, internal=False)
             to_role=to_role,
             internal=internal,
         )
-        comment = Comment(**payload)
+        comment = Comment.create(payload)
         session.add(comment)
 
 
@@ -69,7 +69,7 @@ def create_new_assignment_from_order(order, request, copy_payout=False, old_assi
         for key in payout_fields:
             payload[key] = getattr(old_assignment, key)
 
-    assignment = Assignment(**payload)
+    assignment = Assignment.create(payload)
     apply_local_roles_from_parent(
         assignment,
         order,

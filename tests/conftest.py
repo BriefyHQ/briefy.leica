@@ -244,7 +244,7 @@ def instance_obj(request, session, obj_payload):
         cls.create_dependencies(session)
 
     payload = obj_payload
-    obj_id = payload['id']
+    obj_id = uuid.UUID(payload['id'])
     obj = model.get(obj_id)
     if not obj:
         # composed primary keys
@@ -253,6 +253,7 @@ def instance_obj(request, session, obj_payload):
             new_payload.pop('id')
             obj = cls.model.create(new_payload)
         else:
+            payload['id'] = obj_id
             obj = cls.model.create(payload)
         session.add(obj)
         session.flush()

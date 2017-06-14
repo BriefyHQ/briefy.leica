@@ -2,6 +2,8 @@
   {
     "internal": true,
     "partners": true,
+    "owner": ["23d94a43-3947-42fc-958c-09245ecca5f2"],
+    "id": "23d94a43-3947-42fc-958c-09245ecca5f2",
     "state_history": [
       {
         "transition": "",
@@ -18,7 +20,6 @@
     "title": "Sebastião Salgado",
     "last_name": "Salgado",
     "first_name": "Sebastião",
-    "id": "23d94a43-3947-42fc-958c-09245ecca5f2",
     "created_at": "2016-09-08T15:36:28.087112+00:00",
     "state": "created",
     "mobile": "+49 176 37755722",
@@ -65,6 +66,7 @@
     "title": "Sebastião Salgado",
     "last_name": "Salgado",
     "first_name": "Sebastião",
+    "owner": ["669a99c2-9bb3-443f-8891-e600a15e3c10"],
     "id": "669a99c2-9bb3-443f-8891-e600a15e3c10",
     "created_at": "2016-09-08T15:36:28.087112+00:00",
     "state": "created",
@@ -125,6 +127,7 @@
     "title": "Steve McCurry",
     "last_name": "McCurry",
     "first_name": "Steve",
+    "owner": ["d39c07c6-7955-489a-afce-483dfc7c9c5b"],
     "id": "d39c07c6-7955-489a-afce-483dfc7c9c5b",
     "created_at": "2016-09-08T15:36:28.087112+00:00",
     "state": "created",

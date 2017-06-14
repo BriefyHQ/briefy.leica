@@ -78,7 +78,7 @@ class ProfessionalsInPool(mixins.VersionMixin, Timestamp, Base):
     """
 
 
-class Pool(mixins.LeicaVersionedMixin, Item):
+class Pool(mixins.LeicaSubVersionedMixin, Item):
     """A Pool."""
 
     _workflow = workflows.PoolWorkflow

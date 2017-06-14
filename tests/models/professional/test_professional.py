@@ -23,7 +23,7 @@ class TestProfessionalModel(BaseModelTest):
 
         for item in pools:
             instance_obj.pools.append(item)
-            assert instance_obj.id == str(item.professionals[0].id)
+            assert instance_obj.id == item.professionals[0].id
             assert len(item.professionals) == 1
 
         session.flush()

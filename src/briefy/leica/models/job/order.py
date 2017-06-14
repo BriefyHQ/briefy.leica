@@ -7,7 +7,6 @@ from briefy.leica import logger
 from briefy.leica.cache import cache_manager
 from briefy.leica.cache import cache_region
 from briefy.leica.cache import enable_cache
-from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.descriptors import UnaryRelationshipWrapper
 from briefy.leica.models.job import workflows
@@ -126,7 +125,7 @@ def default_current_type(context):
 
 
 class Order(mixins.OrderFinancialInfo, mixins.OrderRolesMixin,
-            mixins.LeicaVersionedMixin, Item):
+            mixins.LeicaSubVersionedMixin, Item):
     """An Order from the customer."""
 
     _workflow = workflows.OrderWorkflow
@@ -732,7 +731,6 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderRolesMixin,
         data = super().to_summary_dict()
         data['category'] = self.category.value \
             if isinstance(self.category, CategoryChoices) else self.category
-        data = self._apply_actors_info(data)
         return data
 
     @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
@@ -745,7 +743,6 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderRolesMixin,
         data = super().to_listing_dict()
         data['category'] = self.category.value \
             if isinstance(self.category, CategoryChoices) else self.category
-        data = self._apply_actors_info(data)
         return data
 
     @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
