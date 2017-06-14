@@ -136,7 +136,6 @@ class TestImageModel(BaseModelTest):
         assert 'approve' in wf.transitions
 
         # QA request an edit
-        import pdb; pdb.set_trace()
         wf.request_edit()
         assert asset.state == 'edit'
         # Professional re-submits it and validation works
