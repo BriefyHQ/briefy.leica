@@ -7,6 +7,7 @@ History
     * Added history endpoint for all first level models (rudaporto).
     * Refactor to user VersionsService base class from briefy.ws for Versions endpoints (rudaporto).
     * Added versions endpoint for all first level models with versions support (rudaporto).
+    * Card #413: Remove state_history from listing and view serialisations (ericof).
 
 2.1.19 (2017-06-12)
 -------------------

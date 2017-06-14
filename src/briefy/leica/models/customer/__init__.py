@@ -209,13 +209,16 @@ class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerRolesMixin,
         data = self._apply_actors_info(data)
         return data
 
-    def to_dict(self):
+    def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
-        data = super().to_dict()
+        excludes = list(excludes) if excludes else []
+        data = super().to_dict(excludes=excludes, includes=includes)
         data['slug'] = self.slug
         data['projects'] = [p.to_summary_dict() for p in self.projects]
         data['billing_info_id'] = self.billing_info.id if self.billing_info else ''
-        add_user_info_to_state_history(self.state_history)
+        if includes and 'state_history' in includes:
+            # Workflow history
+            add_user_info_to_state_history(self.state_history)
         # Apply actor information to data
         data = self._apply_actors_info(data)
         return data

@@ -41,7 +41,7 @@ __summary_attributes__ = [
 __listing_attributes__ = __summary_attributes__ + [
     'assignment_date', 'last_approval_date', 'submission_date', 'last_submission_date',
     'set_type', 'number_required_assets', 'category', 'availability', 'additional_compensation',
-    'reason_additional_compensation', 'qa_manager', 'state_history', 'requirements', 'pool_id',
+    'reason_additional_compensation', 'qa_manager', 'requirements', 'pool_id',
     'location', 'project', 'closed_on_date', 'pool', 'delivery', 'refused_times', 'asset_types'
 ]
 
@@ -631,6 +631,32 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin,
         return get_transition_date_from_history(transitions, state_history)
 
     @property
+    def external_state(self) -> str:
+        """Return the external state for this assignment."""
+        state_history = self.state_history
+        state = self.state
+        set_type = self.set_type
+        last_transition = state_history[-1]
+        if state == 'in_qa' and set_type == 'refused_customer':
+            state = 'in_qa_further_revision'
+        elif state == 'awaiting_assets':
+            if last_transition == 'reject':
+                state = 'awaiting_assets_edit_needed'
+            elif last_transition == 'invalidate_assets':
+                state = 'awaiting_assets_technical_error'
+        return state
+
+    @property
+    def last_transition_message(self) -> str:
+        """Return the message from the most recent transition."""
+        message = ''
+        state_history = self.state_history
+        last_transition = state_history[-1]
+        if last_transition:
+            message = last_transition['message']
+        return message
+
+    @property
     def briefing(self) -> str:
         """Return the briefing URL for the parent project."""
         return self.order.project.briefing
@@ -649,7 +675,6 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin,
         """
         data = super().to_summary_dict()
         data['category'] = self.category
-        data = self._apply_actors_info(data)
         return data
 
     @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
@@ -664,6 +689,7 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin,
         category = self.category
         data['set_type'] = set_type
         data['category'] = category
+        data['external_state'] = self.external_state
         data = self._apply_actors_info(data)
         return data
 
@@ -679,6 +705,7 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin,
         data['assignment_date'] = self.assignment_date
         data['last_approval_date'] = self.last_approval_date
         data['last_submission_date'] = self.last_submission_date
+        data['last_transition_message'] = self.last_transition_message
         data['closed_on_date'] = self.closed_on_date
         data['slug'] = self.slug
         data['timezone'] = self.timezone
@@ -686,6 +713,7 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin,
         data['availability'] = self.availability
         data['order'] = self.order.to_summary_dict() if self.order else None
         data['location'] = self.location.to_summary_dict() if self.location else None
+        data['external_state'] = self.external_state
 
         set_type = self.set_type
         category = self.category
@@ -699,7 +727,8 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin,
             data['project']['delivery'] = self.project.delivery
 
         # Workflow history
-        add_user_info_to_state_history(self.state_history)
+        if includes and 'state_history' in includes:
+            add_user_info_to_state_history(self.state_history)
 
         # Apply actor information to data
         data = self._apply_actors_info(data)
