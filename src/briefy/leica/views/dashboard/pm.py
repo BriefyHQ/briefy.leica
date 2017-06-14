@@ -34,7 +34,6 @@ class DashboardPmOrderService(RESTService):
     """Dashboard Pm: Order Service."""
 
     model = DashboardPMOrder
-    friendly_name = model.__name__
     default_order_by = 'title'
 
     _columns_map = ORDER_PROJECT_COLS
@@ -72,7 +71,6 @@ class DashboardPMDeliveredOrdersService(RESTService):
     """Dashboard PM: Delivered Orders Service."""
 
     model = DashboardPMDeliveredOrders
-    friendly_name = model.__name__
     default_order_by = 'title'
 
     _columns_map = DELIVERED_ORDERS_COLS
@@ -110,7 +108,6 @@ class DashboardPMAllLeadsService(RESTService):
     """Dashboard PM: All Leads Service."""
 
     model = DashboardPMAllLeads
-    friendly_name = model.__name__
     default_order_by = 'title'
 
     _columns_map = LEAD_PROJECT_COLS

@@ -2,13 +2,12 @@
 from briefy.leica.events import pool as events
 from briefy.leica.models import Pool
 from briefy.ws import CORS_POLICY
-from briefy.ws.resources import BaseResource
+from briefy.ws.resources import HistoryService
 from briefy.ws.resources import RESTService
+from briefy.ws.resources import VersionsService
 from briefy.ws.resources import WorkflowAwareResource
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
-from cornice.resource import view
-from pyramid.httpexceptions import HTTPNotFound as NotFound
 from pyramid.security import Allow
 
 
@@ -43,7 +42,6 @@ class PoolService(RESTService):
     """Pool service."""
 
     model = Pool
-    friendly_name = model.__name__
     default_order_by = 'title'
     filter_related_fields = []
 
@@ -65,7 +63,6 @@ class PoolWorkflowService(WorkflowAwareResource):
     """Pool workflow resource."""
 
     model = Pool
-    friendly_name = model.__name__
 
 
 @resource(
@@ -74,46 +71,18 @@ class PoolWorkflowService(WorkflowAwareResource):
     cors_policy=CORS_POLICY,
     factory=PoolFactory
 )
-class PoolVersionsService(BaseResource):
+class PoolVersionsService(VersionsService):
     """Versioning of Pools."""
 
     model = Pool
-    friendly_name = model.__name__
 
-    @view(validators='_run_validators')
-    def collection_get(self):
-        """Return the list of versions for this object."""
-        id = self.request.matchdict.get('id', '')
-        obj = self.get_one(id)
-        raw_versions = obj.versions
-        versions = []
-        for version_id, version in enumerate(raw_versions):
-            versions.append(
-                {
-                    'id': version_id,
-                    'updated_at': version.updated_at
-                }
-            )
-        response = {
-            'versions': versions,
-            'total': obj.version + 1
-        }
-        return response
 
-    @view(validators='_run_validators')
-    def get(self):
-        """Return a version for this object."""
-        id = self.request.matchdict.get('id', '')
-        obj = self.get_one(id)
-        version_id = self.request.matchdict.get('version_id', 0)
-        try:
-            version_id = int(version_id)
-            version = obj.versions[version_id]
-        except (ValueError, IndexError):
-            raise NotFound(
-                '{friendly_name} with version: {id} not found.'.format(
-                    friendly_name=self.friendly_name,
-                    id=version_id
-                )
-            )
-        return version
+@resource(
+    path=PATH + '/history',
+    cors_policy=CORS_POLICY,
+    factory=PoolFactory
+)
+class PoolHistory(HistoryService):
+    """Workflow history of Pools."""
+
+    model = Pool

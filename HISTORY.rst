@@ -2,9 +2,15 @@
 History
 =======
 
+2.2.0 (Unreleased)
+------------------
+    * Added history endpoint for all first level models (rudaporto).
+    * Refactor to user VersionsService base class from briefy.ws for Versions endpoints (rudaporto).
+    * Added versions endpoint for all first level models with versions support (rudaporto).
+    * Card #413: Remove state_history from listing and view serialisations (ericof).
+
 2.1.19 (2017-06-12)
 -------------------
-
     * Card #282: Allow filtering Order/LeadOrder by type on /orders endpoint (ericof).
     * Card #196: Migrate Delivery Hero project Orders to LeadOrders (ericof).
     * Card #197: Migrate Agoda project Orders to LeadOrders (ericof).

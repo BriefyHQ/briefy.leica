@@ -35,7 +35,6 @@ class CustomerBillingInfoService(RESTService):
     """CustomerBillingInfo Service."""
 
     model = CustomerBillingInfo
-    friendly_name = model.__name__
     default_order_by = 'created_at'
     default_order_direction = -1
 
@@ -73,7 +72,6 @@ class ProfessionalBillingInfoService(RESTService):
     """ProfessionalBillingInfo Service."""
 
     model = ProfessionalBillingInfo
-    friendly_name = model.__name__
     default_order_by = 'created_at'
     default_order_direction = -1
 

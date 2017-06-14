@@ -25,7 +25,6 @@ class CommentService(RESTService):
     """Comments Service."""
 
     model = Comment
-    friendly_name = model.__name__
     default_order_by = 'created_at'
     default_order_direction = -1
 
