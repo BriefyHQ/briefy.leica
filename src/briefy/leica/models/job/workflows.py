@@ -50,7 +50,7 @@ PERM_REJECT_REQUIRED_FIELDS = (
 
 
 class AssignmentWorkflow(BriefyWorkflow):
-    """Workflow for a Assignment."""
+    """Workflow for an Assignment."""
 
     entity = 'assignment'
     initial_state = 'created'
