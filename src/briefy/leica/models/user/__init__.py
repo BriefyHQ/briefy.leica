@@ -1,10 +1,8 @@
 """User profile information."""
 from briefy.common.db.models import Item
 from briefy.common.db.models.local_role import LocalRole
-from briefy.common.db.mixins import SubItemMixin
 from briefy.common.utils import schema
 from briefy.leica import logger
-from briefy.leica.db import Base
 from briefy.leica.models import Customer
 from briefy.leica.models import mixins
 from briefy.leica.models.user import workflows

@@ -36,8 +36,8 @@ from briefy.leica.models.professional.location import AdditionalWorkingLocation
 from briefy.leica.models.professional.location import MainWorkingLocation
 from briefy.leica.models.professional.location import WorkingLocation  # noQA
 from briefy.leica.models.project import Project
-from briefy.leica.models.user import InternalUserProfile
 from briefy.leica.models.user import CustomerUserProfile
+from briefy.leica.models.user import InternalUserProfile
 from briefy.leica.models.user import UserProfile
 from briefy.ws.listeners import register_workflow_context_listeners
 

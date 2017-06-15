@@ -5,7 +5,6 @@ from briefy.common.utils import schema
 from briefy.leica.cache import cache_manager
 from briefy.leica.cache import cache_region
 from briefy.leica.cache import enable_cache
-from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.job import workflows
 from briefy.leica.models.job.order import Order
@@ -19,8 +18,8 @@ from sqlalchemy import event
 from sqlalchemy import orm
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import TimezoneType
 from zope.interface import implementer

@@ -7,7 +7,6 @@ from briefy.leica import logger
 from briefy.leica.cache import cache_manager
 from briefy.leica.cache import cache_region
 from briefy.leica.cache import enable_cache
-from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.descriptors import UnaryRelationshipWrapper
 from briefy.leica.models.job import workflows
