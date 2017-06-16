@@ -4,7 +4,9 @@ from briefy.common.vocabularies.roles import LocalRolesChoices as LR
 from briefy.common.workflow import WorkflowState as WS
 from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import Permission
-from briefy.leica.utils.user import create_rolleiflex_user
+from briefy.leica.utils.user import activate_or_create_user
+from briefy.leica.utils.user import activate_user
+from briefy.leica.utils.user import inactivate_user
 
 import logging
 
@@ -55,7 +57,7 @@ class ProfessionalWorkflow(BriefyWorkflow):
     )
 
     deleted = WS(
-        'deleted', 'Deleted Skill',
+        'deleted', 'Deleted professional',
         'Professional was deleted from the platform.'
     )
 
@@ -68,7 +70,7 @@ class ProfessionalWorkflow(BriefyWorkflow):
     @validation.transition(deleted, 'can_delete')
     @pending.transition(deleted, 'can_delete')
     def delete(self):
-        """Delete a professional."""
+        """Delete a professional from our platform."""
         pass
 
     @created.transition(pending, 'can_submit')
@@ -86,7 +88,7 @@ class ProfessionalWorkflow(BriefyWorkflow):
     def approve(self):
         """Quality approval of a professional application."""
         groups = ('g:professionals',)
-        create_rolleiflex_user(self.document, groups=groups)
+        activate_or_create_user(self.document, groups=groups)
 
     @validation.transition(trial, 'can_validate')
     def validate(self):
@@ -97,13 +99,16 @@ class ProfessionalWorkflow(BriefyWorkflow):
     @inactive.transition(active, 'can_activate')
     def activate(self):
         """Activate a professional."""
-        pass
+        professional = self.document
+        # Activate on Rolleiflex only if current state is inactive.
+        if professional.state == 'inactive':
+            activate_user(professional)
 
     @active.transition(inactive, 'can_inactivate')
     @trial.transition(inactive, 'can_inactivate')
     def inactivate(self):
         """Inactivate a professional."""
-        pass
+        inactivate_user(self.document)
 
     @active.transition(active, 'can_assign', required_fields=('pools_ids',))
     @trial.transition(trial, 'can_assign', required_fields=('pools_ids',))
@@ -128,7 +133,7 @@ class ProfessionalWorkflow(BriefyWorkflow):
         """Validate if user can submit this professional for QA approval."""
         return True
 
-    @Permission(groups=[LR['owner'], G['qa'], ])
+    @Permission(groups=[LR['owner'], G['qa'], G['scout'], ])
     def can_quality_reject(self):
         """Validate if user can reject this professional application."""
         return True

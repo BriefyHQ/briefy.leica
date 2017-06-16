@@ -1,4 +1,4 @@
-"""Test CustomerUserProfile database model."""
+"""Test BriefyUserProfile database model."""
 from briefy.leica import models
 from conftest import BaseModelTest
 
@@ -6,15 +6,12 @@ import pytest
 
 
 @pytest.mark.usefixtures('create_dependencies')
-class TestCustomerUserProfileModel(BaseModelTest):
-    """Test Customer user profiles."""
+class TestBriefyUserProfileModel(BaseModelTest):
+    """Test Internal user profiles."""
 
-    dependencies = [
-        (models.Customer, 'data/customers.json'),
-        (models.Project, 'data/projects.json'),
-    ]
-    file_path = 'data/customer_profiles.json'
-    model = models.CustomerUserProfile
+    dependencies = []
+    file_path = 'data/internal_profiles.json'
+    model = models.BriefyUserProfile
     initial_wf_state = 'active'
 
     @staticmethod
@@ -30,7 +27,7 @@ class TestCustomerUserProfileModel(BaseModelTest):
         return obj, wf, web_request
 
     @pytest.mark.parametrize('origin_state', ['created', 'inactive'])
-    @pytest.mark.parametrize('role_name', ['scout', 'system', 'bizdev', 'finance'])
+    @pytest.mark.parametrize('role_name', ['support', 'system'])
     def test_workflow_activate(
         self, instance_obj, web_request, session, roles, role_name, origin_state
     ):
@@ -48,7 +45,7 @@ class TestCustomerUserProfileModel(BaseModelTest):
         assert obj.state_history[-1]['transition'] == 'activate'
 
     @pytest.mark.parametrize('origin_state', ['active'])
-    @pytest.mark.parametrize('role_name', ['scout', 'system', 'bizdev', 'finance'])
+    @pytest.mark.parametrize('role_name', ['support', 'system'])
     def test_workflow_inactivate(
         self, instance_obj, web_request, session, roles, role_name, origin_state
     ):
