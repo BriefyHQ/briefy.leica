@@ -350,11 +350,9 @@ class AssignmentWorkflow(BriefyWorkflow):
         now = datetime_utcnow()
         assignment = self.document
         scheduled_datetime = assignment.scheduled_datetime
-        date_diff = scheduled_datetime - now
-        if date_diff.total_seconds() >= 0:
-            return True
-        else:
-            return False
+        # Needs to be in the past
+        if scheduled_datetime > now:
+            raise WorkflowTransitionException('Scheduled date time needs to be in the past.')
 
     @Permission(groups=[G['system'], ])
     def can_get_ready_for_upload(self):
