@@ -57,7 +57,7 @@ class ProfessionalWorkflow(BriefyWorkflow):
     )
 
     deleted = WS(
-        'deleted', 'Deleted Skill',
+        'deleted', 'Deleted professional',
         'Professional was deleted from the platform.'
     )
 
@@ -70,7 +70,7 @@ class ProfessionalWorkflow(BriefyWorkflow):
     @validation.transition(deleted, 'can_delete')
     @pending.transition(deleted, 'can_delete')
     def delete(self):
-        """Delete a professional."""
+        """Delete a professional from our platform."""
         pass
 
     @created.transition(pending, 'can_submit')
