@@ -8,6 +8,7 @@ History
     * Refactor to user VersionsService base class from briefy.ws for Versions endpoints (rudaporto).
     * Added versions endpoint for all first level models with versions support (rudaporto).
     * Card #413: Remove state_history from listing and view serialisations (ericof).
+    * Card #407: Sync between Leica User Profiles and Rolleiflex accounts (ericof).
 
 2.1.19 (2017-06-12)
 -------------------
