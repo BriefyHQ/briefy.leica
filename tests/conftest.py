@@ -11,6 +11,7 @@ from briefy.ws.config import JWT_EXPIRATION
 from briefy.ws.config import JWT_SECRET
 from datetime import date
 from datetime import datetime
+from octopus.lens import EasyUUID
 from prettyconf import config
 from pyramid.paster import get_app
 from pyramid.testing import DummyRequest
@@ -244,8 +245,9 @@ def instance_obj(request, session, obj_payload):
         cls.create_dependencies(session)
 
     payload = obj_payload
+
     obj_id = payload['id']
-    obj_id = uuid.UUID(obj_id) if isinstance(obj_id, str) else obj_id
+    obj_id = EasyUUID(obj_id) if not isinstance(obj_id, list) else obj_id
     obj = model.get(obj_id)
     if not obj:
         # composed primary keys
@@ -445,7 +447,7 @@ class BaseTestView:
         assert result['status'] == 'error'
         assert error['name'] == 'id'
         assert error['location'] == 'path'
-        assert error['description'] == 'The id informed is not 16 byte uuid valid.'
+        assert 'uuid' in error['description'].lower()
 
     def test_put_invalid_id(self, app, obj_payload):
         """Confirm failure when try to use invalid UUID as id."""
@@ -459,7 +461,7 @@ class BaseTestView:
         assert result['status'] == 'error'
         assert error['name'] == 'id'
         assert error['location'] == 'path'
-        assert error['description'] == 'The id informed is not 16 byte uuid valid.'
+        assert 'uuid' in error['description'].lower()
 
 
 @pytest.mark.usefixtures('db_transaction', 'login')
