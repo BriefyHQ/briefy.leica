@@ -1,15 +1,8 @@
-"""User profile workflow."""
-from briefy.common.vocabularies.roles import Groups as G
+"""Base User profile workflow."""
 from briefy.common.workflow import WorkflowState as WS
 from briefy.common.workflow import BriefyWorkflow
-from briefy.common.workflow import Permission
 from briefy.leica.utils.user import activate_or_create_user
 from briefy.leica.utils.user import inactivate_user
-
-import logging
-
-
-logger = logging.getLogger(__name__)
 
 
 class UserProfileWorkflow(BriefyWorkflow):
@@ -52,35 +45,3 @@ class UserProfileWorkflow(BriefyWorkflow):
     def inactivate(self):
         """Inactivate the UserProfile."""
         inactivate_user(self.document)
-
-
-class CustomerUserProfileWorkflow(UserProfileWorkflow):
-    """Workflow for a Customer User profile."""
-
-    entity = 'customeruserprofile'
-
-    @Permission(groups=[G['system'], G['pm'], G['scout'], G['bizdev'], G['finance']])
-    def can_activate(self):
-        """Validate if user can activate this user profile."""
-        return True
-
-    @Permission(groups=[G['system'], G['pm'], G['scout'], G['bizdev'], G['finance']])
-    def can_inactivate(self):
-        """Validate if user can inactivate this user profile."""
-        return True
-
-
-class BriefyUserProfileWorkflow(UserProfileWorkflow):
-    """Workflow for a Briefy user profile."""
-
-    entity = 'briefyuserprofile'
-
-    @Permission(groups=[G['system'], G['support']])
-    def can_activate(self):
-        """Validate if user can activate this user profile."""
-        return True
-
-    @Permission(groups=[G['system'], G['support']])
-    def can_inactivate(self):
-        """Validate if user can inactivate this user profile."""
-        return True

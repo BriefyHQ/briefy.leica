@@ -1,4 +1,4 @@
-"""Billing information workflow."""
+"""Base workflow for billing information."""
 from briefy.common.vocabularies.roles import Groups as G
 from briefy.common.vocabularies.roles import LocalRolesChoices as LR
 from briefy.common.workflow import WorkflowState as WS
@@ -33,15 +33,3 @@ class BillingInfoWorkflow(BriefyWorkflow):
     def can_delete(self):
         """Validate if user can delete this info."""
         return True
-
-
-class CustomerBillingInfoWorkflow(BillingInfoWorkflow):
-    """Workflow for a CustomerBillingInfoWorkflow."""
-
-    entity = 'customerbillinginfo'
-
-
-class ProfessionalBillingInfoWorkflow(BillingInfoWorkflow):
-    """Workflow for a ProfessionalBillingInfoWorkflow."""
-
-    entity = 'professionalbillinginfo'
