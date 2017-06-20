@@ -1,6 +1,8 @@
 """Base User profile workflow."""
+from briefy.common.vocabularies.roles import Groups as G
 from briefy.common.workflow import WorkflowState as WS
 from briefy.common.workflow import BriefyWorkflow
+from briefy.common.workflow import Permission
 from briefy.leica.utils.user import activate_or_create_user
 from briefy.leica.utils.user import inactivate_user
 
