@@ -5,11 +5,6 @@ from briefy.common.workflow import WorkflowState as WS
 from briefy.common.workflow import BriefyWorkflow
 from briefy.common.workflow import Permission
 
-import logging
-
-
-logger = logging.getLogger(__name__)
-
 
 class CustomerWorkflow(BriefyWorkflow):
     """Workflow for a Customer."""
@@ -69,27 +64,3 @@ class CustomerWorkflow(BriefyWorkflow):
     def can_inactivate(self):
         """Validate if user can inactivate this working location."""
         return True
-
-
-class BillingAddressWorkflow(BriefyWorkflow):
-    """Workflow for a Customer Billing Address."""
-
-    entity = 'customerbillingaddress'
-    initial_state = 'created'
-
-    created = WS(
-        'created', 'Created',
-        'Customer Billing Address created.'
-    )
-
-
-class ContactWorkflow(BriefyWorkflow):
-    """Workflow for a Customer Contct ."""
-
-    entity = 'customercontact'
-    initial_state = 'created'
-
-    created = WS(
-        'created', 'Created',
-        'Customer Contact created.'
-    )

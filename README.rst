@@ -11,8 +11,7 @@ A comprehensive documentation is available at the `Developer Documentation`_ ser
 TODO
 ====
 
-* Create a versions endpoint generic service in briefy.ws and refactor / add to all views for models with versions.
-
+* Add unit tests for all versions and history endpoints
 
 Code Health
 ===========

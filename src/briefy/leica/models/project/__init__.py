@@ -417,11 +417,6 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_summary_dict()
-        data['category'] = self.category.value \
-            if isinstance(self.category, CategoryChoices) else self.category
-        data['order_type'] = self.order_type.value \
-            if isinstance(self.order_type, OrderTypeChoices) else self.order_type
-        data = self._apply_actors_info(data)
         return data
 
     @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
@@ -452,7 +447,9 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         data['order_type'] = self.order_type.value \
             if isinstance(self.order_type, OrderTypeChoices) else self.order_type
         data = self._apply_actors_info(data)
-        add_user_info_to_state_history(self.state_history)
+        if includes and 'state_history' in includes:
+            # Workflow history
+            add_user_info_to_state_history(self.state_history)
         # Apply actor information to data
         data = self._apply_actors_info(data)
         return data

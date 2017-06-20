@@ -30,7 +30,6 @@ class DashboardQaTypeService(RESTService):
     """Dashboard Qa: Type Service."""
 
     model = DashboardQaType
-    friendly_name = model.__name__
     default_order_by = 'total'
 
     _columns_map = (
@@ -75,7 +74,6 @@ class DashboardQaProjectService(RESTService):
     """Dashboard Qa: Project Service."""
 
     model = DashboardQaProject
-    friendly_name = model.__name__
     default_order_by = 'title'
 
     _columns_map = (

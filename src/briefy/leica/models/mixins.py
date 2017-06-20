@@ -8,7 +8,7 @@ from briefy.common.db.mixins import Mixin
 from briefy.common.db.mixins import OptIn
 from briefy.common.db.mixins import PersonalInfoMixin
 from briefy.common.db.models.roles import LocalRole
-from briefy.common.users import SystemUser
+from briefy.common.utilities.interfaces import IUserProfileQuery
 from briefy.common.utils import schema
 from briefy.common.utils.cache import timeout_cache
 from briefy.common.vocabularies.roles import LocalRolesChoices
@@ -20,11 +20,11 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_continuum.utils import count_versions
+from zope.component import getUtility
 
 import colander
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils
-import uuid
 
 
 @timeout_cache(600, renew=False)
@@ -34,34 +34,8 @@ def get_public_user_info(user_id: str) -> dict:
     :param user_id: Id for the user we want to query.
     :return: Dictionary with public user information.
     """
-    data = {
-        'id': user_id,
-        'first_name': '',
-        'last_name': '',
-        'fullname': '',
-        'email': '',
-        'internal': False,
-    }
-    from briefy.leica.models import UserProfile
-    try:
-        _ = uuid.UUID(user_id)  # noqa
-    except (ValueError, AttributeError) as exc:
-        return data
-    else:
-        if user_id == SystemUser.id:
-            raw_data = SystemUser
-            raw_data.internal = True
-            raw_data.title = raw_data.fullname
-        else:
-            raw_data = UserProfile.get(user_id)
-        if raw_data:
-            data['id'] = str(raw_data.id)
-            data['first_name'] = raw_data.first_name
-            data['last_name'] = raw_data.last_name
-            data['fullname'] = raw_data.title
-            data['email'] = raw_data.email
-            data['internal'] = raw_data.internal
-        return data
+    profile_service = getUtility(IUserProfileQuery)
+    return profile_service.get_data(user_id)
 
 
 _ID_COLANDER = {

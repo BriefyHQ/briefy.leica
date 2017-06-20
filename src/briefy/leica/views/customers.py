@@ -2,7 +2,9 @@
 from briefy.leica.events import customer as events
 from briefy.leica.models import Customer
 from briefy.ws import CORS_POLICY
+from briefy.ws.resources import HistoryService
 from briefy.ws.resources import RESTService
+from briefy.ws.resources import VersionsService
 from briefy.ws.resources import WorkflowAwareResource
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
@@ -40,7 +42,6 @@ class CustomersService(RESTService):
     """Customers Service."""
 
     model = Customer
-    friendly_name = model.__name__
     default_order_by = 'title'
     filter_related_fields = [
         'customer_user', 'account_manager', 'business_contact.email', 'business_contact.fullname',
@@ -65,4 +66,28 @@ class CustomerWorkflowService(WorkflowAwareResource):
     """Customer workflow resource."""
 
     model = Customer
-    friendly_name = Customer.__name__
+
+
+@resource(
+    collection_path=PATH + '/versions',
+    path=PATH + '/versions/{version_id}',
+    cors_policy=CORS_POLICY,
+    factory=CustomerFactory
+)
+class CustomerVersionsService(VersionsService):
+    """Versioning of Customers."""
+
+    model = Customer
+    default_order_by = 'title'
+
+
+@resource(
+    collection_path=PATH + '/history',
+    path=PATH + '/history/{item_id}',
+    cors_policy=CORS_POLICY,
+    factory=CustomerFactory
+)
+class CustomerHistory(HistoryService):
+    """Workflow history of Customers."""
+
+    model = Customer

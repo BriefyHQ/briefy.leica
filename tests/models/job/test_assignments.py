@@ -123,8 +123,16 @@ class TestAssignmentModel(BaseModelTest):
         wf.context = roles['system']
         request.user = roles['system']
         assert 'ready_for_upload' in wf.transitions
+        with pytest.raises(WorkflowTransitionException) as excinfo:
+            wf.ready_for_upload()
+        assert 'Scheduled date time needs to be in the past.' in str(excinfo)
+
+        # Set scheduled date time to be in the past
+        assignment.scheduled_datetime = now - timedelta(1)
         wf.ready_for_upload()
         assert assignment.state == 'awaiting_assets'
+
+        assignment.scheduled_datetime = scheduled_datetime
 
         # Customer can cancel this assignment before first upload to in_qa
         wf.context = roles['customer']
