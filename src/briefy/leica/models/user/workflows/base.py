@@ -1,14 +1,8 @@
-"""User profile workflow."""
-from briefy.common.vocabularies.roles import Groups as G
+"""Base User profile workflow."""
 from briefy.common.workflow import WorkflowState as WS
 from briefy.common.workflow import BriefyWorkflow
-from briefy.common.workflow import Permission
-from briefy.leica.utils.user import create_rolleiflex_user
-
-import logging
-
-
-logger = logging.getLogger(__name__)
+from briefy.leica.utils.user import activate_or_create_user
+from briefy.leica.utils.user import inactivate_user
 
 
 class UserProfileWorkflow(BriefyWorkflow):
@@ -44,17 +38,13 @@ class UserProfileWorkflow(BriefyWorkflow):
             groups = ('g:customers', )
         elif profile.type == 'internaluserprofile':
             groups = ('g:briefy',)
-        create_rolleiflex_user(self.document, groups=groups)
-
-    @Permission(groups=[G['system'], G['pm'], G['scout'], G['bizdev'], G['finance']])
-    def can_activate(self):
-        """Validate if user can activate this user profile."""
-        return True
+        activate_or_create_user(self.document, groups=groups)
 
     # Transitions:
     @active.transition(inactive, 'can_inactivate')
     def inactivate(self):
         """Inactivate the UserProfile."""
+        inactivate_user(self.document)
         pass
 
     @Permission(groups=[G['system'], G['pm'], G['scout'], G['bizdev'], G['finance']])
@@ -63,13 +53,3 @@ class UserProfileWorkflow(BriefyWorkflow):
         return True
 
 
-class CustomerUserProfileWorkflow(UserProfileWorkflow):
-    """Workflow for a Customer User profile."""
-
-    entity = 'customeruserprofile'
-
-
-class InternalUserProfileWorkflow(UserProfileWorkflow):
-    """Workflow for a internal user profile."""
-
-    entity = 'internaluserprofile'

@@ -2,15 +2,26 @@
 History
 =======
 
-2.2.0 (Unreleased)
-------------------
+2.1.21 (Unreleased)
+-------------------
+
+    * TODO
+
+
+
+2.1.20 (2017-06-20)
+-------------------
+
     * Added history endpoint for all first level models (rudaporto).
     * Refactor to user VersionsService base class from briefy.ws for Versions endpoints (rudaporto).
     * Added versions endpoint for all first level models with versions support (rudaporto).
     * Card #413: Remove state_history from listing and view serialisations (ericof).
+    * Card #407: Sync between Leica User Profiles and Rolleiflex accounts (ericof).
+    * Refactor workflows to be inside packages (ericof).
 
 2.1.19 (2017-06-12)
 -------------------
+
     * Card #282: Allow filtering Order/LeadOrder by type on /orders endpoint (ericof).
     * Card #196: Migrate Delivery Hero project Orders to LeadOrders (ericof).
     * Card #197: Migrate Agoda project Orders to LeadOrders (ericof).
@@ -29,6 +40,7 @@ History
 
 2.1.18 (2017-06-02)
 -------------------
+
     * Card #385: fix order location field in the order payload after order creation (rudaporto).
     * Fix: professionals view tests now have a proper main_location in the original payload (rudaporto).
     * Fix: professionals main_location update test now is really updating the existing location (rudaporto).
@@ -37,14 +49,17 @@ History
 
 2.1.17 (2017-05-24)
 -------------------
+
     * Card #362: add a comment to Order after workflow 'accept' transition using transition message (rudaporto).
 
 2.1.16 (2017-05-24)
 -------------------
+
     * Card #47: order.schedule_datetime should be in the payload after schedule transition (rudaporto).
 
 2.1.15 (2017-05-22)
 -------------------
+
     * Card #355: block approve from post processing when there is no archive url (rudaporto).
 
 2.1.14 (2017-05-19)
@@ -99,18 +114,22 @@ History
 
 2.1.12 (2017-04-28)
 -------------------
+
     * Fix: new script remove the last transition from two orders and respective assignments (rudaporto).
 
 2.1.11 (2017-04-28)
 -------------------
+
     * Fix: Order.delivery field now has the correct colander type definition (rudaporto).
 
 2.1.10 (2017-04-26)
 -------------------
+
     * Card #263: New Projects will have default delivery config and update config in all current Projects (rudaporto).
 
 2.1.9 (2017-04-25)
 ------------------
+
     * Card #260: Fix Google drive delivery and archive configuration in all Delivery Hero Projects (rudaporto).
 
 2.1.8 (2017-04-21)
