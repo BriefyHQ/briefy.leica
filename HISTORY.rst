@@ -2,8 +2,8 @@
 History
 =======
 
-2.2.0 (Unreleased)
-------------------
+2.1.20 (2016-06-20)
+-------------------
     * Added history endpoint for all first level models (rudaporto).
     * Refactor to user VersionsService base class from briefy.ws for Versions endpoints (rudaporto).
     * Added versions endpoint for all first level models with versions support (rudaporto).
