@@ -639,16 +639,52 @@ def login(request):
     return user_payload
 
 
+def _mock_rolleiflex(self, method, url, *args, **kwargs):
+    status_code = 200
+    payload = kwargs.get('data', '')
+    if 'internal/login' in url:
+        filename = 'data/rolleiflex_login.json'
+        # Wrong username
+        if 'foo@bar.com' in payload:
+            status_code = 404
+    elif '/transitions' in url:
+        filename = 'data/rolleiflex_user_transition.json'
+    elif 'internal/user' in url:
+        filename = 'data/user.json'
+        # Not existing user:
+        if '645fd371-b88d-4700-96a3-4692bb932ccb' in url:
+            status_code = 404
+    elif 'users' in url:
+        filename = 'data/user.json'
+        if '7645fd371-b88d-4700-96a3-4692bb932ccb' in payload:
+            status_code = 405
+        elif '8645fd371-b88d-4700-96a3-4692bb932ccb' in payload:
+            status_code = 405
+            filename = 'data/rolleiflex_failed_user_creation.json'
+        elif '9645fd371-b88d-4700-96a3-4692bb932ccb' in payload:
+            status_code = 405
+            filename = 'data/rolleiflex_failed_user_creation.txt'
+    headers = {
+        'content-type': 'application/json',
+    }
+    data = open(os.path.join(__file__.rsplit('/', 1)[0], filename)).read()
+    resp = requests.Response()
+    resp.status_code = status_code
+    resp.headers = headers
+    resp._content = data.encode('utf8')
+    return resp
+
+
 @pytest.fixture(scope='session')
 def mock_request():
     def mock_requests_response(self, method, url, *args, **kwargs):
         """Mock a response"""
         if 'briefy-thumbor' in url:
             filename = 'data/thumbor.json'
-        elif 'internal/users' in url:
-            filename = 'data/user.json'
-        elif 'api.geonames.org':
+        elif 'api.geonames.org' in url:
             filename = 'data/timezone.json'
+        elif 'briefy-rolleiflex' in url:
+            return _mock_rolleiflex(self, method, url, *args, **kwargs)
         status_code = 200
         headers = {
             'content-type': 'application/json',

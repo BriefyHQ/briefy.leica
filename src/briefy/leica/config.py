@@ -42,6 +42,11 @@ API_USERNAME = config('API_USERNAME', default='rudazz@gmail.com')
 API_PASSWORD = config('API_PASSWORD', default='testtest')
 
 API_BASE = config('API_BASE', default='https://api.stg.briefy.co')
+ROLLEIFLEX_USERNAME = config('ROLLEIFLEX_USERNAME', default='app@briefy.co')
+ROLLEIFLEX_BASE = config(
+    'ROLLEIFLEX_BASE',
+    default='http://briefy-rolleiflex.briefy-rolleiflex'
+)
 LOGIN_ENDPOINT = config('LOGIN_ENDPOINT', default=API_BASE + '/login/email')
 ROSETTA_ENDPOINT = config('ROSETTA_ENDPOINT', default=API_BASE + '/internal/rosetta')
 
