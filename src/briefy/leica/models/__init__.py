@@ -11,8 +11,8 @@ from briefy.leica.models.comment import Comment
 from briefy.leica.models.customer import Customer
 from briefy.leica.models.customer.address import CustomerBillingAddress
 from briefy.leica.models.customer.contact import CustomerContact
-from briefy.leica.models.job import Assignment
-from briefy.leica.models.job import IAssignment  # noQA
+from briefy.leica.models.job.assignment import Assignment
+from briefy.leica.models.job.assignment import IAssignment  # noQA
 from briefy.leica.models.job.leadorder import LeadOrder
 from briefy.leica.models.job.location import OrderLocation
 from briefy.leica.models.job.order import Order
