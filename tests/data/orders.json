@@ -185,6 +185,11 @@
     "number_required_assets": 100,
     "customer_order_id": "ffffs",
     "state": "received",
+    "delivery" : {
+      "gdrive": "https://drive.google.com/folders/xyz",
+      "archive": "https://drive.google.com/folders/xyy",
+      "sftp": "sftp://foo.bar/foobar"
+    },
     "title": "Job Title 5",
     "external_id": "ID5555",
     "timezone": "Europe/Berlin",

@@ -5,9 +5,7 @@ History
 2.1.21 (Unreleased)
 -------------------
 
-    * TODO
-
-
+    * Card #391: Implement new finance reports (ericof).
 
 2.1.20 (2017-06-20)
 -------------------
