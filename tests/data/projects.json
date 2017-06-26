@@ -118,7 +118,7 @@
     "asset_types": ["Image"],
     "project_manager": "77f88fab-dbdf-4705-8da1-8512f6012a86",
     "price": 10000,
-    "state": "created",
+    "state": "ongoing",
     "order_type": "leadorder",
     "title": "Project 05",
     "id": "4a068a1b-3646-4acf-937d-15563853e388",
@@ -135,6 +135,14 @@
         "message": null,
         "date": "2016-09-18T18:55:30.746610+00:00",
         "from": ""
+      },
+      {
+        "to": "ongoing",
+        "transition": "start",
+        "actor": "5f767bb3-125f-42d4-9ba5-af57a3d1b6d0",
+        "message": null,
+        "date": "2016-09-18T18:55:30.746610+00:00",
+        "from": "created"
       }
     ],
     "tech_requirements": {},
