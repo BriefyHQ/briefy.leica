@@ -1,6 +1,7 @@
 """Leica Reports package."""
 from briefy.leica.utils.transitions import get_transition_date_from_history
 from datetime import datetime
+from dateutil import parser
 from decimal import Decimal
 from io import StringIO
 from typing import Sequence
@@ -20,11 +21,7 @@ def export_date_from_history(
 ) -> datetime:
     """Convert workflow dates in str format to datetime."""
     date = get_transition_date_from_history(transitions, state_history, first=first)
-    try:
-        date = datetime.strptime(date[:-6], DATETIME_TRANSFORM01) if date else None
-    except ValueError:
-        date = datetime.strptime(date[:-6], DATETIME_TRANSFORM02) if date else None
-
+    date = parser.parse(date) if date else None
     return date
 
 

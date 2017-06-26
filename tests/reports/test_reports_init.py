@@ -11,9 +11,9 @@ import pytest
 
 
 testdata = [
-    (('submit', ), True, datetime(2016, 9, 16, 0, 0, 0)),
-    (('refuse', ), True, datetime(2017, 6, 1, 6, 41, 17, 326818)),
-    (('refuse', 'deliver', ), True, datetime(2017, 5, 31, 16, 33, 10, 813737)),
+    (('submit', ), True, datetime(2016, 9, 16, 0, 0, 0, tzinfo=utc)),
+    (('refuse', ), True, datetime(2017, 6, 1, 6, 41, 17, 326818, tzinfo=utc)),
+    (('refuse', 'deliver', ), True, datetime(2017, 5, 31, 16, 33, 10, 813737, tzinfo=utc)),
 ]
 
 
