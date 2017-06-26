@@ -2,8 +2,8 @@
 from briefy.leica.models import Order
 from briefy.leica.reports import export_date_from_history
 from briefy.leica.reports import export_datetime
-from briefy.leica.reports import export_integer
 from briefy.leica.reports import export_location
+from briefy.leica.reports import export_money_to_fixed_point
 from briefy.leica.reports.base import BaseReport
 from sqlalchemy.orm.query import Query
 
@@ -105,10 +105,10 @@ class AllOrders(BaseReport):
             'last_refusal_date': export_datetime(last_refusal_date),
             'accept_date': export_datetime(accept_date),
             'order_price_currency': record.price_currency,
-            'default_order_price': export_integer(record.price),
+            'default_order_price': export_money_to_fixed_point(record.price),
             'delivery_sftp_link': delivery_sftp_link,
             'type': record.type,
-            'actual_order_price': export_integer(record.actual_order_price)
+            'actual_order_price': export_money_to_fixed_point(record.actual_order_price)
         }
         return payload
 

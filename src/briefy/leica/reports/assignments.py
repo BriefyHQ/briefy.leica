@@ -3,8 +3,8 @@ from briefy.common.utilities.interfaces import IUserProfileQuery
 from briefy.leica.models import Assignment
 from briefy.leica.reports import export_date_from_history
 from briefy.leica.reports import export_datetime
-from briefy.leica.reports import export_integer
 from briefy.leica.reports import export_location
+from briefy.leica.reports import export_money_to_fixed_point
 from briefy.leica.reports.base import BaseReport
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.query import Query
@@ -90,9 +90,11 @@ class AllAssignments(BaseReport):
             'last_refusal_date': export_datetime(last_refusal_date),
             'complete_date': export_datetime(complete_date),
             'assignment_price_currency': record.payout_currency,
-            'actual_assignment_price': export_integer(record.payout_value),
-            'actual_assignment_travel_expenses': export_integer(record.travel_expenses),
-            'actual_assignment_additional_compensation': export_integer(
+            'actual_assignment_price': export_money_to_fixed_point(record.payout_value),
+            'actual_assignment_travel_expenses': export_money_to_fixed_point(
+                record.travel_expenses
+            ),
+            'actual_assignment_additional_compensation': export_money_to_fixed_point(
                 record.additional_compensation
             ),
             'reason_additional_compensation': record.reason_additional_compensation

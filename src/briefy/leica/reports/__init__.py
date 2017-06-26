@@ -30,8 +30,8 @@ def export_datetime(date: datetime) -> str:
     return date.strftime(DATETIME_EXPORT) if date else None
 
 
-def export_integer(value: int) -> Decimal:
-    """Convert integer to decimal."""
+def export_money_to_fixed_point(value: int) -> Decimal:
+    """Convert integer representation of money, in cents, to decimal."""
     return Decimal(value) / Decimal(100) if value else None
 
 

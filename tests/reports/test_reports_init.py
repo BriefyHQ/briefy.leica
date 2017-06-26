@@ -1,8 +1,8 @@
 """Test imaging utilities."""
 from briefy.leica.reports import export_date_from_history
 from briefy.leica.reports import export_datetime
-from briefy.leica.reports import export_integer
 from briefy.leica.reports import export_location
+from briefy.leica.reports import export_money_to_fixed_point
 from briefy.leica.reports import records_to_csv
 from datetime import datetime
 from pytz import utc
@@ -105,11 +105,11 @@ testdata = [
 
 
 @pytest.mark.parametrize('value,expected', testdata)
-def test_export_integer(value, expected):
-    """Test export_integer."""
+def test_export_money_to_fixed_point(value, expected):
+    """Test export_money_to_fixed_point."""
     from decimal import Decimal
 
-    func = export_integer
+    func = export_money_to_fixed_point
 
     assert func(value) == Decimal(expected)
 
