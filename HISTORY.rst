@@ -2,7 +2,7 @@
 History
 =======
 
-2.1.21 (Unreleased)
+2.1.21 (2017-06-26)
 -------------------
 
     * Card #391: Implement new finance reports (ericof).
