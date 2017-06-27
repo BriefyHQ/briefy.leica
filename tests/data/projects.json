@@ -122,6 +122,7 @@
     "order_type": "leadorder",
     "title": "Project 05",
     "id": "4a068a1b-3646-4acf-937d-15563853e388",
+    "add_order_roles": [],
     "qa_manager": "5f767bb3-125f-42d4-9ba5-af57a3d1b6d0",
     "description": null,
     "updated_at": "2016-09-18T18:55:30.747823+00:00",

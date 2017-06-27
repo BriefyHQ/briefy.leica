@@ -11,6 +11,7 @@ from briefy.ws.resources import WorkflowAwareResource
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
 from cornice.resource import view
+from pyramid.httpexceptions import HTTPForbidden
 from pyramid.security import Allow
 from sqlalchemy import and_
 from sqlalchemy import or_
@@ -67,12 +68,23 @@ class OrderService(RESTService):
         :returns: Newly created instance of model Order or LeadOrder.
         """
         request = self.request
+        user = request.user
+        user_groups = user.groups
         payload = request.validated
+        payload['source'] = 'customer' if 'g:customers' in user_groups else 'briefy'
         project = Project.get(payload.get('project_id'))
+        add_order_roles = project.add_order_roles
+
         if project.order_type.value == 'leadorder':
             model = LeadOrder
         else:
             model = model if model else Order
+
+        if len(set(add_order_roles) & set(user_groups)) == 0:
+            model_name = 'lead' if model == LeadOrder else 'order'
+            raise HTTPForbidden(f'You are not allowed to add a new {model_name} to this project')
+
+        request.validated = payload
         return super().collection_post(model=model)
 
     @property

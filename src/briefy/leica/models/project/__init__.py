@@ -2,6 +2,7 @@
 from briefy.common.db.mixins import BriefyRoles
 from briefy.common.utils import schema
 from briefy.common.vocabularies.categories import CategoryChoices
+from briefy.common.vocabularies.roles import Groups
 from briefy.leica.cache import cache_region
 from briefy.leica.cache import enable_cache
 from briefy.leica.db import Base
@@ -45,6 +46,11 @@ DEFAULT_DELIVERY_CONFIG = {
         }
     }
 }
+
+DEFAULT_ADD_ORDER_ROLES = [
+    'g:customers',
+    'g:briefy_pm',
+]
 
 
 class IProject(Interface):
@@ -342,6 +348,71 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     Zero means a Order will be automatically approved.
     """
 
+    add_order_roles = sa.Column(
+        JSONB,
+        default=DEFAULT_ADD_ORDER_ROLES,
+        info={
+            'colanderalchemy': {
+                'title': 'Roles allowed to add an order.',
+                'missing': colander.drop,
+                'typ': schema.List()
+            }
+        }
+    )
+    """Roles allowed to add orders on this project.
+
+    Options come from :mod:`briefy.common.vocabularies.roles.Groups`.
+    """
+
+    @orm.validates('add_order_roles')
+    def validate_add_order_roles(self, key, value):
+        """Validate if values for add_order_roles are correct."""
+        all_groups = [item.value for item in Groups]
+        for item in value:
+            if item not in all_groups:
+                raise ValidationError(message='Invalid role', name=key)
+        return value
+
+    @property
+    def settings(self) -> dict:
+        """Project settings.
+
+        Aggregate settings information about a project.
+        :return: Dictionary with all settings for a project.
+        """
+        tech_requirements = self.tech_requirements
+        delivery_config = self.delivery
+        add_order_roles = self.add_order_roles
+        cancellation_window = self.cancellation_window
+        availability_window = self.availability_window
+        approval_window = self.approval_window
+        return {
+            'tech_requirements': tech_requirements,
+            'delivery_config': delivery_config,
+            'dates': {
+                'cancellation_window': cancellation_window,
+                'availability_window': availability_window,
+                'approval_window': approval_window,
+            },
+            'permissions': {
+                'add_order': add_order_roles
+            }
+        }
+
+    @settings.setter
+    def settings(self, value: dict):
+        """Project settings.
+
+        Set all settings for a project.
+        :value: Dictionary with all settings for a project.
+        """
+        self.tech_requirements = value.get('tech_requirements', {})
+        self.delivery = value.get('delivery_config', {})
+        self.add_order_roles = value.get('permissions', {}).get('add_order', [])
+        self.cancellation_window = value.get('dates', {}).get('cancellation_window', 0)
+        self.availability_window = value.get('dates', {}).get('availability_window', 0)
+        self.approval_window = value.get('dates', {}).get('approval_window', 0)
+
     orders = orm.relationship(
         'Order',
         backref=orm.backref('project'),
@@ -446,6 +517,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
             if isinstance(self.category, CategoryChoices) else self.category
         data['order_type'] = self.order_type.value \
             if isinstance(self.order_type, OrderTypeChoices) else self.order_type
+        data['settings'] = self.settings
         data = self._apply_actors_info(data)
         if includes and 'state_history' in includes:
             # Workflow history
