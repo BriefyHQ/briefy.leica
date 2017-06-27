@@ -1,6 +1,7 @@
 """Briefy Leica Project model."""
 from briefy.common.db.mixins import BriefyRoles
 from briefy.common.utils import schema
+from briefy.common.utils.data import Objectify
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.common.vocabularies.roles import Groups
 from briefy.leica.cache import cache_region
@@ -21,6 +22,7 @@ from zope.interface import Interface
 import colander
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils
+import typing as t
 
 
 # TODO: improve this based on the project type
@@ -374,44 +376,54 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         return value
 
     @property
-    def settings(self) -> dict:
+    def settings(self) -> Objectify:
         """Project settings.
 
         Aggregate settings information about a project.
         :return: Dictionary with all settings for a project.
         """
-        tech_requirements = self.tech_requirements
-        delivery_config = self.delivery
-        add_order_roles = self.add_order_roles
-        cancellation_window = self.cancellation_window
-        availability_window = self.availability_window
-        approval_window = self.approval_window
-        return {
-            'tech_requirements': tech_requirements,
-            'delivery_config': delivery_config,
+        # TODO: These settings are in a transitional state while
+        # we move other configuration-related fields here.
+        # To preserve backwards compability, we simply proxy those
+        # fields - but their use should be deprecated as possible.
+
+        # (NB. Even with Objectify, there is no provision
+        # for write-back any of the "dates" subfields yet)
+
+        return Objectify({
+            'tech_requirements': self.tech_requirements,
+            'delivery_config': self.delivery,
             'dates': {
-                'cancellation_window': cancellation_window,
-                'availability_window': availability_window,
-                'approval_window': approval_window,
+                'cancellation_window': self.cancellation_window,
+                'availability_window': self.availability_window,
+                'approval_window': self.approval_window,
             },
             'permissions': {
-                'add_order': add_order_roles
+                'add_order': self.add_order_roles
             }
-        }
+        })
 
     @settings.setter
-    def settings(self, value: dict):
+    def settings(self, value: t.Union[Objectify, t.Mapping]):
         """Project settings.
 
         Set all settings for a project.
         :value: Dictionary with all settings for a project.
         """
-        self.tech_requirements = value.get('tech_requirements', {})
-        self.delivery = value.get('delivery_config', {})
-        self.add_order_roles = value.get('permissions', {}).get('add_order', [])
-        self.cancellation_window = value.get('dates', {}).get('cancellation_window', 0)
-        self.availability_window = value.get('dates', {}).get('availability_window', 0)
-        self.approval_window = value.get('dates', {}).get('approval_window', 0)
+        # 'PUT' semmantics setter. This will destroy everything on the way.
+        # to change a single sub-field, consider changing the just the desired
+        # entry along with a call to
+        # sqlalchemy.orm.attributes.flag_modified(obj, data_field_name)
+        # (check the correct underlying field_name on the settings.getter
+        # above while we are in this transitional stage)
+
+        value = Objectify(value, sentinel=None)
+        self.tech_requirements = value.tech_requirements or {}
+        self.delivery = value.delivery_config or {}
+        self.add_order_roles = value.permissions.add_order or []
+        self.cancellation_window = value.dates.cancellation_window or 0
+        self.availability_window = value.dates.availability_window or 0
+        self.approval_window = value.dates.approval_window or 0
 
     orders = orm.relationship(
         'Order',
@@ -517,7 +529,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
             if isinstance(self.category, CategoryChoices) else self.category
         data['order_type'] = self.order_type.value \
             if isinstance(self.order_type, OrderTypeChoices) else self.order_type
-        data['settings'] = self.settings
+        data['settings'] = self.settings._get()
         data = self._apply_actors_info(data)
         if includes and 'state_history' in includes:
             # Workflow history

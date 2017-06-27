@@ -34,26 +34,27 @@ class TestProjectModel(BaseModelTest):
     def test_settings_getter(self, instance_obj):
         """Test settings of a project."""
         settings = instance_obj.settings
-        assert 'dates' in settings
-        assert settings['dates']['approval_window'] == 5
-        assert settings['dates']['availability_window'] == 7
-        assert settings['dates']['cancellation_window'] == 1
 
-        assert 'delivery_config' in settings
-        assert 'tech_requirements' in settings
+        assert hasattr(settings, 'dates')
 
-        assert 'permissions' in settings
-        assert 'g:briefy_pm' in settings['permissions']['add_order']
-        assert 'g:briefy_support' in settings['permissions']['add_order']
+        assert settings.dates.approval_window == 5
+        assert settings.dates.availability_window == 7
+        assert settings.dates.cancellation_window == 1
+
+        assert hasattr(settings, 'delivery_config')
+        assert hasattr(settings, 'tech_requirements')
+
+        assert hasattr(settings, 'permissions')
+        assert 'g:briefy_pm' in settings.permissions.add_order._dct
 
     def test_settings_setter(self, instance_obj):
         """Test settings of a project."""
         settings = instance_obj.settings
-        settings['permissions']['add_order'] = ['g:customers']
+        settings.permissions.add_order = ['g:customers']
 
         instance_obj.settings = settings
 
         new_settings = instance_obj.settings
-        assert 'permissions' in new_settings
-        assert 'g:customers' in new_settings['permissions']['add_order']
-        assert 'g:briefy_support' not in new_settings['permissions']['add_order']
+        assert hasattr(new_settings, 'permissions')
+        assert 'g:customers' in new_settings.permissions.add_order._dct
+        assert 'g:briefy_support' not in new_settings.permissions.add_order._dct
