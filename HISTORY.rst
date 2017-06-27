@@ -5,7 +5,7 @@ History
 2.1.22 (Unreleased)
 -------------------
 
-    * TODO
+    * Card #434: Make sure Professional user has ownership over its profile (ericof).
 
 2.1.21 (2017-06-26)
 -------------------
