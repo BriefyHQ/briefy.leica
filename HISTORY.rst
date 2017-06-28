@@ -2,6 +2,11 @@
 History
 =======
 
+2.1.23 (2017-06-28)
+-------------------
+
+    * Fix listing assignments per Professional (ericof).
+
 2.1.22 (2017-06-28)
 -------------------
 
