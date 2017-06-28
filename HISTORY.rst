@@ -2,6 +2,11 @@
 History
 =======
 
+2.1.22 (2017-06-28)
+-------------------
+
+    * Card #438: Fix search assignments by project title (ericof).
+
 2.1.21 (2017-06-26)
 -------------------
 
