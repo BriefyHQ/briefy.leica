@@ -2,6 +2,11 @@
 History
 =======
 
+2.1.24 (2017-06-29)
+-------------------
+
+    * Fix incorrect endpoint integration between Leica and Rolleiflex (ericof).
+
 2.1.23 (2017-06-28)
 -------------------
 
