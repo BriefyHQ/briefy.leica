@@ -33,7 +33,7 @@ def professional_ownership(event):
 
 
 def transition_handler(event):
-    """Handle Order transition events."""
+    """Handle Professional transition events."""
     event_name = event.event_name
     if not event_name.startswith('professional.workflow'):
         return
