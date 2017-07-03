@@ -2,6 +2,13 @@
 History
 =======
 
+2.1.25 (2017-07-03)
+-------------------
+
+    * Card #434: Make sure Professional user has ownership over its profile (ericof).
+    * Card #436: Conditional add order per project (ericof).
+    * Fix /pools/{id}/history endpoint access (ericof).
+
 2.1.24 (2017-06-29)
 -------------------
 
