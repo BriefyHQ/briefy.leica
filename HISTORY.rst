@@ -2,7 +2,7 @@
 History
 =======
 
-2.1.25 (Unreleased)
+2.1.25 (2017-07-03)
 -------------------
 
     * Card #434: Make sure Professional user has ownership over its profile (ericof).
