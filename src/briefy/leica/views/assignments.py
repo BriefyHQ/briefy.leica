@@ -10,6 +10,7 @@ from briefy.ws.resources import WorkflowAwareResource
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
 from pyramid.security import Allow
+from sqlalchemy.orm import joinedload
 
 
 COLLECTION_PATH = '/assignments'
@@ -76,6 +77,7 @@ class AssignmentService(RESTService):
                 Assignment.pool_id.in_(pool_ids),
                 Assignment.state == 'published'
             )
+        query = query.options(joinedload('order'))
         return query
 
 

@@ -2,12 +2,32 @@
 History
 =======
 
-2.1.21 (Unreleased)
+2.1.25 (2017-07-03)
 -------------------
 
-    * TODO
+    * Card #434: Make sure Professional user has ownership over its profile (ericof).
+    * Card #436: Conditional add order per project (ericof).
+    * Fix /pools/{id}/history endpoint access (ericof).
 
+2.1.24 (2017-06-29)
+-------------------
 
+    * Fix incorrect endpoint integration between Leica and Rolleiflex (ericof).
+
+2.1.23 (2017-06-28)
+-------------------
+
+    * Fix listing assignments per Professional (ericof).
+
+2.1.22 (2017-06-28)
+-------------------
+
+    * Card #438: Fix search assignments by project title (ericof).
+
+2.1.21 (2017-06-26)
+-------------------
+
+    * Card #391: Implement new finance reports (ericof).
 
 2.1.20 (2017-06-20)
 -------------------

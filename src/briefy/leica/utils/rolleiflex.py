@@ -17,7 +17,7 @@ UUID_TYPE = Union[str, UUID]
 
 ROLLEIFLEX_USER_CREATION = f'{ROLLEIFLEX_BASE}/users'
 ROLLEIFLEX_LOGIN = f'{ROLLEIFLEX_BASE}/internal/login'
-ROLLEIFLEX_USERS = f'{ROLLEIFLEX_BASE}/internal/user'
+ROLLEIFLEX_USERS = f'{ROLLEIFLEX_BASE}/internal/users'
 
 HEADERS = {
     'x-locale': 'en_GB',

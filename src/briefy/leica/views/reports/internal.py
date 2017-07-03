@@ -1,12 +1,40 @@
 """Views to handle internal Reports."""
-from briefy.leica.tools.finance_csv_export import export_assignment
-from briefy.leica.tools.finance_csv_export import export_order
+from briefy.leica.reports.assignments import ActiveAssignments
+from briefy.leica.reports.assignments import AllAssignments
+from briefy.leica.reports.assignments import AssignmentsQAFollowUP
+from briefy.leica.reports.customers import AllCustomers
+from briefy.leica.reports.orders import ActiveOrders
+from briefy.leica.reports.orders import AllOrders
+from briefy.leica.reports.professionals import AllProfessionals
 from briefy.leica.views.reports import BaseReport
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.security import Allow
 from pyramid.security import Everyone
+
+
+ASSIGNMENT_REPORTS = {
+    'all': AllAssignments,
+    'active': ActiveAssignments,
+    'qa': AssignmentsQAFollowUP
+}
+
+
+CUSTOMER_REPORTS = {
+    'all': AllCustomers
+}
+
+
+ORDER_REPORTS = {
+    'all': AllOrders,
+    'active': ActiveOrders,
+}
+
+PROFESSIONAL_REPORTS = {
+    'all': AllProfessionals
+}
 
 
 class InternalReportFactory(BaseFactory):
@@ -17,37 +45,67 @@ class InternalReportFactory(BaseFactory):
     ]
 
 
+class MsOphelieReport(BaseReport):
+    """Report generation for Ms. Ophelie."""
+
+    reports = None
+
+    def get_report_data(self, filename: str):
+        """Execute the report, return a tuple with data and metadata."""
+        report_id = self.request.matchdict.get('id', '')
+        all_reports = self.reports
+        if not (all_reports and report_id in all_reports):
+            raise HTTPNotFound('Report not found')
+        content_type = self.mime_type
+        report = all_reports[report_id]()
+        csv_file = report()
+        data = csv_file.getvalue()
+        return filename, content_type, data
+
+
 @resource(
-    path='/ms-ophelie/assignments',
+    path='/ms-ophelie/assignments/{id}',
     cors_policy=CORS_POLICY,
     factory=InternalReportFactory
 )
-class MsOphelieAssignments(BaseReport):
+class MsOphelieAssignments(MsOphelieReport):
     """Assignment report for Ms. Ophelie."""
 
     filename = 'assignments.csv'
-
-    def get_report_data(self, filename: str):
-        """Execute the report, return a tuple with data and metadata."""
-        content_type = self.mime_type
-        csv_file = export_assignment()
-        data = csv_file.getvalue()
-        return filename, content_type, data
+    reports = ASSIGNMENT_REPORTS
 
 
 @resource(
-    path='/ms-ophelie/orders',
+    path='/ms-ophelie/customers/{id}',
     cors_policy=CORS_POLICY,
     factory=InternalReportFactory
 )
-class MsOphelieOrders(BaseReport):
+class MsOphelieCustomers(MsOphelieReport):
+    """Customer report for Ms. Ophelie."""
+
+    filename = 'customers.csv'
+    reports = CUSTOMER_REPORTS
+
+
+@resource(
+    path='/ms-ophelie/orders/{id}',
+    cors_policy=CORS_POLICY,
+    factory=InternalReportFactory
+)
+class MsOphelieOrders(MsOphelieReport):
     """Order report for Ms. Ophelie."""
 
     filename = 'orders.csv'
+    reports = ORDER_REPORTS
 
-    def get_report_data(self, filename: str):
-        """Execute the report, return a tuple with data and metadata."""
-        content_type = self.mime_type
-        csv_file = export_order()
-        data = csv_file.getvalue()
-        return filename, content_type, data
+
+@resource(
+    path='/ms-ophelie/professionals/{id}',
+    cors_policy=CORS_POLICY,
+    factory=InternalReportFactory
+)
+class MsOphelieProfessionals(MsOphelieReport):
+    """Customer report for Ms. Ophelie."""
+
+    filename = 'professionals.csv'
+    reports = PROFESSIONAL_REPORTS
