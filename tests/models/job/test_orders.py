@@ -332,21 +332,13 @@ class TestOrderModel(BaseModelTest):
             roles[role_name],
             'received',
         )
-        scout_manager = {}
-        with pytest.raises(WorkflowTransitionException) as excinfo:
-            wf.assign(fields=scout_manager)
 
-        assert 'Field scout_manager is required for this transition' in str(excinfo)
-
-        scout_manager = {'scout_manager': uuid.uuid4()}
-        wf.assign(fields=scout_manager)
+        # this transition will be triggered only from the Assignment
+        wf.assign()
         session.flush()
 
         assert order.state == 'assigned'
         assert order.state_history[-1]['transition'] == 'assign'
-
-        for key, value in scout_manager.items():
-            assert getattr(order, key) == value
 
     @pytest.mark.parametrize('origin_state', ['assigned', 'scheduled'])
     @pytest.mark.parametrize('role_name', ['pm', 'system'])

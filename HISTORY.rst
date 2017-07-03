@@ -2,6 +2,14 @@
 History
 =======
 
+2.2.0 (Unreleased)
+------------------
+
+    * Remove scout_manager as a required field for Order.assign transition (rudaporto).
+    * Added back external_id column to Professional model (rudaporto).
+    * Update Professional tests to use the classmethod `created` to create new model instances (rudaporto).
+
+
 2.1.25 (2017-07-03)
 -------------------
 

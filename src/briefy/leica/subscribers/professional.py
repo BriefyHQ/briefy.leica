@@ -28,8 +28,8 @@ def professional_ownership(event):
     professional = event.obj
     professional_id = professional.id
     owner = professional.owner
-    if str(professional_id) != str(owner):
-        professional.owner = professional_id
+    if owner and str(professional_id) != str(owner):
+        professional.owner = [professional_id]
 
 
 def transition_handler(event):

@@ -184,15 +184,14 @@ class TestProfessionalModel(BaseModelTest):
 
         obj_payload['id'] = uuid4()
         obj_payload['email'] = str(obj_payload['id'])[6] + obj_payload['email']
-        professional = models.Professional(**obj_payload)
-        session.add(professional)
-
+        models.Professional.create(obj_payload)
         pool_id = uuid4()
-        pool = models.Pool(id=pool_id, title='Pool fake', country='br')
-        session.add(pool)
-
-        session.flush()
-
+        pool_payload = dict(
+            id=pool_id,
+            title='Pool fake',
+            country='br'
+        )
+        models.Pool.create(pool_payload)
         instance_obj = models.Professional.get(obj_payload['id'])
 
         obj, wf, request = self.prepare_obj_wf(

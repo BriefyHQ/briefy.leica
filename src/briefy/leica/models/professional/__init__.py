@@ -79,6 +79,18 @@ class Professional(UserProfile, Base):
     accept_travel = sa.Column(sa.Boolean(), default=False, index=True)
     """Accept travel to other locations to work."""
 
+    external_id = sa.Column(
+        sa.String(255),
+        nullable=True,
+        info={'colanderalchemy': {
+              'title': 'External ID',
+              'missing': colander.drop,
+              'typ': colander.String}}
+    )
+    """External ID from knack.
+
+    Used as key in the Intercom integration for professionals created on Knack."""
+
     @declared_attr
     def title(cls):
         """Return the Professional fullname."""

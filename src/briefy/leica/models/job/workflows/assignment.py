@@ -132,8 +132,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         assignment = self.document
         order = assignment.order
         if order.state == 'received':
-            fields = {'assignment_internal_scout': user_id}
-            order.workflow.assign(fields=fields)
+            order.workflow.assign()
         # set local roles
         fields = kwargs['fields']
         assignment.assingment_internal_scout = [user_id]

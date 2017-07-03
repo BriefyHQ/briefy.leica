@@ -12,6 +12,7 @@ TODO
 ====
 
 * Add unit tests for all versions and history endpoints
+* Update workflow for required fields.
 
 Code Health
 ===========
