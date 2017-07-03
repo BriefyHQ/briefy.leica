@@ -53,5 +53,3 @@ class UserProfileWorkflow(BriefyWorkflow):
     def can_inactivate(self):
         """Validate if user can inactivate this user profile."""
         return True
-
-
