@@ -72,7 +72,6 @@ class TestMoveOrderToAccepted(BaseTaskTest):
 
     def test_wrong_assignment_state(self, instance_obj):
         """Will not move the order because an Assignment is not in a correct state."""
-
         order = instance_obj
         order_id = order.id
         assignment = models.Assignment.create({'order_id': order.id})

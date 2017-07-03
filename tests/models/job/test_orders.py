@@ -10,7 +10,6 @@ from datetime import timedelta
 
 import pytest
 import pytz
-import transaction
 import uuid
 
 
