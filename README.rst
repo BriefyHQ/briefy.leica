@@ -13,6 +13,10 @@ TODO
 
 * Add unit tests for all versions and history endpoints
 * Update workflow for required fields.
+* Implement customer roles and project roles in the CustomerUserProfile
+* Implement unit tests to check local roles inheritance (traverse)
+* Implement unit tests for local permissions
+* Fix many to many relationship between professional and pool with sqlalchemy_continuum
 
 Code Health
 ===========
