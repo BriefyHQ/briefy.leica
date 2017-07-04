@@ -191,8 +191,8 @@ class AssignmentsQAFollowUP(ActiveAssignments):
         p['customer_name'] = customer.title
         p['briefy_assignment_id'] = p['briefy_id']
         p['responsible_qa_manager'] = ''
-        if record.qa_manager:
-            data = profile_service.get_data(str(record.qa_manager))
+        if record.assignment_internal_qa:
+            data = profile_service.get_data(str(record.assignment_internal_qa[0]))
             p['responsible_qa_manager'] = data['fullname']
         p['first_rejection_date'] = export_date_from_history(history, ('reject',), first=True)
         p['last_rejection_date'] = export_date_from_history(history, ('reject',), first=False)

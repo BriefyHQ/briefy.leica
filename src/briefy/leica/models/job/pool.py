@@ -1,7 +1,8 @@
 """Briefy Leica Pool."""
 from briefy.common.db.mixins import Timestamp
-from briefy.common.db.models import Item
+from briefy.common.db.mixins import VersionMixin
 from briefy.leica.db import Base
+from briefy.leica.db import Item
 from briefy.leica.db import Session
 from briefy.leica.models import Assignment
 from briefy.leica.models import mixins
@@ -18,7 +19,7 @@ import sqlalchemy as sa
 import sqlalchemy_utils as sautils
 
 
-class ProfessionalsInPool(mixins.VersionMixin, Timestamp, Base):
+class ProfessionalsInPool(VersionMixin, Timestamp, Base):
     """Relationship between Professional and Pool."""
 
     __session__ = Session

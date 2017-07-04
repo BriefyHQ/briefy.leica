@@ -1,5 +1,5 @@
 """Briefy Leica Customer model."""
-from briefy.common.db.models import Item
+from briefy.leica.db import Item
 from briefy.leica.models import mixins
 from briefy.leica.models.customer import workflows
 from briefy.leica.utils.user import add_user_info_to_state_history
@@ -19,7 +19,7 @@ class ICustomer(Interface):
 
 @implementer(ICustomer)
 class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerRolesMixin,
-               mixins.LeicaSubVersionedMixin, Item):
+               mixins.LeicaSubMixin, Item):
     """A Customer for Briefy."""
 
     _workflow = workflows.CustomerWorkflow

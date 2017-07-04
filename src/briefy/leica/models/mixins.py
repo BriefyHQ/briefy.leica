@@ -6,6 +6,7 @@ from briefy.common.db.mixins import Mixin
 from briefy.common.db.mixins import OptIn
 from briefy.common.db.mixins import PersonalInfoMixin
 from briefy.common.db.mixins import SubItemMixin
+from briefy.common.db.mixins import VersionMixin
 from briefy.common.utilities.interfaces import IUserProfileQuery
 from briefy.common.utils import schema
 from briefy.common.utils.cache import timeout_cache
@@ -13,7 +14,6 @@ from briefy.leica.db import Session
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy_continuum.utils import count_versions
 from zope.component import getUtility
 
 import colander
@@ -301,37 +301,6 @@ class OrderFinancialInfo:
         self._price = value
 
 
-class VersionMixin:
-    """Versioning support for Leica objects."""
-
-    __versioned__ = {
-        'exclude': ['state_history', '_state_history', ]
-    }
-    """SQLAlchemy Continuum settings.
-
-    By default we do not keep track of state_history.
-    """
-
-    @property
-    def version(self) -> int:
-        """Return the current version number.
-
-        We are civilised here, so version numbering starts from zero ;-)
-        :return: Version number of this object.
-        """
-        versions = count_versions(self)
-        return versions - 1
-
-    @version.setter
-    def version(self, value: int) -> int:
-        """Explicitly sets a version to the asset (Deprecated).
-
-        XXX: Here only to avoid issues if any client tries to set this.
-        :param value:
-        """
-        pass
-
-
 class BaseLeicaMixin:
     """Base mixin for all leica models."""
 
@@ -364,10 +333,13 @@ class LeicaMixin(BaseLeicaMixin, Mixin):
 
 
 class LeicaSubMixin(BaseLeicaMixin, SubItemMixin):
-    """Base mixin for Leica sub Item objects."""
+    """Base mixin for Leica sub Item objects.
+
+    This includes versionnig and metadata in the Item base table.
+    """
 
 
-class LeicaSubVersionedMixin(VersionMixin, BaseMetadata, LeicaSubMixin):
+class LeicaSubVersionedMixin(VersionMixin, LeicaSubMixin):
     """Base mixin for Leica Objects supporting versioning and sub item of Item.
 
     Used on objects that require Version support and Base metadata.

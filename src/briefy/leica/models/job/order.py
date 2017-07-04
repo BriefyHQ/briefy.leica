@@ -1,5 +1,4 @@
 """Briefy Leica Order to a Job."""
-from briefy.common.db.models import Item
 from briefy.common.db.types import AwareDateTime
 from briefy.common.utils import schema
 from briefy.common.vocabularies.categories import CategoryChoices
@@ -7,6 +6,7 @@ from briefy.leica import logger
 from briefy.leica.cache import cache_manager
 from briefy.leica.cache import cache_region
 from briefy.leica.cache import enable_cache
+from briefy.leica.db import Item
 from briefy.leica.models import mixins
 from briefy.leica.models.descriptors import UnaryRelationshipWrapper
 from briefy.leica.models.job import workflows
@@ -125,7 +125,7 @@ def default_current_type(context):
 
 
 class Order(mixins.OrderFinancialInfo, mixins.OrderRolesMixin,
-            mixins.LeicaSubVersionedMixin, Item):
+            mixins.LeicaSubMixin, Item):
     """An Order from the customer."""
 
     _workflow = workflows.OrderWorkflow

@@ -62,18 +62,16 @@ class TestAssignmentView(BaseVersionedTestView):
         assert error['location'] == 'body'
         assert 'Invalid number of type of assets' in error['description']
 
-    def test_workflow(self, app, session, instance_obj):
+    def test_workflow(self, app, instance_obj):
         """Test workflow endpoints."""
         payload = {
-            'owner': 'Professional Name',
             'id': '264b3e66-c327-4bbd-9cc7-271716fce178',
             'professional_id': '23d94a43-3947-42fc-958c-09245ecca5f2',
-            'uploaded_by': '23d94a43-3947-42fc-958c-09245ecca5f2',
+            'owner': '23d94a43-3947-42fc-958c-09245ecca5f2',
+            'uploaded_by': 'f5c2199f-6ed7-4ff8-90df-d1a98249f5e7',
             'description': '',
-            'updated_at': '2016-09-18T18:55:20.696061+00:00',
             'filename': '2345.jpg',
             'source_path': 'source/files/assignments/2345.jpg',
-            'created_at': '2016-09-18T18:55:20.696043+00:00',
             'state': 'pending',
             'width': 5760,
             'height': 3840,
@@ -102,9 +100,7 @@ class TestAssignmentView(BaseVersionedTestView):
         }
         # Create the object using a new transaction
         with transaction.manager:
-            asset = models.Asset(**payload)
-            session.add(asset)
-            session.flush()
+            models.Image.create(payload)
 
         obj_id = instance_obj.id
         state = instance_obj.state

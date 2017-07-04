@@ -7,8 +7,7 @@ class TestCustomerModel(BaseModelTest):
     """Test Customer."""
 
     dependencies = [
-        (models.CustomerUserProfile, 'data/internal_profiles.json'),
-        (models.InternalUserProfile, 'data/customer_profiles.json'),
+        (models.InternalUserProfile, 'data/internal_profiles.json'),
     ]
     file_path = 'data/customers.json'
     model = models.Customer

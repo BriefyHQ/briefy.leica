@@ -8,7 +8,6 @@ from pytz import utc
 
 import json
 import mock
-import pytest
 
 
 class TestMoveAssignmentToAwaitingAssets(BaseTaskTest):
@@ -64,7 +63,6 @@ class TestMoveAssignmentToAwaitingAssets(BaseTaskTest):
 
         assert assignment.state == 'awaiting_assets'
 
-    @pytest.mark.skip
     def test_move_assignments_awaiting_assets(self, instance_obj):
         """Test move_assignments_awaiting_assets."""
         assignment = instance_obj
@@ -72,7 +70,7 @@ class TestMoveAssignmentToAwaitingAssets(BaseTaskTest):
         assignment.scheduled_datetime = datetime(2016, 9, 1, 12, 0, 0, tzinfo=utc)
         move_assignments_awaiting_assets()
         messages = self.get_messages_from_queue()
-        assert len(messages) == 0
+        assert len(messages) == 2
 
     def test_wrong_assignment_state(self, instance_obj):
         """Will not move the order because an Assignment is not in a correct state."""

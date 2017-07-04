@@ -3,6 +3,7 @@ from briefy.leica import models
 from conftest import BaseModelTest
 
 import pytest
+import transaction
 
 
 @pytest.mark.usefixtures('create_dependencies')
@@ -26,20 +27,6 @@ class TestProfessionalModel(BaseModelTest):
             web_request.user = role
             wf.context = role
         return obj, wf, web_request
-
-    def test_add_pool_to_professional(self, instance_obj, session):
-        """Add job pools to the professional."""
-        pools = models.Pool.query().all()
-        assert len(pools) == 3
-        assert len(instance_obj.pools) == 0
-
-        for item in pools:
-            instance_obj.pools.append(item)
-            assert instance_obj.id == item.professionals[0].id
-            assert len(item.professionals) == 1
-
-        session.flush()
-        assert len(instance_obj.pools) == 3
 
     @pytest.mark.parametrize('origin_state', ['pending'])
     @pytest.mark.parametrize('role_name', ['qa', 'scout'])
@@ -204,3 +191,18 @@ class TestProfessionalModel(BaseModelTest):
         session.flush()
         assert obj.state == origin_state
         assert obj.state_history[-1]['transition'] == 'assign'
+
+    def test_add_pool_to_professional(self, instance_obj, session):
+        """Add job pools to the professional."""
+        pools = models.Pool.query().all()
+        assert len(pools) == 3
+        assert len(instance_obj.pools) == 0
+
+        for item in pools:
+            instance_obj.pools.append(item)
+            transaction.commit()
+            assert instance_obj in item.professionals
+            assert len(item.professionals) == 1
+
+        session.flush()
+        assert len(instance_obj.pools) == 3

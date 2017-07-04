@@ -1,5 +1,6 @@
 """This module contains SQLAlchemy helpers and connectivity."""
 from briefy.common.db import Base  # noQA
+from briefy.common.db.models import Item  # noQA
 from briefy.leica import config
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session

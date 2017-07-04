@@ -9,6 +9,7 @@ class TestCustomerReports:
     """Test customer reports."""
 
     dependencies = [
+        (models.InternalUserProfile, 'data/internal_profiles.json'),
         (models.Customer, 'data/customers.json'),
         (models.CustomerBillingInfo, 'data/customer_billing_infos.json'),
     ]

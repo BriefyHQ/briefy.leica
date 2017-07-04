@@ -90,11 +90,6 @@ class Professional(UserProfile):
 
     Used as key in the Intercom integration for professionals created on Knack."""
 
-    @declared_attr
-    def title(cls):
-        """Return the Professional fullname."""
-        return orm.column_property(cls.first_name + ' ' + cls.last_name)
-
     # Profile information
     photo_path = sa.Column(
         sa.String(255),

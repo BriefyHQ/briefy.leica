@@ -15,7 +15,6 @@
     "number_required_assets": 100,
     "customer_order_id": "aaaa",
     "state": "new",
-    "type": "leadorder",
     "title": "Job Title 1",
     "state_history": [
       {
@@ -74,7 +73,6 @@
     "number_required_assets": 100,
     "customer_order_id": "bbbb",
     "state": "new",
-    "type": "leadorder",
     "title": "Job Title 2",
     "timezone": "Europe/Berlin",
     "state_history": [
@@ -106,7 +104,6 @@
     "number_required_assets": 100,
     "customer_order_id": "cccc",
     "state": "new",
-    "type": "leadorder",
     "title": "Job Title 3",
     "timezone": "Europe/Berlin",
     "state_history": [
@@ -138,7 +135,6 @@
     "number_required_assets": 100,
     "customer_order_id": "eeee",
     "state": "new",
-    "type": "leadorder",
     "title": "Job Title 4",
     "timezone": "Europe/Berlin",
     "state_history": [
@@ -170,7 +166,6 @@
     "number_required_assets": 100,
     "customer_order_id": "ffffs",
     "state": "new",
-    "type": "leadorder",
     "title": "Job Title 5",
     "timezone": "Europe/Berlin",
     "state_history": [

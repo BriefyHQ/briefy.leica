@@ -1,11 +1,11 @@
 """Briefy Leica Project model."""
-from briefy.common.db.models import Item
 from briefy.common.utils import schema
 from briefy.common.utils.data import Objectify
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.common.vocabularies.roles import Groups
 from briefy.leica.cache import cache_region
 from briefy.leica.cache import enable_cache
+from briefy.leica.db import Item
 from briefy.leica.models import mixins
 from briefy.leica.models.project import workflows
 from briefy.leica.utils.user import add_user_info_to_state_history
@@ -79,7 +79,7 @@ class CommercialInfoMixin(mixins.ProfessionalPayoutInfo, mixins.ProjectRolesMixi
 
 @implementer(IProject)
 class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
-              mixins.LeicaSubVersionedMixin, Item):
+              mixins.LeicaSubMixin, Item):
     """A Project in Briefy."""
 
     _workflow = workflows.ProjectWorkflow

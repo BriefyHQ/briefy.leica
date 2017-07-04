@@ -1,8 +1,8 @@
 """User profile information."""
-from briefy.common.db.models import Item
 from briefy.common.db.models.local_role import LocalRole
 from briefy.common.utils import schema
 from briefy.leica import logger
+from briefy.leica.db import Item
 from briefy.leica.models import Customer
 from briefy.leica.models import mixins
 from briefy.leica.models.user import workflows
@@ -84,10 +84,10 @@ class UserProfile(mixins.UserProfileMixin, mixins.UserProfileRolesMixin, Item):
         """User id."""
         return self.id
 
-    @declared_attr
-    def title(cls):
-        """Return the User fullname."""
-        return sa.orm.column_property(cls.first_name + ' ' + cls.last_name)
+    # @declared_attr
+    # def title(cls):
+    #    """Return the User fullname."""
+    #    return sa.orm.column_property(cls.first_name + ' ' + cls.last_name)
 
     def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
@@ -170,8 +170,9 @@ class CustomerUserProfile(UserProfile):
             return
         if isinstance(id_, str):
             id_ = UUID(id_)
-        if id_ not in customer.customer_users:
-            customer.customer_users.append(id_)
+        # TODO: fix this to the new way to specify the customer role
+        # if id_ not in customer.customer_users:
+            # customer.customer_users.append(id_)
 
     @declared_attr
     def project_ids(cls):
@@ -237,7 +238,8 @@ class CustomerUserProfile(UserProfile):
 
         for project_id in to_add:
             project = validate_project(project_id)
-            project.customer_users.append(ensure_uid(self.id))
+            # TODO: fix this to the new way to specify the customer role
+            # project.customer_users.append(ensure_uid(self.id))
 
         for project_id in to_remove:
             project = validate_project(project_id)

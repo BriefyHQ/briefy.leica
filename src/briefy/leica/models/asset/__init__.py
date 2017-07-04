@@ -1,6 +1,6 @@
 """Briefy Leica Asset model."""
 from briefy.common.db.mixins import asset
-from briefy.common.db.models import Item
+from briefy.leica.db import Item
 from briefy.leica.models import mixins
 from briefy.leica.models.asset import workflows
 from briefy.leica.models.mixins import get_public_user_info
@@ -40,11 +40,6 @@ class Asset(asset.Asset, mixins.LeicaSubVersionedMixin, Item):
         ('view', ('g:briefy', 'g:system')),
         ('edit', ('g:briefy_qa', 'g:system')),
         ('delete', ('g:briefy_qa', 'g:system')),
-    )
-
-    __actors__ = (
-        'professional_user',
-        'uploaded_by'
     )
 
     __colanderalchemy_config__ = {'excludes': [

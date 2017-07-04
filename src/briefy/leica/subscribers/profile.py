@@ -11,8 +11,9 @@ def userprofile_created_handler(event):
 
     if obj.type == 'customeruserprofile':
         # force this because sometimes the obj.id is not available before the flush
-        customer_roles = request.validated.get('customer_roles')
-        project_roles = request.validated.get('project_roles')
+        payload = request.validated
+        customer_roles = payload.get('customer_roles')
+        project_roles = payload.get('project_roles')
         obj.customer_roles = customer_roles
         obj.project_roles = project_roles
 
