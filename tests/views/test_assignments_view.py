@@ -1,7 +1,9 @@
 """Test Assignments Service view."""
+from briefy.common.db import datetime_utcnow
 from briefy.leica import models
 from conftest import BaseVersionedTestView
 
+import datetime
 import pytest
 import transaction
 
@@ -29,6 +31,7 @@ class TestAssignmentView(BaseVersionedTestView):
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {
+        'updated_at': (datetime_utcnow() + datetime.timedelta(minutes=10)).isoformat(),
         'payable': False,
         'travel_expenses': 1000,
         'payout_currency': 'USD'

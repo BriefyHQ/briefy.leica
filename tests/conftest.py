@@ -485,9 +485,10 @@ class BaseVersionedTestView(BaseTestView):
         result = request.json
         db_obj = self.model.query().get(obj_id)
         field = self.check_versions_field
-        assert getattr(db_obj, field) != result[field]
         version = db_obj.versions[0]
-        assert getattr(version, field) == result[field]
+        assert to_serializable(getattr(version, field)) != result[field]
+        version = db_obj.versions[1]
+        assert to_serializable(getattr(version, field)) == result[field]
 
     def test_versions_get_item_wrong_id(self, app, obj_payload):
         """Test get a item passing the wrong id."""

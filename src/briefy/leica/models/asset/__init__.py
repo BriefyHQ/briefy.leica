@@ -1,6 +1,6 @@
 """Briefy Leica Asset model."""
 from briefy.common.db.mixins import asset
-from briefy.leica.db import Item
+from briefy.common.db.models import Item
 from briefy.leica.models import mixins
 from briefy.leica.models.asset import workflows
 from briefy.leica.models.mixins import get_public_user_info

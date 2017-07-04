@@ -339,7 +339,7 @@ class LeicaSubMixin(BaseLeicaMixin, SubItemMixin):
     """
 
 
-class LeicaSubVersionedMixin(VersionMixin, LeicaSubMixin):
+class LeicaSubVersionedMixin(LeicaSubMixin):
     """Base mixin for Leica Objects supporting versioning and sub item of Item.
 
     Used on objects that require Version support and Base metadata.
