@@ -116,7 +116,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         # Assignment creation handled by Order creation event subscriber
         pass
 
-    @Permission(groups=[G['customers'], G['pm'], G['qa'], G['bizdev'], G['system'], ])
+    @Permission(groups=[G['customers'], G['pm'], G['qa'], G['bizdev'], G['support'], G['system']])
     def can_submit(self):
         """Validate if user can submit an Assignment."""
         return True
@@ -326,7 +326,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         order = assignment.order
         order.scheduled_datetime = None
 
-    @Permission(groups=[G['customers'], G['pm'], G['system'], ])
+    @Permission(groups=[G['customers'], G['pm'], G['support'], G['system'], ])
     def can_cancel(self):
         """Validate if user can cancel an Assignment."""
         assignment = self.document
