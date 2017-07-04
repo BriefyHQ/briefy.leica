@@ -45,7 +45,7 @@ class DashboardCustomerAllOrdersService(RESTService):
         :returns: A tuple of default filters to be applied to queries.
         """
         user = self.request.user
-        query = query.params(user_id_1=user.id)
+        query = query.params(principal_id_1=user.id)
         return query
 
 
@@ -82,7 +82,7 @@ class DashboardCustomerDeliveredOrderService(RESTService):
         :returns: A tuple of default filters to be applied to queries.
         """
         user = self.request.user
-        query = query.params(user_id_1=user.id)
+        query = query.params(principal_id_1=user.id)
         return query
 
 
@@ -119,5 +119,5 @@ class DashboardCustomerAllLeadsService(RESTService):
         :returns: A tuple of default filters to be applied to queries.
         """
         user = self.request.user
-        query = query.params(user_id_1=user.id)
+        query = query.params(principal_id_1=user.id)
         return query

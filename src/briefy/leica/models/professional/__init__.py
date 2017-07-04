@@ -1,5 +1,4 @@
 """A Professional for Briefy."""
-from briefy.leica.db import Base
 from briefy.leica.models.descriptors import MultipleRelationshipWrapper
 from briefy.leica.models.descriptors import UnaryRelationshipWrapper
 from briefy.leica.models.professional.link import Link
@@ -16,7 +15,7 @@ import colander
 import sqlalchemy as sa
 
 
-class Professional(UserProfile, Base):
+class Professional(UserProfile):
     """A Professional on our system."""
 
     __tablename__ = 'professionals'
