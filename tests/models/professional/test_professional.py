@@ -188,11 +188,10 @@ class TestProfessionalModel(BaseModelTest):
             origin_state
         )
         wf.assign(fields={'pools_ids': [pool_id, ]})
-        session.flush()
         assert obj.state == origin_state
         assert obj.state_history[-1]['transition'] == 'assign'
 
-    def test_add_pool_to_professional(self, instance_obj, session):
+    def test_add_pool_to_professional(self, instance_obj):
         """Add job pools to the professional."""
         pools = models.Pool.query().all()
         assert len(pools) == 3
@@ -200,9 +199,7 @@ class TestProfessionalModel(BaseModelTest):
 
         for item in pools:
             instance_obj.pools.append(item)
-            transaction.commit()
             assert instance_obj in item.professionals
             assert len(item.professionals) == 1
 
-        session.flush()
         assert len(instance_obj.pools) == 3

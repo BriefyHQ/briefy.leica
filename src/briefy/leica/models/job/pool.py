@@ -29,7 +29,7 @@ class ProfessionalsInPool(VersionMixin, Timestamp, Base):
 
     pool_id = sa.Column(
         sautils.UUIDType,
-        sa.ForeignKey('pools.id'),
+        sa.ForeignKey('pools.id', ondelete='CASCADE'),
         index=True,
         primary_key=True,
         info={
@@ -47,7 +47,7 @@ class ProfessionalsInPool(VersionMixin, Timestamp, Base):
 
     professional_id = sa.Column(
         sautils.UUIDType,
-        sa.ForeignKey('professionals.id'),
+        sa.ForeignKey('professionals.id', ondelete='CASCADE'),
         primary_key=True,
         info={
             'colanderalchemy': {
@@ -125,7 +125,8 @@ class Pool(mixins.LeicaSubVersionedMixin, Item):
     professionals = orm.relationship(
         'Professional',
         secondary='professionals_in_pool',
-        back_populates='pools'
+        back_populates='pools',
+        lazy='subquery',
     )
 
     # Projects

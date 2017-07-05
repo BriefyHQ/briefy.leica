@@ -191,7 +191,8 @@ class Professional(UserProfile):
     pools = orm.relationship(
         'Pool',
         secondary='professionals_in_pool',
-        back_populates='professionals'
+        back_populates='professionals',
+        lazy='subquery',
     )
 
     billing_info = orm.relationship('ProfessionalBillingInfo', uselist=False)
