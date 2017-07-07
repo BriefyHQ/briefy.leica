@@ -23,6 +23,10 @@ History
     * Added asst_types field to LeadOrder model payload (rudaporto).
     * Remove title from Professional model payload (rudaporto).
 
+2.1.26 (2017-07-04)
+-------------------
+
+    * Card #448: Give Support users permission to remove availability from Orders in Received state (ericof).
 
 2.1.25 (2017-07-03)
 -------------------

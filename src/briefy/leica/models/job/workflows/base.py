@@ -220,24 +220,31 @@ class BaseOrderWorkflow(BriefyWorkflow):
 
     @assigned.transition(received, 'can_remove_availability')
     @scheduled.transition(received, 'can_remove_availability')
+    @received.transition(received, 'can_remove_availability')
     def remove_availability(self, **kwargs):
         """Transition: Inform the removal of availability dates to the customer."""
         order = self.document
         order.availability = []
-        old_assignment = order.assignments[-1]
-        # this will handle the creation of a new Assignment
-        message = kwargs.get('message', '')
-        create_new_assignment_from_order(order, order.request, copy_payout=True)
-        old_assignment.workflow.cancel(message=message)
+        if order.state in ('assigned', 'scheduled'):
+            old_assignment = order.assignments[-1]
+            # this will handle the creation of a new Assignment
+            message = kwargs.get('message', '')
+            create_new_assignment_from_order(order, order.request, copy_payout=True)
+            old_assignment.workflow.cancel(message=message)
         return True
 
-    @Permission(groups=[G['pm'], G['customers'], G['system'], ])
+    @Permission(groups=[G['pm'], G['customers'], G['support'], G['system']])
     def can_remove_availability(self):
         """Permission: Validate if user can remove availability dates of an Order.
 
-        Groups: g:pm, r:project_manager, g:customers, r:customer_user
+        Groups: g:briefy_pm, r:project_manager, g:customers, g:briefy_support, r:customer_user
         """
-        return True
+        allowed = True
+        order = self.document
+        if order.state == 'received':
+            user = self.context
+            allowed = G['support'].value in user.groups
+        return allowed
 
     @assigned.transition(
         assigned, 'can_reassign',

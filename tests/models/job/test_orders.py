@@ -277,8 +277,39 @@ class TestOrderModel(BaseModelTest):
             assert getattr(order, key)[0] == value[0].isoformat()
             assert getattr(order, key)[1] == value[1].isoformat()
 
+    @pytest.mark.parametrize('origin_state', ['received'])
+    @pytest.mark.parametrize('role_name', ['support'])
+    def test_workflow_remove_availability_from_received(
+        self, instance_obj, web_request, session, roles, role_name, now_utc, origin_state
+    ):
+        """Test Order workflow remove_availability transition from received state."""
+        order, wf, request = self.prepare_obj_wf(
+            instance_obj,
+            web_request,
+            roles[role_name],
+            origin_state
+        )
+
+        availability_1 = now_utc + timedelta(10)
+        availability_2 = now_utc + timedelta(11)
+        new_availability = [
+            availability_1.isoformat(),
+            availability_2.isoformat()
+        ]
+        order.availability = new_availability
+        session.flush()
+
+        message = 'Remove availability!'
+        wf.remove_availability(message=message)
+        session.flush()
+
+        assert order.state == 'received'
+        assert order.state_history[-1]['transition'] == 'remove_availability'
+        assert order.state_history[-1]['message'] == message
+        assert len(order.availability) == 0
+
     @pytest.mark.parametrize('origin_state', ['assigned', 'scheduled'])
-    @pytest.mark.parametrize('role_name', ['pm', 'customer', 'system'])
+    @pytest.mark.parametrize('role_name', ['pm', 'customer', 'support', 'system'])
     def test_workflow_remove_availability(
         self, instance_obj, web_request, session, roles, role_name, now_utc, origin_state
     ):
