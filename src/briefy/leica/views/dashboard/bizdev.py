@@ -41,5 +41,5 @@ class DashboardBizDevOrderService(RESTService):
         :returns: A tuple of default filters to be applied to queries.
         """
         user = self.request.user
-        query = query.params(user_id_1=user.id, user_id_2=user.id)
+        query = query.params(principal_id_1=user.id, principal_id_2=user.id)
         return query

@@ -64,8 +64,8 @@ total_order_project = select([
         Project.customer_id == Customer.id,
         Project.can_view.in_(['{customer_manager}', '{customer_qa}', '{customer_pm}']),
         or_(
-            Project.local_roles.any(principal_id=':user_id'),
-            Customer.local_roles.any(principal_id=':user_id')
+            Project.local_roles.any(principal_id=':principal_id'),
+            Customer.local_roles.any(principal_id=':principal_id')
         )
     )
 ).alias('total_order_project')
