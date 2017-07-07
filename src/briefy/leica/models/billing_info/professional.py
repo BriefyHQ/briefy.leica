@@ -4,7 +4,6 @@ from briefy.leica.models.billing_info import workflows
 from briefy.leica.vocabularies import TaxIdStatusProfessionals
 from sqlalchemy import orm
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import UUIDType
 
@@ -130,15 +129,14 @@ class ProfessionalBillingInfo(BillingInfo):
             method_name = info[1].get('type_')
         return method_name
 
-    @declared_attr
-    def title(cls):
-        """Return first and last name as title."""
-        return cls.first_name + ' ' + cls.last_name
+    def to_dict(self, excludes: list=None, includes: list=None) -> dict:
+        """Return a dictionary with fields and values used by this Class.
 
-    def to_dict(self):
-        """Return a dict representation of this object."""
-        data = super().to_dict()
-        data['slug'] = self.slug
+        :param excludes: attributes to exclude from dict representation.
+        :param includes: attributes to include from dict representation.
+        :returns: Dictionary with fields and values used by this Class
+        """
+        data = super().to_dict(excludes, includes)
         data['payment_info'] = self.payment_info
         data['default_payment_method'] = self.default_payment_method
         data['secondary_payment_method'] = self.secondary_payment_method

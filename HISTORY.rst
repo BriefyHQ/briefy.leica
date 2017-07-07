@@ -10,6 +10,7 @@ History
     * Update Professional tests to use the classmethod `created` to create new model instances (rudaporto).
     * Added tests for finance and bizdev dashboards and group all dashboards tests in a folder (rudaporto).
     * Removed the sqlalchemy continuum make_versioned call since this is already execute in briefy.common init (rudaporto).
+    * Removed BillingInfo.title field and turn it to a computed field on first and last name (rudaporto).
 
 
 2.1.25 (2017-07-03)
