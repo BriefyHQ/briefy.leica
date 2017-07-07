@@ -11,6 +11,7 @@ History
     * Added tests for finance and bizdev dashboards and group all dashboards tests in a folder (rudaporto).
     * Removed the sqlalchemy continuum make_versioned call since this is already execute in briefy.common init (rudaporto).
     * Removed BillingInfo.title field and turn it to a computed field on first and last name (rudaporto).
+    * Removed deprecated TaxInfo mixin from Customer model and clean up to_dict from fields BaseMetada will take care of (rudaporto).
 
 
 2.1.25 (2017-07-03)

@@ -1,5 +1,5 @@
 """Briefy Leica Customer model."""
-from briefy.leica.db import Item
+from briefy.common.db.models import Item
 from briefy.leica.models import mixins
 from briefy.leica.models.customer import workflows
 from briefy.leica.utils.user import add_user_info_to_state_history
@@ -18,8 +18,7 @@ class ICustomer(Interface):
 
 
 @implementer(ICustomer)
-class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerRolesMixin,
-               mixins.LeicaSubMixin, Item):
+class Customer(mixins.CustomerRolesMixin, mixins.LeicaSubMixin, Item):
     """A Customer for Briefy."""
 
     _workflow = workflows.CustomerWorkflow
@@ -213,7 +212,6 @@ class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerRolesMixin,
         """Return a dict representation of this object."""
         excludes = list(excludes) if excludes else []
         data = super().to_dict(excludes=excludes, includes=includes)
-        data['slug'] = self.slug
         data['projects'] = [p.to_summary_dict() for p in self.projects]
         data['billing_info_id'] = self.billing_info.id if self.billing_info else ''
         if includes and 'state_history' in includes:
