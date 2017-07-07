@@ -207,7 +207,6 @@ class Professional(UserProfile):
         excludes = list(excludes) if excludes else []
         excludes.extend(['assets', 'assignments'])
         data = super().to_dict(excludes=excludes, includes=includes)
-        data['slug'] = self.slug
         data['locations'] = [c.to_dict() for c in self.locations or []]
         data['links'] = [c.to_dict() for c in self.links or []]
         data['comments'] = [c.to_summary_dict() for c in self.comments]

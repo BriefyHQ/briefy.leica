@@ -27,7 +27,7 @@ class TestAssignmentView(BaseVersionedTestView):
     file_path = 'data/assignments.json'
     model = models.Assignment
     initial_wf_state = 'pending'
-    check_versions_field = 'payout_currency'
+    check_versions_field = 'updated_at'
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {

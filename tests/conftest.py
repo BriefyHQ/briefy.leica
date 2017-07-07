@@ -468,7 +468,7 @@ class BaseTestView:
 class BaseVersionedTestView(BaseTestView):
     """Test resources with versions."""
 
-    check_versions_field = 'title'
+    check_versions_field = '_title'
 
     def test_versions_get_item(self, app, obj_payload):
         """Test get a item."""
@@ -484,11 +484,12 @@ class BaseVersionedTestView(BaseTestView):
         )
         result = request.json
         db_obj = self.model.query().get(obj_id)
-        field = self.check_versions_field
+        obj_field = self.check_versions_field
+        result_field = obj_field[1:] if obj_field.startswith('_') else obj_field
         version = db_obj.versions[0]
-        assert to_serializable(getattr(version, field)) != result[field]
+        assert to_serializable(getattr(version, obj_field)) == result[result_field]
         version = db_obj.versions[1]
-        assert to_serializable(getattr(version, field)) == result[field]
+        assert to_serializable(getattr(version, obj_field)) != result[result_field]
 
     def test_versions_get_item_wrong_id(self, app, obj_payload):
         """Test get a item passing the wrong id."""

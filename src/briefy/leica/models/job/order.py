@@ -22,7 +22,6 @@ from dateutil.parser import parse
 from sqlalchemy import event
 from sqlalchemy import orm
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy_utils import TimezoneType
@@ -112,9 +111,9 @@ def get_category_from_project(context):
 
 def default_actual_order_price(context):
     """Get category for Order from the Project.category."""
-    order_type = context.current_parameters.get('type')
+    current_type = context.current_parameters.get('current_type')
     actual_order_price = 0
-    if order_type == 'order':
+    if current_type == 'order':
         actual_order_price = context.current_parameters.get('price', 0)
     return actual_order_price
 
@@ -164,20 +163,6 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderRolesMixin,
 
     By default we do not keep track of state_history and helper columns.
     """
-
-    type = sa.Column(sa.String(50))
-    """Polymorphic type name."""
-
-    @declared_attr
-    def __mapper_args__(cls):
-        """Return polymorphic identity."""
-        cls_name = cls.__name__.lower()
-        args = {
-            'polymorphic_identity': cls_name,
-        }
-        if cls_name == 'order':
-            args['polymorphic_on'] = cls.type
-        return args
 
     current_type = sa.Column(
         sa.String(50),
@@ -759,7 +744,6 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderRolesMixin,
         data['briefing'] = self.project.briefing
         data['availability'] = self.availability
         data['price'] = self.price
-        data['slug'] = self.slug
         data['source'] = self.source.value \
             if isinstance(self.source, OrderInputSource) else self.source
         data['category'] = self.category.value \

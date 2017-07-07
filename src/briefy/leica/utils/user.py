@@ -1,6 +1,6 @@
 """Utils to query user info."""
+from briefy.common.config import ENV
 from briefy.common.utilities.interfaces import IUserProfileQuery
-#  from briefy.leica import logger
 from briefy.leica.utils.rolleiflex import create_user
 from briefy.leica.utils.rolleiflex import get_user
 from briefy.leica.utils.rolleiflex import transition_user
@@ -39,6 +39,10 @@ def activate_or_create_user(profile: 'UserProfile', groups: Sequence=()) -> bool
     :param groups: Sequence of groups to be used on User creation
     :return: Status of this action.
     """
+    # avoid to connect to rolleiflex when in test or development ENV
+    if ENV in ('development', 'test'):
+        return True
+
     user_id = profile.id
     user = get_user(user_id)
     if user:

@@ -1,5 +1,6 @@
 [
   {
+    "asset_types": ["Image"],
     "order_customer_qa": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
     "project_id": "0f3d99eb-0a99-40cc-9ad7-168fe77ee6ce",
     "customer_id": "c2034c1b-0a40-4b84-9ace-54b958f64ed4",
@@ -11,6 +12,7 @@
     "requirements": "Requirement 1",
     "source": "briefy",
     "price": 20000,
+    "current_type": "leadorder",
     "price_currency": "EUR",
     "number_required_assets": 100,
     "customer_order_id": "aaaa",
@@ -58,6 +60,7 @@
     }
   },
   {
+    "asset_types": ["Image"],
     "order_customer_qa": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
     "project_id": "0f3d99eb-0a99-40cc-9ad7-168fe77ee6ce",
     "customer_id": "51eaab79-1c05-44fa-b3cf-278ecf311978",
@@ -69,6 +72,7 @@
     "requirements": "Requirement 2",
     "source": "briefy",
     "price": 20100,
+    "current_type": "leadorder",
     "price_currency": "USD",
     "number_required_assets": 100,
     "customer_order_id": "bbbb",
@@ -89,6 +93,7 @@
     "availability": ["2016-09-18T19:55:25.930638+00:00", "2016-09-18T18:55:25.930638+00:00"]
   },
   {
+    "asset_types": ["Image"],
     "order_customer_qa": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
     "project_id": "0f3d99eb-0a99-40cc-9ad7-168fe77ee6ce",
     "customer_id": "979191be-0412-4d70-8587-5df5beb1b4c6",
@@ -100,6 +105,7 @@
     "requirements": "Requirement 3",
     "source": "customer",
     "price": 23000,
+    "current_type": "leadorder",
     "price_currency": "EUR",
     "number_required_assets": 100,
     "customer_order_id": "cccc",
@@ -120,6 +126,7 @@
     "availability": ["2016-09-18T19:55:25.930638+00:00", "2016-09-18T18:55:25.930638+00:00"]
   },
   {
+    "asset_types": ["Image"],
     "order_customer_qa": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
     "project_id": "0f3d99eb-0a99-40cc-9ad7-168fe77ee6ce",
     "customer_id": "f61437ce-ca13-4a64-8474-c43906267215",
@@ -131,6 +138,7 @@
     "requirements": "Requirement 4",
     "source": "customer",
     "price": 30100,
+    "current_type": "leadorder",
     "price_currency": "EUR",
     "number_required_assets": 100,
     "customer_order_id": "eeee",
@@ -151,6 +159,7 @@
     "availability": ["2016-09-18T19:55:25.930638+00:00", "2016-09-18T18:55:25.930638+00:00"]
   },
   {
+    "asset_types": ["Image"],
     "order_customer_qa": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
     "project_id": "0f3d99eb-0a99-40cc-9ad7-168fe77ee6ce",
     "customer_id": "efd00ae0-55d2-4c63-a70b-cfc716d66a11",
@@ -162,6 +171,7 @@
     "requirements": "Requirement 5",
     "source": "briefy",
     "price": 40200,
+    "current_type": "leadorder",
     "price_currency": "USD",
     "number_required_assets": 100,
     "customer_order_id": "ffffs",

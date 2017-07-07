@@ -1,8 +1,8 @@
 """Briefy Leica Pool."""
 from briefy.common.db.mixins import Timestamp
 from briefy.common.db.mixins import VersionMixin
+from briefy.common.db.models import Item
 from briefy.leica.db import Base
-from briefy.leica.db import Item
 from briefy.leica.db import Session
 from briefy.leica.models import Assignment
 from briefy.leica.models import mixins
@@ -174,9 +174,3 @@ class Pool(mixins.LeicaSubVersionedMixin, Item):
             )
         ).as_scalar()
         return orm.column_property(stmt)
-
-    def to_dict(self):
-        """Return a dict representation of this object."""
-        data = super().to_dict()
-        data['slug'] = self.slug
-        return data

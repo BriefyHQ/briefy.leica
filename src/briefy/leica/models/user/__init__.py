@@ -1,8 +1,8 @@
 """User profile information."""
+from briefy.common.db.models import Item
 from briefy.common.db.models.local_role import LocalRole
 from briefy.common.utils import schema
 from briefy.leica import logger
-from briefy.leica.db import Item
 from briefy.leica.models import Customer
 from briefy.leica.models import mixins
 from briefy.leica.models.user import workflows
@@ -19,6 +19,7 @@ from uuid import UUID
 import colander
 import copy
 import sqlalchemy as sa
+import sqlalchemy_utils as sautils
 
 
 __colander_alchemy_config_overrides__ = \
@@ -84,10 +85,27 @@ class UserProfile(mixins.UserProfileMixin, mixins.UserProfileRolesMixin, Item):
         """User id."""
         return self.id
 
-    # @declared_attr
-    # def title(cls):
-    #    """Return the User fullname."""
-    #    return sa.orm.column_property(cls.first_name + ' ' + cls.last_name)
+    @hybrid_property
+    def title(self):
+        """Return the User fullname."""
+        return self.fullname
+
+    @title.setter
+    def title(self, value: str):
+        """Set the User fullname."""
+        raise ValueError(
+            'You can not set the user profile title. Please update first_name and last_name.'
+        )
+
+    @title.expression
+    def title(cls):
+        """Return the User fullname."""
+        return cls.first_name + ' ' + cls.last_name
+
+    @sautils.observes('first_name', 'last_name')
+    def _title_observer(self, first_name, last_name):
+        """Calculate dates on a change of a state."""
+        self._title = first_name + ' ' + last_name
 
     def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""

@@ -55,7 +55,7 @@ class UserProfileRolesMixin:
 
     __colanderalchemy_config__ = {
         'overrides': {
-            'owner': _ID_COLANDER,
+            'owner': _ID_COLANDER_LIST,
         }
     }
 

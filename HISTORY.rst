@@ -11,7 +11,17 @@ History
     * Added tests for finance and bizdev dashboards and group all dashboards tests in a folder (rudaporto).
     * Removed the sqlalchemy continuum make_versioned call since this is already execute in briefy.common init (rudaporto).
     * Removed BillingInfo.title field and turn it to a computed field on first and last name (rudaporto).
-    * Removed deprecated TaxInfo mixin from Customer model and clean up to_dict from fields BaseMetada will take care of (rudaporto).
+    * Removed deprecated TaxInfo mixin from Customer model (rudaporto).
+    * Clean up to_dict from all models that inherit from BaseMetadata since it will take care of adding these fields (rudaporto).
+    * Remove all override code from BillingInfo and ProfessionalBillingInfo that is already in BaseMetadata now (rudaporto).
+    * Remove Order.type field since Item.type is already used and Order.current_type should store the current order type (rudaporto).
+    * Fix: UserProfile.owner actor colander definition should be a list (rudaporto).
+    * Override UserProfile.title setter and getter to compute from first and last name and also update Item.title using an observer (rudaporto).
+    * Avoiding to create or activate a new user in Rolleiflex internal API if running in test or development ENV (rudaporto).
+    * Update description field on Image model payload (rudaporto).
+    * Remove title from InternalUserProfile model payload (rudaporto).
+    * Added asst_types field to LeadOrder model payload (rudaporto).
+    * Remove title from Professional model payload (rudaporto).
 
 
 2.1.25 (2017-07-03)

@@ -2,7 +2,7 @@
   {
     "state": "created",
     "title": "Cliente 01",
-    "description": null,
+    "description": "Client 01 Description",
     "customer_qa": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
     "customer_pm": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
     "customer_manager": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
@@ -25,7 +25,7 @@
   {
     "state": "created",
     "title": "Client 02",
-    "description": null,
+    "description": "Client 02 Description",
     "customer_qa": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
     "customer_pm": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
     "customer_manager": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
@@ -48,7 +48,7 @@
   {
     "state": "created",
     "title": "Client 03",
-    "description": null,
+    "description": "Client 03 Description",
     "customer_qa": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
     "customer_pm": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
     "customer_manager": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
@@ -71,7 +71,7 @@
   {
     "state": "created",
     "title": "Client 04",
-    "description": null,
+    "description": "Client 04 Description",
     "customer_qa": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
     "customer_pm": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
     "customer_manager": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
@@ -94,7 +94,7 @@
   {
     "state": "created",
     "title": "Client 05",
-    "description": null,
+    "description": "Client 05 Description",
     "customer_qa": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
     "customer_pm": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
     "customer_manager": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],

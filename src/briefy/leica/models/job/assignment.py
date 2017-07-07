@@ -645,7 +645,6 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
         data['last_submission_date'] = self.last_submission_date
         data['last_transition_message'] = self.last_transition_message
         data['closed_on_date'] = self.closed_on_date
-        data['slug'] = self.slug
         data['timezone'] = self.timezone
         data['tech_requirements'] = self.order.tech_requirements
         data['availability'] = self.availability
