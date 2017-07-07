@@ -8,6 +8,8 @@ History
     * Remove scout_manager as a required field for Order.assign transition (rudaporto).
     * Added back external_id column to Professional model (rudaporto).
     * Update Professional tests to use the classmethod `created` to create new model instances (rudaporto).
+    * Added tests for finance and bizdev dashboards and group all dashboards tests in a folder (rudaporto).
+    * Removed the sqlalchemy continuum make_versioned call since this is already execute in briefy.common init (rudaporto).
 
 
 2.1.25 (2017-07-03)
