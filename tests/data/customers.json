@@ -1,7 +1,7 @@
 [
   {
     "state": "created",
-    "title": "Cliente 01",
+    "title": "Client 01",
     "description": "Client 01 Description",
     "customer_qa": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
     "customer_pm": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],

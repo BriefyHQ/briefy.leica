@@ -15,7 +15,7 @@ class TestCustomerReports:
     ]
 
     testdata = [
-        ('all', 7, b'customer_display_name', b'Cliente'),
+        ('all', 7, b'customer_display_name', b'Client'),
     ]
 
     @pytest.mark.parametrize('report,size,column,value', testdata)
