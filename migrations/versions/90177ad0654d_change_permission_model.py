@@ -60,6 +60,13 @@ METADATA_MAP = {
     'assignments': 'slug, updated_at, created_at, state',
 }
 
+INSERTS_LOCALROLES = '''
+INSERT INTO localroles (id, item_id, item_type, principal_id, role_name)
+SELECT id, entity_id, '{item_type}', user_id, '{new_role_name}'
+from localroles_deprecated
+where role_name='{old_role_name}' AND entity_type='{item_type}';
+'''
+
 
 def rename_tables():
     """Rename tables."""
@@ -367,6 +374,7 @@ def create_indexes():
 
     # localroles
     op.create_index(op.f('ix_localroles_created_at'), 'localroles', ['created_at'], unique=False)
+    op.create_index(op.f('ix_localroles_item_type'), 'localroles', ['item_type'], unique=False)
     op.create_index(op.f('ix_localroles_item_id'), 'localroles', ['item_id'], unique=False)
     op.create_index(
         op.f('ix_localroles_principal_id'), 'localroles', ['principal_id'], unique=False
@@ -482,6 +490,7 @@ def create_tables():
     op.create_table(
         'localroles',
         sa.Column('id', types.UUIDType(), autoincrement=False, nullable=False),
+        sa.Column('item_type', sa.String(length=255), nullable=False),
         sa.Column('item_id', types.UUIDType(), sa.ForeignKey('items.id'), nullable=False),
         sa.Column('created_at', AwareDateTime(), nullable=True),
         sa.Column('updated_at', AwareDateTime(), autoincrement=False, nullable=True),
@@ -541,6 +550,38 @@ def copy_userprofiles_external_id():
     )
 
 
+def migrate_localroles():
+    """Migration of localroles from the old table to the new one."""
+    type_roles_mappping = {
+        'Customer': (
+            ('account_manager', 'internal_account', 'Customer'),
+            ('customer_user', 'customer_pm', 'Customer'),
+        ),
+        'Project': (
+            # TODO: add on Project using distinct values from children objects
+            # ('qa_manager', 'internal_qa', 'Assignment'),
+            # ('scout_manager', 'internal_scout', 'Order'),
+            ('project_manager', 'internal_pm', 'Project'),
+            ('customer_user', 'project_customer_pm', 'Project'),
+        ),
+        'Assignment': (
+            ('qa_manager', 'assignment_internal_scout', 'Assignment'),
+            ('scout_manager', 'assignment_internal_qa', 'Assignment'),
+            ('professional_user', 'professional_user', 'Assignment')
+        ),
+    }
+
+    for item_type, roles_mapping in type_roles_mappping.items():
+        for role in roles_mapping:
+            old_role_name, new_role_name, old_item_type = role
+            insert = INSERTS_LOCALROLES.format(
+                item_type=item_type,
+                old_role_name=old_role_name,
+                new_role_name=new_role_name
+            )
+            op.execute(insert)
+
+
 def upgrade():
     """Upgrade database."""
     drop_indexes()
@@ -551,6 +592,7 @@ def upgrade():
     create_columns()
     create_indexes()
     copy_userprofiles_external_id()
+    migrate_localroles()
     drop_columns()
 
 

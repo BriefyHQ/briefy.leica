@@ -22,6 +22,11 @@ History
     * Remove title from InternalUserProfile model payload (rudaporto).
     * Added asst_types field to LeadOrder model payload (rudaporto).
     * Remove title from Professional model payload (rudaporto).
+    * Added database migration: (rudaporto)
+        * migrate data to items and items_version
+        * migrate external_id from userprofiles to professional (intercom still need it)
+        * migrate local roles from the old table to the new table format
+
 
 2.1.26 (2017-07-04)
 -------------------
