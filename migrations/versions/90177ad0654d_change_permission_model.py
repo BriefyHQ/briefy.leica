@@ -17,6 +17,50 @@ branch_labels = None
 depends_on = None
 
 
+INSERTS_ITEMS_METADATA_TYPE = '''
+INSERT INTO items (id, path, type, can_view, {fields}, state_history)
+SELECT id, ARRAY[id], type, ARRAY[''], {fields}, state_history
+from {table};
+'''
+
+INSERTS_ITEMS_METADATA = '''
+INSERT INTO items (id, path, type, can_view, {fields}, state_history)
+SELECT id, ARRAY[id], '{type}', ARRAY[''], {fields}, state_history
+from {table};
+'''
+
+INSERTS_ITEMS_VERSIONS_TYPE = '''
+INSERT INTO items_version (
+id, path, type, can_view, transaction_id, end_transaction_id, operation_type, {fields}
+)
+SELECT id, ARRAY[id], type, ARRAY[''],
+transaction_id, end_transaction_id, operation_type, {fields}
+from {table}_version;
+'''
+
+INSERTS_ITEMS_VERSIONS = '''
+INSERT INTO items_version (
+id, path, type, can_view, transaction_id, end_transaction_id, operation_type, {fields}
+)
+SELECT id, ARRAY[id], '{type}', ARRAY[''],
+transaction_id, end_transaction_id, operation_type, {fields}
+from {table}_version;
+'''
+
+METADATA_MAP_TYPE = {
+    'assets': 'title, slug, description, updated_at, created_at, state',
+    'orders': 'title, slug, description, updated_at, created_at, state',
+    'userprofiles': 'slug, description, updated_at, created_at, state',
+}
+
+METADATA_MAP = {
+    'customers': 'title, slug, description, updated_at, created_at, state',
+    'pools': 'title, slug, description, updated_at, created_at, state',
+    'projects': 'title, slug, description, updated_at, created_at, state',
+    'assignments': 'slug, updated_at, created_at, state',
+}
+
+
 def rename_tables():
     """Rename tables."""
     op.rename_table('localroles', 'localroles_deprecated')
@@ -68,6 +112,14 @@ def drop_columns():
     op.drop_column('customers', 'created_at')
     op.drop_column('customers', 'title')
 
+    # remove deprecated fields
+    op.drop_column('customers', 'tax_id_type')
+    op.drop_column('customers', 'tax_id')
+    op.drop_column('customers', 'tax_country')
+    op.drop_column('customers_version', 'tax_id_type')
+    op.drop_column('customers_version', 'tax_id')
+    op.drop_column('customers_version', 'tax_country')
+
     # customers_version
     op.drop_column('customers_version', 'description')
     op.drop_column('customers_version', 'updated_at')
@@ -82,6 +134,7 @@ def drop_columns():
     op.drop_column('orders', 'updated_at')
     op.drop_column('orders', 'state_history')
     op.drop_column('orders', 'state')
+    op.drop_column('orders', 'type')
     op.drop_column('orders', 'external_id')
     op.drop_column('orders', 'created_at')
     op.drop_column('orders', 'title')
@@ -90,6 +143,7 @@ def drop_columns():
     op.drop_column('orders_version', 'description')
     op.drop_column('orders_version', 'updated_at')
     op.drop_column('orders_version', 'state')
+    op.drop_column('orders_version', 'type'),
     op.drop_column('orders_version', 'external_id')
     op.drop_column('orders_version', 'created_at')
     op.drop_column('orders_version', 'title')
@@ -328,9 +382,18 @@ def create_indexes():
     op.create_index(op.f('ix_customeruserprofiles_version_customer_id'),
                     'customeruserprofiles_version', ['customer_id'], unique=False)
 
+    # billing_infos
+    op.create_index(op.f('ix_billing_infos_title'), 'billing_infos', ['title'], unique=False)
+    op.create_index(
+        op.f('ix_billing_infos_version_title'), 'billing_infos_version', ['title'], unique=False
+    )
+
 
 def create_columns():
-    """Create new columns."""
+    """Create and alter columns and constraints."""
+    op.create_unique_constraint(None, 'items', ['id'])
+    op.create_unique_constraint(None, 'localroles', ['id'])
+
     op.drop_constraint('professionals_in_pool_pool_id_fkey', 'professionals_in_pool',
                        type_='foreignkey')
     op.drop_constraint('professionals_in_pool_professional_id_fkey', 'professionals_in_pool',
@@ -339,7 +402,6 @@ def create_columns():
     op.alter_column('customercontacts', 'title',
                     existing_type=sa.VARCHAR(),
                     nullable=True)
-
     op.add_column(
         'customeruserprofiles',
         sa.Column('customer_id', types.UUIDType(), nullable=True)
@@ -353,9 +415,6 @@ def create_columns():
         sa.Column('customer_id', types.UUIDType(), autoincrement=False, nullable=True)
     )
     op.add_column('professionals', sa.Column('external_id', sa.String(length=255), nullable=True))
-    op.add_column('professionals_in_pool', sa.Column('id', types.UUIDType(), nullable=False))
-    op.add_column('professionals_in_pool_version',
-                  sa.Column('id', types.UUIDType(), autoincrement=False, nullable=False))
     op.add_column('professionals_version',
                   sa.Column('external_id', sa.String(length=255), autoincrement=False,
                             nullable=True))
@@ -434,387 +493,68 @@ def create_tables():
     )
 
 
+def copy_metadata_items():
+    """Copy base metadata fields from all tables to items table."""
+    for table, fields in METADATA_MAP.items():
+        insert = INSERTS_ITEMS_METADATA.format(
+            table=table,
+            fields=fields,
+            type=table,
+        )
+        op.execute(insert)
+
+    for table, fields in METADATA_MAP_TYPE.items():
+        insert = INSERTS_ITEMS_METADATA_TYPE.format(
+            table=table,
+            fields=fields,
+        )
+        op.execute(insert)
+
+
+def copy_versions_items():
+    """Copy versions info from all tables to items_versions table."""
+    for table, fields in METADATA_MAP.items():
+        insert = INSERTS_ITEMS_VERSIONS.format(
+            table=table,
+            fields=fields,
+            type=table,
+        )
+        op.execute(insert)
+
+    for table, fields in METADATA_MAP_TYPE.items():
+        insert = INSERTS_ITEMS_VERSIONS_TYPE.format(
+            table=table,
+            fields=fields,
+        )
+        op.execute(insert)
+
+
+def copy_userprofiles_external_id():
+    """Copy external_id from userprofiles to professionals table where type is professionals."""
+    op.execute(
+        '''
+        UPDATE professionals SET external_id=other.external_id
+        from 
+        (SELECT id, external_id from userprofiles  WHERE type='professionals') as other 
+        WHERE professionals.id=other.id
+        '''
+    )
+
+
 def upgrade():
-    """Upgrade database model."""
+    """Upgrade database."""
     drop_indexes()
     rename_tables()
     create_tables()
+    copy_metadata_items()
+    copy_versions_items()
     create_columns()
     create_indexes()
-    # TODO:
-    # migrate data
+    copy_userprofiles_external_id()
     drop_columns()
-    # drop tables
 
 
 def downgrade():
     """Downgrade database model."""
-    # ### commands auto generated by Alembic - please adjust! ###
-    op.add_column('userprofiles_version',
-                  sa.Column('created_at', postgresql.TIMESTAMP(), autoincrement=False,
-                            nullable=True))
-    op.add_column('userprofiles_version',
-                  sa.Column('external_id', sa.VARCHAR(), autoincrement=False, nullable=True))
-    op.add_column('userprofiles_version',
-                  sa.Column('type', sa.VARCHAR(length=50), autoincrement=False, nullable=True))
-    op.add_column('userprofiles_version',
-                  sa.Column('state', sa.VARCHAR(length=100), autoincrement=False, nullable=True))
-    op.add_column('userprofiles_version',
-                  sa.Column('slug', sa.VARCHAR(length=255), autoincrement=False, nullable=True))
-    op.add_column('userprofiles_version',
-                  sa.Column('updated_at', postgresql.TIMESTAMP(), autoincrement=False,
-                            nullable=True))
-    op.create_index('ix_userprofiles_version_updated_at', 'userprofiles_version', ['updated_at'],
-                    unique=False)
-    op.create_index('ix_userprofiles_version_slug', 'userprofiles_version', ['slug'], unique=False)
-    op.create_index('ix_userprofiles_version_created_at', 'userprofiles_version', ['created_at'],
-                    unique=False)
-    op.add_column('userprofiles',
-                  sa.Column('created_at', postgresql.TIMESTAMP(), autoincrement=False,
-                            nullable=True))
-    op.add_column('userprofiles',
-                  sa.Column('external_id', sa.VARCHAR(), autoincrement=False, nullable=True))
-    op.add_column('userprofiles',
-                  sa.Column('type', sa.VARCHAR(length=50), autoincrement=False, nullable=True))
-    op.add_column('userprofiles',
-                  sa.Column('state', sa.VARCHAR(length=100), autoincrement=False, nullable=True))
-    op.add_column('userprofiles', sa.Column('state_history', postgresql.JSON(astext_type=sa.Text()),
-                                            autoincrement=False, nullable=True))
-    op.add_column('userprofiles',
-                  sa.Column('slug', sa.VARCHAR(length=255), autoincrement=False, nullable=True))
-    op.add_column('userprofiles',
-                  sa.Column('updated_at', postgresql.TIMESTAMP(), autoincrement=False,
-                            nullable=True))
-    op.drop_constraint(None, 'userprofiles', type_='foreignkey')
-    op.create_index('ix_userprofiles_updated_at', 'userprofiles', ['updated_at'], unique=False)
-    op.create_index('ix_userprofiles_slug', 'userprofiles', ['slug'], unique=False)
-    op.create_index('ix_userprofiles_created_at', 'userprofiles', ['created_at'], unique=False)
-    op.add_column('projects_version',
-                  sa.Column('title', sa.VARCHAR(), autoincrement=False, nullable=True))
-    op.add_column('projects_version',
-                  sa.Column('created_at', postgresql.TIMESTAMP(), autoincrement=False,
-                            nullable=True))
-    op.add_column('projects_version',
-                  sa.Column('external_id', sa.VARCHAR(), autoincrement=False, nullable=True))
-    op.add_column('projects_version',
-                  sa.Column('state', sa.VARCHAR(length=100), autoincrement=False, nullable=True))
-    op.add_column('projects_version',
-                  sa.Column('slug', sa.VARCHAR(length=255), autoincrement=False, nullable=True))
-    op.add_column('projects_version',
-                  sa.Column('updated_at', postgresql.TIMESTAMP(), autoincrement=False,
-                            nullable=True))
-    op.add_column('projects_version',
-                  sa.Column('description', sa.TEXT(), autoincrement=False, nullable=True))
-    op.create_index('ix_projects_version_updated_at', 'projects_version', ['updated_at'],
-                    unique=False)
-    op.create_index('ix_projects_version_title', 'projects_version', ['title'], unique=False)
-    op.create_index('ix_projects_version_slug', 'projects_version', ['slug'], unique=False)
-    op.create_index('ix_projects_version_created_at', 'projects_version', ['created_at'],
-                    unique=False)
-    op.add_column('projects', sa.Column('title', sa.VARCHAR(), autoincrement=False, nullable=False))
-    op.add_column('projects', sa.Column('created_at', postgresql.TIMESTAMP(), autoincrement=False,
-                                        nullable=True))
-    op.add_column('projects',
-                  sa.Column('external_id', sa.VARCHAR(), autoincrement=False, nullable=True))
-    op.add_column('projects',
-                  sa.Column('state', sa.VARCHAR(length=100), autoincrement=False, nullable=True))
-    op.add_column('projects', sa.Column('state_history', postgresql.JSON(astext_type=sa.Text()),
-                                        autoincrement=False, nullable=True))
-    op.add_column('projects',
-                  sa.Column('slug', sa.VARCHAR(length=255), autoincrement=False, nullable=True))
-    op.add_column('projects', sa.Column('updated_at', postgresql.TIMESTAMP(), autoincrement=False,
-                                        nullable=True))
-    op.add_column('projects',
-                  sa.Column('description', sa.TEXT(), autoincrement=False, nullable=True))
-    op.drop_constraint(None, 'projects', type_='foreignkey')
-    op.create_index('ix_projects_updated_at', 'projects', ['updated_at'], unique=False)
-    op.create_index('ix_projects_title', 'projects', ['title'], unique=False)
-    op.create_index('ix_projects_slug', 'projects', ['slug'], unique=False)
-    op.create_index('ix_projects_created_at', 'projects', ['created_at'], unique=False)
-    op.drop_column('professionals_version', 'external_id')
-    op.drop_column('professionals_in_pool_version', 'id')
-    op.drop_constraint(None, 'professionals_in_pool', type_='foreignkey')
-    op.drop_constraint(None, 'professionals_in_pool', type_='foreignkey')
-    op.create_foreign_key('professionals_in_pool_professional_id_fkey', 'professionals_in_pool',
-                          'professionals', ['professional_id'], ['id'])
-    op.create_foreign_key('professionals_in_pool_pool_id_fkey', 'professionals_in_pool', 'pools',
-                          ['pool_id'], ['id'])
-    op.drop_constraint(None, 'professionals_in_pool', type_='unique')
-    op.drop_column('professionals_in_pool', 'id')
-    op.drop_column('professionals', 'external_id')
-    op.add_column('pools_version',
-                  sa.Column('title', sa.VARCHAR(), autoincrement=False, nullable=True))
-    op.add_column('pools_version',
-                  sa.Column('created_at', postgresql.TIMESTAMP(), autoincrement=False,
-                            nullable=True))
-    op.add_column('pools_version',
-                  sa.Column('external_id', sa.VARCHAR(), autoincrement=False, nullable=True))
-    op.add_column('pools_version',
-                  sa.Column('state', sa.VARCHAR(length=100), autoincrement=False, nullable=True))
-    op.add_column('pools_version',
-                  sa.Column('slug', sa.VARCHAR(length=255), autoincrement=False, nullable=True))
-    op.add_column('pools_version',
-                  sa.Column('updated_at', postgresql.TIMESTAMP(), autoincrement=False,
-                            nullable=True))
-    op.add_column('pools_version',
-                  sa.Column('description', sa.TEXT(), autoincrement=False, nullable=True))
-    op.create_index('ix_pools_version_updated_at', 'pools_version', ['updated_at'], unique=False)
-    op.create_index('ix_pools_version_title', 'pools_version', ['title'], unique=False)
-    op.create_index('ix_pools_version_slug', 'pools_version', ['slug'], unique=False)
-    op.create_index('ix_pools_version_created_at', 'pools_version', ['created_at'], unique=False)
-    op.add_column('pools', sa.Column('title', sa.VARCHAR(), autoincrement=False, nullable=False))
-    op.add_column('pools', sa.Column('created_at', postgresql.TIMESTAMP(), autoincrement=False,
-                                     nullable=True))
-    op.add_column('pools',
-                  sa.Column('external_id', sa.VARCHAR(), autoincrement=False, nullable=True))
-    op.add_column('pools',
-                  sa.Column('state', sa.VARCHAR(length=100), autoincrement=False, nullable=True))
-    op.add_column('pools', sa.Column('state_history', postgresql.JSON(astext_type=sa.Text()),
-                                     autoincrement=False, nullable=True))
-    op.add_column('pools',
-                  sa.Column('slug', sa.VARCHAR(length=255), autoincrement=False, nullable=True))
-    op.add_column('pools', sa.Column('updated_at', postgresql.TIMESTAMP(), autoincrement=False,
-                                     nullable=True))
-    op.add_column('pools', sa.Column('description', sa.TEXT(), autoincrement=False, nullable=True))
-    op.drop_constraint(None, 'pools', type_='foreignkey')
-    op.create_index('ix_pools_updated_at', 'pools', ['updated_at'], unique=False)
-    op.create_index('ix_pools_title', 'pools', ['title'], unique=False)
-    op.create_index('ix_pools_slug', 'pools', ['slug'], unique=False)
-    op.create_index('ix_pools_created_at', 'pools', ['created_at'], unique=False)
-    op.add_column('orders_version',
-                  sa.Column('title', sa.VARCHAR(), autoincrement=False, nullable=True))
-    op.add_column('orders_version',
-                  sa.Column('created_at', postgresql.TIMESTAMP(), autoincrement=False,
-                            nullable=True))
-    op.add_column('orders_version',
-                  sa.Column('external_id', sa.VARCHAR(), autoincrement=False, nullable=True))
-    op.add_column('orders_version',
-                  sa.Column('state', sa.VARCHAR(length=100), autoincrement=False, nullable=True))
-    op.add_column('orders_version',
-                  sa.Column('updated_at', postgresql.TIMESTAMP(), autoincrement=False,
-                            nullable=True))
-    op.add_column('orders_version',
-                  sa.Column('description', sa.TEXT(), autoincrement=False, nullable=True))
-    op.create_index('ix_orders_version_updated_at', 'orders_version', ['updated_at'], unique=False)
-    op.create_index('ix_orders_version_title', 'orders_version', ['title'], unique=False)
-    op.create_index('ix_orders_version_created_at', 'orders_version', ['created_at'], unique=False)
-    op.add_column('orders', sa.Column('title', sa.VARCHAR(), autoincrement=False, nullable=False))
-    op.add_column('orders', sa.Column('created_at', postgresql.TIMESTAMP(), autoincrement=False,
-                                      nullable=True))
-    op.add_column('orders',
-                  sa.Column('external_id', sa.VARCHAR(), autoincrement=False, nullable=True))
-    op.add_column('orders',
-                  sa.Column('state', sa.VARCHAR(length=100), autoincrement=False, nullable=True))
-    op.add_column('orders', sa.Column('state_history', postgresql.JSON(astext_type=sa.Text()),
-                                      autoincrement=False, nullable=True))
-    op.add_column('orders', sa.Column('updated_at', postgresql.TIMESTAMP(), autoincrement=False,
-                                      nullable=True))
-    op.add_column('orders', sa.Column('description', sa.TEXT(), autoincrement=False, nullable=True))
-    op.drop_constraint(None, 'orders', type_='foreignkey')
-    op.create_index('ix_orders_updated_at', 'orders', ['updated_at'], unique=False)
-    op.create_index('ix_orders_title', 'orders', ['title'], unique=False)
-    op.create_index('ix_orders_created_at', 'orders', ['created_at'], unique=False)
-    op.add_column('localroles',
-                  sa.Column('entity_type', sa.VARCHAR(length=255), autoincrement=False,
-                            nullable=False))
-    op.add_column('localroles',
-                  sa.Column('can_list', sa.BOOLEAN(), autoincrement=False, nullable=False))
-    op.add_column('localroles',
-                  sa.Column('entity_id', postgresql.UUID(), autoincrement=False, nullable=False))
-    op.add_column('localroles',
-                  sa.Column('can_create', sa.BOOLEAN(), autoincrement=False, nullable=False))
-    op.add_column('localroles',
-                  sa.Column('user_id', postgresql.UUID(), autoincrement=False, nullable=False))
-    op.add_column('localroles',
-                  sa.Column('can_view', sa.BOOLEAN(), autoincrement=False, nullable=False))
-    op.add_column('localroles',
-                  sa.Column('can_edit', sa.BOOLEAN(), autoincrement=False, nullable=False))
-    op.add_column('localroles',
-                  sa.Column('can_delete', sa.BOOLEAN(), autoincrement=False, nullable=False))
-    op.drop_constraint(None, 'localroles', type_='foreignkey')
-    op.create_index('ix_localroles_user_id', 'localroles', ['user_id'], unique=False)
-    op.create_index('ix_localroles_role_name', 'localroles', ['role_name'], unique=False)
-    op.create_index('ix_localroles_entity_type', 'localroles', ['entity_type'], unique=False)
-    op.create_index('ix_localroles_entity_id', 'localroles', ['entity_id'], unique=False)
-    op.create_index('ix_localroles_can_view', 'localroles', ['can_view'], unique=False)
-    op.create_index('ix_localroles_can_list', 'localroles', ['can_list'], unique=False)
-    op.create_index('ix_localroles_can_edit', 'localroles', ['can_edit'], unique=False)
-    op.create_index('ix_localroles_can_delete', 'localroles', ['can_delete'], unique=False)
-    op.create_index('ix_localroles_can_create', 'localroles', ['can_create'], unique=False)
-    op.drop_column('localroles', 'principal_id')
-    op.drop_column('localroles', 'item_id')
-    op.drop_index(op.f('ix_customeruserprofiles_version_customer_id'),
-                  table_name='customeruserprofiles_version')
-    op.drop_column('customeruserprofiles_version', 'customer_id')
-    op.drop_constraint(None, 'customeruserprofiles', type_='foreignkey')
-    op.drop_index(op.f('ix_customeruserprofiles_customer_id'), table_name='customeruserprofiles')
-    op.drop_column('customeruserprofiles', 'customer_id')
-    op.add_column('customers_version',
-                  sa.Column('title', sa.VARCHAR(), autoincrement=False, nullable=True))
-    op.add_column('customers_version',
-                  sa.Column('created_at', postgresql.TIMESTAMP(), autoincrement=False,
-                            nullable=True))
-    op.add_column('customers_version',
-                  sa.Column('external_id', sa.VARCHAR(), autoincrement=False, nullable=True))
-    op.add_column('customers_version',
-                  sa.Column('state', sa.VARCHAR(length=100), autoincrement=False, nullable=True))
-    op.add_column('customers_version',
-                  sa.Column('slug', sa.VARCHAR(length=255), autoincrement=False, nullable=True))
-    op.add_column('customers_version',
-                  sa.Column('updated_at', postgresql.TIMESTAMP(), autoincrement=False,
-                            nullable=True))
-    op.add_column('customers_version',
-                  sa.Column('description', sa.TEXT(), autoincrement=False, nullable=True))
-    op.create_index('ix_customers_version_updated_at', 'customers_version', ['updated_at'],
-                    unique=False)
-    op.create_index('ix_customers_version_title', 'customers_version', ['title'], unique=False)
-    op.create_index('ix_customers_version_slug', 'customers_version', ['slug'], unique=False)
-    op.create_index('ix_customers_version_created_at', 'customers_version', ['created_at'],
-                    unique=False)
-    op.add_column('customers',
-                  sa.Column('title', sa.VARCHAR(), autoincrement=False, nullable=False))
-    op.add_column('customers', sa.Column('created_at', postgresql.TIMESTAMP(), autoincrement=False,
-                                         nullable=True))
-    op.add_column('customers',
-                  sa.Column('external_id', sa.VARCHAR(), autoincrement=False, nullable=True))
-    op.add_column('customers',
-                  sa.Column('state', sa.VARCHAR(length=100), autoincrement=False, nullable=True))
-    op.add_column('customers', sa.Column('state_history', postgresql.JSON(astext_type=sa.Text()),
-                                         autoincrement=False, nullable=True))
-    op.add_column('customers',
-                  sa.Column('slug', sa.VARCHAR(length=255), autoincrement=False, nullable=True))
-    op.add_column('customers', sa.Column('updated_at', postgresql.TIMESTAMP(), autoincrement=False,
-                                         nullable=True))
-    op.add_column('customers',
-                  sa.Column('description', sa.TEXT(), autoincrement=False, nullable=True))
-    op.drop_constraint(None, 'customers', type_='foreignkey')
-    op.create_index('ix_customers_updated_at', 'customers', ['updated_at'], unique=False)
-    op.create_index('ix_customers_title', 'customers', ['title'], unique=False)
-    op.create_index('ix_customers_slug', 'customers', ['slug'], unique=False)
-    op.create_index('ix_customers_created_at', 'customers', ['created_at'], unique=False)
-    op.alter_column('customercontacts', 'title',
-                    existing_type=sa.VARCHAR(),
-                    nullable=False)
-    op.add_column('assignments_version',
-                  sa.Column('state', sa.VARCHAR(length=100), autoincrement=False, nullable=True))
-    op.add_column('assignments_version',
-                  sa.Column('created_at', postgresql.TIMESTAMP(), autoincrement=False,
-                            nullable=True))
-    op.add_column('assignments_version',
-                  sa.Column('updated_at', postgresql.TIMESTAMP(), autoincrement=False,
-                            nullable=True))
-    op.add_column('assignments_version',
-                  sa.Column('slug', sa.VARCHAR(length=255), autoincrement=False, nullable=True))
-    op.create_index('ix_assignments_version_updated_at', 'assignments_version', ['updated_at'],
-                    unique=False)
-    op.create_index('ix_assignments_version_slug', 'assignments_version', ['slug'], unique=False)
-    op.create_index('ix_assignments_version_created_at', 'assignments_version', ['created_at'],
-                    unique=False)
-    op.drop_column('assignments_version', 'timezone')
-    op.add_column('assignments',
-                  sa.Column('created_at', postgresql.TIMESTAMP(), autoincrement=False,
-                            nullable=True))
-    op.add_column('assignments',
-                  sa.Column('state', sa.VARCHAR(length=100), autoincrement=False, nullable=True))
-    op.add_column('assignments', sa.Column('state_history', postgresql.JSON(astext_type=sa.Text()),
-                                           autoincrement=False, nullable=True))
-    op.add_column('assignments',
-                  sa.Column('slug', sa.VARCHAR(length=255), autoincrement=False, nullable=True))
-    op.add_column('assignments',
-                  sa.Column('updated_at', postgresql.TIMESTAMP(), autoincrement=False,
-                            nullable=True))
-    op.drop_constraint(None, 'assignments', type_='foreignkey')
-    op.create_index('ix_assignments_updated_at', 'assignments', ['updated_at'], unique=False)
-    op.create_index('ix_assignments_slug', 'assignments', ['slug'], unique=False)
-    op.create_index('ix_assignments_created_at', 'assignments', ['created_at'], unique=False)
-    op.add_column('assets_version',
-                  sa.Column('title', sa.VARCHAR(), autoincrement=False, nullable=True))
-    op.add_column('assets_version',
-                  sa.Column('created_at', postgresql.TIMESTAMP(), autoincrement=False,
-                            nullable=True))
-    op.add_column('assets_version',
-                  sa.Column('type', sa.VARCHAR(length=50), autoincrement=False, nullable=True))
-    op.add_column('assets_version',
-                  sa.Column('state', sa.VARCHAR(length=100), autoincrement=False, nullable=True))
-    op.add_column('assets_version',
-                  sa.Column('slug', sa.VARCHAR(length=255), autoincrement=False, nullable=True))
-    op.add_column('assets_version',
-                  sa.Column('updated_at', postgresql.TIMESTAMP(), autoincrement=False,
-                            nullable=True))
-    op.add_column('assets_version',
-                  sa.Column('description', sa.TEXT(), autoincrement=False, nullable=True))
-    op.create_index('ix_assets_version_updated_at', 'assets_version', ['updated_at'], unique=False)
-    op.create_index('ix_assets_version_title', 'assets_version', ['title'], unique=False)
-    op.create_index('ix_assets_version_slug', 'assets_version', ['slug'], unique=False)
-    op.create_index('ix_assets_version_created_at', 'assets_version', ['created_at'], unique=False)
-    op.add_column('assets', sa.Column('title', sa.VARCHAR(), autoincrement=False, nullable=False))
-    op.add_column('assets', sa.Column('created_at', postgresql.TIMESTAMP(), autoincrement=False,
-                                      nullable=True))
-    op.add_column('assets',
-                  sa.Column('type', sa.VARCHAR(length=50), autoincrement=False, nullable=False))
-    op.add_column('assets',
-                  sa.Column('state', sa.VARCHAR(length=100), autoincrement=False, nullable=True))
-    op.add_column('assets', sa.Column('state_history', postgresql.JSON(astext_type=sa.Text()),
-                                      autoincrement=False, nullable=True))
-    op.add_column('assets',
-                  sa.Column('slug', sa.VARCHAR(length=255), autoincrement=False, nullable=True))
-    op.add_column('assets', sa.Column('updated_at', postgresql.TIMESTAMP(), autoincrement=False,
-                                      nullable=True))
-    op.add_column('assets', sa.Column('description', sa.TEXT(), autoincrement=False, nullable=True))
-    op.drop_constraint(None, 'assets', type_='foreignkey')
-    op.create_index('ix_assets_updated_at', 'assets', ['updated_at'], unique=False)
-    op.create_index('ix_assets_title', 'assets', ['title'], unique=False)
-    op.create_index('ix_assets_slug', 'assets', ['slug'], unique=False)
-    op.create_index('ix_assets_created_at', 'assets', ['created_at'], unique=False)
-    op.create_table('briefyuserprofiles_version',
-                    sa.Column('id', postgresql.UUID(), autoincrement=False, nullable=False),
-                    sa.Column('transaction_id', sa.BIGINT(), autoincrement=False, nullable=False),
-                    sa.Column('end_transaction_id', sa.BIGINT(), autoincrement=False,
-                              nullable=True),
-                    sa.Column('operation_type', sa.SMALLINT(), autoincrement=False, nullable=False),
-                    sa.PrimaryKeyConstraint('id', 'transaction_id',
-                                            name='briefyuserprofiles_version_pkey')
-                    )
-    op.create_table('briefyuserprofiles',
-                    sa.Column('id', postgresql.UUID(), autoincrement=False, nullable=False),
-                    sa.ForeignKeyConstraint(['id'], ['userprofiles.id'],
-                                            name='briefyuserprofiles_id_fkey'),
-                    sa.PrimaryKeyConstraint('id', name='briefyuserprofiles_pkey')
-                    )
-    op.drop_index(op.f('ix_internaluserprofiles_id'), table_name='internaluserprofiles')
-    op.drop_table('internaluserprofiles')
-    op.drop_index(op.f('ix_localroles_deprecated_user_id'), table_name='localroles_deprecated')
-    op.drop_index(op.f('ix_localroles_deprecated_updated_at'), table_name='localroles_deprecated')
-    op.drop_index(op.f('ix_localroles_deprecated_role_name'), table_name='localroles_deprecated')
-    op.drop_index(op.f('ix_localroles_deprecated_entity_type'), table_name='localroles_deprecated')
-    op.drop_index(op.f('ix_localroles_deprecated_entity_id'), table_name='localroles_deprecated')
-    op.drop_index(op.f('ix_localroles_deprecated_created_at'), table_name='localroles_deprecated')
-    op.drop_index(op.f('ix_localroles_deprecated_can_view'), table_name='localroles_deprecated')
-    op.drop_index(op.f('ix_localroles_deprecated_can_list'), table_name='localroles_deprecated')
-    op.drop_index(op.f('ix_localroles_deprecated_can_edit'), table_name='localroles_deprecated')
-    op.drop_index(op.f('ix_localroles_deprecated_can_delete'), table_name='localroles_deprecated')
-    op.drop_index(op.f('ix_localroles_deprecated_can_create'), table_name='localroles_deprecated')
-    op.drop_table('localroles_deprecated')
-    op.drop_index(op.f('ix_items_version_updated_at'), table_name='items_version')
-    op.drop_index(op.f('ix_items_version_transaction_id'), table_name='items_version')
-    op.drop_index(op.f('ix_items_version_title'), table_name='items_version')
-    op.drop_index(op.f('ix_items_version_slug'), table_name='items_version')
-    op.drop_index(op.f('ix_items_version_operation_type'), table_name='items_version')
-    op.drop_index(op.f('ix_items_version_end_transaction_id'), table_name='items_version')
-    op.drop_index(op.f('ix_items_version_created_at'), table_name='items_version')
-    op.drop_table('items_version')
-    op.drop_index(op.f('ix_items_updated_at'), table_name='items')
-    op.drop_index(op.f('ix_items_title'), table_name='items')
-    op.drop_index(op.f('ix_items_slug'), table_name='items')
-    op.drop_index(op.f('ix_items_created_at'), table_name='items')
-    op.drop_table('items')
-    op.drop_index(op.f('ix_internaluserprofiles_version_transaction_id'),
-                  table_name='internaluserprofiles_version')
-    op.drop_index(op.f('ix_internaluserprofiles_version_operation_type'),
-                  table_name='internaluserprofiles_version')
-    op.drop_index(op.f('ix_internaluserprofiles_version_id'),
-                  table_name='internaluserprofiles_version')
-    op.drop_index(op.f('ix_internaluserprofiles_version_end_transaction_id'),
-                  table_name='internaluserprofiles_version')
-    op.drop_table('internaluserprofiles_version')
-    # ### end Alembic commands ###
+    # no downgrade for this migration
+    pass
