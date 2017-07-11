@@ -29,6 +29,7 @@ History
     * Final query to create localroles in the project level for internal_qa and internal_scout based on the assignments roles for each project. (rudaporto)
     * Move to postgresql 9.6 container (rudaporto).
     * Added __parent_attr__ attribute to the models: Project, Order, Assignment, Asset (rudaporto).
+    * Added migration to update items.path using parent items.path (rudaporto).
 
 
 2.1.26 (2017-07-04)
