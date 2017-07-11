@@ -558,9 +558,6 @@ def migrate_localroles():
             ('customer_user', 'customer_pm', 'Customer'),
         ),
         'Project': (
-            # TODO: add on Project using distinct values from children objects
-            # ('qa_manager', 'internal_qa', 'Assignment'),
-            # ('scout_manager', 'internal_scout', 'Order'),
             ('project_manager', 'internal_pm', 'Project'),
             ('customer_user', 'project_customer_pm', 'Project'),
         ),
@@ -580,6 +577,35 @@ def migrate_localroles():
                 new_role_name=new_role_name
             )
             op.execute(insert)
+
+    # IMPORTANT 1: before this you need to enable pgcrypto extension in the leica database
+    # this extensions is already enable on stg and live databases
+    # to enable in your local database do:
+    # $ psql -h localhost -p 9999 -U briefy briefy-leica
+    # briefy-leica=# create extension pgcrypto;
+
+    # IMPORTANT 2: this query will take some time to run
+
+    insert_qa_scout_roles = '''
+    INSERT INTO localroles (id, item_id, item_type, principal_id, role_name)
+    SELECT DISTINCT
+    gen_random_uuid() as id,
+    p.id,
+    'Project',
+    l.user_id,
+    CASE l.role_name
+        WHEN 'qa_manager' THEN 'internal_qa'
+        WHEN 'scout_manager' THEN 'internal_scout'
+    END as role_name
+    FROM projects as p, localroles_deprecated as l
+    where l.role_name IN ('qa_manager', 'scout_manager')
+    AND l.entity_id IN (
+        SELECT a.id from assignments as a
+        join orders as o on o.id=a.order_id
+        where o.project_id = p.id)
+    ORDER BY p.id;
+    '''
+    op.execute(insert_qa_scout_roles)
 
 
 def upgrade():
