@@ -26,6 +26,9 @@ History
         * migrate data to items and items_version
         * migrate external_id from userprofiles to professional (intercom still need it)
         * migrate local roles from the old table to the new table format
+    * Final query to create localroles in the project level for internal_qa and internal_scout based on the assignments roles for each project. (rudaporto)
+    * Move to postgresql 9.6 container (rudaporto).
+    * Added __parent_attr__ attribute to the models: Project, Order, Assignment, Asset (rudaporto).
 
 
 2.1.26 (2017-07-04)

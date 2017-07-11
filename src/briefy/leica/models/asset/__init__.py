@@ -47,6 +47,8 @@ class Asset(asset.Asset, mixins.LeicaSubVersionedMixin, Item):
         'comments', 'assignment'
     ]}
 
+    __parent_attr__ = 'assignment_id'
+
     owner = sa.Column(sa.String(255), nullable=False)
     """Denormalized string with the name of the OWNER of an asset.
 

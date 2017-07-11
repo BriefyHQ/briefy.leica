@@ -164,6 +164,8 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderRolesMixin,
     By default we do not keep track of state_history and helper columns.
     """
 
+    __parent_attr__ = 'project_id'
+
     current_type = sa.Column(
         sa.String(50),
         index=True,

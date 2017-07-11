@@ -19,7 +19,7 @@ depends_on = None
 
 INSERTS_ITEMS_METADATA_TYPE = '''
 INSERT INTO items (id, path, type, can_view, {fields}, state_history)
-SELECT id, ARRAY[id], type, ARRAY[''], {fields}, state_history
+SELECT id, ARRAY[id], {table}.type, ARRAY[''], {fields}, state_history
 from {table};
 '''
 
@@ -508,7 +508,7 @@ def copy_metadata_items():
         insert = INSERTS_ITEMS_METADATA.format(
             table=table,
             fields=fields,
-            type=table,
+            type=table[:-1],
         )
         op.execute(insert)
 
@@ -526,7 +526,7 @@ def copy_versions_items():
         insert = INSERTS_ITEMS_VERSIONS.format(
             table=table,
             fields=fields,
-            type=table,
+            type=table[:-1],
         )
         op.execute(insert)
 
@@ -583,9 +583,9 @@ def migrate_localroles():
     # to enable in your local database do:
     # $ psql -h localhost -p 9999 -U briefy briefy-leica
     # briefy-leica=# create extension pgcrypto;
+    op.execute('CREATE EXTENSION IF NOT EXISTS pgcrypto')
 
     # IMPORTANT 2: this query will take some time to run
-
     insert_qa_scout_roles = '''
     INSERT INTO localroles (id, item_id, item_type, principal_id, role_name)
     SELECT DISTINCT
@@ -608,6 +608,38 @@ def migrate_localroles():
     op.execute(insert_qa_scout_roles)
 
 
+def update_items_path():
+    """Update items.path column with data from the parent models."""
+    update_sql = '''
+    UPDATE items SET path=source.new_path
+    from (
+        SELECT DISTINCT
+        items.id,
+        array_cat(parent.path, ARRAY[items.id]) as new_path
+        from {table}
+        JOIN items on {table}.id = items.id
+        JOIN (select id, path from items where items.type IN ({parent_types})) as parent
+        on parent.id = {table}.{parent_attr}
+        WHERE items.type IN ({item_types})
+    ) as source
+    WHERE items.type IN ({item_types}) AND source.id=items.id
+    '''
+    update_map = (
+        ('projects', ("'customer'",), 'customer_id', ("'project'",)),
+        ('orders', ("'project'",), 'project_id', ("'order'", "'leadorder'",)),
+        ('assignments', ("'order'", "'leadorder'",), 'order_id', ("'assignment'",)),
+    )
+    for update_data in update_map:
+        table, parent_types, parent_attr, item_types = update_data
+        update = update_sql.format(
+            table=table,
+            item_types=','.join(item_types),
+            parent_types=','.join(parent_types),
+            parent_attr=parent_attr
+        )
+        op.execute(update)
+
+
 def upgrade():
     """Upgrade database."""
     drop_indexes()
@@ -619,6 +651,7 @@ def upgrade():
     create_indexes()
     copy_userprofiles_external_id()
     migrate_localroles()
+    update_items_path()
     drop_columns()
 
 

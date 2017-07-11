@@ -184,6 +184,8 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
         'overrides': __colander_alchemy_config_overrides__
     }
 
+    __parent_attr__ = 'order_id'
+
     @hybrid_property
     def slug(self) -> str:
         """Return a slug for an object.

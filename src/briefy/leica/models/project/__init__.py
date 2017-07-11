@@ -113,6 +113,8 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
         'overrides': mixins.ProjectRolesMixin.__colanderalchemy_config__['overrides']
     }
 
+    __parent_attr__ = 'customer_id'
+
     customer_id = sa.Column(sautils.UUIDType,
                             sa.ForeignKey('customers.id'),
                             index=True,
