@@ -1,4 +1,5 @@
 """Database models to work within the briefy.leica system."""
+from briefy.common.db.models.item import Item
 from briefy.common.db.models.roles import LocalRoleDeprecated
 from briefy.leica.db import Session
 from briefy.leica.models.asset import Asset
@@ -44,6 +45,7 @@ from briefy.ws.listeners import register_workflow_context_listeners
 import sqlalchemy as sa
 
 
+Item.__session__ = Session
 LocalRoleDeprecated.__session__ = Session
 
 ALL_MODELS = [
