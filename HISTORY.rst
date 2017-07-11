@@ -20,7 +20,7 @@ History
     * Avoiding to create or activate a new user in Rolleiflex internal API if running in test or development ENV (rudaporto).
     * Update description field on Image model payload (rudaporto).
     * Remove title from InternalUserProfile model payload (rudaporto).
-    * Added asst_types field to LeadOrder model payload (rudaporto).
+    * Added asset_types field to LeadOrder model payload (rudaporto).
     * Remove title from Professional model payload (rudaporto).
     * Added database migration: (rudaporto)
         * migrate data to items and items_version
