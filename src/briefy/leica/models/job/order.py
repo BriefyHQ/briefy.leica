@@ -656,6 +656,13 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderRolesMixin,
             for assignment in self.assignments:
                 assignment.timezone = timezone
 
+    @sautils.observes('project_id')
+    def _project_id_observer(self, project_id):
+        """Update path when project id changes."""
+        if project_id:
+            project = Item.get(project_id)
+            self.path = project.path + [self.id]
+
     def _update_dates_from_history(self, keep_updated_at: bool = False):
         """Update dates from history."""
         updated_at = self.updated_at

@@ -556,6 +556,13 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
         if keep_updated_at:
             self.updated_at = updated_at
 
+    @sautils.observes('order_id')
+    def _order_id_observer(self, order_id):
+        """Update path when order id changes."""
+        if order_id:
+            order = Item.get(order_id)
+            self.path = order.path + [self.id]
+
     # Relevant dates
     @sautils.observes('state')
     def dates_observer(self, state) -> datetime:

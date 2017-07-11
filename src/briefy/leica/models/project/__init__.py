@@ -495,6 +495,13 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
     Relationship between a project and a Pool.
     """
 
+    @sautils.observes('customer_id')
+    def _customer_id_observer(self, customer_id):
+        """Update path when customer id changes."""
+        if customer_id:
+            customer = Item.get(customer_id)
+            self.path = customer.path + [self.id]
+
     @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_summary_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.

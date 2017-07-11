@@ -30,6 +30,7 @@ History
     * Move to postgresql 9.6 container (rudaporto).
     * Added __parent_attr__ attribute to the models: Project, Order, Assignment, Asset (rudaporto).
     * Added migration to update items.path using parent items.path (rudaporto).
+    * Added observers to update Project, Order, Assignment and Asset path when foreign key to parent model changes (rudaporto).
 
 
 2.1.26 (2017-07-04)

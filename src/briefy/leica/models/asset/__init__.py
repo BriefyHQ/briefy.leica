@@ -129,6 +129,13 @@ class Asset(asset.Asset, mixins.LeicaSubVersionedMixin, Item):
     )
     """Comments."""
 
+    @sautils.observes('assignment_id')
+    def _assignment_id_observer(self, assignment_id):
+        """Update path when assignment id changes."""
+        if assignment_id:
+            assignment = Item.get(assignment_id)
+            self.path = assignment.path + [self.id]
+
     @property
     def tech_requirements(self) -> dict:
         """Technical requirements for this asset.
