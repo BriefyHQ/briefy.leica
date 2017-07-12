@@ -2,6 +2,11 @@
 History
 =======
 
+2.1.27 (2017-07-12)
+-------------------
+    * Fixed Assignments report to return the category from the order (rudaporto).
+    * Making sure that Order.actual_order_price is corrected updated after Order creation (rudaporto).
+
 2.1.26 (2017-07-04)
 -------------------
 

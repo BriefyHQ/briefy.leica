@@ -115,6 +115,8 @@ def default_actual_order_price(context):
     order_type = context.current_parameters.get('type')
     actual_order_price = 0
     if order_type == 'order':
+        # TODO: this can be zero if price not informed
+        # The subscriber also take care of this on the order and leadorder creation
         actual_order_price = context.current_parameters.get('price', 0)
     return actual_order_price
 

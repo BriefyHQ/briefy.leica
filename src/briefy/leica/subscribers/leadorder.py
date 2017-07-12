@@ -23,6 +23,7 @@ def leadorder_created_handler(event):
     # First set price and price_currency based on the project
     price = project.price
     leadorder.price = price
+    leadorder.actual_order_price = 0
     price_currency = project.price_currency
     leadorder.price_currency = price_currency
     if not leadorder.asset_types:
