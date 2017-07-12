@@ -1,20 +1,17 @@
 """User profile information."""
+from briefy.common.db.mixins.local_roles import set_local_roles_by_principal
 from briefy.common.db.models import Item
 from briefy.common.db.models.local_role import LocalRole
 from briefy.common.utils import schema
-from briefy.leica import logger
 from briefy.leica.models import Customer
 from briefy.leica.models import mixins
 from briefy.leica.models.user import workflows
-from briefy.leica.utils import ensure_uid
 from briefy.leica.utils.user import add_user_info_to_state_history
+from collections import defaultdict
+from copy import deepcopy
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm.session import object_session
 from sqlalchemy_utils import UUIDType
-from uuid import UUID
 
 import colander
 import copy
@@ -129,6 +126,23 @@ class CustomerUserProfile(UserProfile):
         ('delete', ('g:briefy_finance', 'g:system')),
     )
 
+    __colanderalchemy_config__ = {
+        'overrides': {
+                'customer_roles': {
+                    'title': 'User roles in the customer',
+                    'default': '',
+                    'missing': colander.drop,
+                    'typ': colander.List()
+                },
+                'project_roles': {
+                    'title': 'User roles in the projects',
+                    'default': '',
+                    'missing': colander.drop,
+                    'typ': colander.Mapping()
+                },
+        }
+    }
+
     id = sa.Column(
         UUIDType(),
         sa.ForeignKey('userprofiles.id'),
@@ -153,24 +167,31 @@ class CustomerUserProfile(UserProfile):
               'typ': colander.String}}
     )
 
-    @declared_attr
-    def customer_ids(cls):
-        """Return a list of customer ids related to this CustomerUserProfile."""
-        return association_proxy('_customer_roles', 'entity_id')
+    @classmethod
+    def create(cls, payload) -> object:
+        """Factory that creates a new instance of this object.
 
-    @declared_attr
-    def _customer_roles(cls):
-        """Local roles of this user in the Customer context as customer_user."""
-        return sa.orm.relationship(
-            'LocalRole',
-            foreign_keys='LocalRole.principal_id',
-            viewonly=True,
-            primaryjoin="""and_(
-                        LocalRole.principal_id==CustomerUserProfile.id,
-                        LocalRole.item_id==CustomerUserProfile.customer_id,
-                        LocalRole.role_name=="customer_user"
-                    )"""
-        )
+        :param payload: Dictionary containing attributes and values
+        :type payload: dict
+        """
+        payload = deepcopy(payload)
+        project_roles = payload.pop('project_roles')
+        customer_roles = payload.pop('customer_roles')
+        obj = super().create(payload)
+        setattr(obj, 'project_roles', project_roles)
+        setattr(obj, 'customer_roles', customer_roles)
+        return obj
+
+    @hybrid_property
+    def customer(self):
+        """Customer object this user belongs."""
+        return Customer.get(self.customer_id)
+
+    @property
+    def _customer_roles(self):
+        """Get customer roles for this user in the customer context."""
+        customer = Customer.get(self.customer_id)
+        return {r.role_name for r in customer.local_roles if r.principal_id == self.id}
 
     @hybrid_property
     def customer_roles(self):
@@ -178,45 +199,32 @@ class CustomerUserProfile(UserProfile):
         return self._customer_roles
 
     @customer_roles.setter
-    def customer_roles(self, customer_id):
+    def customer_roles(self, roles: list):
         """Add customer_user role for this customer user profile."""
-        customer = Customer.get(customer_id)
-        id_ = self.id
-        if not customer:
-            raise ValueError('Invalid customer ID')
-        if not id_:
-            return
-        if isinstance(id_, str):
-            id_ = UUID(id_)
-        # TODO: fix this to the new way to specify the customer role
-        # if id_ not in customer.customer_users:
-            # customer.customer_users.append(id_)
+        customer = self.customer
+        set_local_roles_by_principal(customer, self.id, roles)
 
-    @declared_attr
-    def project_ids(cls):
-        """Return a list of project ids related to this CustomerUserProfile."""
-        return association_proxy('_project_roles', 'entity_id')
-
-    @declared_attr
-    def _project_roles(cls):
-        """Local roles of this user in the Customer context as project_user."""
-        return sa.orm.relationship(
-            'LocalRole',
-            foreign_keys='LocalRole.principal_id',
-            viewonly=True,
-            uselist=True,
-            primaryjoin="""and_(
-                        LocalRole.principal_id == CustomerUserProfile.id,
-                        LocalRole.item_id==CustomerUserProfile.customer_id,
-                        LocalRole.role_name=="customer_user"
-                    )"""
+    @hybrid_property
+    def project_ids(self):
+        """Return a list of project ids related to the customer the user belongs."""
+        roles = LocalRole.query().filter(
+            LocalRole.item_type == 'Project',
+            LocalRole.principal_id == self.id
         )
+        return [lr.item_id for lr in roles]
 
-    @property
-    def customers(self):
-        """Return Customers attached to this profile."""
-        customer_ids = self.customer_ids
-        return Customer.query().filter(Customer.id.in_(customer_ids)).all()
+    @hybrid_property
+    def _project_roles(self):
+        """Local roles of this user in the Customer context as project_user."""
+        roles = LocalRole.query().filter(
+            LocalRole.item_type == 'Project',
+            LocalRole.principal_id == self.id
+        )
+        role_map = {lr.item_id: lr.role_name for lr in roles}
+        result = defaultdict(list)
+        for project_id, role_name in role_map.items():
+            result[id].append(role_name)
+        return result
 
     @hybrid_property
     def project_roles(self):
@@ -224,50 +232,17 @@ class CustomerUserProfile(UserProfile):
         return self._project_roles
 
     @project_roles.setter
-    def project_roles(self, project_ids):
+    def project_roles(self, roles_map: dict):
         """Update the Projects that this user has customer_user role."""
-        project_ids = set(project_ids)
-        current_projects = {role.entity_id for role in self._project_roles}
-        to_add = project_ids - current_projects
-        to_remove = current_projects - project_ids
-
-        def validate_project(project_id):
-            """Get project instance and validate."""
-            from briefy.leica.models import Project
+        from briefy.leica.models import Project
+        for project_id, new_roles in roles_map.items():
             project = Project.get(project_id)
-            if not project:
-                raise ValueError('There is not Project with ID: {0}'.format(project_id))
-
-            if project.customer_id not in self.customer_ids:
-                msg = 'Project "{0}" is not linked ot the Customer the user belongs.'
-                # TODO: this can not be validated here, it must be before commit the transaction
-                logger.warn(msg.format(project.title))
-            return project
-
-        def remove_project(project, user_id):
-            """Remove customer_user LocalRole from the Project."""
-            session = object_session(project)
-            local_role = session.query(LocalRole).filter_by(
-                entity_id=project.id,
-                user_id=user_id,
-                role_name='customer_user'
-            ).first()
-            session.delete(local_role)
-
-        for project_id in to_add:
-            project = validate_project(project_id)
-            # TODO: fix this to the new way to specify the customer role
-            # project.customer_users.append(ensure_uid(self.id))
-
-        for project_id in to_remove:
-            project = validate_project(project_id)
-            remove_project(project, ensure_uid(self.id))
+            set_local_roles_by_principal(project, self.id, new_roles)
 
     @property
     def projects(self):
         """Return Projects attached to this profile."""
         from briefy.leica.models import Project
-
         project_ids = self.project_ids
         return Project.query().filter(Project.id.in_(project_ids)).all()
 
@@ -287,7 +262,7 @@ class CustomerUserProfile(UserProfile):
     def to_dict(self):
         """Return a dict representation of this object."""
         data = super().to_dict()
-        data['customers'] = self.summarize_relations(self.customers)
+        data['customers'] = self.summarize_relations([self.customer])
         data['projects'] = self.summarize_relations(self.projects)
         return data
 
