@@ -71,6 +71,7 @@ class AllAssignments(BaseReport):
 
         payload = {
             'project_name': project.title,
+            'category': record.order.category.value,
             'uid': record.id,
             'briefy_id': record.slug,
             'customer_order_id': record.customer_order_id,

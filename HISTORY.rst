@@ -2,10 +2,9 @@
 History
 =======
 
-2.2.0 (Unreleased)
-------------------
-
-    * TODO
+2.1.27 (2017-07-12)
+-------------------
+    * Fixed Assignments report to return the category from the order (rudaporto).
 
 2.1.26 (2017-07-04)
 -------------------
