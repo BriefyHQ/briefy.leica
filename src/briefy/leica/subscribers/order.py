@@ -25,6 +25,7 @@ def order_created_handler(event):
     # First set price and price_currency based on the project
     price = project.price
     order.price = price
+    order.current_price = price
     price_currency = project.price_currency
     order.price_currency = price_currency
     if not order.asset_types:
