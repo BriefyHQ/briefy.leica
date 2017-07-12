@@ -29,7 +29,7 @@ class TestCustomerUserProfileslView(BaseTestView):
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {
-        'company_name': 'Outro nome',
+        'company_name': 'Other',
         'internal': False,
         'partners': False,
         'gender': 'm',

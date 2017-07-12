@@ -635,6 +635,7 @@ def login(request):
             'g:briefy_bizdev',
             'g:briefy_scout',
             'g:briefy_finance',
+            'g:briefy_support',
             'g:briefy'
         ]
     }

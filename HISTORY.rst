@@ -32,6 +32,7 @@ History
     * Added migration to update items.path using parent items.path (rudaporto).
     * Added observer to update Project, Order, Assignment and Asset path when foreign key to parent model changes (rudaporto).
     * Update CustomerUserProfile to support read and write customer_roles and project_roles with the new format (rudaporto).
+    * Added tests to InternalUserProfile view (rudaporto).
 
 
 2.1.26 (2017-07-04)
