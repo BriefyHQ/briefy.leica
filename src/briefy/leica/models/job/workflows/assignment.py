@@ -137,7 +137,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         fields = kwargs['fields']
         assignment.assingment_internal_scout = [user_id]
         professional_id = fields.get('professional_id')
-        assignment.professional_user = [professional_id]
+        assignment.professional_user.append(professional_id)
         # force explicit here but it will also be set by the workflow engine
         assignment.professional_id = professional_id
 

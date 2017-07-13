@@ -33,6 +33,7 @@ History
     * Added observer to update Project, Order, Assignment and Asset path when foreign key to parent model changes (rudaporto).
     * Update CustomerUserProfile to support read and write customer_roles and project_roles with the new format (rudaporto).
     * Added tests to InternalUserProfile view (rudaporto).
+    * Use correct InstrumentedList api do update professional_user in the Assignment assign transition (rudaporto).
 
 2.1.27 (2017-07-12)
 -------------------
