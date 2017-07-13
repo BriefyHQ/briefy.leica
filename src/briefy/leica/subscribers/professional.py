@@ -1,4 +1,5 @@
 """Event subscribers for briefy.leica.models.user.UserProfile."""
+from briefy.common.db.mixins.local_roles import set_local_roles_by_role_name
 from briefy.leica.events import professional as events
 from pyramid.events import subscriber
 
@@ -29,7 +30,7 @@ def professional_ownership(event):
     professional_id = professional.id
     owner = professional.owner
     if owner and str(professional_id) != str(owner):
-        professional.owner = [professional_id]
+        set_local_roles_by_role_name(professional, 'owner', [professional_id])
 
 
 def transition_handler(event):

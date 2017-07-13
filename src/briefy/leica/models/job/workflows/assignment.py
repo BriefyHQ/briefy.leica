@@ -1,5 +1,6 @@
 """Assignment workflow."""
 from briefy.common.db import datetime_utcnow
+from briefy.common.db.mixins.local_roles import set_local_roles_by_role_name
 from briefy.common.users import SystemUser
 from briefy.common.vocabularies.roles import Groups as G
 from briefy.common.vocabularies.roles import LocalRolesChoices as LR
@@ -137,7 +138,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         fields = kwargs['fields']
         assignment.assingment_internal_scout = [user_id]
         professional_id = fields.get('professional_id')
-        assignment.professional_user.append(professional_id)
+        set_local_roles_by_role_name(assignment, 'professional_user', [professional_id])
         # force explicit here but it will also be set by the workflow engine
         assignment.professional_id = professional_id
 
