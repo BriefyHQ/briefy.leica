@@ -112,9 +112,14 @@ def get_category_from_project(context):
 def default_actual_order_price(context):
     """Get category for Order from the Project.category."""
     current_type = context.current_parameters.get('current_type')
+    default_price = 0
     actual_order_price = 0
     if current_type == 'order':
-        actual_order_price = context.current_parameters.get('price', 0)
+        project_id = context.current_parameters.get('project_id', None)
+        if project_id:
+            project = Project.get(project_id)
+            default_price = project.price if project else default_price
+        actual_order_price = context.current_parameters.get('price', default_price)
     return actual_order_price
 
 
