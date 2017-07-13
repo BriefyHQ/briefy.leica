@@ -34,6 +34,7 @@ History
     * Update CustomerUserProfile to support read and write customer_roles and project_roles with the new format (rudaporto).
     * Added tests to InternalUserProfile view (rudaporto).
     * Use correct InstrumentedList api do update professional_user in the Assignment assign transition (rudaporto).
+    * Added migration to set Item.can_view list of roles for each model (rudaporto).
 
 2.1.27 (2017-07-12)
 -------------------

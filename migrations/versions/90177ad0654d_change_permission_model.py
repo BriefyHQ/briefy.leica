@@ -640,6 +640,69 @@ def update_items_path():
         op.execute(update)
 
 
+def update_items_can_view():
+    """Update items.can_view with default values."""
+    import pdb; pdb.set_trace()
+    # customers
+    op.execute(
+        '''
+        UPDATE items SET can_view=ARRAY[
+            'customer_manager',
+            'customer_pm',
+            'customer_qa',
+            'internal_account'
+        ]
+        WHERE items.type='customer'
+        '''
+    )
+
+    # projects
+    op.execute(
+        '''
+        UPDATE items SET can_view=ARRAY[
+            'internal_qa',
+            'internal_pm',
+            'internal_scout',
+            'project_customer_pm',
+            'project_customer_qa'
+        ]
+        WHERE items.type='project'
+        '''
+    )
+
+    # orders
+    op.execute(
+        '''
+        UPDATE items SET can_view=ARRAY[
+            'order_customer_qa'
+        ]
+        WHERE items.type='order'
+        '''
+    )
+
+    # assignments
+    op.execute(
+        '''
+        UPDATE items SET can_view=ARRAY[
+            'professional_user',
+            'assignment_internal_scout',
+            'assignment_internal_qa'
+        ]
+        WHERE items.type='assignment'
+        '''
+    )
+
+    # customeruserprofiles, internaluserprofiles, professionals
+    op.execute(
+        '''
+        UPDATE items SET can_view=ARRAY[
+            'owner'
+        ]
+        WHERE items.type IN ('customeruserprofile', 'internaluserprofile', 'professional')
+        '''
+    )
+
+
 def upgrade():
     """Upgrade database."""
     drop_indexes()
@@ -652,6 +715,7 @@ def upgrade():
     copy_userprofiles_external_id()
     migrate_localroles()
     update_items_path()
+    update_items_can_view()
     drop_columns()
 
 
