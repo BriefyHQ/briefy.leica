@@ -8,6 +8,7 @@ import sqlalchemy as sa
 import sqlalchemy_utils
 from alembic import op
 from briefy.common.db.types.aware_datetime import AwareDateTime
+from briefy.leica import models
 from sqlalchemy.dialects import postgresql
 from sqlalchemy_utils import types
 
@@ -61,8 +62,8 @@ METADATA_MAP = {
 }
 
 INSERTS_LOCALROLES = '''
-INSERT INTO localroles (id, item_id, item_type, principal_id, role_name)
-SELECT id, entity_id, '{item_type}', user_id, '{new_role_name}'
+INSERT INTO localroles (id, item_id, item_type, principal_id, role_name, created_at, updated_at)
+SELECT id, entity_id, '{item_type}', user_id, '{new_role_name}', created_at, updated_at
 from localroles_deprecated
 where role_name='{old_role_name}' AND entity_type='{item_type}';
 '''
@@ -538,6 +539,11 @@ def copy_versions_items():
         op.execute(insert)
 
 
+def udpate_type_internaluserprofile():
+    """Update items.type from briefyuserprofile to internluserprofile."""
+    op.execute("UPDATE items SET type='internaluserprofile' where type='briefyuserprofile'")
+
+
 def copy_userprofiles_external_id():
     """Copy external_id from userprofiles to professionals table where type is professionals."""
     op.execute(
@@ -566,6 +572,9 @@ def migrate_localroles():
             ('scout_manager', 'assignment_internal_qa', 'Assignment'),
             ('professional_user', 'professional_user', 'Assignment')
         ),
+        'UserProfile': (
+            ('owner', 'owner', 'UserProfile'),
+        ),
     }
 
     for item_type, roles_mapping in type_roles_mappping.items():
@@ -577,6 +586,8 @@ def migrate_localroles():
                 new_role_name=new_role_name
             )
             op.execute(insert)
+
+    # now we need to update UserProfile type to correct type: Professional,
 
     # IMPORTANT 1: before this you need to enable pgcrypto extension in the leica database
     # this extensions is already enable on stg and live databases
@@ -642,65 +653,24 @@ def update_items_path():
 
 def update_items_can_view():
     """Update items.can_view with default values."""
-    import pdb; pdb.set_trace()
-    # customers
-    op.execute(
-        '''
-        UPDATE items SET can_view=ARRAY[
-            'customer_manager',
-            'customer_pm',
-            'customer_qa',
-            'internal_account'
-        ]
-        WHERE items.type='customer'
-        '''
+    can_view_update_map = (
+        (models.Customer, ("'customer'",)),
+        (models.Project, ("'project'",)),
+        (models.Order, ("'order'", "'leadorder'")),
+        (models.Assignment, ("'assignment'",)),
+        (models.UserProfile, ("'customeruserprofile'", "'internaluserprofile'", "'professional'")),
     )
 
-    # projects
-    op.execute(
-        '''
-        UPDATE items SET can_view=ARRAY[
-            'internal_qa',
-            'internal_pm',
-            'internal_scout',
-            'project_customer_pm',
-            'project_customer_qa'
-        ]
-        WHERE items.type='project'
-        '''
-    )
+    for model, types in can_view_update_map:
+        update = '''
+        UPDATE items SET can_view=ARRAY[{roles}]
+        WHERE items.type IN ({types})
+        '''.format(
+            roles=",".join(["'{0}'".format(r) for r in model._default_can_view()]),
+            types=",".join(types)
+        )
 
-    # orders
-    op.execute(
-        '''
-        UPDATE items SET can_view=ARRAY[
-            'order_customer_qa'
-        ]
-        WHERE items.type='order'
-        '''
-    )
-
-    # assignments
-    op.execute(
-        '''
-        UPDATE items SET can_view=ARRAY[
-            'professional_user',
-            'assignment_internal_scout',
-            'assignment_internal_qa'
-        ]
-        WHERE items.type='assignment'
-        '''
-    )
-
-    # customeruserprofiles, internaluserprofiles, professionals
-    op.execute(
-        '''
-        UPDATE items SET can_view=ARRAY[
-            'owner'
-        ]
-        WHERE items.type IN ('customeruserprofile', 'internaluserprofile', 'professional')
-        '''
-    )
+        op.execute(update)
 
 
 def upgrade():
@@ -712,6 +682,7 @@ def upgrade():
     copy_versions_items()
     create_columns()
     create_indexes()
+    udpate_type_internaluserprofile()
     copy_userprofiles_external_id()
     migrate_localroles()
     update_items_path()

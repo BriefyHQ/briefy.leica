@@ -41,7 +41,7 @@ __summary_attributes__ = [
 __listing_attributes__ = __summary_attributes__ + [
     'assignment_date', 'last_approval_date', 'submission_date', 'last_submission_date',
     'set_type', 'number_required_assets', 'category', 'availability', 'additional_compensation',
-    'reason_additional_compensation', 'qa_manager', 'requirements', 'pool_id',
+    'reason_additional_compensation', 'assignment_internal_qa', 'requirements', 'pool_id',
     'location', 'project', 'closed_on_date', 'pool', 'delivery', 'refused_times', 'asset_types'
 ]
 

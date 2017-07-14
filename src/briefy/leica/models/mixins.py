@@ -91,6 +91,8 @@ class ProjectRolesMixin:
         'project_customer_qa',
     )
 
+    __additional_can_view_lr__ = list(CustomerRolesMixin.__actors__)
+
     __colanderalchemy_config__ = {
         'overrides': {
             'internal_qa': _ID_COLANDER_LIST,
@@ -109,6 +111,10 @@ class OrderRolesMixin:
         'order_customer_qa',
     )
 
+    __additional_can_view_lr__ = list(ProjectRolesMixin.__actors__) + [
+        'customer_manager', 'internal_account'
+    ]
+
     __colanderalchemy_config__ = {
         'overrides': {
             'order_customer_qa': _ID_COLANDER_LIST,
@@ -124,6 +130,13 @@ class AssignmentRolesMixin:
         'assignment_internal_scout',
         'assignment_internal_qa',
     )
+
+    __additional_can_view_lr__ = [
+        'internal_qa',
+        'internal_pm',
+        'internal_scout',
+        'internal_account'
+    ]
 
     __colanderalchemy_config__ = {
         'overrides': {

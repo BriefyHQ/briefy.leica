@@ -35,6 +35,9 @@ History
     * Added tests to InternalUserProfile view (rudaporto).
     * Use correct InstrumentedList api do update professional_user in the Assignment assign transition (rudaporto).
     * Added migration to set Item.can_view list of roles for each model (rudaporto).
+    * Added default local roles attribute to all Models based on Item (rudaporto).
+    * Fixed local roles migration to set Item.can_view using _default_can_view class method from each model (rudaporto).
+    * Fixed migration of data to localroles table: added created_at and updated_at (rudaporto).
 
 2.1.27 (2017-07-12)
 -------------------
