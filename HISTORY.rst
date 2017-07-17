@@ -4,7 +4,8 @@ History
 
 2.1.28 (Unreleased)
 -------------------
-    * New task to notify about Assignments with late submissions (rudaporto).
+    * New task to notify professionals about Assignments with late submissions (rudaporto).
+    * New task to notify professionals before shooting (rudaporto).
 
 2.1.27 (2017-07-12)
 -------------------
