@@ -91,6 +91,15 @@ def _notify_late_submissions(assignment: Assignment) -> bool:
     :return: True if the notify comment was registered in the Assignment.
     """
     status = False
+    delta = timedelta(seconds=48*3600)
+    now = datetime_utcnow()
+    has_notify_comment = assignment.comments.filter(
+        Comment.content == LATE_SUBMISSION_MSG
+    ).all()
+    notify_datetime = assignment.scheduled_datetime + delta
+    if assignment.state != 'awaiting_assets' or has_notify_comment or notify_datetime > now:
+        return status
+
     payload = dict(
         entity_id=assignment.id,
         entity_type=assignment.__class__.__name__,

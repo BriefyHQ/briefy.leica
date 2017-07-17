@@ -44,6 +44,14 @@ class TestMoveAssignmentToAwaitingAssets(BaseTaskTest):
         """
         assignment = instance_obj
         assignment_id = assignment.id
+
+        # do not notify with wrong status or scheduled datetime
+        assignment.scheduled_datetime = now_utc
+        assignment.state = 'scheduled'
+        status = _notify_late_submissions(assignment=assignment)
+        assert status is False
+
+        # now we make sure status and scheduled datetime is correct
         assignment.state = 'awaiting_assets'
         assignment.scheduled_datetime = now_utc - timedelta(seconds=49 * 3600)
         status = _notify_late_submissions(assignment=assignment)
@@ -59,3 +67,7 @@ class TestMoveAssignmentToAwaitingAssets(BaseTaskTest):
 
         assignment = models.Assignment.get(assignment_id)
         assert assignment.comments[0].content == LATE_SUBMISSION_MSG
+
+        # assert next time it will not notify again
+        status = _notify_late_submissions(assignment=assignment)
+        assert status is False
