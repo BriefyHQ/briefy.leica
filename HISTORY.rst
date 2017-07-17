@@ -2,6 +2,11 @@
 History
 =======
 
+
+2.1.28 (Unreleased)
+-------------------
+    * New task to notify about Assignments with late submissions (rudaporto).
+
 2.1.27 (2017-07-12)
 -------------------
     * Fixed Assignments report to return the category from the order (rudaporto).
