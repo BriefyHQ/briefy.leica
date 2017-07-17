@@ -39,6 +39,12 @@ History
     * Fixed local roles migration to set Item.can_view using _default_can_view class method from each model (rudaporto).
     * Fixed migration of data to localroles table: added created_at and updated_at (rudaporto).
 
+2.1.28 (Unreleased)
+-------------------
+    * New task to notify professionals about Assignments with late submissions (rudaporto).
+    * New task to notify professionals before shooting (rudaporto).
+
+
 2.1.27 (2017-07-12)
 -------------------
     * Fixed Assignments report to return the category from the order (rudaporto).
