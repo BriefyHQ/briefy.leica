@@ -2,7 +2,6 @@
 History
 =======
 
-
 2.1.28 (Unreleased)
 -------------------
     * New task to notify about Assignments with late submissions (rudaporto).
