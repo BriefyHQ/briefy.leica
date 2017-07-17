@@ -25,7 +25,7 @@ class TestNotifyAssignmentNotSubmitted(BaseTaskTest):
     file_path = 'data/assignments.json'
     model = models.Assignment
 
-    def test_wrong_state_scheduled_datetime(self, instance_obj, now_utc):
+    def test_failure_public_notify(self, instance_obj, now_utc):
         """Will ignore assignment because its state and scheduled_datetime is not the expected one.
 
         Assignment State is not awaiting assets.
@@ -46,7 +46,7 @@ class TestNotifyAssignmentNotSubmitted(BaseTaskTest):
         messages = self.get_messages_from_queue()
         assert len(messages) == 0
 
-    def test_success(self, instance_obj, now_utc):
+    def test_success_protected_notify(self, instance_obj, now_utc):
         """Will be successful if conditions are met.
 
         Assignment State is awaiting_assets

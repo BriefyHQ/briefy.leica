@@ -25,7 +25,7 @@ class TestNotifyAssignmentBeforeShooting(BaseTaskTest):
     file_path = 'data/assignments.json'
     model = models.Assignment
 
-    def test_wrong_state_scheduled_datetime(self, instance_obj, now_utc):
+    def test_failure_public_notify(self, instance_obj, now_utc):
         """Will ignore assignment because its state and scheduled_datetime is not the expected one.
 
         Assignment State is not scheduled.
@@ -38,7 +38,7 @@ class TestNotifyAssignmentBeforeShooting(BaseTaskTest):
         assert len(messages) == 0
 
         assignment.scheduled_datetime = now_utc - timedelta(
-            seconds=int(BEFORE_SHOOTING_SECONDS) + 3600
+            seconds=int(BEFORE_SHOOTING_SECONDS) - 3600
         )
         assignment.state = 'pending'
         notify_24hs_shooting()
@@ -46,11 +46,11 @@ class TestNotifyAssignmentBeforeShooting(BaseTaskTest):
         messages = self.get_messages_from_queue()
         assert len(messages) == 0
 
-    def test_success(self, instance_obj, now_utc):
+    def test_success_protected_notify(self, instance_obj, now_utc):
         """Will be successful if conditions are met.
 
         Assignment State is scheduled
-        Assignment scheduled_datetime is in the past
+        Assignment now >= scheduled_datetime >= 24hs before the shooting
         """
         assignment = instance_obj
         assignment_id = assignment.id

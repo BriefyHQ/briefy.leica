@@ -134,13 +134,13 @@ def notify_late_submissions():
     """Search for assignments with late submissions to be notified."""
     delta = timedelta(seconds=int(LATE_SUBMISSION_SECONDS))
     now = datetime_utcnow()
-    query = Assignment.query().filter(
+    assignments = Assignment.query().filter(
         and_(
             Assignment.state == 'awaiting_assets',
             not_(Assignment.comments.any(Comment.content == LATE_SUBMISSION_MSG))
         )
-    )
-    assignments = [a for a in query if (a.scheduled_datetime + delta) < now]
+    ).all()
+    assignments = [a for a in assignments if a.scheduled_datetime >= (now - delta)]
     msg = 'Total assignments professionals will be notified for late submissions: {size}'
     logger.info(msg.format(size=len(assignments)))
 
@@ -172,8 +172,8 @@ def _notify_24hs_shooting(assignment: Assignment) -> bool:
         Comment.content == BEFORE_SHOOTING_MSG,
         Comment.internal.is_(True),
     ).all()
-    notify_datetime = (assignment.scheduled_datetime > (now - delta)) \
-        and (assignment.scheduled_datetime < now)
+    notify_datetime = (assignment.scheduled_datetime >= (now - delta)) \
+        and (assignment.scheduled_datetime <= now)
 
     if assignment.state != 'scheduled' or not notify_datetime or has_notify_comment:
         return status
@@ -213,8 +213,8 @@ def notify_24hs_shooting():
     query = Assignment.query().filter(
         and_(
             Assignment.state == 'scheduled',
-            Assignment.scheduled_datetime > Assignment.scheduled_datetime + delta,
-            Assignment.scheduled_datetime < now,
+            Assignment.scheduled_datetime >= now - delta,
+            Assignment.scheduled_datetime <= now,
             not_(Assignment.comments.any(Comment.content == BEFORE_SHOOTING_MSG))
         )
     )
