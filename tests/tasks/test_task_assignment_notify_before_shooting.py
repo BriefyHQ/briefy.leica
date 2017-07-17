@@ -1,6 +1,6 @@
 """Test Task to notify assignments 24hs before shooting."""
 from briefy.leica import models
-from briefy.leica.tasks.assignment import BEFORE_SHOOTING_SECONDS
+from briefy.leica.config import BEFORE_SHOOTING_SECONDS
 from briefy.leica.tasks.assignment import _notify_24hs_shooting
 from briefy.leica.tasks.assignment import BEFORE_SHOOTING_MSG
 from briefy.leica.tasks.assignment import notify_24hs_shooting
