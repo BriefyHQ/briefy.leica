@@ -1,5 +1,4 @@
 """Move Assignments to awaiting assets."""
-from briefy.common.db import datetime_utcnow
 from briefy.common.users import SystemUser
 from briefy.common.workflow.exceptions import WorkflowTransitionException
 from briefy.leica.cache import cache_region
@@ -9,13 +8,20 @@ from briefy.leica.events.task import LeicaTaskEvent
 from briefy.leica.log import tasks_logger as logger
 from briefy.leica.models import Assignment
 from briefy.leica.models import Comment
+from datetime import datetime
 from datetime import timedelta
+from pytz import timezone
 from sqlalchemy import and_
+from sqlalchemy import func
 from sqlalchemy import not_
-
 
 LATE_SUBMISSION_MSG = '** notify task **: The creative was notified about late submission.'
 BEFORE_SHOOTING_MSG = '** notify task **: The creative was notified before the shooting.'
+
+
+def timezone_now(tz: (str, timezone)):
+    """Return datetime.now with timezone information."""
+    return datetime.now(tz=timezone(str(tz)))
 
 
 def _move_assignment_awaiting_assets(assignment: Assignment) -> bool:
@@ -31,7 +37,7 @@ def _move_assignment_awaiting_assets(assignment: Assignment) -> bool:
     :return: Status of the transition
     """
     task_name = 'leica.task.assignment_awaiting_assets'
-    now = datetime_utcnow()
+    now = timezone_now(assignment.timezone)
     status = False
     if assignment.state == 'scheduled' and assignment.scheduled_datetime < now:
         wf = assignment.workflow
@@ -61,14 +67,17 @@ def _move_assignment_awaiting_assets(assignment: Assignment) -> bool:
 
 def move_assignments_awaiting_assets():
     """Move Assignments from scheduled to awaiting_assets."""
-    now = datetime_utcnow()
-    assignments = Assignment.query().filter(
-        Assignment.scheduled_datetime < now,
+    query = Assignment.query().filter(
         Assignment.state == 'scheduled'
     ).all()
 
-    logger.info('Total assignments to be moved: {size}'.format(size=len(assignments)))
+    assignments = []
+    for item in query:
+        now = timezone_now(item.timezone)
+        if item.scheduled_datetime and item.scheduled_datetime < now:
+            assignments.append(item)
 
+    logger.info('Total assignments to be moved: {size}'.format(size=len(assignments)))
     total_moved = 0
 
     for assignment in assignments:
@@ -93,7 +102,7 @@ def _notify_late_submissions(assignment: Assignment) -> bool:
     """
     status = False
     delta = timedelta(seconds=int(LATE_SUBMISSION_SECONDS))
-    now = datetime_utcnow()
+    now = timezone_now(assignment.timezone)
     has_notify_comment = assignment.comments.filter(
         Comment.content == LATE_SUBMISSION_MSG,
         Comment.internal.is_(True),
@@ -133,14 +142,18 @@ def _notify_late_submissions(assignment: Assignment) -> bool:
 def notify_late_submissions():
     """Search for assignments with late submissions to be notified."""
     delta = timedelta(seconds=int(LATE_SUBMISSION_SECONDS))
-    now = datetime_utcnow()
-    assignments = Assignment.query().filter(
+    query = Assignment.query().filter(
         and_(
             Assignment.state == 'awaiting_assets',
             not_(Assignment.comments.any(Comment.content == LATE_SUBMISSION_MSG))
         )
-    ).all()
-    assignments = [a for a in assignments if a.scheduled_datetime >= (now - delta)]
+    )
+    assignments = []
+    for item in query:
+        now = timezone_now(item.timezone)
+        if item.scheduled_datetime >= now - delta:
+            assignments.append(item)
+
     msg = 'Total assignments professionals will be notified for late submissions: {size}'
     logger.info(msg.format(size=len(assignments)))
 
@@ -167,7 +180,7 @@ def _notify_before_shooting(assignment: Assignment) -> bool:
     """
     status = False
     delta = timedelta(seconds=int(BEFORE_SHOOTING_SECONDS))
-    now = datetime_utcnow()
+    now = timezone_now(assignment.timezone)
     has_notify_comment = assignment.comments.filter(
         Comment.content == BEFORE_SHOOTING_MSG,
         Comment.internal.is_(True),
@@ -209,16 +222,18 @@ def _notify_before_shooting(assignment: Assignment) -> bool:
 def notify_before_shooting():
     """Search for assignments scheduled and notify professional before shooting."""
     delta = timedelta(seconds=int(BEFORE_SHOOTING_SECONDS))
-    now = datetime_utcnow()
     query = Assignment.query().filter(
         and_(
             Assignment.state == 'scheduled',
-            Assignment.scheduled_datetime >= now - delta,
-            Assignment.scheduled_datetime <= now,
             not_(Assignment.comments.any(Comment.content == BEFORE_SHOOTING_MSG))
         )
     )
-    assignments = query.all()
+    assignments = []
+    for item in query:
+        now = timezone_now(item.timezone)
+        if (item.scheduled_datetime >= (now - delta)) and (item.scheduled_datetime <= now):
+            assignments.append(item)
+
     msg = 'Total assignments professionals will be notified before shooting: {size}'
     logger.info(msg.format(size=len(assignments)))
 
