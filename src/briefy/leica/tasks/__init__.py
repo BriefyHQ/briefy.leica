@@ -6,7 +6,7 @@ from briefy.leica.db import db_configure
 from briefy.leica.db import Session
 from briefy.leica.log import tasks_logger as logger
 from briefy.leica.tasks.assignment import move_assignments_awaiting_assets
-from briefy.leica.tasks.assignment import notify_24hs_shooting
+from briefy.leica.tasks.assignment import notify_before_shooting
 from briefy.leica.tasks.assignment import notify_late_submissions
 from briefy.leica.tasks.order import move_orders_accepted
 from briefy.leica.tasks.pool import move_assignments_to_pool
@@ -34,7 +34,7 @@ def main():
 
         with transaction.manager:
             logger.info('Start: notifying assignments 24hs before shooting.')
-            notify_24hs_shooting()
+            notify_before_shooting()
             logger.info('End: notifying assignments 24hs before shooting.')
 
         with transaction.manager:

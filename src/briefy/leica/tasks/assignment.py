@@ -153,14 +153,14 @@ def notify_late_submissions():
     logger.info(msg.format(total=total_notified))
 
 
-def _notify_24hs_shooting(assignment: Assignment) -> bool:
+def _notify_before_shooting(assignment: Assignment) -> bool:
     """Create a new comment to let professionals about scheduled datetime 24hs before shooting.
 
-    Task name: leica.task.notify_24hs_before_shooting
+    Task name: leica.task.notify_before_shooting
     Task events:
 
-        * leica.task.notify_24hs_before_shooting.success
-        * leica.task.notify_24hs_before_shooting.failure
+        * leica.task.notify_before_shooting.success
+        * leica.task.notify_before_shooting.failure
 
     :param assignment: Assignment to be processed
     :return: True if a new notify comment was registered in the Assignment.
@@ -200,14 +200,14 @@ def _notify_24hs_shooting(assignment: Assignment) -> bool:
         cache_region.invalidate(assignment)
         status = True
 
-    task_name = 'leica.task.notify_24hs_before_shooting'
+    task_name = 'leica.task.notify_before_shooting'
     event = LeicaTaskEvent(task_name=task_name, success=status, obj=assignment)
     event()
     return status
 
 
-def notify_24hs_shooting():
-    """Search for assignments scheduled 24hs before shooting to be notified."""
+def notify_before_shooting():
+    """Search for assignments scheduled and notify professional before shooting."""
     delta = timedelta(seconds=int(BEFORE_SHOOTING_SECONDS))
     now = datetime_utcnow()
     query = Assignment.query().filter(
@@ -224,7 +224,7 @@ def notify_24hs_shooting():
 
     total_notified = 0
     for assignment in assignments:
-        status = _notify_24hs_shooting(assignment)
+        status = _notify_before_shooting(assignment)
         total_notified += 1 if status else 0
 
     msg = 'Total of assignments professionals were notified 24hs before shooting: {total}'
