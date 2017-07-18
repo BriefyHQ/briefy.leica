@@ -37,7 +37,7 @@ def _move_assignment_awaiting_assets(assignment: Assignment) -> bool:
     :return: Status of the transition
     """
     task_name = 'leica.task.assignment_awaiting_assets'
-    now = timezone_now(assignment.timezone)
+    now = timezone_now('UTC')
     status = False
     if assignment.state == 'scheduled' and assignment.scheduled_datetime < now:
         wf = assignment.workflow
@@ -73,7 +73,7 @@ def move_assignments_awaiting_assets():
 
     assignments = []
     for item in query:
-        now = timezone_now(item.timezone)
+        now = timezone_now('UTC')
         if item.scheduled_datetime and item.scheduled_datetime < now:
             assignments.append(item)
 
@@ -101,14 +101,15 @@ def _notify_late_submissions(assignment: Assignment) -> bool:
     :return: True if a new notify comment was registered in the Assignment.
     """
     status = False
-    delta = timedelta(seconds=int(LATE_SUBMISSION_SECONDS))
-    now = timezone_now(assignment.timezone)
     has_notify_comment = assignment.comments.filter(
         Comment.content == LATE_SUBMISSION_MSG,
         Comment.internal.is_(True),
     ).all()
-    notify_datetime = assignment.scheduled_datetime + delta
-    if assignment.state != 'awaiting_assets' or has_notify_comment or notify_datetime > now:
+
+    now = timezone_now('UTC')
+    delta = now - assignment.scheduled_datetime
+    should_notify = delta.seconds >= int(LATE_SUBMISSION_SECONDS)
+    if assignment.state != 'awaiting_assets' or has_notify_comment or should_notify:
         return status
 
     payload = dict(
@@ -141,7 +142,6 @@ def _notify_late_submissions(assignment: Assignment) -> bool:
 
 def notify_late_submissions():
     """Search for assignments with late submissions to be notified."""
-    delta = timedelta(seconds=int(LATE_SUBMISSION_SECONDS))
     query = Assignment.query().filter(
         and_(
             Assignment.state == 'awaiting_assets',
@@ -150,8 +150,10 @@ def notify_late_submissions():
     )
     assignments = []
     for item in query:
-        now = timezone_now(item.timezone)
-        if item.scheduled_datetime >= now - delta:
+        now = timezone_now('UTC')
+        delta = now - item.scheduled_datetime
+        should_notify = delta.seconds >= int(LATE_SUBMISSION_SECONDS)
+        if should_notify:
             assignments.append(item)
 
     msg = 'Total assignments professionals will be notified for late submissions: {size}'
@@ -179,16 +181,15 @@ def _notify_before_shooting(assignment: Assignment) -> bool:
     :return: True if a new notify comment was registered in the Assignment.
     """
     status = False
-    delta = timedelta(seconds=int(BEFORE_SHOOTING_SECONDS))
     now = timezone_now(assignment.timezone)
     has_notify_comment = assignment.comments.filter(
         Comment.content == BEFORE_SHOOTING_MSG,
         Comment.internal.is_(True),
     ).all()
-    notify_datetime = (assignment.scheduled_datetime >= (now - delta)) \
-        and (assignment.scheduled_datetime <= now)
+    delta = assignment.scheduled_datetime - now
+    should_notify = 0 < delta.seconds <= int(BEFORE_SHOOTING_SECONDS)
 
-    if assignment.state != 'scheduled' or not notify_datetime or has_notify_comment:
+    if assignment.state != 'scheduled' or not should_notify or has_notify_comment:
         return status
 
     payload = dict(
@@ -221,7 +222,6 @@ def _notify_before_shooting(assignment: Assignment) -> bool:
 
 def notify_before_shooting():
     """Search for assignments scheduled and notify professional before shooting."""
-    delta = timedelta(seconds=int(BEFORE_SHOOTING_SECONDS))
     query = Assignment.query().filter(
         and_(
             Assignment.state == 'scheduled',
@@ -230,8 +230,10 @@ def notify_before_shooting():
     )
     assignments = []
     for item in query:
-        now = timezone_now(item.timezone)
-        if (item.scheduled_datetime >= (now - delta)) and (item.scheduled_datetime <= now):
+        now = timezone_now('UTC')
+        delta = item.scheduled_datetime - now
+        should_notify = 0 < delta.seconds <= int(BEFORE_SHOOTING_SECONDS)
+        if should_notify:
             assignments.append(item)
 
     msg = 'Total assignments professionals will be notified before shooting: {size}'
