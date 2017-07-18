@@ -1,4 +1,5 @@
 """Test imaging utilities."""
+from briefy.leica.reports import export_asset_types
 from briefy.leica.reports import export_date_from_history
 from briefy.leica.reports import export_datetime
 from briefy.leica.reports import export_location
@@ -170,3 +171,19 @@ def test_records_to_csv():
     assert lines[0] == 'phone\ttitle\ttld\r\n'
     assert lines[1] == '55\tBrazil\tbr\r\n'
     assert lines[2] == '49\tGermany\tde\r\n'
+
+
+testdata = [
+    (['Image'], 'Photograph'),
+    (['Image', 'ImageRaw'], 'Photograph, Photograph (RAW)'),
+    (['Matterport', 'ImageRaw'], '3D Scan, Photograph (RAW)'),
+    (['Image360', 'Video'], '360 degree Photograph, Video'),
+]
+
+
+@pytest.mark.parametrize('value,expected', testdata)
+def test_export_asset_types(value, expected):
+    """Test export_asset_types."""
+    func = export_asset_types
+
+    assert func(asset_types=value) == expected
