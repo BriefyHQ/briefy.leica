@@ -12,8 +12,8 @@ from datetime import datetime
 from datetime import timedelta
 from pytz import timezone
 from sqlalchemy import and_
-from sqlalchemy import func
 from sqlalchemy import not_
+
 
 LATE_SUBMISSION_MSG = '** notify task **: The creative was notified about late submission.'
 BEFORE_SHOOTING_MSG = '** notify task **: The creative was notified before the shooting.'
