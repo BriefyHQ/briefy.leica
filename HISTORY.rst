@@ -4,6 +4,7 @@ History
 
 2.1.28 (Unreleased)
 -------------------
+
     * New task to notify professionals about Assignments with late submissions (rudaporto).
     * New task to notify professionals before shooting (rudaporto).
     * Card #451: On Order export use the vocabulary value of Asset Type (ericof).
@@ -11,6 +12,7 @@ History
 
 2.1.27 (2017-07-12)
 -------------------
+
     * Fixed Assignments report to return the category from the order (rudaporto).
     * Making sure that Order.actual_order_price is corrected updated after Order creation (rudaporto).
 
