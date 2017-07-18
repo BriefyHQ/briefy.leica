@@ -1,8 +1,8 @@
 """Package handling tasks on Leica."""
 from apscheduler.schedulers.blocking import BlockingScheduler
+from briefy.leica.config import BEFORE_SHOOTING_SECONDS
 from briefy.leica.config import CRON_HOUR_JOB_TASKS
 from briefy.leica.config import CRON_MINUTE_JOB_TASKS
-from briefy.leica.config import BEFORE_SHOOTING_SECONDS
 from briefy.leica.config import LATE_SUBMISSION_SECONDS
 from briefy.leica.db import db_configure
 from briefy.leica.db import Session
