@@ -1,4 +1,4 @@
-"""Test Task to notify assignments 24hs before shooting."""
+"""Test Task to notify assignments before shooting."""
 from briefy.leica import models
 from briefy.leica.config import BEFORE_SHOOTING_SECONDS
 from briefy.leica.tasks.assignment import _notify_before_shooting
@@ -11,7 +11,7 @@ import json
 
 
 class TestNotifyAssignmentBeforeShooting(BaseTaskTest):
-    """Test notify Assignment 24hs before shooting."""
+    """Test notify Assignment before shooting."""
 
     dependencies = [
         (models.Professional, 'data/professionals.json'),
@@ -50,7 +50,7 @@ class TestNotifyAssignmentBeforeShooting(BaseTaskTest):
         """Will be successful if conditions are met.
 
         Assignment State is scheduled
-        Assignment now >= scheduled_datetime >= 24hs before the shooting
+        Assignment now >= scheduled_datetime >= BEFORE_SHOOTING_SECONDS
         """
         assignment = instance_obj
         assignment_id = assignment.id

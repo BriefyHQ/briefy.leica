@@ -33,9 +33,9 @@ def main():
             logger.info('End: moving assignments to Awaiting Assets.')
 
         with transaction.manager:
-            logger.info('Start: notifying assignments 24hs before shooting.')
+            logger.info('Start: notifying assignments before shooting.')
             notify_before_shooting()
-            logger.info('End: notifying assignments 24hs before shooting.')
+            logger.info('End: notifying assignments before shooting.')
 
         with transaction.manager:
             logger.info('Start: notifying assignments not submitted 48hs after shooting.')

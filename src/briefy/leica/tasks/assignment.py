@@ -15,7 +15,7 @@ from sqlalchemy import not_
 
 
 LATE_SUBMISSION_MSG = '** notify task **: The creative was notified about late submission.'
-BEFORE_SHOOTING_MSG = '** notify task **: The creative was notified 24hs before the shooting.'
+BEFORE_SHOOTING_MSG = '** notify task **: The creative was notified before the shooting.'
 
 
 def _move_assignment_awaiting_assets(assignment: Assignment) -> bool:
@@ -154,7 +154,7 @@ def notify_late_submissions():
 
 
 def _notify_before_shooting(assignment: Assignment) -> bool:
-    """Create a new comment to let professionals about scheduled datetime 24hs before shooting.
+    """Create a new comment to let professionals about scheduled datetime before shooting.
 
     Task name: leica.task.notify_before_shooting
     Task events:
@@ -219,7 +219,7 @@ def notify_before_shooting():
         )
     )
     assignments = query.all()
-    msg = 'Total assignments professionals will be notified 24hs before shooting: {size}'
+    msg = 'Total assignments professionals will be notified before shooting: {size}'
     logger.info(msg.format(size=len(assignments)))
 
     total_notified = 0
@@ -227,5 +227,5 @@ def notify_before_shooting():
         status = _notify_before_shooting(assignment)
         total_notified += 1 if status else 0
 
-    msg = 'Total of assignments professionals were notified 24hs before shooting: {total}'
+    msg = 'Total of assignments professionals were notified before shooting: {total}'
     logger.info(msg.format(total=total_notified))
