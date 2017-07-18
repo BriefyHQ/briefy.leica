@@ -61,9 +61,21 @@ class TestNotifyAssignmentBeforeShooting(BaseTaskTest):
         status = _notify_before_shooting(assignment)
         assert status is False
 
-        # now we make sure status and scheduled datetime is correct
+        # now status is correct but date scheduled_datetime in the past
         assignment.state = 'scheduled'
-        assignment.scheduled_datetime = now_utc - timedelta(
+        assignment.scheduled_datetime = now_utc - timedelta(seconds=3600)
+        status = _notify_before_shooting(assignment)
+        assert status is False
+
+        # now scheduled_datetime is more than BEFORE_SHOOTING_SECONDS in seconds
+        assignment.scheduled_datetime = now_utc + timedelta(
+            seconds=int(BEFORE_SHOOTING_SECONDS) + 3600
+        )
+        status = _notify_before_shooting(assignment)
+        assert status is False
+
+        # finally we test a correct scheduled_datetime
+        assignment.scheduled_datetime = now_utc + timedelta(
             seconds=int(BEFORE_SHOOTING_SECONDS) - 3600
         )
         status = _notify_before_shooting(assignment)

@@ -108,8 +108,9 @@ def _notify_late_submissions(assignment: Assignment) -> bool:
 
     now = timezone_now('UTC')
     delta = now - assignment.scheduled_datetime
-    should_notify = delta.seconds >= int(LATE_SUBMISSION_SECONDS)
-    if assignment.state != 'awaiting_assets' or has_notify_comment or should_notify:
+    config_delta = timedelta(seconds=int(LATE_SUBMISSION_SECONDS))
+    should_notify = delta > config_delta
+    if assignment.state != 'awaiting_assets' or has_notify_comment or not should_notify:
         return status
 
     payload = dict(
@@ -152,7 +153,8 @@ def notify_late_submissions():
     for item in query:
         now = timezone_now('UTC')
         delta = now - item.scheduled_datetime
-        should_notify = delta.seconds >= int(LATE_SUBMISSION_SECONDS)
+        config_delta = timedelta(seconds=int(LATE_SUBMISSION_SECONDS))
+        should_notify = delta > config_delta
         if should_notify:
             assignments.append(item)
 
@@ -181,14 +183,14 @@ def _notify_before_shooting(assignment: Assignment) -> bool:
     :return: True if a new notify comment was registered in the Assignment.
     """
     status = False
-    now = timezone_now(assignment.timezone)
+    now = timezone_now('UTC')
     has_notify_comment = assignment.comments.filter(
         Comment.content == BEFORE_SHOOTING_MSG,
         Comment.internal.is_(True),
     ).all()
     delta = assignment.scheduled_datetime - now
-    should_notify = 0 < delta.seconds <= int(BEFORE_SHOOTING_SECONDS)
-
+    config_delta = timedelta(seconds=int(BEFORE_SHOOTING_SECONDS))
+    should_notify = delta.days >= 0 and delta <= config_delta
     if assignment.state != 'scheduled' or not should_notify or has_notify_comment:
         return status
 
@@ -232,7 +234,8 @@ def notify_before_shooting():
     for item in query:
         now = timezone_now('UTC')
         delta = item.scheduled_datetime - now
-        should_notify = 0 < delta.seconds <= int(BEFORE_SHOOTING_SECONDS)
+        config_delta = timedelta(seconds=int(BEFORE_SHOOTING_SECONDS))
+        should_notify = delta.days >= 0 and delta <= config_delta
         if should_notify:
             assignments.append(item)
 
