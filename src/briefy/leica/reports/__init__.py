@@ -1,5 +1,6 @@
 """Leica Reports package."""
 from briefy.leica.utils.transitions import get_transition_date_from_history
+from briefy.leica.vocabularies import AssetTypes
 from datetime import datetime
 from dateutil import parser
 from decimal import Decimal
@@ -65,3 +66,16 @@ def records_to_csv(records: Sequence, fieldnames: Sequence) -> StringIO:
         data = {k: v for k, v in data.items() if k in fieldnames}
         writer.writerow(data)
     return fout
+
+
+def export_asset_types(asset_types: Sequence) -> str:
+    """Process the asset types list and return its user friendly labels.
+
+    :param asset_types: Asset types list.
+    :return: Concatenated string with asset types friendly labels.
+    """
+    friendly_values = []
+    for asset_type in asset_types:
+        value = AssetTypes[asset_type].label if hasattr(AssetTypes, asset_type) else asset_type
+        friendly_values.append(value)
+    return ', '.join(friendly_values)
