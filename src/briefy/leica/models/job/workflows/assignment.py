@@ -615,8 +615,8 @@ class AssignmentWorkflow(BriefyWorkflow):
             has_permission = True
         elif G['finance'].value in user.groups:
             has_permission = True
-        elif G['scout'].value in user.groups and state.name not in scout_states:
-            has_permission = False
+        elif G['scout'].value in user.groups and state.name in scout_states:
+            has_permission = True
         elif G['pm'].value in user.groups and state.name not in final_states:
             has_permission = True
 

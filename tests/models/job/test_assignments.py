@@ -325,13 +325,21 @@ class TestAssignmentModel(BaseModelTest):
         self, instance_obj, web_request, session, roles, role_name, origin_state
     ):
         """Test Assignment workflow cancel transition from scheduled."""
+        now = datetime_utcnow()
         assignment, wf, request = self.prepare_obj_wf(
             instance_obj,
             web_request,
             roles[role_name],
             origin_state
         )
+        # Will not be available if in the past
+        scheduled_datetime = now - timedelta(1)
+        assignment.scheduled_datetime = scheduled_datetime
+        assert 'cancel' not in wf.transitions
 
+        # Will not be available if in the past
+        scheduled_datetime = now + timedelta(10)
+        assignment.scheduled_datetime = scheduled_datetime
         assert 'cancel' in wf.transitions
 
     @pytest.mark.parametrize('origin_state', ['scheduled'])
@@ -400,6 +408,23 @@ class TestAssignmentModel(BaseModelTest):
             }
         )
         assert assignment.state == 'asset_validation'
+
+    @pytest.mark.parametrize('origin_state', ['asset_validation'])
+    @pytest.mark.parametrize('role_name', ['system', 'qa', ])
+    def test_workflow_invalidate_assets(
+        self, instance_obj, web_request, session, roles, role_name, origin_state
+    ):
+        """Test Assignment workflow invalidate_assets transition."""
+        assignment, wf, request = self.prepare_obj_wf(
+            instance_obj,
+            web_request,
+            roles[role_name],
+            origin_state
+        )
+        order = assignment.order
+        order.state = 'scheduled'
+        wf.invalidate_assets(message='Invalidated by Ms. Laure')
+        assert assignment.state == 'awaiting_assets'
 
     @pytest.mark.parametrize('origin_state', ['asset_validation'])
     @pytest.mark.parametrize('role_name', ['system', 'qa', ])
@@ -474,6 +499,27 @@ class TestAssignmentModel(BaseModelTest):
             wf.reject()
         assert 'Message is required' in str(excinfo)
         wf.reject(message='Missing 5 or 6 pictures',)
+
+    @pytest.mark.parametrize('origin_state', ['awaiting_assets'])
+    @pytest.mark.parametrize('role_name', ['qa', ])
+    def test_workflow_retract_rejection(
+            self, instance_obj, web_request, session, roles, role_name, origin_state
+    ):
+        """Test Assignment workflow retract_rejection transition."""
+        assignment, wf, request = self.prepare_obj_wf(
+            instance_obj,
+            web_request,
+            roles[role_name],
+            origin_state
+        )
+        order = assignment.order
+        order.state = 'scheduled'
+        fields_payload = {
+            'submission_path': 'https://drive.google.com/folders/0BwrdIL719n7waUlleFJfZ1RGak0'
+        }
+        wf.retract_rejection(fields=fields_payload)
+
+        assert assignment.state == 'in_qa'
 
     @pytest.mark.parametrize('origin_state', ['in_qa'])
     @pytest.mark.parametrize('role_name', ['qa', ])
@@ -558,9 +604,26 @@ class TestAssignmentModel(BaseModelTest):
         assignment.order.delivery = {
             'archive': 'https://drive.google.com/drive/folders/0BwrdIL719n7waUlleFJfZ1RGak0',
         }
-        wf.approve(fields={'customer_message': ''})
+        wf.approve(fields={'customer_message': 'Delivered.'})
         assert assignment.state == 'approved'
         assert 'retract_approval' in wf.transitions
+
+    @pytest.mark.parametrize('origin_state', ['approved'])
+    @pytest.mark.parametrize('role_name', ['qa', ])
+    def test_workflow_retract_approval(
+            self, instance_obj, web_request, session, roles, role_name, origin_state
+    ):
+        """Test Assignment workflow retract_approval transition."""
+        assignment, wf, request = self.prepare_obj_wf(
+            instance_obj,
+            web_request,
+            roles[role_name],
+            origin_state
+        )
+
+        wf.retract_approval()
+
+        assert assignment.state == 'in_qa'
 
     @pytest.mark.parametrize('origin_state', ['approved'])
     @pytest.mark.parametrize('role_name', ['system', 'pm'])
@@ -625,7 +688,8 @@ class TestAssignmentModel(BaseModelTest):
             roles[role_name],
             origin_state
         )
-
+        order = assignment.order
+        order.state = 'refused'
         wf.return_to_qa()
 
         assert assignment.state == 'in_qa'
@@ -647,6 +711,47 @@ class TestAssignmentModel(BaseModelTest):
             'reason_additional_compensation': 'Post processing',
         }
         wf.edit_compensation(fields=compensation_fields)
+
+        assert assignment.state == origin_state
+
+    @pytest.mark.parametrize('origin_state', ['assigned', 'in_qa'])
+    @pytest.mark.parametrize('role_name', ['pm'])
+    def test_workflow_edit_compensation_from_pending_states(
+            self, instance_obj, web_request, session, roles, role_name, origin_state
+    ):
+        """Test Assignment workflow edit_compensation transition during pending states."""
+        assignment, wf, request = self.prepare_obj_wf(
+            instance_obj,
+            web_request,
+            roles[role_name],
+            origin_state
+        )
+        compensation_fields = {
+            'additional_compensation': 3000,
+            'reason_additional_compensation': 'Post processing',
+        }
+        wf.edit_compensation(fields=compensation_fields)
+
+        assert assignment.state == origin_state
+
+    @pytest.mark.parametrize('origin_state', ['pending', 'published'])
+    @pytest.mark.parametrize('role_name', ['scout', 'pm'])
+    def test_workflow_edit_payout_from_scout_states(
+            self, instance_obj, web_request, session, roles, role_name, origin_state
+    ):
+        """Test Assignment workflow edit_payout transition during scout states."""
+        assignment, wf, request = self.prepare_obj_wf(
+            instance_obj,
+            web_request,
+            roles[role_name],
+            origin_state
+        )
+        payout_fields = dict(
+            payout_value=12000,
+            payout_currency='GBP',
+            travel_expenses=5000,
+        )
+        wf.edit_payout(fields=payout_fields)
 
         assert assignment.state == origin_state
 
