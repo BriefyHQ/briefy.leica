@@ -7,8 +7,8 @@ History
 
     * New task to notify professionals about Assignments with late submissions (rudaporto).
     * New task to notify professionals before shooting (rudaporto).
-    * Card #451: On Order export use the vocabulary value of Asset Type (ericof).
-    * Card #468: On Assignment cancellation set travel expenses to zero (ericof).
+    * Card #462: two new _custom_filter for assignment endpoint: late_first_submission and late_re_submission (rudaporto).
+    * Card #462: two new _custom_filter for order endpoint: late_first_submission and late_re_submission (rudaporto).
 
 2.1.27 (2017-07-12)
 -------------------
