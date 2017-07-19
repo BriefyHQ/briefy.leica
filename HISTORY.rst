@@ -2,7 +2,7 @@
 History
 =======
 
-2.1.28 (Unreleased)
+2.1.28 (2017-07-19)
 -------------------
 
     * New task to notify professionals about Assignments with late submissions (rudaporto).
