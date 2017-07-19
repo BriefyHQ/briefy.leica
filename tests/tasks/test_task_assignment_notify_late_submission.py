@@ -59,11 +59,18 @@ class TestNotifyAssignmentNotSubmitted(BaseTaskTest):
         # do not notify with wrong status or scheduled datetime
         assignment.scheduled_datetime = now_utc
         assignment.state = 'scheduled'
-        status = _notify_late_submissions(assignment=assignment)
+        status = _notify_late_submissions(assignment)
         assert status is False
 
-        # now we make sure status and scheduled datetime is correct
+        # now status is correct but scheduled_datetime is past less than LATE_SUBMISSION_SECONDS
         assignment.state = 'awaiting_assets'
+        assignment.scheduled_datetime = now_utc - timedelta(
+            seconds=int(LATE_SUBMISSION_SECONDS) - 3600
+        )
+        status = _notify_late_submissions(assignment)
+        assert status is False
+
+        # finally we test a correct scheduled_datetime
         assignment.scheduled_datetime = now_utc - timedelta(
             seconds=int(LATE_SUBMISSION_SECONDS) + 3600
         )

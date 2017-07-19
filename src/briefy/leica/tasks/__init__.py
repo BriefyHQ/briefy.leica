@@ -1,12 +1,14 @@
 """Package handling tasks on Leica."""
 from apscheduler.schedulers.blocking import BlockingScheduler
+from briefy.leica.config import BEFORE_SHOOTING_SECONDS
 from briefy.leica.config import CRON_HOUR_JOB_TASKS
 from briefy.leica.config import CRON_MINUTE_JOB_TASKS
+from briefy.leica.config import LATE_SUBMISSION_SECONDS
 from briefy.leica.db import db_configure
 from briefy.leica.db import Session
 from briefy.leica.log import tasks_logger as logger
 from briefy.leica.tasks.assignment import move_assignments_awaiting_assets
-from briefy.leica.tasks.assignment import notify_24hs_shooting
+from briefy.leica.tasks.assignment import notify_before_shooting
 from briefy.leica.tasks.assignment import notify_late_submissions
 from briefy.leica.tasks.order import move_orders_accepted
 from briefy.leica.tasks.pool import move_assignments_to_pool
@@ -33,14 +35,18 @@ def main():
             logger.info('End: moving assignments to Awaiting Assets.')
 
         with transaction.manager:
-            logger.info('Start: notifying assignments 24hs before shooting.')
-            notify_24hs_shooting()
-            logger.info('End: notifying assignments 24hs before shooting.')
+            seconds = BEFORE_SHOOTING_SECONDS
+            logger.info(f'Start: notifying assignments {seconds} seconds before shooting.')
+            notify_before_shooting()
+            logger.info(f'End: notifying assignments {seconds} seconds before shooting.')
 
         with transaction.manager:
-            logger.info('Start: notifying assignments not submitted 48hs after shooting.')
+            seconds = LATE_SUBMISSION_SECONDS
+            logger.info(f'Start: notifying assignments not submitted '
+                        f'{seconds} seconds after shooting.')
             notify_late_submissions()
-            logger.info('End: notifying assignments not submitted 48hs after shooting.')
+            logger.info(f'End: notifying assignments not submitted '
+                        f'{seconds} seconds after shooting.')
 
         with transaction.manager:
             logger.info('Start: moving orders to accepted.')

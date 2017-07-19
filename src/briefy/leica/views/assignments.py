@@ -1,4 +1,6 @@
 """Views to handle Assignments creation."""
+from briefy.common.db import datetime_utcnow
+from briefy.leica.config import LATE_SUBMISSION_SECONDS
 from briefy.leica.events import assignment as events
 from briefy.leica.models import Assignment
 from briefy.leica.models import Professional
@@ -9,6 +11,7 @@ from briefy.ws.resources import VersionsService
 from briefy.ws.resources import WorkflowAwareResource
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
+from datetime import timedelta
 from pyramid.security import Allow
 from sqlalchemy.orm import joinedload
 
@@ -67,6 +70,7 @@ class AssignmentService(RESTService):
         :returns: A tuple of default filters to be applied to queries.
         """
         user = self.request.user
+        model = self.model
         custom_filter = self.request.params.get('_custom_filter')
         if 'g:professionals' in user.groups and custom_filter == 'pool':
             # disable security for this custom filter
@@ -74,8 +78,24 @@ class AssignmentService(RESTService):
             professional = Professional.get(user.id)
             pool_ids = [item.id for item in professional.pools]
             query = query.filter(
-                Assignment.pool_id.in_(pool_ids),
-                Assignment.state == 'published'
+                model.pool_id.in_(pool_ids),
+                model.state == 'published'
+            )
+        elif custom_filter == 'late_first_submission':
+            config_delta = timedelta(seconds=int(LATE_SUBMISSION_SECONDS))
+            date_limit = datetime_utcnow() - config_delta
+            query = query.filter(
+                model.scheduled_datetime <= date_limit,
+                model.state == 'awaiting_assets',
+                model.submission_path.is_(None),
+            )
+        elif custom_filter == 'late_re_submission':
+            config_delta = timedelta(seconds=int(LATE_SUBMISSION_SECONDS))
+            date_limit = datetime_utcnow() - config_delta
+            query = query.filter(
+                model.last_approval_date <= date_limit,
+                model.state == 'awaiting_assets',
+                model.submission_path.isnot(None),
             )
         query = query.options(joinedload('order'))
         return query

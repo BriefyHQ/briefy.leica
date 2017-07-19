@@ -1,5 +1,6 @@
 """Order reports."""
 from briefy.leica.models import Order
+from briefy.leica.reports import export_asset_types
 from briefy.leica.reports import export_date_from_history
 from briefy.leica.reports import export_datetime
 from briefy.leica.reports import export_location
@@ -63,7 +64,7 @@ class AllOrders(BaseReport):
         last_refusal_date = export_date_from_history(state_history, ('refuse',), first=False)
         accept_date = export_date_from_history(state_history, ('accept',), first=True)
         street, locality, country = export_location(record.location)
-        asset_types = ','.join(record.asset_types)
+        asset_types = export_asset_types(record.asset_types)
 
         submission_date = None
         submission_path = None
