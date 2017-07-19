@@ -4,21 +4,21 @@ Getting Started
 ===============
 
 Prerequisites
------------------
+-------------
 
 * Git
-* Python 3.5
+* Python 3.6
 
 
 Get the code
---------------------
+------------
 Given you have privileges to access the codebase on GitHub, execute the following command on
 a shell prompt::
 
   $ git clone git@github.com:BriefyHQ/briefy.leica.git
 
 Local Install
---------------
+-------------
 Access the directory containing *briefy.leica* codebase::
 
   $ cd briefy.leica
@@ -28,7 +28,7 @@ Create a virtual environment::
   $ python3 -m venv .
 
 Install package & dependencies
-+++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++
 
 For development::
 
@@ -42,21 +42,24 @@ For staging / production::
 
 
 Running tests
------------------------
+-------------
 
-To run all tests, first, it is needed to setup a mock server for AWS SQS::
+To run all tests, first, it is needed to create all docker containers::
 
-    $ docker run -d -p 127.0.0.1:5000:5000 --name sqs briefy/aws-test:latest sqs
-    $ export SQS_IP=127.0.0.1 SQS_PORT=5000
+    $ make create_dockers
+
+If containers are already created but not started::
+
+    $ make start_dockers
 
 Run all tests::
 
-    $ ./bin/tox
+    $ make test
 
 
 Check style::
 
-    $ ./bin/flake8 src/briefy/leica tests setup.py
+    $ make lint
 
 To run just a subset of the tests::
 
@@ -64,7 +67,7 @@ To run just a subset of the tests::
 
 
 Reporting Bugs
---------------------------
+--------------
 
 Report bugs at https://github.com/BriefyHQ/briefy.leica/issues.
 
@@ -75,7 +78,7 @@ If you are reporting a bug, please include:
 * Detailed steps to reproduce the bug.
 
 Generating the documentation
---------------------------------------------
+----------------------------
 
 Install this package and its dependencies::
 
@@ -84,6 +87,6 @@ Install this package and its dependencies::
 
 Generate the HTML documentation::
 
-    $ make server
+    $ make docs_server
 
 Open the your browser at http://localhost:8000

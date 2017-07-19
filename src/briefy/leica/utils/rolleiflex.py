@@ -1,5 +1,6 @@
 """Utils to query user info."""
 from briefy.leica import logger
+from briefy.leica import models as m
 from briefy.leica.config import ROLLEIFLEX_BASE
 from briefy.leica.config import ROLLEIFLEX_USERNAME
 from pyramid.httpexceptions import HTTPBadRequest
@@ -78,7 +79,7 @@ def transition_user(user_id: UUID_TYPE, transition: str) -> bool:
     return status
 
 
-def create_user(profile: 'UserProfile', initial_password: str, groups: Sequence) -> dict:
+def create_user(profile: 'm.UserProfile', initial_password: str, groups: Sequence) -> dict:
     """Create an user on Rolleiflex.
 
     :param profile: User profile to create on Rolleiflex.

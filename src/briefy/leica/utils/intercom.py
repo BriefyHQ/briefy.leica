@@ -1,4 +1,5 @@
 """User functions for Intercom integration."""
+from briefy.leica import models as m
 from briefy.leica.config import INTERCOM_APP_ID
 from briefy.leica.config import INTERCOM_HASH_KEY
 from briefy.leica.models.mixins import get_public_user_info
@@ -42,14 +43,14 @@ def user_hash_from_user_id(user_id: str) -> str:
     return _generate_hash(user_id)
 
 
-def get_projects_for_professional(professional: 'Professional') -> t.Sequence['Project']:
+def get_projects_for_professional(professional: 'm.Professional') -> t.Sequence['m.Project']:
     """Get projects for a professional."""
     assignments = professional.assignments
     projects = tuple({a.project for a in assignments})
     return projects
 
 
-def get_project_managers(projects: t.Sequence['Project']) -> t.Sequence[dict]:
+def get_project_managers(projects: t.Sequence['m.Project']) -> t.Sequence[dict]:
     """Get project managers."""
     project_managers = []
     project_managers_ids = set()
@@ -61,7 +62,7 @@ def get_project_managers(projects: t.Sequence['Project']) -> t.Sequence[dict]:
     return project_managers
 
 
-def intercom_payload_professional(professional: 'Professional') -> dict:
+def intercom_payload_professional(professional: 'm.Professional') -> dict:
     """Return the intercom payload for a professional."""
     # Priority is to old external id info (Knack id)
     old_id = professional.external_id

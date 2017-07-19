@@ -1,6 +1,6 @@
 """Utils to query user info."""
 from briefy.common.utilities.interfaces import IUserProfileQuery
-#  from briefy.leica import logger
+from briefy.leica import models as m
 from briefy.leica.utils.rolleiflex import create_user
 from briefy.leica.utils.rolleiflex import get_user
 from briefy.leica.utils.rolleiflex import transition_user
@@ -32,7 +32,7 @@ def create_rolleiflex_user(profile, groups=()):
     return create_user(profile, initial_password, groups)
 
 
-def activate_or_create_user(profile: 'UserProfile', groups: Sequence=()) -> bool:
+def activate_or_create_user(profile: 'm.UserProfile', groups: Sequence=()) -> bool:
     """Create an User on Rolleiflex or activate an existing User.
 
     :param profile: UserProfile to be synced to Rolleiflex.
@@ -48,7 +48,7 @@ def activate_or_create_user(profile: 'UserProfile', groups: Sequence=()) -> bool
     return status
 
 
-def _transition_profile(profile: 'UserProfile', transition: str) -> bool:
+def _transition_profile(profile: 'm.UserProfile', transition: str) -> bool:
     """Transition an User connected to an UserProfile.
 
     :param profile: UserProfile to be transitioned on Rolleiflex.
@@ -65,7 +65,7 @@ def _transition_profile(profile: 'UserProfile', transition: str) -> bool:
     return status
 
 
-def activate_user(profile: 'UserProfile') -> bool:
+def activate_user(profile: 'm.UserProfile') -> bool:
     """Activate an User connected to an UserProfile.
 
     :param profile: UserProfile to be transitioned on Rolleiflex.
@@ -75,7 +75,7 @@ def activate_user(profile: 'UserProfile') -> bool:
     return _transition_profile(profile, transition)
 
 
-def inactivate_user(profile: 'UserProfile') -> bool:
+def inactivate_user(profile: 'm.UserProfile') -> bool:
     """Inactivate an User connected to an UserProfile.
 
     :param profile: UserProfile to be transitioned on Rolleiflex.

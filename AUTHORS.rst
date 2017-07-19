@@ -2,11 +2,9 @@
 Credits
 =======
 
-Development Lead
------------------------------
+Contributors
+------------
 
 * João S. O. Bueno
-
-Contributors
-------------------
-
+* Ruda Porto
+* Érico Andrei
