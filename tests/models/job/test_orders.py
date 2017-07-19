@@ -5,6 +5,7 @@ from briefy.leica.events.assignment import AssignmentCreatedEvent
 from briefy.leica.events.order import OrderCreatedEvent
 from briefy.leica.subscribers.assignment import assignment_created_handler
 from briefy.leica.subscribers.order import order_created_handler
+from briefy.ws.errors import ValidationError
 from conftest import BaseModelTest
 from datetime import timedelta
 
@@ -45,6 +46,59 @@ class TestOrderModel(BaseModelTest):
         assignment_created_handler(event)
         event()
         session.flush()
+
+    def test_invalid_additional_charges(self, instance_obj):
+        """"Test failed modification of additional_charges."""
+        actual_price = instance_obj.actual_order_price
+
+        wrong_data = (
+            ('wrong_reason', 1200, '', '669a99c2-9bb3-443f-8891-e600a15e3c10'),
+            ('work', 'wrong', 'Foo bar', '669a99c2-9bb3-443f-8891-e600a15e3c10'),
+            ('work', 123000, 123, '669a99c2-9bb3-443f-8891-e600a15e3c10'),
+            ('work', 123000, '', 'meu_login'),
+        )
+        payload = [
+            {'category': i[0], 'amount': i[1], 'reason': i[2], 'created_by': i[3]}
+            for i in wrong_data
+        ]
+
+        with pytest.raises(ValidationError) as exc:
+            instance_obj.additional_charges = payload
+
+        assert 'Invalid payload for additional_charges' in str(exc)
+
+        assert instance_obj.total_order_price == actual_price
+        total_additional_charges = instance_obj.total_additional_charges
+        assert total_additional_charges == 0
+
+        # Manually triggering the observer
+        instance_obj._calculate_total_order_price(actual_price)
+        assert instance_obj.total_order_price == actual_price
+
+    def test_valid_additional_charges(self, instance_obj):
+        """"Test successful modification of additional_charges."""
+        actual_price = instance_obj.actual_order_price
+
+        valid_data = (
+            ('rescheduling', 1200, '', '669a99c2-9bb3-443f-8891-e600a15e3c10'),
+            ('cancellation', 0, 'Foo bar', '669a99c2-9bb3-443f-8891-e600a15e3c10'),
+            ('model_release', 123000, '20 people', '669a99c2-9bb3-443f-8891-e600a15e3c10'),
+            ('property_release', 3000, 'Owner signed', '669a99c2-9bb3-443f-8891-e600a15e3c10'),
+            ('other', 3000, 'Other reason', '669a99c2-9bb3-443f-8891-e600a15e3c10'),
+        )
+        payload = [
+            {'category': i[0], 'amount': i[1], 'reason': i[2], 'created_by': i[3]}
+            for i in valid_data
+        ]
+        instance_obj.additional_charges = payload
+
+        assert instance_obj.total_order_price == actual_price
+        total_additional_charges = instance_obj.total_additional_charges
+        assert total_additional_charges == 130200
+
+        # Manually triggering the observer
+        instance_obj._calculate_total_order_price(actual_price)
+        assert instance_obj.total_order_price == actual_price + total_additional_charges
 
     @staticmethod
     def prepare_obj_wf(obj, web_request, role=None, state=None):
