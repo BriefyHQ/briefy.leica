@@ -10,8 +10,8 @@ from briefy.ws.resources import RESTService
 from briefy.ws.resources import VersionsService
 from briefy.ws.resources import WorkflowAwareResource
 from briefy.ws.resources.factory import BaseFactory
-from datetime import timedelta
 from cornice.resource import resource
+from datetime import timedelta
 from pyramid.security import Allow
 from sqlalchemy.orm import joinedload
 
