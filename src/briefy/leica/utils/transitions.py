@@ -1,6 +1,4 @@
 """Transition helpers for Leica."""
-from briefy.common.db import Base
-from briefy.leica import logger
 from datetime import datetime
 from sqlalchemy.orm.session import object_session
 
@@ -50,31 +48,32 @@ def get_transition_info_from_history(
     return valid[order] if valid else None
 
 
-def approve_assets_in_assignment(assignment: Base, context) -> list:
-    """Approve all pending assets in an Assignment.
-
-    :param assignment: Internal Briefy Assignment.
-    :param context: Workflow context.
-    :returns: List of approved assets in this assignment.
-    """
-    all_assets = assignment.assets
-    pending = [
-        a for a in all_assets if a.state == 'pending'
-    ]
-    assets_ids = [a.id for a in all_assets if a.state == 'approved']
-    for asset in pending:
-        asset.workflow.context = context
-        # Approve asset
-        asset.workflow.approve()
-        assets_ids.append(asset.id)
-
-    logger.info(
-        'Transitioned {assets_count} assets to approved for Assignment {id}'.format(
-            assets_count=len(pending),
-            id=assignment.id,
-        )
-    )
-    return assets_ids
+# Currently not in use
+# def approve_assets_in_assignment(assignment: Base, context) -> list:
+#     """Approve all pending assets in an Assignment.
+#
+#     :param assignment: Internal Briefy Assignment.
+#     :param context: Workflow context.
+#     :returns: List of approved assets in this assignment.
+#     """
+#     all_assets = assignment.assets
+#     pending = [
+#         a for a in all_assets if a.state == 'pending'
+#     ]
+#     assets_ids = [a.id for a in all_assets if a.state == 'approved']
+#     for asset in pending:
+#         asset.workflow.context = context
+#         # Approve asset
+#         asset.workflow.approve()
+#         assets_ids.append(asset.id)
+#
+#     logger.info(
+#         'Transitioned {assets_count} assets to approved for Assignment {id}'.format(
+#             assets_count=len(pending),
+#             id=assignment.id,
+#         )
+#     )
+#     return assets_ids
 
 
 def create_comment_on_assignment_approval(assignment, actor, message):

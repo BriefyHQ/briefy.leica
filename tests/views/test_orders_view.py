@@ -37,6 +37,18 @@ class TestOrderView(BaseVersionedTestView):
         ]
     }
 
+    def test_get_collection_custom_filter_customer_deliveries(self, app, login_as_customer):
+        """Test get a collection of items using custom filters."""
+        user_payload, token = login_as_customer
+        headers = self.headers
+        headers['Authorization'] = f'JWT {token}'
+        request = app.get('{base}?_custom_filter=customer_deliveries'.format(base=self.base_path),
+                          headers=headers, status=200)
+        result = request.json
+        assert 'data' in result
+        assert 'total' in result
+        assert result['total'] == len(result['data'])
+
     def test_put_invalid_asset_type(self, app, obj_payload):
         """Asset type should match one of the possible values."""
         payload = obj_payload

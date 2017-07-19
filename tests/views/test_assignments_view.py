@@ -34,6 +34,29 @@ class TestAssignmentView(BaseVersionedTestView):
         'payout_currency': 'USD'
     }
 
+    def test_get_collection_no_access_to_customer(self, app, login_as_customer):
+        """Test get a collection of Assignments as a customer."""
+        user_payload, token = login_as_customer
+        headers = self.headers
+        headers['Authorization'] = f'JWT {token}'
+        request = app.get('{base}'.format(base=self.base_path),
+                          headers=headers, status=403)
+        result = request.json
+        assert result['status'] == 'error'
+        assert result['message'] == 'Unauthorized'
+
+    def test_get_collection_custom_filter_pool(self, app, login_as_professional):
+        """Test get a collection of items using custom filters."""
+        user_payload, token = login_as_professional
+        headers = self.headers
+        headers['Authorization'] = f'JWT {token}'
+        request = app.get('{base}?_custom_filter=pool'.format(base=self.base_path),
+                          headers=headers, status=200)
+        result = request.json
+        assert 'data' in result
+        assert 'total' in result
+        assert result['total'] == len(result['data'])
+
     def test_put_invalid_asset_type(self, app, obj_payload):
         """Asset type should match one of the possible values."""
         payload = obj_payload

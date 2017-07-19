@@ -639,6 +639,46 @@ def login(request):
     return user_payload
 
 
+@pytest.fixture
+def login_as_customer():
+    """Login and get JWT token."""
+    user_payload = {
+        'locale': 'en_GB',
+        'id': '83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d',
+        'fullname': 'Maike Bork',
+        'first_name': 'Maike',
+        'email': 'maike@lieferheld.de',
+        'last_name': 'Borke',
+        'groups': [
+            'g:customers'
+        ]
+    }
+    policy = JWTAuthenticationPolicy(private_key=JWT_SECRET,
+                                     expiration=int(JWT_EXPIRATION))
+    token = policy.create_token(user_payload['id'], **user_payload)
+    return (user_payload, token)
+
+
+@pytest.fixture
+def login_as_professional():
+    """Login and get JWT token."""
+    user_payload = {
+        'locale': 'en_GB',
+        'id': '23d94a43-3947-42fc-958c-09245ecca5f2',
+        'fullname': 'Sebastiao Salgado',
+        'first_name': 'Sebastiao',
+        'email': 'salgado@professional.briefy.co',
+        'last_name': 'Salgado',
+        'groups': [
+            'g:professionals'
+        ]
+    }
+    policy = JWTAuthenticationPolicy(private_key=JWT_SECRET,
+                                     expiration=int(JWT_EXPIRATION))
+    token = policy.create_token(user_payload['id'], **user_payload)
+    return (user_payload, token)
+
+
 def _mock_rolleiflex(self, method, url, *args, **kwargs):
     status_code = 200
     payload = kwargs.get('data', '')
@@ -675,6 +715,25 @@ def _mock_rolleiflex(self, method, url, *args, **kwargs):
     return resp
 
 
+def _mock_geonames(self, method, url, *args, **kwargs):
+    status_code = 200
+    headers = {'content-type': 'application/json'}
+    filename = 'data/timezone.json'
+    if 'lat=91' in url:
+        filename = 'data/timezone_no_user.json'
+    elif 'lng=181' in url:
+        filename = 'data/timezone_ratelimit.json'
+    data = open(os.path.join(__file__.rsplit('/', 1)[0], filename)).read()
+    if 'lat=92'in url:
+        # An invalid JSON response
+        data = '{-'
+    resp = requests.Response()
+    resp.status_code = status_code
+    resp.headers = headers
+    resp._content = data.encode('utf8')
+    return resp
+
+
 @pytest.fixture(scope='session')
 def mock_request():
     def mock_requests_response(self, method, url, *args, **kwargs):
@@ -682,7 +741,7 @@ def mock_request():
         if 'briefy-thumbor' in url:
             filename = 'data/thumbor.json'
         elif 'api.geonames.org' in url:
-            filename = 'data/timezone.json'
+            return _mock_geonames(self, method, url, *args, **kwargs)
         elif 'briefy-rolleiflex' in url:
             return _mock_rolleiflex(self, method, url, *args, **kwargs)
         status_code = 200

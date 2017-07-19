@@ -11,9 +11,13 @@ ENDPOINT = 'http://api.geonames.org/timezoneJSON?formatted=true&lat={0}&lng={1}&
 
 
 def timezone_from_coordinates(lat: float, lng: float) -> str:
-    """Get timezone info from coordinates."""
+    """Get timezone info from coordinates.
+
+    :param lat: Latitude.
+    :param lng: Longitude.
+    :return: Timezone id. i.e: Europe/Berlin
+    """
     url = ENDPOINT.format(lat, lng)
-    data = None
     try:
         r = requests.get(url)
         data = r.json()
@@ -21,14 +25,8 @@ def timezone_from_coordinates(lat: float, lng: float) -> str:
             return data['timezoneId']
         elif data.get('status', {}).get('value') == 19:
             # Rate limit
-            logger.error(
-                'Unable to fetch timezone: GeoNames rate limit.'
-            )
+            logger.error('Unable to fetch timezone: GeoNames rate limit.')
         else:
-            logger.error(
-                'Unable to fetch timezone thanks to GeoNames throttling '
-            )
+            logger.error('Unable to fetch timezone thanks to GeoNames throttling.')
     except Exception as exc:
-        logger.exception(
-            'Error retrieving timezone info: ' + str(exc)
-        )
+        logger.exception('Error retrieving timezone info: ' + str(exc))
