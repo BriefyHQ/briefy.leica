@@ -210,56 +210,56 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
 
     It stores a dictionary of requirements to be fulfilled by each asset of each Assignment.
 
-    i.e.  - for a project delivering only photos, its value might be:
+    i.e.  - for a project delivering only photos, its value might be::
 
-    [
-        {
-            "asset_type": "Image",
-            "set": {
-                "minimum_number": 10  # (aliased to 'minimum_number_of_photos' (deprecated))
-            },
-            "asset": {
-                "dimensions": [
-                {
-                    "value": "4000x3000",
-                    "operator": "min"
-                }
-                ],
-                "orientation": [
-                {
-                    "value": "landscape",
-                    "operator": "eq"
-                }
-                ]
-            }
-        },
-        {
-            "asset_type": "Video",
-            "set": {
-                "minimum_number": 2
-            },
-            "asset": {
-                "duration": {"value": "30", "operator" :"min"}
-            },
-            "actions": [
-                {
-                    "state": "post_processing",
-                    "action": "copy",
-                    "settings": {
-                        "driver": "gdrive",
-                        "parentId": "",
-                        "subfolders": true,
-                        "images": true,
-                        "other": true,
-                        "name": "order.customer_order_id",
-                        "resize": []
-                    }
+        [
+            {
+                "asset_type": "Image",
+                "set": {
+                    "minimum_number": 10  # (aliased to 'minimum_number_of_photos' (deprecated))
                 },
-                ...
-            ]
-        },
-        ...
-    ]
+                "asset": {
+                    "dimensions": [
+                    {
+                        "value": "4000x3000",
+                        "operator": "min"
+                    }
+                    ],
+                    "orientation": [
+                    {
+                        "value": "landscape",
+                        "operator": "eq"
+                    }
+                    ]
+                }
+            },
+            {
+                "asset_type": "Video",
+                "set": {
+                    "minimum_number": 2
+                },
+                "asset": {
+                    "duration": {"value": "30", "operator" :"min"}
+                },
+                "actions": [
+                    {
+                        "state": "post_processing",
+                        "action": "copy",
+                        "settings": {
+                            "driver": "gdrive",
+                            "parentId": "",
+                            "subfolders": true,
+                            "images": true,
+                            "other": true,
+                            "name": "order.customer_order_id",
+                            "resize": []
+                        }
+                    },
+                    ...
+                ]
+            },
+            ...
+        ]
 
 
     If there is a single asset type for the project, the outermost list may be omitted -
@@ -270,8 +270,6 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
 
     (Deprecated: for compatibility reasons, ms.laure code will understand a
     missing "asset_type" key will default it to "Image".)
-
-
     """
 
     delivery = sa.Column(

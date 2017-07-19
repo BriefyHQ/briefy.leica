@@ -61,3 +61,19 @@ SCHEDULE_DAYS_LIMIT = config('SCHEDULE_DAYS_LIMIT', default=1)
 
 # Cache
 ENABLE_CACHE = config('ENABLE_CACHE', casts.Boolean(), default=False)
+
+# default 48 hs
+LATE_SUBMISSION_SECONDS = config('LATE_SUBMISSION_SECONDS', default='172800')
+# default 3 day
+LATE_SUBMISSION_MAX_DAYS = config('LATE_SUBMISSION_MAX_DAYS', default='3')
+
+# default 24 hs
+BEFORE_SHOOTING_SECONDS = config('LATE_SUBMISSION_SECONDS', default='86400')
+
+# notifications task config
+ENABLE_LATE_SUBMISSION_NOTIFY = config(
+    'ENABLE_LATE_SUBMISSION_NOTIFY', casts.Boolean(), default=False
+)
+ENABLE_BEFORE_SHOOTING_NOTIFY = config(
+    'ENABLE_BEFORE_SHOOTING_NOTIFY', casts.Boolean(), default=False
+)

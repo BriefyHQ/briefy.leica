@@ -1,19 +1,19 @@
 """User functions for Intercom integration."""
+from briefy.leica import models as m  # noQA
 from briefy.leica.config import INTERCOM_APP_ID
 from briefy.leica.config import INTERCOM_HASH_KEY
 from briefy.leica.models.mixins import get_public_user_info
 
 import hashlib
 import hmac
+import typing as t
 
 
-def _generate_hash(message):
+def _generate_hash(message: str) -> str:
     """Given a message, return a hash.
 
     :param message: String to be hashed
-    :type message: str
     :return: Hash of the message
-    :rtype: str
     """
     encoding = 'utf-8'
     key = bytes(INTERCOM_HASH_KEY, encoding)
@@ -25,36 +25,32 @@ def _generate_hash(message):
     ).hexdigest()
 
 
-def user_hash_from_email(email):
+def user_hash_from_email(email: str) -> str:
     """Given an email, return an acceptable user_hash to be used with Intercom.
 
     :param email: User email, will be the key to integrate with Intercom.io
-    :type email: str
     :return: User hash
-    :rtype: str
     """
     return _generate_hash(email)
 
 
-def user_hash_from_user_id(user_id):
+def user_hash_from_user_id(user_id: str) -> str:
     """Given an user_id, return an acceptable user_hash to be used with Intercom.
 
     :param email: User id, will be the key to integrate with Intercom.io
-    :type email: str
     :return: User hash
-    :rtype: str
     """
     return _generate_hash(user_id)
 
 
-def get_projects_for_professional(professional):
+def get_projects_for_professional(professional: 'm.Professional') -> t.Sequence['m.Project']:
     """Get projects for a professional."""
     assignments = professional.assignments
-    projects = {a.project for a in assignments}
+    projects = tuple({a.project for a in assignments})
     return projects
 
 
-def get_project_managers(projects: list):
+def get_project_managers(projects: t.Sequence['m.Project']) -> t.Sequence[dict]:
     """Get project managers."""
     project_managers = []
     project_managers_ids = set()
@@ -66,7 +62,7 @@ def get_project_managers(projects: list):
     return project_managers
 
 
-def intercom_payload_professional(professional):
+def intercom_payload_professional(professional: 'm.Professional') -> dict:
     """Return the intercom payload for a professional."""
     # Priority is to old external id info (Knack id)
     old_id = professional.external_id

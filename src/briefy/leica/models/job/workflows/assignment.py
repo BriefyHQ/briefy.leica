@@ -155,9 +155,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         """Inform availability dates and move the enable Assignment to be self assigned."""
         order = self.document.order
         if not order.availability:
-            return False
-        else:
-            return True
+            raise WorkflowTransitionException('Order has no availability')
 
     @Permission(groups=[G['customers'], G['pm'], G['scout'], G['system'], ])
     def can_publish(self):
@@ -303,7 +301,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         """Customer, Professional or PM removes the Assignment scheduled shoot datetime."""
         assignment = self.document
         if assignment.submission_path:
-            return False
+            raise WorkflowTransitionException('Assets are already on the system.')
         assignment.scheduled_datetime = None
         order = assignment.order
         order.scheduled_datetime = None
@@ -322,6 +320,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         """Customer or PM cancel the Assignment."""
         assignment = self.document
         assignment.payout_value = 0
+        assignment.travel_expenses = 0
         assignment.scheduled_datetime = None
         order = assignment.order
         order.scheduled_datetime = None
@@ -606,7 +605,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         scout_states = ('pending', 'published',)
         user = self.context
         state = self.state
-        support_groups = {G['product'], G['tech'], G['support']}
+        support_groups = {G['product'].value, G['tech'].value, G['support'].value}
         is_support = support_groups.intersection(set(user.groups))
         has_permission = False
 
@@ -616,8 +615,8 @@ class AssignmentWorkflow(BriefyWorkflow):
             has_permission = True
         elif G['finance'].value in user.groups:
             has_permission = True
-        elif G['scout'].value in user.groups and state.name not in scout_states:
-            has_permission = False
+        elif G['scout'].value in user.groups and state.name in scout_states:
+            has_permission = True
         elif G['pm'].value in user.groups and state.name not in final_states:
             has_permission = True
 
@@ -663,7 +662,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         final_states = ('cancelled', 'completed', 'perm_rejected', )
         user = self.context
         state = self.state
-        support_groups = {G['product'], G['tech'], G['support']}
+        support_groups = {G['product'].value, G['tech'].value, G['support'].value}
         is_support = support_groups.intersection(set(user.groups))
         has_permission = False
 

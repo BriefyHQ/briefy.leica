@@ -167,7 +167,7 @@ create_dockers: export_db_env
 	docker run -d -p 127.0.0.1:6379:6379 --name redis redis
 	docker run -d -p 127.0.0.1:5000:5000 --name sqs briefy/aws-test:latest sqs
 	export SQS_IP=127.0.0.1 SQS_PORT=5000
-	docker run -d -p 127.0.0.1:9999:5432 -e POSTGRES_PASSWORD=briefy -e POSTGRES_USER=briefy -e POSTGRES_DB=briefy-leica --name briefy-leica-test mdillon/postgis:9.5
-	docker run -d -p 127.0.0.1:9998:5432 -e POSTGRES_PASSWORD=briefy -e POSTGRES_USER=briefy -e POSTGRES_DB=briefy-leica-unit_test --name briefy-leica-unit_test mdillon/postgis:9.5
+	docker run -d -p 127.0.0.1:9999:5432 -e POSTGRES_PASSWORD=briefy -e POSTGRES_USER=briefy -e POSTGRES_DB=briefy-leica --name briefy-leica-test mdillon/postgis:9.6
+	docker run -d -p 127.0.0.1:9998:5432 -e POSTGRES_PASSWORD=briefy -e POSTGRES_USER=briefy -e POSTGRES_DB=briefy-leica-unit_test --name briefy-leica-unit_test mdillon/postgis:9.6
 	echo "Waiting Posgtres to start"
 	sleep 40s

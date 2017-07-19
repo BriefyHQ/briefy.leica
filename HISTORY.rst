@@ -2,8 +2,22 @@
 History
 =======
 
+2.1.28 (2017-07-19)
+-------------------
+
+    * New task to notify professionals about Assignments with late submissions (rudaporto).
+    * New task to notify professionals before shooting (rudaporto).
+    * Card #462: two new _custom_filter for assignment endpoint: late_first_submission and late_re_submission (rudaporto).
+    * Card #462: two new _custom_filter for order endpoint: late_first_submission and late_re_submission (rudaporto).
+    * Increase testing coverage for the package (ericof).
+    * Fix documentation generation (ericof).
+    * Added upper limit number of days to notify about late submission (rudaporto).
+    * Added flags to enable before shooting and late submission notification tasks (default False) (rudaporto).
+
+
 2.1.27 (2017-07-12)
 -------------------
+
     * Fixed Assignments report to return the category from the order (rudaporto).
     * Making sure that Order.actual_order_price is corrected updated after Order creation (rudaporto).
 
