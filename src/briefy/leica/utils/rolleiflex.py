@@ -1,6 +1,6 @@
 """Utils to query user info."""
+from briefy.leica import models as m  # noQA
 from briefy.leica import logger
-from briefy.leica import models as m
 from briefy.leica.config import ROLLEIFLEX_BASE
 from briefy.leica.config import ROLLEIFLEX_USERNAME
 from pyramid.httpexceptions import HTTPBadRequest

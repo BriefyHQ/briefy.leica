@@ -1,5 +1,5 @@
 """User functions for Intercom integration."""
-from briefy.leica import models as m
+from briefy.leica import models as m  # noQA
 from briefy.leica.config import INTERCOM_APP_ID
 from briefy.leica.config import INTERCOM_HASH_KEY
 from briefy.leica.models.mixins import get_public_user_info
