@@ -57,6 +57,24 @@ class TestAssignmentView(BaseVersionedTestView):
         assert 'total' in result
         assert result['total'] == len(result['data'])
 
+    def test_get_collection_custom_filter_late_first_submission(self, app):
+        """Test get a collection of items using custom filters."""
+        request = app.get('{base}?_custom_filter=late_first_submission'.format(base=self.base_path),
+                          headers=self.headers, status=200)
+        result = request.json
+        assert 'data' in result
+        assert 'total' in result
+        assert result['total'] == len(result['data'])
+
+    def test_get_collection_custom_filter_late_re_submission(self, app):
+        """Test get a collection of items using custom filters."""
+        request = app.get('{base}?_custom_filter=late_re_submission'.format(base=self.base_path),
+                          headers=self.headers, status=200)
+        result = request.json
+        assert 'data' in result
+        assert 'total' in result
+        assert result['total'] == len(result['data'])
+
     def test_put_invalid_asset_type(self, app, obj_payload):
         """Asset type should match one of the possible values."""
         payload = obj_payload
