@@ -9,6 +9,8 @@ History
     * New task to notify professionals before shooting (rudaporto).
     * Card #462: two new _custom_filter for assignment endpoint: late_first_submission and late_re_submission (rudaporto).
     * Card #462: two new _custom_filter for order endpoint: late_first_submission and late_re_submission (rudaporto).
+    * Increase testing coverage for the package (ericof).
+    * Fix documentation generation (ericof).
     * Added upper limit number of days to notify about late submission (rudaporto).
     * Added flags to enable before shooting and late submission notification tasks (default False) (rudaporto).
 
