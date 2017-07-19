@@ -1,5 +1,8 @@
 """Views to handle Orders creation."""
+from briefy.common.db import datetime_utcnow
+from briefy.leica.config import LATE_SUBMISSION_SECONDS
 from briefy.leica.events import order as events
+from briefy.leica.models import Assignment
 from briefy.leica.models import LeadOrder
 from briefy.leica.models import Order
 from briefy.leica.models import Project
@@ -11,6 +14,7 @@ from briefy.ws.resources import WorkflowAwareResource
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
 from cornice.resource import view
+from datetime import timedelta
 from pyramid.httpexceptions import HTTPForbidden
 from pyramid.security import Allow
 from sqlalchemy import and_
@@ -106,15 +110,40 @@ class OrderService(RESTService):
         :returns: A tuple of default filters to be applied to queries.
         """
         user = self.request.user
+        model = self.model
         custom_filter = self.request.params.get('_custom_filter')
         if 'g:customers' in user.groups and custom_filter == 'customer_deliveries':
             query = query.filter(
                 or_(
                     and_(
-                        Order.state.in_(('accepted', 'refused', 'in_qa')),
-                        Order.accept_date.isnot(None)
+                        model.state.in_(('accepted', 'refused', 'in_qa')),
+                        model.accept_date.isnot(None)
                     ),
-                    Order.state == 'delivered'
+                    model.state == 'delivered'
+                )
+            )
+        elif custom_filter == 'late_first_submission':
+            config_delta = timedelta(seconds=int(LATE_SUBMISSION_SECONDS))
+            date_limit = datetime_utcnow() - config_delta
+            query = query.filter(
+                model.assignments.any(
+                    and_(
+                        Assignment.state == 'awaiting_assets',
+                        Assignment.scheduled_datetime <= date_limit,
+                        Assignment.submission_path.is_(None),
+                    )
+                )
+            )
+        elif custom_filter == 'late_re_submission':
+            config_delta = timedelta(seconds=int(LATE_SUBMISSION_SECONDS))
+            date_limit = datetime_utcnow() - config_delta
+            query = query.filter(
+                model.assignments.any(
+                    and_(
+                        Assignment.state == 'awaiting_assets',
+                        Assignment.last_approval_date <= date_limit,
+                        Assignment.submission_path.isnot(None)
+                    )
                 )
             )
         return query
