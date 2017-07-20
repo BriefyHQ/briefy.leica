@@ -99,7 +99,9 @@ class TestOrderView(BaseVersionedTestView):
                 "category": "other",
                 "amount": 12000,
                 "reason": "A good reason",
-                "created_by": "669a99c2-9bb3-443f-8891-e600a15e3c10"
+                "created_by": "669a99c2-9bb3-443f-8891-e600a15e3c10",
+                "invoice_number": "1DEF1",
+                "invoice_date": "2017-07-21"
             }
         ]"""
         request = app.put_json('{base}/{id}'.format(base=self.base_path, id=obj_id),
@@ -107,9 +109,26 @@ class TestOrderView(BaseVersionedTestView):
         result = request.json
         additional_charges = result['additional_charges']
         assert len(additional_charges) == 1
+        assert additional_charges[0]['created_at'].endswith('+00:00')
+        assert additional_charges[0]['id'] != ''
         assert additional_charges[0]['amount'] == 12000
         assert additional_charges[0]['category'] == 'other'
         assert result['total_order_price'] == result['actual_order_price'] + 12000
+
+    def test_put_invalid_additional_charges_by_deleting(self, app, obj_payload):
+        """It should not be possible to remove an invoiced charge."""
+        payload = obj_payload.copy()
+        del(payload['availability'])
+        obj_id = payload['id']
+        payload['additional_charges'] = '[]'
+        request = app.put_json('{base}/{id}'.format(base=self.base_path, id=obj_id),
+                               payload, headers=self.headers, status=400)
+        result = request.json
+        error = result['errors'][0]
+        assert result['status'] == 'error'
+        assert error['name'] == 'additional_charges'
+        assert error['location'] == 'body'
+        assert 'Not possible to delete an already invoiced item.' in error['description']
 
     def test_put_invalid_asset_type(self, app, obj_payload):
         """Asset type should match one of the possible values."""

@@ -80,17 +80,38 @@ class TestOrderModel(BaseModelTest):
         actual_price = instance_obj.actual_order_price
 
         valid_data = (
-            ('rescheduling', 1200, '', '669a99c2-9bb3-443f-8891-e600a15e3c10'),
-            ('cancellation', 0, 'Foo bar', '669a99c2-9bb3-443f-8891-e600a15e3c10'),
-            ('model_release', 123000, '20 people', '669a99c2-9bb3-443f-8891-e600a15e3c10'),
-            ('property_release', 3000, 'Owner signed', '669a99c2-9bb3-443f-8891-e600a15e3c10'),
-            ('other', 3000, 'Other reason', '669a99c2-9bb3-443f-8891-e600a15e3c10'),
+            (
+                'rescheduling', 1200, '', '669a99c2-9bb3-443f-8891-e600a15e3c10', '', '', ''
+            ),
+            (
+                'cancellation', 0, 'Foo bar', '669a99c2-9bb3-443f-8891-e600a15e3c10', '', '', ''
+            ),
+            (
+                'model_release', 123000, '20 people', '669a99c2-9bb3-443f-8891-e600a15e3c10',
+                '', '', ''
+            ),
+            (
+                'property_release', 3000, 'Owner signed', '669a99c2-9bb3-443f-8891-e600a15e3c10',
+                '', '', ''
+            ),
+            (
+                'other', 3000, 'Other reason', '669a99c2-9bb3-443f-8891-e600a15e3c10',
+                '3e120931-bfef-4d64-b66a-57c0b773b267', '12', ''
+            ),
         )
         payload = [
-            {'category': i[0], 'amount': i[1], 'reason': i[2], 'created_by': i[3]}
+            {
+                'category': i[0], 'amount': i[1], 'reason': i[2], 'created_by': i[3],
+                'id': i[4], 'invoice_number': i[5], 'invoice_date': i[6],
+            }
             for i in valid_data
         ]
         instance_obj.additional_charges = payload
+
+        additional_charges = instance_obj.additional_charges
+        assert len(additional_charges) == 5
+        # Set created_at
+        assert additional_charges[0]['created_at'].endswith('+00:00') is True
 
         assert instance_obj.total_order_price == actual_price
         total_additional_charges = instance_obj.total_additional_charges
@@ -99,6 +120,85 @@ class TestOrderModel(BaseModelTest):
         # Manually triggering the observer
         instance_obj._calculate_total_order_price(actual_price)
         assert instance_obj.total_order_price == actual_price + total_additional_charges
+
+    def test_update_additional_charges(self, instance_obj):
+        """"Test successful modification of additional_charges."""
+        valid_data = (
+            (
+                'rescheduling', 1200, '', '669a99c2-9bb3-443f-8891-e600a15e3c10',
+                '9ea38889-4056-42f3-9eaa-d582efb4d718', '', ''
+            ),
+        )
+        payload = [
+            {
+                'category': i[0], 'amount': i[1], 'reason': i[2], 'created_by': i[3],
+                'id': i[4], 'invoice_number': i[5], 'invoice_date': i[6],
+            }
+            for i in valid_data
+        ]
+        instance_obj.additional_charges = payload
+
+        additional_charges = instance_obj.additional_charges
+        assert len(additional_charges) == 1
+
+        to_update = [d.copy() for d in additional_charges]
+        to_update[0]['invoice_number'] = '1DEF1'
+        to_update[0]['invoice_date'] = '2017-07-21'
+
+        instance_obj.additional_charges = to_update
+        additional_charges = instance_obj.additional_charges
+        assert additional_charges[0]['invoice_number'] == to_update[0]['invoice_number']
+
+    def test_delete_additional_charges(self, instance_obj):
+        """"Test successful deletion of additional_charges."""
+        valid_data = (
+            (
+                'rescheduling', 1200, '', '669a99c2-9bb3-443f-8891-e600a15e3c10',
+                '9ea38889-4056-42f3-9eaa-d582efb4d718', '', ''
+            ),
+        )
+        payload = [
+            {
+                'category': i[0], 'amount': i[1], 'reason': i[2], 'created_by': i[3],
+                'id': i[4], 'invoice_number': i[5], 'invoice_date': i[6],
+            }
+            for i in valid_data
+        ]
+        instance_obj.additional_charges = payload
+
+        additional_charges = instance_obj.additional_charges
+        assert len(additional_charges) == 1
+
+        to_update = []
+
+        instance_obj.additional_charges = to_update
+        additional_charges = instance_obj.additional_charges
+        assert len(additional_charges) == 0
+
+    def test_invalid_update_additional_charges(self, instance_obj):
+        """"Test successful modification of additional_charges."""
+        valid_data = (
+            (
+                'rescheduling', 1200, '', '669a99c2-9bb3-443f-8891-e600a15e3c10',
+                '9ea38889-4056-42f3-9eaa-d582efb4d718', '1DEF1', '2017-07-21'
+            ),
+        )
+        payload = [
+            {
+                'category': i[0], 'amount': i[1], 'reason': i[2], 'created_by': i[3],
+                'id': i[4], 'invoice_number': i[5], 'invoice_date': i[6],
+            }
+            for i in valid_data
+        ]
+        instance_obj.additional_charges = payload
+
+        additional_charges = instance_obj.additional_charges
+        assert len(additional_charges) == 1
+
+        with pytest.raises(ValidationError) as exc:
+            instance_obj.additional_charges = []
+
+        assert 'Not possible to delete an already invoiced item.' in str(exc)
 
     @staticmethod
     def prepare_obj_wf(obj, web_request, role=None, state=None):

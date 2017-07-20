@@ -12,6 +12,7 @@ from briefy.leica.models.descriptors import UnaryRelationshipWrapper
 from briefy.leica.models.job import workflows
 from briefy.leica.models.job.location import OrderLocation
 from briefy.leica.models.project import Project
+from briefy.leica.utils.charges import order_charges_update
 from briefy.leica.utils.transitions import get_transition_date_from_history
 from briefy.leica.utils.user import add_user_info_to_state_history
 from briefy.leica.vocabularies import AssetTypes
@@ -134,15 +135,17 @@ _order_charges_choices = [f for f in OrderChargesChoices.__members__.keys()]
 class OrderCharge(colander.MappingSchema):
     """An additional charge to an Order."""
 
+    id = colander.SchemaNode(colander.String(), validator=colander.uuid, missing='')
     category = colander.SchemaNode(
         colander.String(),
         validator=colander.OneOf(_order_charges_choices)
     )
     amount = colander.SchemaNode(colander.Int())
-
     reason = colander.SchemaNode(colander.String(), missing='')
-
+    created_at = colander.SchemaNode(colander.DateTime(), missing='')
     created_by = colander.SchemaNode(colander.String(), validator=colander.uuid)
+    invoice_number = colander.SchemaNode(colander.String(), missing='')
+    invoice_date = colander.SchemaNode(colander.Date(), missing='')
 
 
 class OrderCharges(colander.SequenceSchema):
@@ -400,12 +403,15 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         :param value: Additional charges payload.
         :return: Validated payload
         """
-        if value:
-            schema = OrderCharges()
+        current_value = list(self.additional_charges) if self.additional_charges else []
+        if value or current_value:
+            charges_schema = OrderCharges()
             try:
-                schema.deserialize(value)
+                new_value = charges_schema.deserialize(value)
             except colander.Invalid as e:
                 raise ValidationError(message='Invalid payload for additional_charges', name=key)
+
+            value = order_charges_update(current_value, new_value)
 
             # Force total_order_price recalculation
             flag_modified(self, 'actual_order_price')
