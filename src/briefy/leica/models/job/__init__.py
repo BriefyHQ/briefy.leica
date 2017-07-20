@@ -160,6 +160,7 @@ class Assignment(AssignmentDates, mixins.AssignmentBriefyRoles,
 
     _workflow = workflows.AssignmentWorkflow
 
+    __exclude_attributes__ = ['assets', ]
     __summary_attributes__ = __summary_attributes__
     __summary_attributes_relations__ = [
         'project', 'comments', 'location', 'professional', 'customer',
