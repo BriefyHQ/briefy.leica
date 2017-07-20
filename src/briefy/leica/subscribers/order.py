@@ -86,9 +86,9 @@ def order_remove_schedule(event):
     user = order.workflow.context
     # this should be always in the subscriber
     # to avoid loop with the order remove_schedule
-    assignment = order.assignment
+    assignment = order.assignments[-1]
     message = order.state_history[-1]['message']
-    if assignment.state == 'scheduled':
+    if assignment.state in ['scheduled', 'awaiting_assets']:
         assignment.workflow.remove_schedule(message=message)
 
     # create the comment if applicable

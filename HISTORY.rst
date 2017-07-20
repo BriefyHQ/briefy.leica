@@ -2,6 +2,11 @@
 History
 =======
 
+2.1.29 (2017-07-20)
+-------------------
+
+    * Card #476: Order subscriber for workflow transition remove_schedule should also including assignment in awaiting_assets state (rudaporto).
+
 2.1.28 (2017-07-19)
 -------------------
 
