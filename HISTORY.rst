@@ -2,10 +2,15 @@
 History
 =======
 
-2.1.29 (Unreleased)
+2.1.31 (Unreleased)
 -------------------
 
     * Card #469: Add additional charges to Order (ericof).
+
+2.1.29 (2017-07-20)
+-------------------
+
+    * Card #476: Order subscriber for workflow transition remove_schedule should also including assignment in awaiting_assets state (rudaporto).
 
 2.1.28 (2017-07-19)
 -------------------

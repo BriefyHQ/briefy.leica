@@ -24,6 +24,8 @@ class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
 
     _workflow = workflows.CustomerWorkflow
 
+    __exclude_attributes__ = ['contacts', 'orders', ]
+
     __summary_attributes__ = [
         'id', 'slug', 'title', 'description', 'created_at', 'updated_at', 'state',
         'tax_country', 'legal_name'
