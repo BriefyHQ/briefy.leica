@@ -130,7 +130,7 @@ def default_current_type(context):
     """Get current type ."""
     return context.current_parameters.get('type')
 
- 
+
 _order_charges_choices = [f for f in OrderChargesChoices.__members__.keys()]
 
 
@@ -156,8 +156,7 @@ class OrderCharges(colander.SequenceSchema):
     charge = OrderCharge()
 
 
-class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
-            mixins.KLeicaVersionedMixin, Base):
+class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.OrderRolesMixin, Item):
     """An Order from the customer."""
 
     _workflow = workflows.OrderWorkflow

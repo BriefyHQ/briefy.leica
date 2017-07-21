@@ -191,7 +191,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         # set local roles
         assignment.scout_manager = SELF_ASSIGN_SCOUT_ID
         professional_id = self.context.id
-        assignment.professional_user = professional_id
+        assignment.update(dict(professional_user=[professional_id]))
         # force here but this will also set by the workflow engine
         assignment.professional_id = professional_id
 
@@ -221,7 +221,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         assignment.scout_manager = user_id
         fields = kwargs['fields']
         professional_id = fields.get('professional_id')
-        assignment.professional_user = professional_id
+        assignment.update(dict(professional_user=[professional_id]))
 
     @Permission(groups=[G['pm'], G['scout'], G['system']])
     def can_assign_pool(self):

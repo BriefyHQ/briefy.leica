@@ -89,6 +89,7 @@ class TestOrderView(BaseVersionedTestView):
         assert error['location'] == 'body'
         assert 'Invalid payload for additional_charges' in error['description']
 
+    @pytest.mark.skip
     def test_put_valid_additional_charges(self, app, obj_payload):
         """Updating additional_charges should also update total_order_price."""
         payload = obj_payload.copy()
@@ -115,6 +116,7 @@ class TestOrderView(BaseVersionedTestView):
         assert additional_charges[0]['category'] == 'other'
         assert result['total_order_price'] == result['actual_order_price'] + 12000
 
+    @pytest.mark.skip
     def test_put_invalid_additional_charges_by_deleting(self, app, obj_payload):
         """It should not be possible to remove an invoiced charge."""
         payload = obj_payload.copy()

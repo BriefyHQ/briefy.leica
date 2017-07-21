@@ -319,6 +319,7 @@ class BaseTestView:
     NOT_FOUND_MESSAGE = ''
     payload_position = 0
     update_map = {}
+    serialize_attrs = ['path']
     initial_wf_state = 'created'
     ignore_validation_fields = ['state_history', 'state']
 
@@ -385,12 +386,17 @@ class BaseTestView:
             if key not in self.ignore_validation_fields:
                 if isinstance(value, (date, datetime, uuid.UUID, enum.Enum, PhoneNumber)):
                     value = to_serializable(value)
+                elif key in self.serialize_attrs:
+                    if isinstance(value, (list, tuple)):
+                        value = [to_serializable(item) for item in value]
+                    else:
+                        value = to_serializable(value)
                 assert result.get(key) == value
 
         # state can be automatic changed by after_insert event listener
         assert self.initial_wf_state == getattr(db_obj, 'state')
 
-    def test_get_collection(self, app, obj_payload):
+    def test_get_collection(self, app):
         """Test get a collection of items."""
         request = app.get('{base}'.format(base=self.base_path),
                           headers=self.headers, status=200)

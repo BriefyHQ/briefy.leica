@@ -101,7 +101,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['published'])
     @pytest.mark.parametrize('role_name', ['professional'])
     def test_workflow_self_assign(
-        self, instance_obj, web_request, session, roles, role_name, origin_state
+        self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow self_assign transition."""
         assignment, wf, request = self.prepare_obj_wf(

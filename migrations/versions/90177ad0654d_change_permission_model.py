@@ -13,7 +13,7 @@ from sqlalchemy.dialects import postgresql
 from sqlalchemy_utils import types
 
 revision = '90177ad0654d'
-down_revision = 'cab6693525e6'
+down_revision = 'e79add10df68'
 branch_labels = None
 depends_on = None
 
