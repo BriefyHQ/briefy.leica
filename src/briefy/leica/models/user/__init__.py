@@ -56,7 +56,7 @@ class UserProfile(mixins.UserProfileMixin, mixins.UserProfileRolesMixin, Item):
 
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', 'type', 'external_id', '_owner', '_customer_roles',
+            'state_history', 'state', 'type', '_owner', '_customer_roles',
             '_project_roles'
 
         ],

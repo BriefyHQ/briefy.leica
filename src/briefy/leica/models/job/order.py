@@ -180,7 +180,7 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
     __colanderalchemy_config__ = {
         'excludes': [
             'state_history', 'state', 'project', 'comments', 'customer', 'type',
-            '_project_manager', '_scout_manager', '_customer_user', 'external_id',
+            '_project_manager', '_scout_manager', '_customer_user',
             'assignment', 'assignments', '_project_managers', '_scout_managers',
             '_customer_users', 'total_order_price'
         ],

@@ -92,7 +92,7 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
 
     __listing_attributes__ = [
         'id', 'title', 'description', 'created_at', 'updated_at', 'state',
-        'external_id', 'total_orders', 'slug', 'customer', 'asset_types'
+        'total_orders', 'slug', 'customer', 'asset_types'
     ]
 
     __raw_acl__ = (
@@ -108,7 +108,7 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
     __colanderalchemy_config__ = {
         'excludes': [
             'state_history', 'state', 'customer', '_customer_user', 'pool',
-            '_project_manager', 'external_id', '_customer_users', '_project_managers'
+            '_project_manager', '_customer_users', '_project_managers'
         ],
         'overrides': mixins.ProjectRolesMixin.__colanderalchemy_config__['overrides']
     }

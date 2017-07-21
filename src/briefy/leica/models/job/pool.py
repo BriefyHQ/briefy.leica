@@ -93,7 +93,7 @@ class Pool(mixins.LeicaSubVersionedMixin, Item):
     ]
 
     __colanderalchemy_config__ = {'excludes': [
-        'state_history', 'state', 'external_id'
+        'state_history', 'state'
     ]}
 
     __raw_acl__ = (

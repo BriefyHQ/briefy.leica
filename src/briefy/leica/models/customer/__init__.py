@@ -26,8 +26,7 @@ class Customer(mixins.CustomerRolesMixin, mixins.LeicaSubMixin, Item):
     __exclude_attributes__ = ['contacts', 'orders', ]
 
     __summary_attributes__ = [
-        'id', 'slug', 'title', 'description', 'created_at', 'updated_at', 'state',
-        'tax_country', 'legal_name'
+        'id', 'slug', 'title', 'description', 'created_at', 'updated_at', 'state', 'legal_name'
     ]
     __summary_attributes_relations__ = [
         'billing_contact', 'business_contact', 'addresses', 'projects'
@@ -38,7 +37,7 @@ class Customer(mixins.CustomerRolesMixin, mixins.LeicaSubMixin, Item):
         'excludes': [
             'state_history', 'state', '_customer_user', '_account_manager',
             '_customer_users', '_account_managers', 'business_contact',
-            'billing_contact', 'external_id', 'billing_info'
+            'billing_contact', 'billing_info'
         ],
         'overrides': mixins.CustomerRolesMixin.__colanderalchemy_config__['overrides']
     }

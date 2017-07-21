@@ -164,7 +164,7 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
     __summary_attributes__ = __summary_attributes__
     __summary_attributes_relations__ = [
         'project', 'comments', 'location', 'professional', 'customer',
-        'pool', 'external_id',
+        'pool'
     ]
     __listing_attributes__ = __listing_attributes__
 
