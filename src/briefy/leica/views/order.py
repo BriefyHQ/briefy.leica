@@ -130,7 +130,7 @@ class OrderService(RESTService):
                     and_(
                         Assignment.state == 'awaiting_assets',
                         Assignment.scheduled_datetime <= date_limit,
-                        Assignment.submission_path.is_(None),
+                        Assignment.last_approval_date.is_(None),
                     )
                 )
             )

@@ -2,6 +2,11 @@
 History
 =======
 
+2.1.30 (2017-07-20)
+-------------------
+
+    * Card #478: Order and Assignment late_first_submission custom filter should include machine rejected sets that were never rejected by QA (rudaporto).
+
 2.1.29 (2017-07-20)
 -------------------
 
