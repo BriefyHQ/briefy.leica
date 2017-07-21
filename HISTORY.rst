@@ -39,6 +39,11 @@ History
     * Fixed local roles migration to set Item.can_view using _default_can_view class method from each model (rudaporto).
     * Fixed migration of data to localroles table: added created_at and updated_at (rudaporto).
 
+2.1.31 (Unreleased)
+-------------------
+
+    * Card #469: Add additional charges to Order (ericof).
+
 2.1.30 (2017-07-20)
 -------------------
 
