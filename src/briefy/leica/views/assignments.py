@@ -87,7 +87,7 @@ class AssignmentService(RESTService):
             query = query.filter(
                 model.scheduled_datetime <= date_limit,
                 model.state == 'awaiting_assets',
-                model.submission_path.is_(None),
+                model.last_approval_date.is_(None)
             )
         elif custom_filter == 'late_re_submission':
             config_delta = timedelta(seconds=int(LATE_SUBMISSION_SECONDS))

@@ -39,13 +39,28 @@ History
     * Fixed local roles migration to set Item.can_view using _default_can_view class method from each model (rudaporto).
     * Fixed migration of data to localroles table: added created_at and updated_at (rudaporto).
 
-2.1.28 (Unreleased)
+2.1.30 (2017-07-20)
+-------------------
+
+    * Card #478: Order and Assignment late_first_submission custom filter should include machine rejected sets that were never rejected by QA (rudaporto).
+
+2.1.29 (2017-07-20)
+-------------------
+
+    * Card #476: Order subscriber for workflow transition remove_schedule should also including assignment in awaiting_assets state (rudaporto).
+
+2.1.28 (2017-07-19)
 -------------------
 
     * New task to notify professionals about Assignments with late submissions (rudaporto).
     * New task to notify professionals before shooting (rudaporto).
     * Card #462: two new _custom_filter for assignment endpoint: late_first_submission and late_re_submission (rudaporto).
     * Card #462: two new _custom_filter for order endpoint: late_first_submission and late_re_submission (rudaporto).
+    * Increase testing coverage for the package (ericof).
+    * Fix documentation generation (ericof).
+    * Added upper limit number of days to notify about late submission (rudaporto).
+    * Added flags to enable before shooting and late submission notification tasks (default False) (rudaporto).
+
 
 
 2.1.27 (2017-07-12)

@@ -23,6 +23,8 @@ class Customer(mixins.CustomerRolesMixin, mixins.LeicaSubMixin, Item):
 
     _workflow = workflows.CustomerWorkflow
 
+    __exclude_attributes__ = ['contacts', 'orders', ]
+
     __summary_attributes__ = [
         'id', 'slug', 'title', 'description', 'created_at', 'updated_at', 'state',
         'tax_country', 'legal_name'

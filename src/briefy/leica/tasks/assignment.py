@@ -3,6 +3,7 @@ from briefy.common.users import SystemUser
 from briefy.common.workflow.exceptions import WorkflowTransitionException
 from briefy.leica.cache import cache_region
 from briefy.leica.config import BEFORE_SHOOTING_SECONDS
+from briefy.leica.config import LATE_SUBMISSION_MAX_DAYS
 from briefy.leica.config import LATE_SUBMISSION_SECONDS
 from briefy.leica.events.task import LeicaTaskEvent
 from briefy.leica.log import tasks_logger as logger
@@ -109,7 +110,7 @@ def _notify_late_submissions(assignment: Assignment) -> bool:
     now = timezone_now('UTC')
     delta = now - assignment.scheduled_datetime
     config_delta = timedelta(seconds=int(LATE_SUBMISSION_SECONDS))
-    should_notify = delta > config_delta
+    should_notify = delta > config_delta and delta.days <= int(LATE_SUBMISSION_MAX_DAYS)
     if assignment.state != 'awaiting_assets' or has_notify_comment or not should_notify:
         return status
 
@@ -154,7 +155,7 @@ def notify_late_submissions():
         now = timezone_now('UTC')
         delta = now - item.scheduled_datetime
         config_delta = timedelta(seconds=int(LATE_SUBMISSION_SECONDS))
-        should_notify = delta > config_delta
+        should_notify = delta > config_delta and delta.days <= int(LATE_SUBMISSION_MAX_DAYS)
         if should_notify:
             assignments.append(item)
 

@@ -444,6 +444,42 @@ class TestOrderModel(BaseModelTest):
         assert order.scheduled_datetime is not None
         assert order.scheduled_datetime == assignment.scheduled_datetime
 
+    @pytest.mark.parametrize('origin_state', ['scheduled'])
+    @pytest.mark.parametrize('assignment_origin_state', ['scheduled', 'awaiting_assets'])
+    @pytest.mark.parametrize('role_name', ['pm', 'customer', 'professional'])
+    def test_workflow_remove_schedule(
+        self, instance_obj, web_request, session, roles, role_name, origin_state,
+            assignment_origin_state, now_utc):
+        """Test Order workflow remove_schedule transition."""
+        order, wf, request = self.prepare_obj_wf(
+            instance_obj,
+            web_request,
+            roles[role_name],
+            origin_state,
+        )
+
+        assignment = order.assignments[-1]
+        assignment, ass_wf, request = self.prepare_obj_wf(
+            assignment,
+            web_request,
+            roles[role_name],
+            assignment_origin_state,
+        )
+        assignment.scheduled_datetime = now_utc
+
+        message = 'Scheduled removed'
+        wf.remove_schedule(message=message)
+        session.flush()
+
+        assert order.state == 'assigned'
+        assert order.state_history[-1]['transition'] == 'remove_schedule'
+        assert order.state_history[-1]['message'] == message
+        assert order.scheduled_datetime is None
+        assert order.scheduled_datetime == assignment.scheduled_datetime
+        assert assignment.state == 'assigned'
+        assert assignment.state_history[-1]['transition'] == 'remove_schedule'
+        assert assignment.state_history[-1]['message'] == message
+
     @pytest.mark.parametrize('origin_state', ['received', 'assigned', 'scheduled'])
     @pytest.mark.parametrize('role_name', ['pm', 'customer', 'system'])
     def test_workflow_cancel(
