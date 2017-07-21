@@ -2,6 +2,11 @@
 History
 =======
 
+2.1.31 (Unreleased)
+-------------------
+
+    * Card #469: Add additional charges to Order (ericof).
+
 2.1.30 (2017-07-20)
 -------------------
 
