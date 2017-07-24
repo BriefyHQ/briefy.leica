@@ -47,7 +47,7 @@ class UserProfile(mixins.UserProfileMixin, mixins.UserProfileRolesMixin, Item):
 
     __summary_attributes__ = [
         'id', 'title', 'description', 'created_at', 'updated_at', 'state',
-        'email', 'mobile', 'type', 'slug'
+        'email', 'mobile', 'type', 'slug', 'fullname'
     ]
 
     __summary_attributes_relations__ = []
@@ -118,6 +118,10 @@ class CustomerUserProfile(UserProfile):
 
     _workflow = workflows.CustomerUserProfileWorkflow
 
+    __listing_attributes__ = UserProfile.__summary_attributes__ + [
+        'internal', 'company_name', 'customer_roles', 'project_roles'
+    ]
+
     __raw_acl__ = (
         ('create', ('g:briefy_bizdev', 'g:briefy_finance', 'g:briefy_pm', 'g:system')),
         ('list', ('g:briefy', 'g:system')),
@@ -149,22 +153,28 @@ class CustomerUserProfile(UserProfile):
         index=True,
         unique=True,
         primary_key=True,
-        info={'colanderalchemy': {
-              'title': 'User id',
-              'validator': colander.uuid,
-              'missing': colander.drop,
-              'typ': colander.String}}
+        info={
+            'colanderalchemy': {
+                'title': 'User ID',
+                'validator': colander.uuid,
+                'missing': colander.drop,
+                'typ': colander.String()
+            }
+        }
     )
 
     customer_id = sa.Column(
         UUIDType(),
         sa.ForeignKey('customers.id'),
         index=True,
-        info={'colanderalchemy': {
-              'title': 'User id',
-              'validator': colander.uuid,
-              'missing': colander.drop,
-              'typ': colander.String}}
+        info={
+            'colanderalchemy': {
+                'title': 'Customer ID',
+                'validator': colander.uuid,
+                'missing': colander.drop,
+                'typ': colander.String()
+            }
+        }
     )
 
     @classmethod
@@ -196,7 +206,7 @@ class CustomerUserProfile(UserProfile):
     @hybrid_property
     def customer_roles(self):
         """Return roles related to this customer user profile."""
-        return self._customer_roles
+        return list(self._customer_roles)
 
     @customer_roles.setter
     def customer_roles(self, roles: list):
@@ -223,7 +233,7 @@ class CustomerUserProfile(UserProfile):
         role_map = {lr.item_id: lr.role_name for lr in roles}
         result = defaultdict(list)
         for project_id, role_name in role_map.items():
-            result[id].append(role_name)
+            result[str(project_id)].append(role_name)
         return result
 
     @hybrid_property

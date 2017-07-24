@@ -29,14 +29,12 @@ class Customer(mixins.CustomerRolesMixin, mixins.LeicaSubMixin, Item):
         'id', 'slug', 'title', 'description', 'created_at', 'updated_at', 'state', 'legal_name'
     ]
     __summary_attributes_relations__ = [
-        'billing_contact', 'business_contact', 'addresses', 'projects'
+        'billing_contact', 'business_contact', 'addresses', 'projects', 'customer_users'
     ]
     __listing_attributes__ = __summary_attributes__
-
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', '_customer_user', '_account_manager',
-            '_customer_users', '_account_managers', 'business_contact',
+            'state_history', 'state', 'business_contact',
             'billing_contact', 'billing_info'
         ],
         'overrides': mixins.CustomerRolesMixin.__colanderalchemy_config__['overrides']
@@ -192,6 +190,22 @@ class Customer(mixins.CustomerRolesMixin, mixins.LeicaSubMixin, Item):
     """List of Orders of this Customer.
 
     Returns a collection of :class:`briefy.leica.models.job.order.Orders`.
+    """
+
+    customer_users = orm.relationship(
+        'CustomerUserProfile',
+        foreign_keys='CustomerUserProfile.customer_id',
+        lazy='dynamic',
+        info={
+            'colanderalchemy': {
+                'title': 'Customer User Profiles',
+                'missing': colander.drop,
+            }
+        }
+    )
+    """List of customer user profiles connected to this customer.
+
+    Returns a collection of :class:`briefy.leica.models.user.CustomerUserProfile`.
     """
 
     @declared_attr
