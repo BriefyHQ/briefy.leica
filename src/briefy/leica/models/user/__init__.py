@@ -56,8 +56,7 @@ class UserProfile(mixins.UserProfileMixin, mixins.UserProfileRolesMixin, Item):
 
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', 'type', '_owner', '_customer_roles',
-            '_project_roles'
+            'state_history', 'state', 'type', '_owner',
 
         ],
         'overrides': __colander_alchemy_config_overrides__
@@ -119,11 +118,11 @@ class CustomerUserProfile(UserProfile):
     _workflow = workflows.CustomerUserProfileWorkflow
 
     __summary_attributes__ = UserProfile.__summary_attributes__.copy() + [
-        'customer_roles'
+        'customer_roles',  'project_roles',
     ]
 
     __listing_attributes__ = __summary_attributes__ + [
-        'internal', 'company_name', 'project_roles'
+        'internal', 'company_name',
     ]
 
     __raw_acl__ = (

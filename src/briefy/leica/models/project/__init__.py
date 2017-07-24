@@ -88,7 +88,7 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
         'id', 'title', 'description', 'created_at', 'updated_at', 'state', 'slug', 'asset_types'
     ]
 
-    __summary_attributes_relations__ = ['customer', 'pool']
+    __summary_attributes_relations__ = ['customer', 'pool', 'customer_users']
 
     __listing_attributes__ = [
         'id', 'title', 'description', 'created_at', 'updated_at', 'state',
@@ -107,8 +107,7 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
 
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', 'customer', '_customer_user', 'pool',
-            '_project_manager', '_customer_users', '_project_managers'
+            'state_history', 'state', 'customer', 'pool',
         ],
         'overrides': mixins.ProjectRolesMixin.__colanderalchemy_config__['overrides']
     }
@@ -127,6 +126,25 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
     """Customer ID.
 
     Builds the relation with :class:`briefy.leica.models.customer.Customer`.
+    """
+
+    customer_users = orm.relationship(
+        'CustomerUserProfile',
+        primaryjoin='and_('
+                    'foreign(CustomerUserProfile.customer_id)==Project.customer_id,'
+                    'LocalRole.principal_id==foreign(CustomerUserProfile.id),'
+                    'LocalRole.item_id==Project.id)',
+        lazy='dynamic',
+        info={
+            'colanderalchemy': {
+                'title': 'Customer User Profiles',
+                'missing': colander.drop,
+            }
+        }
+    )
+    """List of customer user profiles connected to this project.
+
+    Returns a collection of :class:`briefy.leica.models.user.CustomerUserProfile`.
     """
 
     abstract = sa.Column(
