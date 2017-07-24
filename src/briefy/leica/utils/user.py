@@ -1,5 +1,4 @@
 """Utils to query user info."""
-from briefy.common.config import ENV
 from briefy.common.utilities.interfaces import IUserProfileQuery
 from briefy.leica import models as m  # noQA
 from briefy.leica.utils.rolleiflex import create_user
