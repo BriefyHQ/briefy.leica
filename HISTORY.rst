@@ -2,6 +2,11 @@
 History
 =======
 
+2.1.31 (2017-07-24)
+-------------------
+
+    * Card #482: Serialize initial_password after creation of an user on rolleiflex (ericof).
+
 2.1.30 (2017-07-20)
 -------------------
 
