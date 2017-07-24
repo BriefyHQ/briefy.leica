@@ -40,10 +40,6 @@ def activate_or_create_user(profile: 'm.UserProfile', groups: Sequence=()) -> bo
     :param groups: Sequence of groups to be used on User creation
     :return: Status of this action.
     """
-    # avoid to connect to rolleiflex when in test or development ENV
-    if ENV in ('development', 'test'):
-        return True
-
     user_id = profile.id
     user = get_user(user_id)
     if user:
