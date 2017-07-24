@@ -1,6 +1,7 @@
 """Test Professional database model."""
 from briefy.leica import models
 from conftest import BaseModelTest
+from unittest.mock import patch
 
 import pytest
 
@@ -53,9 +54,11 @@ class TestProfessionalModel(BaseModelTest):
             roles[role_name],
             origin_state
         )
-
-        wf.approve()
+        with patch('briefy.leica.utils.user.get_user', return_value=None) as mock:
+            wf.approve()
         session.flush()
+        assert obj.initial_password is not None
+        assert obj.initial_password == obj.to_dict()['initial_password']
         assert obj.state == 'validation'
         assert obj.state_history[-1]['transition'] == 'approve'
 
