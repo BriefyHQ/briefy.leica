@@ -117,6 +117,11 @@ class UserProfile(mixins.UserProfileMixin, mixins.UserProfileBriefyRoles, Base):
         """Return a dict representation of this object."""
         data = super().to_dict(excludes=excludes, includes=includes)
         add_user_info_to_state_history(self.state_history)
+        # HACK: initial_password attribute is never persisted, so we need to explicitly add it
+        # here when it is set by rolleiflex integration
+        # ref: briefy.leica.utils.rolleiflex.create_user
+        if hasattr(self, 'initial_password'):
+            data['initial_password'] = self.initial_password
         return data
 
 
