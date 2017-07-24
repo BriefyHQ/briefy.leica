@@ -118,8 +118,12 @@ class CustomerUserProfile(UserProfile):
 
     _workflow = workflows.CustomerUserProfileWorkflow
 
-    __listing_attributes__ = UserProfile.__summary_attributes__ + [
-        'internal', 'company_name', 'customer_roles', 'project_roles'
+    __summary_attributes__ = UserProfile.__summary_attributes__.copy() + [
+        'customer_roles'
+    ]
+
+    __listing_attributes__ = __summary_attributes__ + [
+        'internal', 'company_name', 'project_roles'
     ]
 
     __raw_acl__ = (

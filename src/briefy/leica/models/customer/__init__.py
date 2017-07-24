@@ -233,5 +233,6 @@ class Customer(mixins.CustomerRolesMixin, mixins.LeicaSubMixin, Item):
             # Workflow history
             add_user_info_to_state_history(self.state_history)
         # Apply actor information to data
+        data['internal_account'] = self.internal_account
         data = self._apply_actors_info(data)
         return data
