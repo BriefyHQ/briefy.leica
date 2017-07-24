@@ -673,6 +673,21 @@ def update_items_can_view():
         op.execute(update)
 
 
+def update_customeruserprofile():
+    """Update customer_id attribute of CustomerUserProfile using Customer local roles."""
+    update_sql = '''UPDATE customeruserprofiles SET customer_id=source.customer_id
+    from (
+        SELECT DISTINCT
+        item_id as customer_id,
+        principal_id
+        FROM localroles
+        WHERE localroles.item_type = 'Customer'
+    ) as source
+    WHERE customeruserprofiles.id=source.principal_id
+    '''
+    op.execute(update_sql)
+
+
 def upgrade():
     """Upgrade database."""
     drop_indexes()
@@ -685,6 +700,7 @@ def upgrade():
     udpate_type_internaluserprofile()
     copy_userprofiles_external_id()
     migrate_localroles()
+    update_customeruserprofile()
     update_items_path()
     update_items_can_view()
     drop_columns()

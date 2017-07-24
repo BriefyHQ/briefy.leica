@@ -38,6 +38,7 @@ History
     * Added default local roles attribute to all Models based on Item (rudaporto).
     * Fixed local roles migration to set Item.can_view using _default_can_view class method from each model (rudaporto).
     * Fixed migration of data to localroles table: added created_at and updated_at (rudaporto).
+    * Added new migration to populate from Customer local roles CustomerUserProfile.customer_id attribute (rudaporto).
 
 2.1.31 (Unreleased)
 -------------------
