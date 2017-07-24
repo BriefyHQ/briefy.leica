@@ -377,7 +377,7 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
         nullable=True,
         info={
             'colanderalchemy': {
-                'typ': schema.JSONType,
+                'typ': colander.List,
                 'missing': None,
             }
         }
@@ -404,6 +404,7 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
 
             # Force total_order_price recalculation
             flag_modified(self, 'actual_order_price')
+            flag_modified(self, 'additional_charges')
         return value
 
     @property
