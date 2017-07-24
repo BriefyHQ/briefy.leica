@@ -120,7 +120,7 @@ class TestOrderView(BaseVersionedTestView):
         payload = obj_payload.copy()
         del(payload['availability'])
         obj_id = payload.pop('id')
-        payload['additional_charges'] = '[]'
+        payload['additional_charges'] = []
         request = app.put_json('{base}/{id}'.format(base=self.base_path, id=obj_id),
                                payload, headers=self.headers, status=400)
         result = request.json
