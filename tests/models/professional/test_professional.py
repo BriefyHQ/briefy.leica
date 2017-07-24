@@ -54,7 +54,7 @@ class TestProfessionalModel(BaseModelTest):
             roles[role_name],
             origin_state
         )
-        with patch('briefy.leica.utils.user.get_user', return_value=None) as mock:
+        with patch('briefy.leica.utils.user.get_user', return_value=None):
             wf.approve()
         session.flush()
         assert obj.initial_password is not None
