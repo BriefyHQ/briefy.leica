@@ -3,7 +3,6 @@ from briefy.leica.cache import cache_manager
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.comment import workflows
-from briefy.leica.utils.user import add_user_info_to_state_history
 from sqlalchemy import event
 from zope.interface import implementer
 from zope.interface import Interface
