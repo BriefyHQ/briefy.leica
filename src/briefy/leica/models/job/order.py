@@ -12,9 +12,11 @@ from briefy.leica.models.descriptors import UnaryRelationshipWrapper
 from briefy.leica.models.job import workflows
 from briefy.leica.models.job.location import OrderLocation
 from briefy.leica.models.project import Project
+from briefy.leica.utils.charges import order_charges_update
 from briefy.leica.utils.transitions import get_transition_date_from_history
 from briefy.leica.utils.user import add_user_info_to_state_history
 from briefy.leica.vocabularies import AssetTypes
+from briefy.leica.vocabularies import OrderChargesChoices
 from briefy.leica.vocabularies import OrderInputSource
 from briefy.ws.errors import ValidationError
 from datetime import datetime
@@ -34,6 +36,7 @@ import random
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils
 import string
+import typing as t
 
 
 __summary_attributes__ = [
@@ -126,6 +129,31 @@ def default_current_type(context):
     return context.current_parameters.get('type')
 
 
+_order_charges_choices = [f for f in OrderChargesChoices.__members__.keys()]
+
+
+class OrderCharge(colander.MappingSchema):
+    """An additional charge to an Order."""
+
+    id = colander.SchemaNode(colander.String(), validator=colander.uuid, missing='')
+    category = colander.SchemaNode(
+        colander.String(),
+        validator=colander.OneOf(_order_charges_choices)
+    )
+    amount = colander.SchemaNode(colander.Int())
+    reason = colander.SchemaNode(colander.String(), missing='')
+    created_at = colander.SchemaNode(colander.DateTime(), missing='')
+    created_by = colander.SchemaNode(colander.String(), validator=colander.uuid)
+    invoice_number = colander.SchemaNode(colander.String(), missing='')
+    invoice_date = colander.SchemaNode(colander.Date(), missing='')
+
+
+class OrderCharges(colander.SequenceSchema):
+    """Collection of charges for an Order."""
+
+    charge = OrderCharge()
+
+
 class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
             mixins.KLeicaVersionedMixin, Base):
     """An Order from the customer."""
@@ -153,7 +181,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
             'state_history', 'state', 'project', 'comments', 'customer', 'type',
             '_project_manager', '_scout_manager', '_customer_user', 'external_id',
             'assignment', 'assignments', '_project_managers', '_scout_managers',
-            '_customer_users',
+            '_customer_users', 'total_order_price'
         ],
         'overrides': __colander_alchemy_config_overrides__
 
@@ -354,6 +382,82 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     This value is expressed in cents.
     """
+
+    additional_charges = sa.Column(
+        JSONB,
+        nullable=True,
+        info={
+            'colanderalchemy': {
+                'typ': colander.List,
+                'missing': None,
+            }
+        }
+    )
+    """Additional charges to be applied to this Order."""
+
+    @orm.validates('additional_charges')
+    def validate_additional_charges(self, key: str, value: t.Sequence) -> t.Sequence:
+        """Validate if additional_charges payload is in the correct format.
+
+        :param key: Attribute name.
+        :param value: Additional charges payload.
+        :return: Validated payload
+        """
+        current_value = list(self.additional_charges) if self.additional_charges else []
+        if value or current_value:
+            charges_schema = OrderCharges()
+            try:
+                new_value = charges_schema.deserialize(value)
+            except colander.Invalid as e:
+                raise ValidationError(message='Invalid payload for additional_charges', name=key)
+
+            value = order_charges_update(current_value, new_value)
+
+            # Force total_order_price recalculation
+            flag_modified(self, 'actual_order_price')
+            flag_modified(self, 'additional_charges')
+        return value
+
+    @property
+    def total_additional_charges(self) -> int:
+        """Return the total of additional charges."""
+        total = 0
+        additional_charges = self.additional_charges
+        if additional_charges:
+            for charge in additional_charges:
+                total += charge['amount']
+        return total
+
+    total_order_price = sa.Column(
+        sa.Integer,
+        nullable=True,
+        default=default_actual_order_price,
+        info={
+            'colanderalchemy': {
+                'title': 'Total Order Price',
+                'missing': None,
+                'typ': colander.Integer
+            }
+        }
+    )
+    """Total price to be paid, by the customer, for this order.
+
+    Total amount to be paid by the customer for this order.
+    This value is a sum of actual_order_price and all additional_charges for this Order.
+
+    This value is expressed in cents.
+    """
+
+    # Calculate total_order_price
+    @sautils.observes('actual_order_price')
+    def _calculate_total_order_price(self, actual_order_price: int):
+        """Calculate the total order price.
+
+        :param actual_order_price: Order price to be charged to the customer.
+        """
+        actual_order_price = actual_order_price if actual_order_price else 0
+        total_additional_charges = self.total_additional_charges
+        self.total_order_price = actual_order_price + total_additional_charges
 
     _location = orm.relationship(
         'OrderLocation',
