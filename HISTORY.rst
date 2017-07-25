@@ -42,7 +42,8 @@ History
     * Added customer_users relationship attribute (summarized) to Customer and Project models (rudaporto).
     * Fix CustomerUserProfile customer_roles and project_roles attributes (rudaporto).
 
-2.1.32 (Unreleased)
+2.1.32 (2017-07-25)
+-------------------
 
     * Card #469: Add additional charges to Order (ericof).
 
