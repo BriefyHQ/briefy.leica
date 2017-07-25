@@ -199,6 +199,13 @@ class BaseModelTest:
         assert objs[0].created_at == obj.created_at
         assert objs[0].updated_at == obj.updated_at
 
+    def test_to_summary_dict(self, instance_obj):
+        """Test to_summary_dict for this model."""
+        expected_attributes = set(self.model.__summary_attributes__)
+        summary_dict = instance_obj.to_summary_dict()
+        item_attributes = {k for k in summary_dict.keys()}
+        assert item_attributes == expected_attributes
+
     def test_workflow(self, instance_obj):
         """Test if we have a workflow setup in here, some objects d'ont have."""
         wf = instance_obj.workflow

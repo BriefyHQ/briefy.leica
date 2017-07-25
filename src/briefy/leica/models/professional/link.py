@@ -18,11 +18,11 @@ class Link(mixins.LeicaMixin, Base):
 
     __exclude_attributes__ = ['professional', ]
 
+    __summary_attributes__ = ['id', 'url']
+
     __summary_attributes_relations__ = ['professional']
 
-    __colanderalchemy_config__ = {
-        'excludes': ['state_history', 'state']
-    }
+    __colanderalchemy_config__ = {'excludes': ['state_history', 'state']}
 
     professional_id = sa.Column(
         UUIDType(),
