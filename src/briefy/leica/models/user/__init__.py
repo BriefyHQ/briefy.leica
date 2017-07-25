@@ -226,7 +226,7 @@ class CustomerUserProfile(UserProfile):
     def project_ids(self):
         """Return a list of project ids related to the customer the user belongs."""
         roles = LocalRole.query().filter(
-            LocalRole.item_type == 'Project',
+            LocalRole.item_type == 'project',
             LocalRole.principal_id == self.id
         )
         return [lr.item_id for lr in roles]
@@ -235,7 +235,7 @@ class CustomerUserProfile(UserProfile):
     def _project_roles(self):
         """Local roles of this user in the Customer context as project_user."""
         roles = LocalRole.query().filter(
-            LocalRole.item_type == 'Project',
+            LocalRole.item_type == 'project',
             LocalRole.principal_id == self.id
         )
         role_map = {lr.item_id: lr.role_name for lr in roles}
