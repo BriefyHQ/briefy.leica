@@ -4,6 +4,7 @@ from briefy.leica.models import mixins
 from briefy.leica.models.customer import workflows
 from briefy.leica.utils.user import add_user_info_to_state_history
 from sqlalchemy import orm
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 from zope.interface import implementer
 from zope.interface import Interface
@@ -26,7 +27,8 @@ class Customer(mixins.CustomerRolesMixin, mixins.LeicaSubMixin, Item):
     __exclude_attributes__ = ['contacts', 'orders', ]
 
     __summary_attributes__ = [
-        'id', 'slug', 'title', 'description', 'created_at', 'updated_at', 'state', 'legal_name'
+        'id', 'slug', 'title', 'description', 'created_at', 'updated_at', 'state', 'legal_name',
+        'tax_country'
     ]
     __summary_attributes_relations__ = [
         'billing_contact', 'business_contact', 'addresses', 'projects', 'customer_users'
@@ -66,23 +68,28 @@ class Customer(mixins.CustomerRolesMixin, mixins.LeicaSubMixin, Item):
     Auto reference to represent composed companies :class:`briefy.leica.models.customer.Customer`.
     """
 
-    legal_name = sa.Column(
-        sa.String(255),
-        nullable=True,
-        info={
-            'colanderalchemy': {
-                'title': 'Customer Legal name',
-                'missing': None,
-                'typ': colander.String
-            }
-        }
+    billing_info = orm.relationship(
+        'CustomerBillingInfo',
+        lazy='joined',
+        uselist=False
     )
+    """Billing Information.
+
+    Financial info about this customer
+    :class:`briefy.leica.models.billing_info.customer.CustomerBillingInfo`.
+    """
+
+    legal_name = association_proxy('billing_info', 'title')
     """Legal name of the company.
 
     i.e.: Insta Stock GmbH
     """
 
-    billing_info = orm.relationship('CustomerBillingInfo', uselist=False)
+    tax_country = association_proxy('billing_info', 'tax_country')
+    """Tax country for this customer.
+
+    i.e.: DE
+    """
 
     addresses = orm.relationship(
         'CustomerBillingAddress',

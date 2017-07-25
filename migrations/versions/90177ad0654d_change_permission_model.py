@@ -124,9 +124,11 @@ def drop_columns():
     op.drop_column('customers', 'tax_id_type')
     op.drop_column('customers', 'tax_id')
     op.drop_column('customers', 'tax_country')
+    op.drop_column('customers', 'legal_name')
     op.drop_column('customers_version', 'tax_id_type')
     op.drop_column('customers_version', 'tax_id')
     op.drop_column('customers_version', 'tax_country')
+    op.drop_column('customers_version', 'legal_name')
 
     # customers_version
     op.drop_column('customers_version', 'description')

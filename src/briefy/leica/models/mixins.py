@@ -485,3 +485,15 @@ class BillingAddress:
 
     Ref: https://maps-apis.googleblog.com/2016/11/address-geocoding-in-google-maps-apis.html
     """
+
+    @hybrid_property
+    def tax_country(self) -> str:
+        """Tax country for this address.
+
+        :return: Country code for this address.
+        """
+        country = ''
+        info = self.billing_address
+        if info and 'country' in info:
+            country = info.get('country', '')
+        return country
