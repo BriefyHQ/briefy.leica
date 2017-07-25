@@ -65,7 +65,7 @@ INSERTS_LOCALROLES = '''
 INSERT INTO localroles (id, item_id, item_type, principal_id, role_name, created_at, updated_at)
 SELECT id, entity_id, '{item_type}', user_id, '{new_role_name}', created_at, updated_at
 from localroles_deprecated
-where role_name='{old_role_name}' AND entity_type='{item_type}';
+where role_name='{old_role_name}' AND entity_type='{old_item_type}';
 '''
 
 
@@ -559,20 +559,20 @@ def copy_userprofiles_external_id():
 def migrate_localroles():
     """Migration of localroles from the old table to the new one."""
     type_roles_mappping = {
-        'Customer': (
+        'customer': (
             ('account_manager', 'internal_account', 'Customer'),
             ('customer_user', 'customer_pm', 'Customer'),
         ),
-        'Project': (
+        'project': (
             ('project_manager', 'internal_pm', 'Project'),
             ('customer_user', 'project_customer_pm', 'Project'),
         ),
-        'Assignment': (
+        'assignment': (
             ('qa_manager', 'assignment_internal_scout', 'Assignment'),
             ('scout_manager', 'assignment_internal_qa', 'Assignment'),
             ('professional_user', 'professional_user', 'Assignment')
         ),
-        'UserProfile': (
+        'userprofile': (
             ('owner', 'owner', 'UserProfile'),
         ),
     }
@@ -583,7 +583,8 @@ def migrate_localroles():
             insert = INSERTS_LOCALROLES.format(
                 item_type=item_type,
                 old_role_name=old_role_name,
-                new_role_name=new_role_name
+                new_role_name=new_role_name,
+                old_item_type=old_item_type
             )
             op.execute(insert)
 
@@ -602,7 +603,7 @@ def migrate_localroles():
     SELECT DISTINCT
     gen_random_uuid() as id,
     p.id,
-    'Project',
+    'project',
     l.user_id,
     CASE l.role_name
         WHEN 'qa_manager' THEN 'internal_qa'
@@ -681,7 +682,7 @@ def update_customeruserprofile():
         item_id as customer_id,
         principal_id
         FROM localroles
-        WHERE localroles.item_type = 'Customer'
+        WHERE localroles.item_type = 'customer'
     ) as source
     WHERE customeruserprofiles.id=source.principal_id
     '''
