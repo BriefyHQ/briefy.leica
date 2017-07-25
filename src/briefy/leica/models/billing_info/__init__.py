@@ -62,6 +62,13 @@ class BillingInfo(TaxInfo, mixins.BillingAddress, mixins.LeicaVersionedMixin, Ba
 
     __tablename__ = 'billing_infos'
 
+    __summary_attributes__ = [
+        'id', 'created_at', 'updated_at', 'state', 'billing_address',
+        'slug', 'email', 'title',
+    ]
+
+    __listing_attributes__ = __summary_attributes__
+
     __colanderalchemy_config__ = {
         'excludes': [
             'state_history', 'state', 'type'

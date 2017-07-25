@@ -22,7 +22,7 @@ __summary_attributes__ = [
 
 __listing_attributes__ = [
     'id', 'title', 'filename', 'created_at', 'updated_at', 'state', 'uploaded_by',
-    'professional_id', 'size', 'width', 'height', 'is_valid', 'image', 'version', 'history'
+    'professional_id', 'size', 'width', 'height', 'is_valid', 'image', 'metadata'
 ]
 
 

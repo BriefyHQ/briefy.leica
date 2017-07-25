@@ -405,6 +405,15 @@ class BaseTestView:
         assert 'total' in result
         assert result['total'] == len(result['data'])
 
+    def test_get_collection_item_attributes(self, app):
+        """Test item attributes on a collection."""
+        request = app.get(f'{self.base_path}', headers=self.headers, status=200)
+        result = request.json
+        item = result['data'][0]
+        expected_attributes = set(self.model.__listing_attributes__)
+        item_attributes = {k for k in item.keys()}
+        assert item_attributes == expected_attributes
+
     def test_successful_update(self, obj_payload, app):
         """Teste put Data to existing object."""
         payload = self.update_map

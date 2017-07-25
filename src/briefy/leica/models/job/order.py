@@ -46,7 +46,7 @@ __summary_attributes__ = [
 
 __listing_attributes__ = __summary_attributes__ + [
     'accept_date', 'availability', 'assignment', 'requirements', 'project',
-    'customer', 'refused_times', 'asset_types', 'type', 'current_type'
+    'customer', 'refused_times', 'asset_types', 'current_type'
 ]
 
 __colander_alchemy_config_overrides__ = \

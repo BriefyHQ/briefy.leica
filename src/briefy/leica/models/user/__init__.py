@@ -47,7 +47,7 @@ class UserProfile(mixins.UserProfileMixin, mixins.UserProfileRolesMixin, Item):
 
     __summary_attributes__ = [
         'id', 'title', 'description', 'created_at', 'updated_at', 'state',
-        'email', 'mobile', 'type', 'slug', 'fullname'
+        'email', 'mobile', 'slug', 'fullname'
     ]
 
     __summary_attributes_relations__ = []

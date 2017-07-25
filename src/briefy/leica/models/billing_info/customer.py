@@ -30,13 +30,6 @@ class CustomerBillingInfo(BillingInfo):
         ('delete', ('g:briefy_finance', 'g:system')),
     )
 
-    __summary_attributes__ = [
-        'id', 'created_at', 'updated_at', 'state', 'billing_address',
-        'slug', 'legal_name', 'email',
-    ]
-
-    __listing_attributes__ = __summary_attributes__
-
     id = sa.Column(
         UUIDType(),
         sa.ForeignKey('billing_infos.id'),
