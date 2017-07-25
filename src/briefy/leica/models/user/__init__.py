@@ -277,9 +277,9 @@ class CustomerUserProfile(UserProfile):
             )
         return response
 
-    def to_dict(self):
+    def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
-        data = super().to_dict()
+        data = super().to_dict(excludes=excludes, includes=includes)
         data['customers'] = self.summarize_relations([self.customer])
         data['projects'] = self.summarize_relations(self.projects)
         return data

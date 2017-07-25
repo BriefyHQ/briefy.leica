@@ -199,6 +199,20 @@ class BaseModelTest:
         assert objs[0].created_at == obj.created_at
         assert objs[0].updated_at == obj.updated_at
 
+    def test_to_dict_respects_excludes(self, instance_obj):
+        """Test to_dict will respect __exclude_attributes__ ."""
+        not_expected_attributes = set(self.model.__exclude_attributes__)
+        obj_dict = instance_obj.to_dict(excludes=[], includes=[])
+        intersection = [k for k in obj_dict.keys() if k in not_expected_attributes]
+        assert len(intersection) == 0
+
+    def test_to_dict_respects__summary_attributes_relations(self, instance_obj):
+        """Test to_dict will respect __summary_attributes_relations__ ."""
+        to_summary_relations = set(self.model.__summary_attributes_relations__)
+        obj_dict = instance_obj.to_dict(excludes=[], includes=[])
+        intersection = [k for k in obj_dict.keys() if k in to_summary_relations]
+        assert len(intersection) == len(to_summary_relations)
+
     def test_to_summary_dict(self, instance_obj):
         """Test to_summary_dict for this model."""
         expected_attributes = set(self.model.__summary_attributes__)

@@ -69,9 +69,9 @@ class WorkingLocation(Address, mixins.LeicaMixin, Base):
         """Define tablename."""
         return 'workinglocations'
 
-    def to_dict(self):
+    def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
-        data = super().to_dict()
+        data = super().to_dict(excludes=excludes, includes=includes)
         data['coordinates'] = self.coordinates
         data['latlng'] = self.latlng
         return data

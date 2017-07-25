@@ -20,7 +20,7 @@ class Link(mixins.LeicaMixin, Base):
 
     __summary_attributes__ = ['id', 'url']
 
-    __summary_attributes_relations__ = ['professional']
+    __summary_attributes_relations__ = []
 
     __colanderalchemy_config__ = {'excludes': ['state_history', 'state']}
 

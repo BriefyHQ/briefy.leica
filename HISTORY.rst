@@ -41,6 +41,8 @@ History
     * Added new migration to populate from Customer local roles CustomerUserProfile.customer_id attribute (rudaporto).
     * Added customer_users relationship attribute (summarized) to Customer and Project models (rudaporto).
     * Fix CustomerUserProfile customer_roles and project_roles attributes (rudaporto).
+    * Remove comments from to_dict of Order, LeadOrder, Assignment, Professional (ericof).
+    * Add tests to to_dict, to_summary_dict (ericof).
 
 2.1.32 (2017-07-25)
 -------------------

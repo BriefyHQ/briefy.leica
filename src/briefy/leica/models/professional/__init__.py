@@ -29,6 +29,8 @@ class Professional(UserProfile):
 
     __summary_attributes_relations__ = ['links', 'main_location', 'locations', 'pools']
 
+    __exclude_attributes__ = ['comments']
+
     __listing_attributes__ = __summary_attributes__ + [
         'main_location'
     ]
@@ -207,9 +209,6 @@ class Professional(UserProfile):
         excludes = list(excludes) if excludes else []
         excludes.extend(['assets', 'assignments'])
         data = super().to_dict(excludes=excludes, includes=includes)
-        data['locations'] = [c.to_dict() for c in self.locations or []]
-        data['links'] = [c.to_dict() for c in self.links or []]
-        data['comments'] = [c.to_summary_dict() for c in self.comments]
         data['billing_info_id'] = self.billing_info.id if self.billing_info else ''
         data['intercom'] = intercom_payload_professional(self)
         return data

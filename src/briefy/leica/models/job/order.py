@@ -163,9 +163,11 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
 
     __summary_attributes__ = __summary_attributes__
     __summary_attributes_relations__ = [
-        'project', 'comments', 'customer', 'assignment', 'assignments', 'location'
+        'project', 'customer', 'assignment', 'assignments', 'location'
     ]
     __listing_attributes__ = __listing_attributes__
+
+    __exclude_attributes__ = ['comments']
 
     __raw_acl__ = (
         ('create', ('g:briefy_pm', 'g:briefy_finance', 'g:briefy_bizdev', 'g:system')),

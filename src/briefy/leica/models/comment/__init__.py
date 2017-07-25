@@ -131,10 +131,9 @@ class Comment(mixins.LeicaMixin, Base):
 
     entity = sautils.generic_relationship(entity_type, entity_id)
 
-    def to_dict(self):
+    def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
-        data = super().to_dict()
-        add_user_info_to_state_history(self.state_history)
+        data = super().to_dict(excludes=excludes, includes=includes)
         data['author'] = self.author
         data['entity'] = self.entity
         return data
