@@ -143,6 +143,7 @@ def drop_columns():
     op.drop_column('orders', 'description')
     op.drop_column('orders', 'updated_at')
     op.drop_column('orders', 'state_history')
+    op.drop_column('orders', 'slug')
     op.drop_column('orders', 'state')
     op.drop_column('orders', 'type')
     op.drop_column('orders', 'external_id')
@@ -152,6 +153,7 @@ def drop_columns():
     # orders_version
     op.drop_column('orders_version', 'description')
     op.drop_column('orders_version', 'updated_at')
+    op.drop_column('orders_version', 'slug')
     op.drop_column('orders_version', 'state')
     op.drop_column('orders_version', 'type'),
     op.drop_column('orders_version', 'external_id')
