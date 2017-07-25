@@ -539,7 +539,7 @@ def copy_versions_items():
         op.execute(insert)
 
 
-def udpate_type_internaluserprofile():
+def update_type_internaluserprofile():
     """Update items.type from briefyuserprofile to internluserprofile."""
     op.execute("UPDATE items SET type='internaluserprofile' where type='briefyuserprofile'")
 
@@ -697,7 +697,7 @@ def upgrade():
     copy_versions_items()
     create_columns()
     create_indexes()
-    udpate_type_internaluserprofile()
+    update_type_internaluserprofile()
     copy_userprofiles_external_id()
     migrate_localroles()
     update_customeruserprofile()
