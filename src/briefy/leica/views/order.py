@@ -150,7 +150,9 @@ class OrderService(RESTService):
                     )
                 )
             )
-        query = query.options(joinedload('project'), joinedload('_location'), joinedload('customer'))
+        query = query.options(
+            joinedload('project'), joinedload('_location'), joinedload('customer')
+        )
         return query
 
 

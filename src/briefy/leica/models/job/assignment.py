@@ -16,7 +16,6 @@ from briefy.ws.errors import ValidationError
 from datetime import datetime
 from sqlalchemy import event
 from sqlalchemy import orm
-from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
