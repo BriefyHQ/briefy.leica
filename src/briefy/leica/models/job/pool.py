@@ -85,8 +85,7 @@ class Pool(mixins.LeicaSubVersionedMixin, Item):
     _workflow = workflows.PoolWorkflow
 
     __summary_attributes__ = [
-        'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
-        'country',
+        'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state', 'country',
     ]
     __listing_attributes__ = __summary_attributes__ + [
         'total_assignments', 'total_professionals', 'live_assignments'

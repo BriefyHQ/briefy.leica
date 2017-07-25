@@ -164,8 +164,7 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
 
     __summary_attributes__ = __summary_attributes__
     __summary_attributes_relations__ = [
-        'project', 'location', 'professional', 'customer',
-        'pool'
+        'project', 'location', 'professional', 'customer', 'pool'
     ]
     __listing_attributes__ = __listing_attributes__
 
@@ -466,11 +465,7 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
     @declared_attr
     def delivery(cls) -> str:
         """Return the delivery of an Order."""
-        return orm.column_property(
-            select([Order._delivery]).where(
-                Order.id == cls.order_id
-            ),
-        )
+        return association_proxy('order', 'delivery')
 
     @declared_attr
     def description(cls) -> str:
