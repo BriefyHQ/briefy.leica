@@ -21,3 +21,14 @@ class TestCustomerView(BaseTestView):
         'title': 'New Customer Name',
         'description': 'New Customer Description',
     }
+
+    def test_get_collection(self, app):
+        """Test get a collection of items."""
+        request = app.get(f'{self.base_path}', headers=self.headers, status=200)
+        result = request.json
+        assert 'data' in result
+        assert 'total' in result
+        assert result['total'] == len(result['data'])
+        item = result['data'][0]
+        assert 'legal_name' in item
+        assert 'tax_country' in item
