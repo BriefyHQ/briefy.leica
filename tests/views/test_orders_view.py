@@ -72,14 +72,14 @@ class TestOrderView(BaseVersionedTestView):
         payload = obj_payload.copy()
         del(payload['availability'])
         obj_id = payload['id']
-        payload['additional_charges'] = """[
+        payload['additional_charges'] = [
             {
-                "category": "wrong",
-                "amount": 1200,
-                "reason": "",
-                "created_by": "669a99c2-9bb3-443f-8891-e600a15e3c10"
+                'category': 'wrong',
+                'amount': 1200,
+                'reason': '',
+                'created_by': '669a99c2-9bb3-443f-8891-e600a15e3c10'
             }
-        ]"""
+        ]
         request = app.put_json('{base}/{id}'.format(base=self.base_path, id=obj_id),
                                payload, headers=self.headers, status=400)
         result = request.json
@@ -94,16 +94,16 @@ class TestOrderView(BaseVersionedTestView):
         payload = obj_payload.copy()
         del(payload['availability'])
         obj_id = payload['id']
-        payload['additional_charges'] = """[
+        payload['additional_charges'] = [
             {
-                "category": "other",
-                "amount": 12000,
-                "reason": "A good reason",
-                "created_by": "669a99c2-9bb3-443f-8891-e600a15e3c10",
-                "invoice_number": "1DEF1",
-                "invoice_date": "2017-07-21"
+                'category': 'other',
+                'amount': 12000,
+                'reason': 'A good reason',
+                'created_by': '669a99c2-9bb3-443f-8891-e600a15e3c10',
+                'invoice_number': '1DEF1',
+                'invoice_date': '2017-07-21'
             }
-        ]"""
+        ]
         request = app.put_json('{base}/{id}'.format(base=self.base_path, id=obj_id),
                                payload, headers=self.headers, status=200)
         result = request.json
@@ -120,7 +120,7 @@ class TestOrderView(BaseVersionedTestView):
         payload = obj_payload.copy()
         del(payload['availability'])
         obj_id = payload['id']
-        payload['additional_charges'] = '[]'
+        payload['additional_charges'] = []
         request = app.put_json('{base}/{id}'.format(base=self.base_path, id=obj_id),
                                payload, headers=self.headers, status=400)
         result = request.json
