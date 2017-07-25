@@ -32,14 +32,14 @@ class TestProfessionalModel(BaseModelTest):
         """Add job pools to the professional."""
         pools = models.Pool.query().all()
         assert len(pools) == 3
-        assert len(instance_obj.pools) == 0
+        assert instance_obj.pools.count() == 0
 
         for item in pools:
             instance_obj.pools.append(item)
             assert instance_obj in item.professionals
             assert len(item.professionals) == 1
 
-        assert len(instance_obj.pools) == 3
+        assert instance_obj.pools.count() == 3
 
     @pytest.mark.parametrize('origin_state', ['pending'])
     @pytest.mark.parametrize('role_name', ['qa', 'scout'])
