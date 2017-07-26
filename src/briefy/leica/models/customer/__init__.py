@@ -33,7 +33,7 @@ class Customer(mixins.CustomerRolesMixin, mixins.LeicaSubMixin, Item):
     __summary_attributes_relations__ = [
         'billing_contact', 'business_contact', 'addresses', 'projects', 'customer_users'
     ]
-    __listing_attributes__ = __summary_attributes__
+    __listing_attributes__ = __summary_attributes__ + ['internal_account']
     __colanderalchemy_config__ = {
         'excludes': [
             'state_history', 'state', 'business_contact',
