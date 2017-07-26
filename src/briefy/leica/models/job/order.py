@@ -856,10 +856,8 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
         data['deliver_date'] = self.deliver_date
         data['scheduled_datetime'] = self.deliver_date
         data['delivery'] = self.delivery
-        data['location'] = self.location.to_summary_dict() if self.location else None
         data['timezone'] = self.timezone
         data['assignment'] = assignment_data
-        data['assignments'] = [item.to_summary_dict() for item in self.assignments]
         data['tech_requirements'] = self.tech_requirements
 
         add_user_info_to_state_history(self.state_history)
