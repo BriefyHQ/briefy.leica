@@ -63,9 +63,11 @@ METADATA_MAP = {
 
 INSERTS_LOCALROLES = '''
 INSERT INTO localroles (id, item_id, item_type, principal_id, role_name, created_at, updated_at)
-SELECT id, entity_id, '{item_type}', user_id, '{new_role_name}', created_at, updated_at
+SELECT DISTINCT ON (entity_id, user_id, role_name)
+   id, entity_id, '{item_type}', user_id, '{new_role_name}', created_at, updated_at
 from localroles_deprecated
-where role_name='{old_role_name}' AND entity_type='{old_item_type}';
+where role_name='{old_role_name}' AND entity_type='{old_item_type}'
+order by entity_id, user_id, role_name;
 '''
 
 
@@ -580,17 +582,20 @@ def migrate_localroles():
             ('owner', 'owner', 'UserProfile'),
         ),
     }
-
+    inserts = []
     for item_type, roles_mapping in type_roles_mappping.items():
         for role in roles_mapping:
             old_role_name, new_role_name, old_item_type = role
-            insert = INSERTS_LOCALROLES.format(
-                item_type=item_type,
-                old_role_name=old_role_name,
-                new_role_name=new_role_name,
-                old_item_type=old_item_type
+            inserts.append(
+                INSERTS_LOCALROLES.format(
+                    item_type=item_type,
+                    old_role_name=old_role_name,
+                    new_role_name=new_role_name,
+                    old_item_type=old_item_type
+                )
             )
-            op.execute(insert)
+    stmt = ''.join(inserts)
+    op.execute(stmt)
 
     # now we need to update UserProfile type to correct type: Professional,
 
@@ -695,19 +700,34 @@ def update_customeruserprofile():
 
 def upgrade():
     """Upgrade database."""
+    print(revision)
+    print('Drop indexes')
     drop_indexes()
+    print('Rename tables')
     rename_tables()
+    print('Create tables')
     create_tables()
+    print('Copy metadata')
     copy_metadata_items()
+    print('Copy versions')
     copy_versions_items()
+    print('Create columns')
     create_columns()
+    print('Create indexes')
     create_indexes()
+    print('Update Internal User Profile')
     update_type_internaluserprofile()
+    print('Update User Profile external ID')
     copy_userprofiles_external_id()
+    print('Migrate local roles')
     migrate_localroles()
+    print('Update customer user profile')
     update_customeruserprofile()
+    print('Update items path')
     update_items_path()
+    print('Update items can_view')
     update_items_can_view()
+    print('Drop columns')
     drop_columns()
 
 
