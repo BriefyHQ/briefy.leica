@@ -64,7 +64,7 @@ class LeadOrderWorkflow(BaseOrderWorkflow):
     @new.transition(
         received,
         'can_confirm',
-        # required_fields=('availability', )
+        optional_fields=('availability', )
     )
     def confirm(self, **kwargs):
         """Confirm LeadOrder and set availability dates."""
