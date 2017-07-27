@@ -889,7 +889,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         # so, the quick solution is to check subtype here.
         if self.type == 'leadorder':
             project = self.project
-            data['confirmation_fields'] = project.leadorder_confirmation_fields
+            data['confirmation_fields'] = self.confirmation_fields
 
         # Apply actor information to data
         data = self._apply_actors_info(data)
