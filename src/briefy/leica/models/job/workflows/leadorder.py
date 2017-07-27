@@ -79,8 +79,9 @@ class LeadOrderWorkflow(BaseOrderWorkflow):
                     f'Field {fieldname} is required for this transition'
                 )
             else:
+                payload = {fieldname: value}
                 try:
-                    setattr(leadorder, fieldname, value)
+                    leadorder.update(payload)
                 except ValidationError as exc:
                     raise WorkflowTransitionException(exc.message)
 
