@@ -21,7 +21,6 @@ requires = [
     'newrelic',
     'phonenumbers',
     'pycountry',
-    'pylibmc',
     'pyramid==1.8.3',
     'pyramid_tm',
     'pyramid_zcml',
