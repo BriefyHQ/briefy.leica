@@ -4,8 +4,9 @@ History
 
 2.1.33 (Unreleased)
 -------------------
-    * Change python3 container to 1.4.1 and add pylibmc as dependency (rudaporto).
 
+    * Change python3 container to 1.4.1 and add pylibmc as dependency (rudaporto).
+    * Card #484: Leads can be confirmed without adding availability (ericof).
 
 2.1.32 (2017-07-25)
 -------------------
