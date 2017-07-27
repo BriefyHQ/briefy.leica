@@ -91,7 +91,7 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
     __summary_attributes_relations__ = ['customer', 'pool', 'customer_users']
 
     __listing_attributes__ = __summary_attributes__ + [
-        'total_orders', 'customer', 'category', 'order_type'
+        'total_orders', 'customer', 'category', 'order_type', 'internal_pm'
     ]
 
     __raw_acl__ = (
