@@ -44,6 +44,13 @@ History
     * Remove comments from to_dict of Order, LeadOrder, Assignment, Professional (ericof).
     * Add tests to to_dict, to_summary_dict (ericof).
 
+2.1.33 (2017-07-28)
+-------------------
+
+    * Change python3 container to 1.4.2 and add pylibmc as dependency (rudaporto).
+    * Card #484: Leads can be confirmed without adding availability (ericof).
+
+
 2.1.32 (2017-07-25)
 -------------------
 

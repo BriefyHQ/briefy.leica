@@ -59,3 +59,15 @@ class TestProjectModel(BaseModelTest):
         assert hasattr(new_settings, 'permissions')
         assert 'g:customers' in new_settings.permissions.add_order._dct
         assert 'g:briefy_support' not in new_settings.permissions.add_order._dct
+
+    def test_leadorder_confirmation_fields(self, instance_obj):
+        """Test leadorder_confirmation_fields of a project."""
+        fields = instance_obj.leadorder_confirmation_fields
+
+        assert fields == ['availability']
+
+        instance_obj.leadorder_confirmation_fields = []
+
+        fields = instance_obj.leadorder_confirmation_fields
+
+        assert fields == []
