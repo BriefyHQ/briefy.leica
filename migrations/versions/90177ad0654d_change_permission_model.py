@@ -698,6 +698,33 @@ def update_customeruserprofile():
     op.execute(update_sql)
 
 
+def alter_table_json_to_jsonb():
+    """Alter all tables with json fields to jsonb."""
+    alter_table_map = {
+        'items': ['state_history'],
+        'comments': ['state_history'],
+        'links': ['state_history'],
+        'customercontacts': ['state_history'],
+        'customerbillingaddresses': ['state_history', 'info'],
+        'orderlocations': ['state_history', 'info'],
+        'assets': ['raw_metadata', 'history'],
+        'assets_version': ['raw_metadata', 'history'],
+        'projects': ['tech_requirements', 'delivery'],
+        'orders': ['availability', 'delivery'],
+        'billing_infos': ['state_history'],
+    }
+
+    for table, values in alter_table_map.items():
+        for column in values:
+            alter_table_template = f'''
+                ALTER TABLE {table}
+                ALTER COLUMN {column}
+                SET DATA TYPE jsonb
+                USING {column}::jsonb;
+            '''
+            op.execute(alter_table_template)
+
+
 def upgrade():
     """Upgrade database."""
     print(revision)
@@ -727,6 +754,8 @@ def upgrade():
     update_items_path()
     print('Update items can_view')
     update_items_can_view()
+    print('Alter tables with json fields to jsonb')
+    alter_table_json_to_jsonb()
     print('Drop columns')
     drop_columns()
 

@@ -43,6 +43,8 @@ History
     * Fix CustomerUserProfile customer_roles and project_roles attributes (rudaporto).
     * Remove comments from to_dict of Order, LeadOrder, Assignment, Professional (ericof).
     * Add tests to to_dict, to_summary_dict (ericof).
+    * Change sautils.JSONType to postgres dialect JSONB in all models (rudaporto).
+    * Added new migration step to migrate all fields from json to jsonb (rudaporto).
 
 2.1.33 (2017-07-28)
 -------------------

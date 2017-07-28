@@ -230,7 +230,7 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
     """
 
     tech_requirements = sa.Column(
-        sautils.JSONType,
+        JSONB,
         info={
             'colanderalchemy': {
                 'title': 'Technical Requirements for this project.',
@@ -306,7 +306,7 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
     """
 
     delivery = sa.Column(
-        sautils.JSONType,
+        JSONB,
         default=DEFAULT_DELIVERY_CONFIG,
         info={
             'colanderalchemy': {

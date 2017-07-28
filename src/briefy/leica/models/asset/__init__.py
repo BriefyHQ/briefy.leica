@@ -7,6 +7,7 @@ from briefy.leica.models.mixins import get_public_user_info
 from briefy.leica.utils import imaging
 from briefy.leica.utils.user import add_user_info_to_state_history
 from sqlalchemy import orm
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy_utils import UUIDType
 
@@ -105,7 +106,7 @@ class Asset(asset.Asset, mixins.LeicaSubVersionedMixin, Item):
     Assignment shooting under which this asset has been generated.
     """
 
-    history = sa.Column(sautils.JSONType, nullable=True)
+    history = sa.Column(JSONB, nullable=True)
     """History.
 
     An unified list of comments and transitions and modifications.

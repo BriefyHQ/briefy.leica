@@ -503,7 +503,7 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
 
     _availability = sa.Column(
         'availability',
-        sautils.JSONType,
+        JSONB,
         info={
             'colanderalchemy': {
                 'title': 'Availability for scheduling this Order.',
@@ -669,7 +669,7 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
 
     _delivery = sa.Column(
         'delivery',
-        sautils.JSONType,
+        JSONB,
         info={
             'colanderalchemy': {
                 'title': 'Delivery information.',
