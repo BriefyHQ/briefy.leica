@@ -2,7 +2,7 @@
 History
 =======
 
-2.1.33 (Unreleased)
+2.1.33 (2017-07-28)
 -------------------
 
     * Change python3 container to 1.4.1 and add pylibmc as dependency (rudaporto).
