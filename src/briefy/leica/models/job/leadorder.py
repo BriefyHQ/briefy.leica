@@ -2,6 +2,7 @@
 from briefy.leica.events import leadorder as events
 from briefy.leica.models.job import workflows
 from briefy.leica.models.job.order import Order
+from sqlalchemy.ext.associationproxy import association_proxy
 
 import colander
 import sqlalchemy as sa
@@ -37,3 +38,6 @@ class LeadOrder(Order):
             }
         }
     )
+
+    confirmation_fields = association_proxy('project', 'leadorder_confirmation_fields')
+    """List of fields to be used in confirmation."""

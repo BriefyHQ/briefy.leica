@@ -159,6 +159,20 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     )
     """Type of order the project support."""
 
+    leadorder_confirmation_fields = sa.Column(
+        JSONB,
+        default=['availability'],
+        nullable=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Fieldnames required to confirm a LeadOrder.',
+                'missing': colander.drop,
+                'typ': schema.List()
+            }
+        }
+    )
+    """List with fieldnames required to confirm a LeadOrder."""
+
     number_required_assets = sa.Column(sa.Integer(), default=10)
     """Number of required assets of a Project to be used in the Order as default value."""
 

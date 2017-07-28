@@ -2,11 +2,13 @@
 from briefy.common.vocabularies.roles import Groups as G
 from briefy.common.workflow import WorkflowState as WS
 from briefy.common.workflow import Permission
+from briefy.common.workflow import WorkflowTransitionException
 from briefy.leica.events.leadorder import LeadOrderUpdatedEvent
 from briefy.leica.models.job.workflows.base import BaseOrderWorkflow
 from briefy.leica.models.job.workflows.base import REQUIREMENTS_REQUIRED_FIELDS
 from briefy.leica.subscribers.utils import create_new_assignment_from_order
 from briefy.leica.utils.transitions import get_transition_date_from_history
+from briefy.ws.errors import ValidationError
 
 
 class LeadOrderWorkflow(BaseOrderWorkflow):
@@ -62,11 +64,27 @@ class LeadOrderWorkflow(BaseOrderWorkflow):
     @new.transition(
         received,
         'can_confirm',
-        required_fields=('availability', )
+        optional_fields=('availability', )
     )
     def confirm(self, **kwargs):
         """Confirm LeadOrder and set availability dates."""
         leadorder = self.document
+        project = leadorder.project
+        needed_fields = project.leadorder_confirmation_fields
+        fields = kwargs.get('fields', {})
+        for fieldname in needed_fields:
+            value = fields.get(fieldname, [])
+            if not value:
+                raise WorkflowTransitionException(
+                    f'Field {fieldname} is required for this transition'
+                )
+            else:
+                payload = {fieldname: value}
+                try:
+                    leadorder.update(payload)
+                except ValidationError as exc:
+                    raise WorkflowTransitionException(exc.message)
+
         state_history = leadorder.state_history
         # Set actual_order_price
         leadorder.actual_order_price = leadorder.price
