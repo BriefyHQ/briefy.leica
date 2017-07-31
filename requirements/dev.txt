@@ -6,7 +6,7 @@ coverage==4.4b1
 httmock==1.2.5
 Jinja2==2.8
 moto==0.4.27
-pyramid-debugtoolbar==2.4.2
+pyramid-debugtoolbar
 pyramid_ipython
 pytest-cov==2.4.0
 pytest==3.0.7
