@@ -46,6 +46,16 @@ History
     * Change sautils.JSONType to postgres dialect JSONB in all models (rudaporto).
     * Added new migration step to migrate all fields from json to jsonb (rudaporto).
 
+2.1.35 (Unreleased)
+-------------------
+
+    * TODO
+
+2.1.34 (2017-07-31)
+-------------------
+
+    * Card #497: Fix issue with leads confirmation when Project.leadorder-confirmationfields is null (ericof).
+
 2.1.33 (2017-07-28)
 -------------------
 
