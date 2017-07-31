@@ -70,7 +70,7 @@ class LeadOrderWorkflow(BaseOrderWorkflow):
         """Confirm LeadOrder and set availability dates."""
         leadorder = self.document
         project = leadorder.project
-        needed_fields = project.leadorder_confirmation_fields
+        needed_fields = project.leadorder_confirmation_fields or []
         fields = kwargs.get('fields', {})
         for fieldname in needed_fields:
             value = fields.get(fieldname, [])

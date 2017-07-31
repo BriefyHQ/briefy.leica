@@ -2,6 +2,11 @@
 History
 =======
 
+2.1.34 (2017-07-31)
+-------------------
+
+    * Card #497: Fix issue with leads confirmation when Project.leadorder-confirmationfields is null (ericof).
+
 2.1.33 (2017-07-28)
 -------------------
 
