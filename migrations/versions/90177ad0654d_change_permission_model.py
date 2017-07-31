@@ -363,6 +363,14 @@ def create_indexes():
     op.create_index(op.f('ix_items_created_at'), 'items', ['created_at'], unique=False)
     op.create_index(op.f('ix_items_slug'), 'items', ['slug'], unique=False)
     op.create_index(op.f('ix_items_title'), 'items', ['title'], unique=False)
+    op.create_index(op.f('ix_items_path'), 'items', ['path'], unique=False)
+    op.create_index(op.f('ix_items_type'), 'items', ['type'], unique=False)
+    # TODO: discover the best way to do this
+    # op.create_index(
+    #    op.f('ix_items_state_history'),
+    #    'items', ['state_history'], unique=False, postgresql_using='gin',
+    #)
+    op.create_index(op.f('ix_items_state'), 'items', ['state'], unique=False)
     op.create_index(op.f('ix_items_updated_at'), 'items', ['updated_at'], unique=False)
 
     # items_version
