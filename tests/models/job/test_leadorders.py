@@ -37,6 +37,19 @@ class TestLeadOrderModel(BaseModelTest):
         assert 'confirmation_fields' in to_dict
         assert 'availability' in to_dict['confirmation_fields']
 
+    def test_confirmation_fields_in_to_dict_returning_empty_list(self, instance_obj, session):
+        """Test if confirmation_fields is on the to_dict payload."""
+        project = instance_obj.project
+        project.leadorder_confirmation_fields = None
+        session.flush()
+        to_dict = instance_obj.to_dict()
+
+        assert 'confirmation_fields' in to_dict
+        assert isinstance(to_dict['confirmation_fields'], list)
+        assert to_dict['confirmation_fields'] == []
+        project.leadorder_confirmation_fields = ['availability']
+        session.flush()
+
     @staticmethod
     def delete_assigment_created(assignment, session):
         """Delete assignment created."""
@@ -201,6 +214,26 @@ class TestLeadOrderModel(BaseModelTest):
         # Remove the need for availability to be provided for a confirmed lead order
         project = leadorder.project
         project.leadorder_confirmation_fields = []
+
+        wf.confirm()
+        assert leadorder.state == 'received'
+
+    @pytest.mark.parametrize('origin_state', ['new'])
+    @pytest.mark.parametrize('role_name', ['pm', 'customer', 'system'])
+    def test_workflow_confirm_without_availability_project_config_with_none(
+        self, instance_obj, web_request, session, roles, role_name, now_utc, origin_state
+    ):
+        """Test LeadOrder workflow confirm transition without providing availability."""
+        leadorder, wf, request = self.prepare_obj_wf(
+            instance_obj,
+            web_request,
+            roles[role_name],
+            origin_state
+        )
+        leadorder.actual_order_price = 0
+        # Remove the need for availability to be provided for a confirmed lead order
+        project = leadorder.project
+        project.leadorder_confirmation_fields = None
 
         wf.confirm()
         assert leadorder.state == 'received'

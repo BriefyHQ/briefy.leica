@@ -888,7 +888,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         # HACK: An issue with cache prevents us from adding a specialized to_dict on LeadOrder
         # so, the quick solution is to check subtype here.
         if self.type == 'leadorder':
-            data['confirmation_fields'] = self.confirmation_fields
+            data['confirmation_fields'] = self.confirmation_fields or []
 
         # Apply actor information to data
         data = self._apply_actors_info(data)
