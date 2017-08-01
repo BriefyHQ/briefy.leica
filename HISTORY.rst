@@ -45,6 +45,7 @@ History
     * Add tests to to_dict, to_summary_dict (ericof).
     * Change sautils.JSONType to postgres dialect JSONB in all models (rudaporto).
     * Added new migration step to migrate all fields from json to jsonb (rudaporto).
+    * Fixed localroles migration step: importing intenal_qa and internal_scout on the project level (rudaporto).
 
 2.1.35 (Unreleased)
 -------------------

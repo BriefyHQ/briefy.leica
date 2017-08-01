@@ -13,7 +13,6 @@ from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
 from datetime import timedelta
 from pyramid.security import Allow
-from sqlalchemy.orm import joinedload
 
 
 COLLECTION_PATH = '/assignments'
@@ -97,7 +96,6 @@ class AssignmentService(RESTService):
                 model.state == 'awaiting_assets',
                 model.submission_path.isnot(None),
             )
-        query = query.options(joinedload('order'))
         return query
 
 

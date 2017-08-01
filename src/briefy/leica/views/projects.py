@@ -9,7 +9,6 @@ from briefy.ws.resources import WorkflowAwareResource
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
 from pyramid.security import Allow
-from sqlalchemy.orm import joinedload
 
 
 COLLECTION_PATH = '/projects'
@@ -61,7 +60,6 @@ class ProjectService(RESTService):
         This is supposed to be specialized by resource classes.
         :returns: A tuple of default filters to be applied to queries.
         """
-        query = query.options(joinedload('customer'))
         return query
 
 

@@ -19,7 +19,6 @@ from pyramid.httpexceptions import HTTPForbidden
 from pyramid.security import Allow
 from sqlalchemy import and_
 from sqlalchemy import or_
-from sqlalchemy.orm import joinedload
 
 
 COLLECTION_PATH = '/orders'
@@ -150,9 +149,6 @@ class OrderService(RESTService):
                     )
                 )
             )
-        query = query.options(
-            joinedload('project'), joinedload('_location'), joinedload('customer')
-        )
         return query
 
 
