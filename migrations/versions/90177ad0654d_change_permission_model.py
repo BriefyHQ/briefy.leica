@@ -365,11 +365,6 @@ def create_indexes():
     op.create_index(op.f('ix_items_title'), 'items', ['title'], unique=False)
     op.create_index(op.f('ix_items_path'), 'items', ['path'], unique=False)
     op.create_index(op.f('ix_items_type'), 'items', ['type'], unique=False)
-    # TODO: discover the best way to do this
-    # op.create_index(
-    #    op.f('ix_items_state_history'),
-    #    'items', ['state_history'], unique=False, postgresql_using='gin',
-    #)
     op.create_index(op.f('ix_items_state'), 'items', ['state'], unique=False)
     op.create_index(op.f('ix_items_updated_at'), 'items', ['updated_at'], unique=False)
 
@@ -616,12 +611,20 @@ def migrate_localroles():
 
     # IMPORTANT 2: this query will take some time to run
     insert_qa_scout_roles = '''
-    INSERT INTO localroles (id, item_id, item_type, principal_id, role_name)
-    SELECT DISTINCT
+    INSERT INTO localroles (id, item_id, item_type, principal_id, role_name, updated_at, created_at)
+    SELECT
     gen_random_uuid() as id,
-    p.id,
-    'project',
-    l.user_id,
+    item_id,
+    item_type,
+    principal_id,
+    role_name,
+    now() as updated_at,
+    now() as created_at
+    FROM
+    (SELECT DISTINCT
+    p.id as item_id,
+    'project' as item_type,
+    l.user_id as principal_id,
     CASE l.role_name
         WHEN 'qa_manager' THEN 'internal_qa'
         WHEN 'scout_manager' THEN 'internal_scout'
@@ -632,7 +635,7 @@ def migrate_localroles():
         SELECT a.id from assignments as a
         join orders as o on o.id=a.order_id
         where o.project_id = p.id)
-    ORDER BY p.id;
+    ORDER BY p.id) as source
     '''
     op.execute(insert_qa_scout_roles)
 
