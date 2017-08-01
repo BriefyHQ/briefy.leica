@@ -381,6 +381,9 @@ def create_indexes():
                     unique=False)
     op.create_index(op.f('ix_items_version_updated_at'), 'items_version', ['updated_at'],
                     unique=False)
+    op.create_index(op.f('ix_items_version_path'), 'items_version', ['path'], unique=False)
+    op.create_index(op.f('ix_items_version_state'), 'items_version', ['state'], unique=False)
+    op.create_index(op.f('ix_items_version_type'), 'items_version', ['type'], unique=False)
 
     # localroles
     op.create_index(op.f('ix_localroles_created_at'), 'localroles', ['created_at'], unique=False)
@@ -405,6 +408,21 @@ def create_indexes():
     op.create_index(
         op.f('ix_billing_infos_version_title'), 'billing_infos_version', ['title'], unique=False
     )
+    op.create_index(op.f('ix_billing_infos_state'), 'billing_infos', ['state'], unique=False)
+    op.create_index(op.f('ix_billing_infos_version_state'), 'billing_infos_version', ['state'],
+                    unique=False)
+
+    # new indexes for workflow mixin subclasses
+    op.create_index(op.f('ix_comments_state'), 'comments', ['state'], unique=False)
+    op.create_index(op.f('ix_customerbillingaddresses_state'), 'customerbillingaddresses',
+                    ['state'], unique=False)
+    op.create_index(op.f('ix_customercontacts_state'), 'customercontacts', ['state'], unique=False)
+
+    op.create_index(op.f('ix_links_state'), 'links', ['state'], unique=False)
+    op.create_index(op.f('ix_orderlocations_state'), 'orderlocations', ['state'], unique=False)
+    op.create_index(op.f('ix_orderlocations_version_state'), 'orderlocations_version', ['state'],
+                    unique=False)
+    op.create_index(op.f('ix_workinglocations_state'), 'workinglocations', ['state'], unique=False)
 
 
 def create_columns():
