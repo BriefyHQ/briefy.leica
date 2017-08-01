@@ -1,7 +1,6 @@
 gunicorn==19.7.1
-gevent==1.2.1
-pycountry==16.11.27.1
-iso8601==0.1.11
+gevent==1.2.2
+pycountry==17.5.14
 -e git+git@github.com:BriefyHQ/briefy.ws.git@refactor\/change-permission-model#egg=briefy.ws
 -e git+git@github.com:BriefyHQ/briefy.common.git@refactor\/change-permission-model#egg=briefy.common[db]
 -e git+git@github.com:BriefyHQ/octopus.lens.git@0.1.3#egg=octopus.lens

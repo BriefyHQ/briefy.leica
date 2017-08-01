@@ -6,7 +6,7 @@ Inheritance
 
 Inheritance diagram for the Assignment class:
 
-.. inheritance-diagram:: briefy.leica.models.job.Assignment
+.. inheritance-diagram:: briefy.leica.models.job.assignment.Assignment
 
 
 Workflow
@@ -21,6 +21,6 @@ Database model
 Database diagram for the Assignment data model:
 
 .. sadisplay::
-    :module: briefy.leica.models.job
+    :module: briefy.leica.models.job.assignment
     :alt: Assignment data model
     :render: graphviz
