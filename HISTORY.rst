@@ -48,6 +48,7 @@ History
     * Fixed localroles migration step: importing intenal_qa and internal_scout on the project level (rudaporto).
     * Project: added new relationship to leadorders and also fix the orders relationship using the current_type in the join condition (rudaporto).
     * Added new aggregator attribute to keep the total of leadorders and return this on the listing (rudaporto).
+    * Fix state_history entries, removing serialized actor information from some transitions (ericof).
 
 2.1.35 (Unreleased)
 -------------------
