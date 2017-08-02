@@ -463,7 +463,6 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
             Order.current_type=='order',
             foreign(Order.project_id)==Project.id,
         )""",
-        backref=orm.backref('project'),
         lazy='dynamic'
     )
     """List of Orders of this project.

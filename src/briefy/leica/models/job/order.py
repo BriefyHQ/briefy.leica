@@ -302,6 +302,15 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
     Relationship with :class:`briefy.leica.models.project.Project`.
     """
 
+    project = orm.relationship(
+        'Project',
+        foreign_keys='Order.project_id'
+    )
+    """Project.
+
+    Relationship with :class:`briefy.leica.models.project.Project`.
+    """
+
     category = sa.Column(
         sautils.ChoiceType(CategoryChoices, impl=sa.String()),
         default=get_category_from_project,
