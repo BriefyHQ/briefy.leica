@@ -239,9 +239,12 @@ class CustomerUserProfile(UserProfile):
             LocalRole.principal_id == self.id
         )
         role_map = {lr.item_id: lr.role_name for lr in roles}
-        result = defaultdict(list)
+        result = {}
         for project_id, role_name in role_map.items():
-            result[str(project_id)].append(role_name)
+            if not result.get(str(project_id)):
+                result[str(project_id)] = [role_name]
+            else:
+                result[str(project_id)].append(role_name)
         return result
 
     @hybrid_property

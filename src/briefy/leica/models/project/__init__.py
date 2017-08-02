@@ -94,6 +94,8 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
         'total_orders', 'total_leadorders', 'customer', 'category', 'order_type', 'internal_pm'
     ]
 
+    __exclude_attributes__ = ['orders', 'leadorders']
+
     __raw_acl__ = (
         ('create', ('g:briefy_pm', 'g:briefy_bizdev', 'g:briefy_finance', 'g:system')),
         ('list', ('g:briefy_qa', 'g:briefy_bizdev',
@@ -585,8 +587,6 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
     @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
-        excludes = list(excludes) if excludes else []
-        excludes.append('orders')
         data = super().to_dict(excludes=excludes, includes=includes)
         data['price'] = self.price
         data['category'] = self.category.value \
