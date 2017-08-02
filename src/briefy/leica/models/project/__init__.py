@@ -91,7 +91,7 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
     __summary_attributes_relations__ = ['customer', 'pool', 'customer_users']
 
     __listing_attributes__ = __summary_attributes__ + [
-        'total_orders', 'customer', 'category', 'order_type', 'internal_pm'
+        'total_orders', 'total_leadorders', 'customer', 'category', 'order_type', 'internal_pm'
     ]
 
     __raw_acl__ = (
@@ -459,7 +459,25 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
     orders = orm.relationship(
         'Order',
         foreign_keys='Order.project_id',
+        primaryjoin="""and_(
+            Order.current_type=='order',
+            foreign(Order.project_id)==Project.id,
+        )""",
         backref=orm.backref('project'),
+        lazy='dynamic'
+    )
+    """List of Orders of this project.
+
+    Returns a collection of :class:`briefy.leica.models.job.order.Order`.
+    """
+
+    leadorders = orm.relationship(
+        'Order',
+        foreign_keys='Order.project_id',
+        primaryjoin="""and_(
+            Order.current_type=='leadorder',
+            foreign(Order.project_id)==Project.id,
+        )""",
         lazy='dynamic'
     )
     """List of Orders of this project.
@@ -470,6 +488,15 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
     @sautils.aggregated('orders', sa.Column(sa.Integer, default=0))
     def total_orders(self):
         """Total Orders in this project.
+
+        This attribute uses the Aggregated funcion of SQLAlchemy Utils, meaning the column
+        should be updated on each change on any contained Order.
+        """
+        return sa.func.count('1')
+
+    @sautils.aggregated('leadorders', sa.Column(sa.Integer, default=0))
+    def total_leadorders(self):
+        """Total LeadOrders in this project.
 
         This attribute uses the Aggregated funcion of SQLAlchemy Utils, meaning the column
         should be updated on each change on any contained Order.
