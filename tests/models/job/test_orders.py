@@ -287,7 +287,7 @@ class TestOrderModel(BaseModelTest):
                 'first_name': 'J.  ',
                 'last_name': 'Hartman-Zwiers',
                 'order_id': str(order.id),
-                'mobile': '+33 31356240391',
+                'mobile': '+4917635573242',
                 'email': 'info@sdlyonne.com',
                 'timezone': 'Europe/Berlin',
                 'formatted_address': 'Nansenstraße 17, 12047 Berlin, Germany',
