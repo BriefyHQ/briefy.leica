@@ -91,7 +91,7 @@ class DashboardPmOrderService(SQLQueryService):
 
     (SELECT i.id, i.state, i.title, o.accept_date, o.project_id
     FROM items as i JOIN orders as o on i.id = o.id
-    WHERE o.current_type = 'order' AND
+    WHERE i.type = '{type}' AND
     i.state IN ('received', 'assigned', 'scheduled', 'cancelled',
     'delivered', 'accepted', 'in_qa', 'refused', 'perm_refused')
     ) as orders JOIN
@@ -117,7 +117,7 @@ class DashboardPmOrderService(SQLQueryService):
         :returns: string with a query after adding parameters
         """
         principal_id = self.request.user.id
-        return query.format(principal_id=principal_id)
+        return query.format(principal_id=principal_id, type='order')
 
     def transform(self, data: list) -> list:
         """Transform data items after query execution
@@ -190,7 +190,7 @@ class DashboardPMDeliveredOrdersService(SQLQueryService):
 
     (SELECT i.id, i.state, i.title, o.accept_date, o.project_id
     FROM items as i JOIN orders as o on i.id = o.id
-    WHERE o.current_type = 'order' AND
+    WHERE i.type = '{type}' AND
     i.state IN ('delivered', 'accepted', 'in_qa', 'refused')
     ) as orders JOIN
 
@@ -215,7 +215,7 @@ class DashboardPMDeliveredOrdersService(SQLQueryService):
         :returns: string with a query after adding parameters
         """
         principal_id = self.request.user.id
-        return query.format(principal_id=principal_id)
+        return query.format(principal_id=principal_id, type='order')
 
     def transform(self, data: list) -> list:
         """Transform data items after query execution
@@ -255,6 +255,52 @@ class DashboardPMAllLeadsService(SQLQueryService):
 
     _columns_map = LEAD_PROJECT_COLS
 
+    _collection_query = '''
+    SELECT
+    count(active_orders.id),
+    active_orders.title,
+    active_orders.project_id,
+
+    sum(
+    CASE WHEN
+    active_orders.state = 'new'
+    THEN 1 ELSE 0
+    END) as open,
+
+    sum(
+    CASE WHEN active_orders.state = 'cancelled'
+    THEN 1 ELSE 0
+    END) as cancelled,
+
+    sum(
+    CASE WHEN active_orders.state NOT IN ('new', 'cancelled')
+    THEN 1 ELSE 0
+    END) as confirmed
+
+    FROM
+
+    (SELECT DISTINCT orders.id, orders.project_id,
+    projects.title, orders.state, orders.accept_date FROM
+
+    (SELECT i.id, i.state, i.title, o.accept_date, o.project_id
+    FROM items as i JOIN orders as o on i.id = o.id
+    WHERE i.type = '{type}' AND
+    i.state IN ('new', 'received', 'assigned', 'scheduled', 'cancelled',
+    'delivered', 'accepted', 'in_qa', 'refused', 'perm_refused')
+    ) as orders JOIN
+
+    (SELECT i.id, i.state, i.title
+    FROM items as i JOIN projects as p on i.id = p.id
+    JOIN localroles as l on p.id = l.item_id
+    WHERE l.principal_id = '{principal_id}') as projects
+    on orders.project_id = projects.id
+
+    ) as active_orders GROUP BY
+    active_orders.title,
+    active_orders.project_id
+    ORDER BY active_orders.title
+    '''
+
     def query_params(self, query: str) -> str:
         """Apply query parameters based on request.
 
@@ -264,4 +310,15 @@ class DashboardPMAllLeadsService(SQLQueryService):
         :returns: string with a query after adding parameters
         """
         principal_id = self.request.user.id
-        return query.format(principal_id=principal_id)
+        return query.format(principal_id=principal_id, type='order')
+
+    def transform(self, data: list) -> list:
+        """Transform data items after query execution
+
+        :data: list of records to be transformed
+        :returns: list of records after transformation
+        """
+        for item in data:
+            project_id = item.pop('project_id')
+            item['absolute_url'] = f'/projects/{project_id}'
+        return data
