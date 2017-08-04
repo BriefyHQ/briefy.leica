@@ -17,7 +17,7 @@
     "state_history": [
       {
         "to": "created",
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "message": null,
         "date": "2016-09-18T18:55:20.693965+00:00",
@@ -46,7 +46,7 @@
     "state_history": [
       {
         "to": "created",
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "message": null,
         "date": "2016-09-18T18:55:23.526648+00:00",
@@ -75,7 +75,7 @@
     "state_history": [
       {
         "to": "created",
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "message": null,
         "date": "2016-09-18T18:55:26.346292+00:00",
@@ -104,7 +104,7 @@
     "state_history": [
       {
         "to": "created",
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "message": null,
         "date": "2016-09-18T18:55:29.032198+00:00",
@@ -133,7 +133,7 @@
     "state_history": [
       {
         "to": "created",
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "message": null,
         "date": "2016-09-18T18:55:31.641573+00:00",

@@ -6,7 +6,7 @@
     "id": "23d94a43-3947-42fc-958c-09245ecca5f2",
     "state_history": [
       {
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "to": "created",
         "date": "2016-09-08T15:36:28.082599+00:00",
@@ -51,7 +51,7 @@
     "partners": true,
     "state_history": [
       {
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "to": "created",
         "date": "2016-09-08T15:36:28.082599+00:00",
@@ -111,7 +111,7 @@
     "partners": true,
     "state_history": [
       {
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "to": "created",
         "date": "2016-09-08T15:36:28.082599+00:00",

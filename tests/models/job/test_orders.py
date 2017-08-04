@@ -819,7 +819,7 @@ class TestOrderModel(BaseModelTest):
 
         assert assignment.state == 'completed'
         assert assignment.state_history[-1]['transition'] == 'complete'
-        assert assignment.state_history[-1]['message'] is None
+        assert assignment.state_history[-1]['message'] == ''
 
     @pytest.mark.parametrize('origin_state', ['in_qa', 'refused', ])
     @pytest.mark.parametrize('ass_origin_state', ['in_qa', 'refused', 'approved', ])

@@ -2,7 +2,7 @@
   {
     "state_history": [
       {
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "to": "created",
         "date": "2016-09-08T15:36:28.082599+00:00",
