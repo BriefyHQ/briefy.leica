@@ -2,10 +2,15 @@
 History
 =======
 
-2.1.35 (Unreleased)
+2.1.36 (Unreleased)
 -------------------
 
     * TODO
+
+2.1.35 (2017-08-04)
+-------------------
+
+    * Card #519: Add first_name and last_name columns to professional export (ericof).
 
 2.1.34 (2017-07-31)
 -------------------
