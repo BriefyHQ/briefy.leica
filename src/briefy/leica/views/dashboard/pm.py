@@ -40,7 +40,7 @@ class DashboardPmOrderService(SQLQueryService):
 
     _collection_query = '''
     SELECT
-    count(active_orders.id),
+    count(active_orders.id) as total,
     active_orders.title,
     active_orders.project_id,
 
@@ -159,7 +159,7 @@ class DashboardPMDeliveredOrdersService(SQLQueryService):
 
     _collection_query = '''
     SELECT
-    count(active_orders.id),
+    count(active_orders.id) as total,
     active_orders.title,
     active_orders.project_id,
     sum(
@@ -257,7 +257,7 @@ class DashboardPMAllLeadsService(SQLQueryService):
 
     _collection_query = '''
     SELECT
-    count(active_orders.id),
+    count(active_orders.id) as total,
     active_orders.title,
     active_orders.project_id,
 
@@ -292,7 +292,8 @@ class DashboardPMAllLeadsService(SQLQueryService):
     (SELECT i.id, i.state, i.title
     FROM items as i JOIN projects as p on i.id = p.id
     JOIN localroles as l on p.id = l.item_id
-    WHERE l.principal_id = '{principal_id}') as projects
+    WHERE l.principal_id = '{principal_id}' AND
+    p.order_type = '{type}') as projects
     on orders.project_id = projects.id
 
     ) as active_orders GROUP BY
@@ -310,7 +311,7 @@ class DashboardPMAllLeadsService(SQLQueryService):
         :returns: string with a query after adding parameters
         """
         principal_id = self.request.user.id
-        return query.format(principal_id=principal_id, type='order')
+        return query.format(principal_id=principal_id, type='leadorder')
 
     def transform(self, data: list) -> list:
         """Transform data items after query execution
