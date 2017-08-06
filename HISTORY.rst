@@ -2,6 +2,11 @@
 History
 =======
 
+2.1.36 (2017-08-06)
+-------------------
+
+    * Card #519: Return profile information when billing info is not available (ericof).
+
 2.1.35 (2017-08-04)
 -------------------
 
