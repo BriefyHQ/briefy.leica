@@ -33,9 +33,6 @@ PATH = COLLECTION_PATH + '/{id}'
 class DashboardPmOrderService(SQLQueryService):
     """Dashboard Pm: Order Service."""
 
-    model = DashboardPMOrder
-    default_order_by = 'title'
-
     _columns_map = ORDER_PROJECT_COLS
 
     _collection_query = """
@@ -152,9 +149,6 @@ PATH = COLLECTION_PATH + '/{id}'
 class DashboardPMDeliveredOrdersService(SQLQueryService):
     """Dashboard PM: Delivered Orders Service."""
 
-    model = DashboardPMDeliveredOrders
-    default_order_by = 'title'
-
     _columns_map = DELIVERED_ORDERS_COLS
 
     _collection_query = """
@@ -249,9 +243,6 @@ PATH = COLLECTION_PATH + '/{id}'
           factory=DashboardPMAllLeadsFactory)
 class DashboardPMAllLeadsService(SQLQueryService):
     """Dashboard PM: All Leads Service."""
-
-    model = DashboardPMAllLeads
-    default_order_by = 'title'
 
     _columns_map = LEAD_PROJECT_COLS
 

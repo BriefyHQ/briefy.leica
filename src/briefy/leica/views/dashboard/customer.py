@@ -34,9 +34,6 @@ PATH = COLLECTION_PATH + '/{id}'
 class DashboardCustomerAllOrdersService(SQLQueryService):
     """Dashboard Customer: All Orders Service."""
 
-    model = DashboardCustomerAllOrders
-    default_order_by = 'title'
-
     _columns_map = ORDER_PROJECT_COLS
 
     _collection_query = DASHBOARD_ALL_ORDERS_CUSTOMER_QUERY
@@ -84,9 +81,6 @@ PATH = COLLECTION_PATH + '/{id}'
           factory=DashboardCustomerAllOrdersFactory)
 class DashboardCustomerDeliveredOrderService(SQLQueryService):
     """Dashboard Customer: Delivered Orders Service."""
-
-    model = DashboardCustomerDeliveredOrders
-    default_order_by = 'title'
 
     _columns_map = DELIVERED_ORDERS_COLS
 
@@ -169,7 +163,7 @@ class DashboardCustomerDeliveredOrderService(SQLQueryService):
 class DashboardCustomerAllLeadsFactory(BaseFactory):
     """Dashboard Customer: All Leads context factory."""
 
-    model = DashboardCustomerAllOrders
+    model = DashboardCustomerAllLeads
 
     __base_acl__ = [
         (Allow, 'g:customers', ['list', 'view']),
@@ -186,9 +180,6 @@ PATH = COLLECTION_PATH + '/{id}'
           factory=DashboardCustomerAllLeadsFactory)
 class DashboardCustomerAllLeadsService(SQLQueryService):
     """Dashboard Customer: All Leads Service."""
-
-    model = DashboardCustomerAllLeads
-    default_order_by = 'title'
 
     _columns_map = LEAD_PROJECT_COLS
 

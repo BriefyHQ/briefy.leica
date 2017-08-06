@@ -30,9 +30,6 @@ PATH = COLLECTION_PATH + '/{id}'
 class DashboardBizDevOrderService(SQLQueryService):
     """Dashboard BizDev: Order Service."""
 
-    model = DashboardBizDevOrder
-    default_order_by = 'title'
-
     _columns_map = ORDER_PROJECT_COLS
 
     _collection_query = DASHBOARD_ALL_ORDERS_CUSTOMER_QUERY
