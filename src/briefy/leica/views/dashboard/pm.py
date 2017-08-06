@@ -38,7 +38,7 @@ class DashboardPmOrderService(SQLQueryService):
 
     _columns_map = ORDER_PROJECT_COLS
 
-    _collection_query = '''
+    _collection_query = """
     SELECT
     count(active_orders.id) as total,
     active_orders.title,
@@ -106,7 +106,7 @@ class DashboardPmOrderService(SQLQueryService):
     active_orders.title,
     active_orders.project_id
     ORDER BY active_orders.title
-    '''
+    """
 
     def query_params(self, query: str) -> str:
         """Apply query parameters based on request.
@@ -120,7 +120,7 @@ class DashboardPmOrderService(SQLQueryService):
         return query.format(principal_id=principal_id, type='order')
 
     def transform(self, data: list) -> list:
-        """Transform data items after query execution
+        """Transform data items after query execution.
 
         :data: list of records to be transformed
         :returns: list of records after transformation
@@ -157,7 +157,7 @@ class DashboardPMDeliveredOrdersService(SQLQueryService):
 
     _columns_map = DELIVERED_ORDERS_COLS
 
-    _collection_query = '''
+    _collection_query = """
     SELECT
     count(active_orders.id) as total,
     active_orders.title,
@@ -204,7 +204,7 @@ class DashboardPMDeliveredOrdersService(SQLQueryService):
     active_orders.title,
     active_orders.project_id
     ORDER BY active_orders.title
-    '''
+    """
 
     def query_params(self, query: str) -> str:
         """Apply query parameters based on request.
@@ -218,7 +218,7 @@ class DashboardPMDeliveredOrdersService(SQLQueryService):
         return query.format(principal_id=principal_id, type='order')
 
     def transform(self, data: list) -> list:
-        """Transform data items after query execution
+        """Transform data items after query execution.
 
         :data: list of records to be transformed
         :returns: list of records after transformation
@@ -255,7 +255,7 @@ class DashboardPMAllLeadsService(SQLQueryService):
 
     _columns_map = LEAD_PROJECT_COLS
 
-    _collection_query = '''
+    _collection_query = """
     SELECT
     count(active_orders.id) as total,
     active_orders.title,
@@ -300,7 +300,7 @@ class DashboardPMAllLeadsService(SQLQueryService):
     active_orders.title,
     active_orders.project_id
     ORDER BY active_orders.title
-    '''
+    """
 
     def query_params(self, query: str) -> str:
         """Apply query parameters based on request.
@@ -314,7 +314,7 @@ class DashboardPMAllLeadsService(SQLQueryService):
         return query.format(principal_id=principal_id, type='leadorder')
 
     def transform(self, data: list) -> list:
-        """Transform data items after query execution
+        """Transform data items after query execution.
 
         :data: list of records to be transformed
         :returns: list of records after transformation
