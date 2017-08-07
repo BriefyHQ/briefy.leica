@@ -124,7 +124,7 @@ class DashboardCustomerDeliveredOrderService(SQLQueryService):
     (SELECT i.id, i.state, i.title, p.customer_id
     FROM items as i JOIN projects as p on i.id = p.id) as projects
     on orders.project_id = projects.id JOIN
-    
+
     (SELECT i.id, i.state, i.title
     FROM items as i JOIN customers as c on i.id = c.id
     JOIN localroles as l on c.id = l.item_id
@@ -211,7 +211,7 @@ class DashboardCustomerAllLeadsService(SQLQueryService):
     projects.title, orders.state, orders.accept_date FROM
 
     (SELECT i.id, i.state, i.title, o.accept_date, o.project_id
-    FROM items as i JOIN orders as o on i.id = o.id 
+    FROM items as i JOIN orders as o on i.id = o.id
     JOIN leadorders as l on l.id = o.id
     WHERE i.type = '{type}' AND
     i.state IN ('new', 'received', 'assigned', 'scheduled', 'cancelled',
@@ -222,7 +222,7 @@ class DashboardCustomerAllLeadsService(SQLQueryService):
     FROM items as i JOIN projects as p on i.id = p.id
     WHERE p.order_type = '{type}') as projects
     on orders.project_id = projects.id JOIN
-    
+
     (SELECT i.id, i.state, i.title
     FROM items as i JOIN customers as c on i.id = c.id
     JOIN localroles as l on c.id = l.item_id

@@ -3,8 +3,8 @@ from briefy.leica.models import Pool
 from briefy.leica.models.dashboard.scouting import DashboardScoutingCountry
 from briefy.leica.models.dashboard.scouting import DashboardScoutingProject
 from briefy.ws import CORS_POLICY
-from briefy.ws.resources import SQLQueryService
 from briefy.ws.resources import RESTService
+from briefy.ws.resources import SQLQueryService
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
 from pyramid.security import Allow
