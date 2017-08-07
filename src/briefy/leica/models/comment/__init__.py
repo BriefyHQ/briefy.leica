@@ -96,7 +96,7 @@ class Comment(mixins.LeicaMixin, Base):
     internal = sa.Column(sa.Boolean, default=True)
     """Internal comment flag.
 
-    Mark if the comment should only be visible internal.
+    Mark if the comment should only be visible by staff.
 
     """
 
