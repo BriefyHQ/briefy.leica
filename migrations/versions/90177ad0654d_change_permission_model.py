@@ -70,12 +70,23 @@ where role_name='{old_role_name}' AND entity_type='{old_item_type}'
 order by entity_id, user_id, role_name;
 '''
 
+DROP_VIEWS = '''
+DROP VIEW IF EXISTS orders_history_last_day;
+DROP VIEW IF EXISTS orders_history_last_month;
+DROP VIEW IF EXISTS orders_history;
+'''
+
 
 def rename_tables():
     """Rename tables."""
     op.rename_table('localroles', 'localroles_deprecated')
     op.rename_table('briefyuserprofiles', 'internaluserprofiles')
     op.rename_table('briefyuserprofiles_version', 'internaluserprofiles_version')
+
+
+def drop_views():
+    """Drop views."""
+    op.execute(DROP_VIEWS)
 
 
 def drop_columns():
@@ -757,6 +768,8 @@ def alter_table_json_to_jsonb():
 def upgrade():
     """Upgrade database."""
     print(revision)
+    print('Drop views')
+    drop_views()
     print('Drop indexes')
     drop_indexes()
     print('Rename tables')
