@@ -50,6 +50,7 @@ History
     * Added new aggregator attribute to keep the total of leadorders and return this on the listing (rudaporto).
     * Fix state_history entries, removing serialized actor information from some transitions (ericof).
     * Refactor dashboards: PM, Customer, Professional, Bizdev, QA, Scout, Finance (rudaporto).
+    * Added Order.current_type as a field in the Assignment model and listing and as a filter in the assignments view (rudaporto).
 
 2.1.35 (Unreleased)
 -------------------

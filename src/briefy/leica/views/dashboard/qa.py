@@ -75,7 +75,6 @@ class DashboardQaTypeService(SQLQueryService):
     FROM items as i
     JOIN assignments as a on i.id = a.id
     JOIN orders as o on a.order_id = o.id
-    JOIN localroles as l on l.item_id = a.id
     WHERE i.state = 'in_qa'
     ) as assignments JOIN
 
@@ -173,7 +172,6 @@ class DashboardQaProjectService(SQLQueryService):
     FROM items as i
     JOIN assignments as a on i.id = a.id
     JOIN orders as o on a.order_id = o.id
-    JOIN localroles as l on l.item_id = a.id
     WHERE i.state = 'in_qa'
     ) as assignments JOIN
 
