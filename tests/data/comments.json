@@ -10,7 +10,7 @@
     "state_history": [
       {
         "to": "created",
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "message": null,
         "date": "2016-09-18T18:55:21.144051+00:00",
@@ -34,7 +34,7 @@
     "state_history": [
       {
         "to": "created",
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "message": null,
         "date": "2016-09-18T18:55:21.562398+00:00",
@@ -58,7 +58,7 @@
     "state_history": [
       {
         "to": "created",
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "message": null,
         "date": "2016-09-18T18:55:23.944455+00:00",
@@ -82,7 +82,7 @@
     "state_history": [
       {
         "to": "created",
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "message": null,
         "date": "2016-09-18T18:55:24.347519+00:00",
@@ -106,7 +106,7 @@
     "state_history": [
       {
         "to": "created",
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "message": null,
         "date": "2016-09-18T18:55:26.749973+00:00",
@@ -130,7 +130,7 @@
     "state_history": [
       {
         "to": "created",
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "message": null,
         "date": "2016-09-18T18:55:27.148701+00:00",
@@ -154,7 +154,7 @@
     "state_history": [
       {
         "to": "created",
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "message": null,
         "date": "2016-09-18T18:55:29.443223+00:00",
@@ -178,7 +178,7 @@
     "state_history": [
       {
         "to": "created",
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "message": null,
         "date": "2016-09-18T18:55:29.839383+00:00",
@@ -202,7 +202,7 @@
     "state_history": [
       {
         "to": "created",
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "message": null,
         "date": "2016-09-18T18:55:32.145516+00:00",
@@ -226,7 +226,7 @@
     "state_history": [
       {
         "to": "created",
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "message": null,
         "date": "2016-09-18T18:55:32.589036+00:00",
@@ -250,7 +250,7 @@
     "state_history": [
       {
         "to": "created",
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "message": null,
         "date": "2016-09-18T18:55:32.589036+00:00",

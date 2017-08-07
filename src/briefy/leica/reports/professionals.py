@@ -16,6 +16,8 @@ class AllProfessionals(BaseReport):
         'professional_display_name',
         'professional_legal_company_name',
         'professional_full_name',
+        'professional_first_name',
+        'professional_last_name',
         'professional_billing_street',
         'professional_billing_neighborhood',
         'professional_billing_city',
@@ -108,8 +110,10 @@ class AllProfessionals(BaseReport):
         legal_name = ''
         address = {}
         address_street = ''
-        contact_name = ''
-        contact_email = ''
+        contact_first_name = record.first_name
+        contact_last_name = record.last_name
+        contact_name = f'{contact_first_name} {contact_last_name}'
+        contact_email = record.email
         tax_id = ''
         tax_id_type = ''
         tax_id_name = ''
@@ -123,7 +127,9 @@ class AllProfessionals(BaseReport):
                 address.get('street_number', '')
             ).strip()
 
-            contact_name = f'{billing_info.first_name} {billing_info.last_name}'
+            contact_first_name = f'{billing_info.first_name}'
+            contact_last_name = f'{billing_info.last_name}'
+            contact_name = f'{contact_first_name} {contact_last_name}'
             contact_email = f'{billing_info.email}'
             tax_id = f'{billing_info.tax_id}'
             tax_id_type = f'{billing_info.tax_id_type.value}' if billing_info.tax_id_type else ''
@@ -136,6 +142,8 @@ class AllProfessionals(BaseReport):
             'professional_display_name': record.title,
             'professional_legal_company_name': legal_name,
             'professional_full_name': contact_name,
+            'professional_first_name': contact_first_name,
+            'professional_last_name': contact_last_name,
             'professional_billing_street': address_street,
             'professional_billing_neighborhood': address.get('sublocality', ''),
             'professional_billing_city': address.get('locality', ''),
