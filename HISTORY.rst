@@ -50,6 +50,11 @@ History
     * Added new aggregator attribute to keep the total of leadorders and return this on the listing (rudaporto).
     * Fix state_history entries, removing serialized actor information from some transitions (ericof).
 
+2.1.36 (2017-08-06)
+-------------------
+
+    * Card #519: Return profile information when billing info is not available (ericof).
+
 2.1.35 (2017-08-04)
 -------------------
 
