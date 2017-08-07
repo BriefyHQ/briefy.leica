@@ -110,10 +110,10 @@ class AllProfessionals(BaseReport):
         legal_name = ''
         address = {}
         address_street = ''
-        contact_name = ''
-        contact_first_name = ''
-        contact_last_name = ''
-        contact_email = ''
+        contact_first_name = record.first_name
+        contact_last_name = record.last_name
+        contact_name = f'{contact_first_name} {contact_last_name}'
+        contact_email = record.email
         tax_id = ''
         tax_id_type = ''
         tax_id_name = ''
