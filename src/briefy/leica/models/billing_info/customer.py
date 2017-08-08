@@ -22,6 +22,8 @@ class CustomerBillingInfo(BillingInfo):
         ]
     }
 
+    __exclude_attributes__ = ['customer']
+
     __raw_acl__ = (
         ('create', ('g:briefy_bizdev', 'g:briefy_finance', 'g:system')),
         ('list', ('g:briefy', 'g:system')),
@@ -75,14 +77,3 @@ class CustomerBillingInfo(BillingInfo):
 
     Internal codes used by Finance to determine tax rates to be applied to this customer.
     """
-
-    def to_dict(self, excludes: list=None, includes: list=None) -> dict:
-        """Return a dictionary with fields and values used by this Class.
-
-        :param excludes: attributes to exclude from dict representation.
-        :param includes: attributes to include from dict representation.
-        :returns: Dictionary with fields and values used by this Class
-        """
-        data = super().to_dict(excludes, includes)
-        data['customer'] = self.customer.to_summary_dict()
-        return data

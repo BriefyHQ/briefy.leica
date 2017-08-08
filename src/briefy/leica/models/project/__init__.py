@@ -233,6 +233,7 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
 
     tech_requirements = sa.Column(
         JSONB,
+        default=dict,
         info={
             'colanderalchemy': {
                 'title': 'Technical Requirements for this project.',

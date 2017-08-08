@@ -17,8 +17,8 @@ class TestProjectView(BaseTestView):
     model = models.Project
     initial_wf_state = 'ongoing'
     ignore_validation_fields = [
-        'state_history', 'state', 'customer', 'updated_at',
-        'qa_manager', 'project_manager', 'scout_manager', 'versions', 'orders', 'leadorders'
+        'state_history', 'state', 'customer', 'updated_at', 'qa_manager',
+        'project_manager', 'scout_manager', 'versions', 'orders', 'leadorders'
     ]
 
     UPDATE_SUCCESS_MESSAGE = ''

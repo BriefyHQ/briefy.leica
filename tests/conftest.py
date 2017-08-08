@@ -206,6 +206,14 @@ class BaseModelTest:
         intersection = [k for k in obj_dict.keys() if k in not_expected_attributes]
         assert len(intersection) == 0
 
+    def test_to_dict_additional_attr(self, instance_obj):
+        """Test to_dict will respect __to_dict_additional_attributes__ ."""
+        additional_attributes = set(self.model.__to_dict_additional_attributes__)
+        obj_dict = instance_obj.to_dict(excludes=[], includes=[])
+        keys = obj_dict.keys()
+        missing = [k for k in additional_attributes if k not in keys]
+        assert len(missing) == 0
+
     def test_to_dict_respects__summary_attributes_relations(self, instance_obj):
         """Test to_dict will respect __summary_attributes_relations__ ."""
         to_summary_relations = set(self.model.__summary_attributes_relations__)
@@ -340,7 +348,7 @@ class BaseTestView:
     NOT_FOUND_MESSAGE = ''
     payload_position = 0
     update_map = {}
-    serialize_attrs = ['path']
+    serialize_attrs = ['path', '_roles']
     initial_wf_state = 'created'
     ignore_validation_fields = ['state_history', 'state']
 
@@ -410,6 +418,9 @@ class BaseTestView:
                 elif key in self.serialize_attrs:
                     if isinstance(value, (list, tuple)):
                         value = [to_serializable(item) for item in value]
+                    elif isinstance(value, dict):
+                        value = {key: [to_serializable(item) for item in val]
+                                 for key, val in value.items()}
                     else:
                         value = to_serializable(value)
                 assert result.get(key) == value

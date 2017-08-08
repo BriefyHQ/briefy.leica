@@ -28,7 +28,9 @@ class Comment(mixins.LeicaMixin, Base):
         'id', 'content', 'internal', 'created_at', 'updated_at', 'author', 'author_role', 'to_role'
     ]
 
-    __summary_attributes_relations__ = ['entity']
+    __exclude_attributes__ = ['entity']
+
+    __to_dict_additional_attributes__ = ['author']
 
     __listing_attributes__ = __summary_attributes__
 
@@ -129,13 +131,6 @@ class Comment(mixins.LeicaMixin, Base):
         return mixins.get_public_user_info(str(self.author_id))
 
     entity = sautils.generic_relationship(entity_type, entity_id)
-
-    def to_dict(self, excludes: list=None, includes: list=None):
-        """Return a dict representation of this object."""
-        data = super().to_dict(excludes=excludes, includes=includes)
-        data['author'] = self.author
-        data['entity'] = self.entity
-        return data
 
 
 @event.listens_for(Comment, 'after_update')

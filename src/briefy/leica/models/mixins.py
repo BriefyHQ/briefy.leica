@@ -319,14 +319,17 @@ class BaseLeicaMixin:
 
     __session__ = Session
 
-    def _apply_actors_info(self, data: dict) -> dict:
+    def _apply_actors_info(self, data: dict, additional_actors: list=None) -> dict:
         """Add actors info to data payload.
 
         :param data: payload with all data from a model
         :return: Dictionary with data payload updated.
         """
         profile_service = getUtility(IUserProfileQuery)
-        return profile_service.apply_actors_info(data, self.__actors__)
+        actors = set(self.__actors__)
+        if additional_actors:
+            actors = actors.union(set(additional_actors))
+        return profile_service.apply_actors_info(data, list(actors))
 
     @declared_attr
     def __tablename__(cls):

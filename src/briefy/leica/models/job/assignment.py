@@ -159,13 +159,18 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
 
     _workflow = workflows.AssignmentWorkflow
 
-    __exclude_attributes__ = ['assets', 'comments']
+    __exclude_attributes__ = ['assets', 'comments', 'approvable_assets', 'active_order']
 
     __summary_attributes__ = __summary_attributes__
     __summary_attributes_relations__ = [
-        'project', 'location', 'professional', 'customer', 'pool'
+        'project', 'location', 'professional', 'customer', 'pool', 'order', 'location'
     ]
     __listing_attributes__ = __listing_attributes__
+    __to_dict_additional_attributes__ = [
+        'title', 'description', 'briefing', 'assignment_date', 'last_approval_date',
+        'last_submission_date', 'last_transition_message', 'closed_on_date', 'timezone',
+        'availability', 'external_state', 'set_type', 'category', 'tech_requirements'
+    ]
 
     __raw_acl__ = (
         ('create', ('g:briefy_pm', 'g:briefy_finance', 'g:briefy_scout', 'g:system')),
@@ -395,6 +400,9 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
 
     Instance of :class:`briefy.leica.models.project.Project`.
     """
+
+    tech_requirements = association_proxy('order', 'tech_requirements')
+    """Project tech requirements."""
 
     current_type = association_proxy('order', 'current_type')
     """Current type of the order."""
@@ -632,10 +640,8 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_listing_dict()
-        set_type = self.set_type
-        category = self.category
-        data['set_type'] = set_type
-        data['category'] = category
+        data['set_type'] = self.set_type
+        data['category'] = self.category
         data['external_state'] = self.external_state
         data = self._apply_actors_info(data)
         return data
@@ -643,28 +649,13 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
     @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
-        excludes = list(excludes) if excludes else []
-        excludes.extend(['approvable_assets', 'active_order', ])
         data = super().to_dict(excludes=excludes, includes=includes)
-        data['title'] = self.title
-        data['description'] = self.description
-        data['briefing'] = self.briefing
-        data['assignment_date'] = self.assignment_date
-        data['last_approval_date'] = self.last_approval_date
-        data['last_submission_date'] = self.last_submission_date
-        data['last_transition_message'] = self.last_transition_message
-        data['closed_on_date'] = self.closed_on_date
-        data['timezone'] = self.timezone
-        data['tech_requirements'] = self.order.tech_requirements
-        data['availability'] = self.availability
-        data['order'] = self.order.to_summary_dict() if self.order else None
-        data['location'] = self.location.to_summary_dict() if self.location else None
-        data['external_state'] = self.external_state
 
-        set_type = self.set_type
-        category = self.category
-        data['set_type'] = set_type
-        data['category'] = category
+        # local roles
+        data['professional_user'] = self.professional_user
+        data['assignment_internal_scout'] = self.assignment_internal_scout
+        data['assignment_internal_qa'] = self.assignment_internal_qa
+        data['internal_pm'] = self.order.project.internal_pm
 
         if data['project']:
             # Project delivery data used on the 'approve' transition
@@ -677,7 +668,7 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
             add_user_info_to_state_history(self.state_history)
 
         # Apply actor information to data
-        data = self._apply_actors_info(data)
+        data = self._apply_actors_info(data, additional_actors=['internal_pm'])
         return data
 
 

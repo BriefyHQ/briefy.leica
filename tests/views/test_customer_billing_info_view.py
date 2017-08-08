@@ -16,7 +16,6 @@ class TestCustomerBillingInfo(BaseTestView):
         (models.Customer, 'data/customers.json'),
     ]
     file_path = 'data/customer_billing_infos.json'
-    ignore_validation_fields = ['customer', 'state_history']
     model = models.CustomerBillingInfo
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''

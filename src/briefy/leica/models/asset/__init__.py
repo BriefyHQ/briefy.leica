@@ -35,6 +35,8 @@ class Asset(asset.Asset, mixins.LeicaSubVersionedMixin, Item):
     __summary_attributes__ = __summary_attributes__
     __listing_attributes__ = __listing_attributes__
 
+    __summary_attributes_relations__ = ['assignment']
+
     __raw_acl__ = (
         ('list', ('g:briefy', 'g:system')),
         ('create', ('g:briefy_qa', 'g:system')),

@@ -24,6 +24,7 @@ from dateutil.parser import parse
 from sqlalchemy import event
 from sqlalchemy import orm
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy_utils import TimezoneType
@@ -734,18 +735,8 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
         )
         return query
 
-    @property
-    def tech_requirements(self) -> dict:
-        """Tech requirements for this Order.
-
-        IMPORTANT: This difers from project tech_requirements - those
-        are wrapped in the 'asset' key issued from here.
-
-        :return: A dictionary with technical requirements for an Order.
-        """
-        project = self.project
-        requirements = project.tech_requirements or {}
-        return requirements
+    tech_requirements = association_proxy('project', 'tech_requirements')
+    """Project tech requirements."""
 
     timezone = sa.Column(TimezoneType(backend='pytz'), default='UTC')
     """Timezone in which this address is located.

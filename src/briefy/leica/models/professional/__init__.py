@@ -29,7 +29,7 @@ class Professional(UserProfile):
 
     __summary_attributes_relations__ = ['links', 'main_location', 'locations', 'pools']
 
-    __exclude_attributes__ = ['comments']
+    __exclude_attributes__ = ['comments', 'assets', 'assignments']
 
     __listing_attributes__ = __summary_attributes__ + [
         'main_location'
@@ -206,8 +206,6 @@ class Professional(UserProfile):
 
     def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
-        excludes = list(excludes) if excludes else []
-        excludes.extend(['assets', 'assignments'])
         data = super().to_dict(excludes=excludes, includes=includes)
         data['billing_info_id'] = self.billing_info.id if self.billing_info else ''
         data['intercom'] = intercom_payload_professional(self)

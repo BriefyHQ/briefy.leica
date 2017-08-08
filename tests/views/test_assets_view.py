@@ -24,7 +24,7 @@ class TestAssetView(BaseVersionedTestView):
     # TODO: author_id and uploaded_by should be validated
     ignore_validation_fields = [
         'state_history', 'state', 'updated_at', 'assignment',
-        'raw_metadata', 'uploaded_by', 'professional', 'professional_user'
+        'raw_metadata', 'uploaded_by', 'professional', 'professional_user',
     ]
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''

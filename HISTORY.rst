@@ -52,6 +52,13 @@ History
     * Refactor dashboards: PM, Customer, Professional, Bizdev, QA, Scout, Finance (rudaporto).
     * Added Order.current_type as a field in the Assignment model and listing and as a filter in the assignments view (rudaporto).
     * Comments endpoint now filter internal notes based on user groups (ericof).
+    * Changed Assignment.to_dict by removing additional fields that will be now handled by to_dict and new class attribute (rudaporto).
+    * Remove from Comments and CustomerBillingInfo attributes from the payload (rudaporto).
+    * Remove unnecessary to_dict customizations from models (rudaporto).
+    * Added tech_requirements to the assignment as an association proxy to be serialized in the to_dict payload (rudaporto).
+    * Update BaseLeicaMixin:._apply_actors_info to accept additional_actors to also add actors info roles from parent levels (rudaporto).
+    * Changed Order.tech_requirements to be an association proxy (rudaporto).
+    * Project.tech_requirements has an empty dict as default (rudaporto).
 
 2.1.36 (2017-08-06)
 -------------------
