@@ -59,6 +59,7 @@ History
     * Update BaseLeicaMixin:._apply_actors_info to accept additional_actors to also add actors info roles from parent levels (rudaporto).
     * Changed Order.tech_requirements to be an association proxy (rudaporto).
     * Project.tech_requirements has an empty dict as default (rudaporto).
+    * Explicit remove from Pool.to_dict payload assignments, projects and professionals (rudaporto).
 
 2.1.36 (2017-08-06)
 -------------------

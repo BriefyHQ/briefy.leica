@@ -91,6 +91,8 @@ class Pool(mixins.LeicaSubVersionedMixin, Item):
         'total_assignments', 'total_professionals', 'live_assignments'
     ]
 
+    __exclude_attributes__ = ['professionals', 'assignments', 'projects']
+
     __colanderalchemy_config__ = {'excludes': [
         'state_history', 'state'
     ]}
