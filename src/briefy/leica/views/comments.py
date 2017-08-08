@@ -7,6 +7,9 @@ from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
 from pyramid.security import Allow
 from pyramid.security import Deny
+from sqlalchemy.orm.query import Query
+
+import typing as t
 
 
 class CommentFactory(BaseFactory):
@@ -36,17 +39,27 @@ class CommentService(RESTService):
     }
 
     @property
-    def filter_allowed_fields(self):
+    def filter_allowed_fields(self) -> t.Sequence[str]:
         """List of fields allowed in filtering and sorting."""
-        allowed_fields = super().filter_allowed_fields
+        allowed_fields = list(super().filter_allowed_fields)
         # Remove assignment_id and asset_id
         allowed_fields.remove('entity_id')
         return allowed_fields
 
-    def default_filters(self, query) -> object:
-        """Default filters for this Service."""
-        entity_id = self.request.matchdict.get('entity_id', '')
+    def default_filters(self, query: Query) -> Query:
+        """Apply default filters for Comments resource..
+
+        :param query: Base query.
+        :return: Query with additional filters appliet to it.
+        """
+        request = self.request
+        entity_id = request.matchdict.get('entity_id', '')
+        user = request.user
+        groups = user.groups
         query = query.filter(self.model.entity_id == entity_id)
+        # External users should not access internal notes
+        if 'g:briefy' not in groups:
+            query = query.filter(self.model.internal.is_(False))
         return query
 
 

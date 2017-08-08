@@ -7,6 +7,7 @@
     "entity_id": "c04dc102-7d3b-4574-a261-4bf72db571db",
     "id": "bf910521-d72f-44be-bc29-661851d28bb8",
     "in_reply_to": null,
+    "internal": false,
     "state_history": [
       {
         "to": "created",
@@ -31,6 +32,7 @@
     "entity_id": "7caa7704-7558-47f6-a00f-f3e18bbc06b6",
     "id": "90650a98-c2d8-4484-8aa1-aaaa2afe7fac",
     "in_reply_to": null,
+    "internal": false,
     "state_history": [
       {
         "to": "created",
@@ -55,6 +57,7 @@
     "entity_id": "fbf36c64-5ce0-499b-9f99-27b6979a86c5",
     "id": "a75758c3-f203-4b95-963b-8bde2ec2635f",
     "in_reply_to": null,
+    "internal": false,
     "state_history": [
       {
         "to": "created",
@@ -79,6 +82,7 @@
     "entity_id": "28bd9151-222a-4076-abe0-5867bf22f18d",
     "id": "823807f7-4ffc-4aee-a48e-f8c2e510ed69",
     "in_reply_to": null,
+    "internal": false,
     "state_history": [
       {
         "to": "created",
@@ -103,6 +107,7 @@
     "entity_id": "d244238c-d789-45b2-803e-1a4f03167b08",
     "id": "a69347bd-746b-47d7-8e1f-64912a2a8b54",
     "in_reply_to": null,
+    "internal": false,
     "state_history": [
       {
         "to": "created",
@@ -127,6 +132,7 @@
     "entity_id": "bf721f30-79ce-4bc7-9887-79b6c53c681d",
     "id": "9c4eb62d-1446-4fdb-a77b-21b13644d113",
     "in_reply_to": null,
+    "internal": false,
     "state_history": [
       {
         "to": "created",
@@ -151,6 +157,7 @@
     "entity_id": "fcc22009-5d02-4ea8-af83-2f9305aca255",
     "id": "5f7f39cd-f1ae-485c-a0de-9f663eb3e6ce",
     "in_reply_to": null,
+    "internal": false,
     "state_history": [
       {
         "to": "created",
@@ -175,6 +182,7 @@
     "entity_id": "39c6163f-9341-47e2-875c-8ca399c77193",
     "id": "a281169e-a249-4a7e-ba85-eaa136f80642",
     "in_reply_to": null,
+    "internal": false,
     "state_history": [
       {
         "to": "created",
@@ -199,6 +207,7 @@
     "entity_id": "c5904fb5-f589-4c5f-aecd-1cd2e20a5625",
     "id": "e4833938-2ebb-41f2-a788-077ad6e0a676",
     "in_reply_to": null,
+    "internal": false,
     "state_history": [
       {
         "to": "created",
@@ -223,6 +232,7 @@
     "entity_id": "97bacb3e-0d90-47c9-8904-f6bd80f5171d",
     "id": "6ef510c3-c7a4-40ad-acb9-0d607f683a95",
     "in_reply_to": null,
+    "internal": false,
     "state_history": [
       {
         "to": "created",
@@ -247,6 +257,7 @@
     "entity_id": "011418fa-f450-4deb-b6ea-7f8e103a66d1",
     "id": "9a050aa2-b22d-4ff1-8bc9-1d511604aa73",
     "in_reply_to": null,
+    "internal": false,
     "state_history": [
       {
         "to": "created",
@@ -262,5 +273,30 @@
     "author_id": "a90a4275-a83b-45ca-a869-9a387504cfb9",
     "created_at": "2016-09-18T18:55:32.590388+00:00",
     "content": "Order will take longer to execute!"
+  },
+  {
+    "comment_order": 0,
+    "state": "created",
+    "author_role": "qa_manager",
+    "to_role": "qa_manager",
+    "entity_id": "011418fa-f450-4deb-b6ea-7f8e103a66d1",
+    "id": "8ef510c3-c7a4-40ad-acb9-0d607f683a95",
+    "in_reply_to": null,
+    "internal": true,
+    "state_history": [
+      {
+        "to": "created",
+        "transition": "create",
+        "actor": null,
+        "message": null,
+        "date": "2016-09-18T18:55:32.589036+00:00",
+        "from": ""
+      }
+    ],
+    "updated_at": "2016-09-18T18:55:32.590414+00:00",
+    "entity_type": "Order",
+    "author_id": "a90a4275-a83b-45ca-a869-9a387504cfb9",
+    "created_at": "2016-09-18T18:55:32.590388+00:00",
+    "content": "Customer feedback!"
   }
 ]

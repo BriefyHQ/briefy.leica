@@ -51,6 +51,7 @@ History
     * Fix state_history entries, removing serialized actor information from some transitions (ericof).
     * Refactor dashboards: PM, Customer, Professional, Bizdev, QA, Scout, Finance (rudaporto).
     * Added Order.current_type as a field in the Assignment model and listing and as a filter in the assignments view (rudaporto).
+    * Comments endpoint now filter internal notes based on user groups (ericof).
 
 2.1.36 (2017-08-06)
 -------------------
