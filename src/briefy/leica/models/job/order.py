@@ -170,6 +170,10 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
 
     __exclude_attributes__ = ['comments']
 
+    __to_dict_additional_attributes__ = [
+        'availability', 'delivery', 'tech_requirements'
+    ]
+
     __raw_acl__ = (
         ('create', ('g:briefy_pm', 'g:briefy_finance', 'g:briefy_bizdev', 'g:system')),
         ('list', ('g:briefy_qa', 'g:briefy_bizdev',
@@ -819,8 +823,6 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_summary_dict()
-        data['category'] = self.category.value \
-            if isinstance(self.category, CategoryChoices) else self.category
         return data
 
     @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
@@ -831,36 +833,25 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_listing_dict()
-        data['category'] = self.category.value \
-            if isinstance(self.category, CategoryChoices) else self.category
         return data
 
-    @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
+    # TODO: find way this breaks when try to serialize
+    # @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
         data = super().to_dict(excludes=excludes, includes=includes)
-        assignment_data = None
         if self.assignments:
             assignment = self.assignments[-1]
             assignment_data = assignment.to_summary_dict()
             assignment_data = assignment._apply_actors_info(assignment_data)
+        else:
+            assignment_data = None
 
-        data['description'] = self.description
         data['briefing'] = self.project.briefing
-        data['availability'] = self.availability
-        data['price'] = self.price
-        data['source'] = self.source.value \
-            if isinstance(self.source, OrderInputSource) else self.source
-        data['category'] = self.category.value \
-            if isinstance(self.category, CategoryChoices) else self.category
-        data['deliver_date'] = self.deliver_date
         data['scheduled_datetime'] = self.deliver_date
-        data['delivery'] = self.delivery
-        data['timezone'] = self.timezone
         data['assignment'] = assignment_data
-        data['tech_requirements'] = self.tech_requirements
 
-        add_user_info_to_state_history(self.state_history)
+        # add_user_info_to_state_history(self.state_history)
         if includes and 'state_history' in includes:
             # Workflow history
             add_user_info_to_state_history(self.state_history)
