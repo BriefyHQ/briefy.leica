@@ -62,6 +62,7 @@ History
     * Explicit remove from Pool.to_dict payload assignments, projects and professionals (rudaporto).
     * Clean up Order to_dict, to_listing_dict and to_summary_dict (rudaporto).
     * Temporary disable cache on Order to_dict until we found the why it fail to serialize (rudaporto).
+    * Added _actors new key in the model to_dict payload when they are subclass of Item (rudaporto).
 
 2.1.36 (2017-08-06)
 -------------------

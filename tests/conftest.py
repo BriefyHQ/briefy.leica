@@ -348,7 +348,7 @@ class BaseTestView:
     NOT_FOUND_MESSAGE = ''
     payload_position = 0
     update_map = {}
-    serialize_attrs = ['path', '_roles']
+    serialize_attrs = ['path', '_roles', '_actors']
     initial_wf_state = 'created'
     ignore_validation_fields = ['state_history', 'state']
 
@@ -416,13 +416,7 @@ class BaseTestView:
                 if isinstance(value, (date, datetime, uuid.UUID, enum.Enum, PhoneNumber)):
                     value = to_serializable(value)
                 elif key in self.serialize_attrs:
-                    if isinstance(value, (list, tuple)):
-                        value = [to_serializable(item) for item in value]
-                    elif isinstance(value, dict):
-                        value = {key: [to_serializable(item) for item in val]
-                                 for key, val in value.items()}
-                    else:
-                        value = to_serializable(value)
+                    value = json.loads(json.dumps(value, default=to_serializable))
                 assert result.get(key) == value
 
         # state can be automatic changed by after_insert event listener

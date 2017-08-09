@@ -8,6 +8,8 @@ from octopus.lens import EasyUUID
 from octopus.lens import map_from_object
 from zope.interface import implementer
 
+import sqlalchemy as sa
+
 
 user_schema = {
     'id': '',
@@ -40,6 +42,15 @@ class LeicaUserProfileQuery:
             user = UserProfile.get(user_id)
 
         return map_from_object(user_schema, user, default='') if user else {}
+
+    def get_all_data(self, principal_ids: list) -> list:
+        """Get all user data from a list of principals."""
+        users = UserProfile.query().filter(UserProfile.id == sa.any_(principal_ids)).all()
+        result = []
+        for user in users:
+            data = map_from_object(user_schema, user, default='')
+            result.append(data)
+        return result
 
     def update_wf_history(self, state_history: list) -> list:
         """Update workflow history with user data."""

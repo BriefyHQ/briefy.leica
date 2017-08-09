@@ -354,6 +354,17 @@ class LeicaSubMixin(BaseLeicaMixin, SubItemMixin):
     This includes versionnig and metadata in the Item base table.
     """
 
+    def to_dict(self, excludes: list=None, includes: list=None):
+        """Add _actors attribute with user the profile information to the payload."""
+        data = super().to_dict(excludes=excludes, includes=includes)
+        if data.get('_roles'):
+            principal_ids = set([lr.principal_id for lr in self._all_local_roles])
+            profile_service = getUtility(IUserProfileQuery)
+            users_data = profile_service.get_all_data(list(principal_ids))
+            _actors = {str(user.pop('id')): user for user in users_data}
+            data['_actors'] = _actors
+        return data
+
 
 class LeicaSubVersionedMixin(LeicaSubMixin):
     """Base mixin for Leica Objects supporting versioning and sub item of Item.
