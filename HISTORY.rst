@@ -64,6 +64,7 @@ History
     * Temporary disable cache on Order to_dict until we found the why it fail to serialize (rudaporto).
     * Added _actors new key in the model to_dict payload when they are subclass of Item (rudaporto).
     * Card #501: Copy comment of client refusal from the Order to the Assignment as an internal note (ericof).
+    * Fix issue with polymorphic type for Professional and Photographer (ericof).
 
 
 2.1.36 (2017-08-06)

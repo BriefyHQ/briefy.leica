@@ -220,7 +220,7 @@ class Photographer(Professional):
     __table_args__ = {'extend_existing': True}
 
     __mapper_args__ = {
-        'polymorphic_identity': 'photographers',
+        'polymorphic_identity': 'photographer',
     }
 
     id = sa.Column(
@@ -245,7 +245,7 @@ class Videographer(Professional):
     __table_args__ = {'extend_existing': True}
 
     __mapper_args__ = {
-        'polymorphic_identity': 'videographers',
+        'polymorphic_identity': 'videographer',
     }
 
     id = sa.Column(
