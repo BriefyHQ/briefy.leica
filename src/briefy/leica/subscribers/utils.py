@@ -1,4 +1,5 @@
 """Utils functions for subscribers."""
+from briefy.common.db.models.item import Item
 from briefy.leica.events.assignment import AssignmentCreatedEvent
 from briefy.leica.models import Comment
 from sqlalchemy.ext.associationproxy import _AssociationList
@@ -24,17 +25,32 @@ def apply_local_roles_from_parent(obj, parent, add_roles=()):
                 obj_role_value = parent_role_value
 
 
-def create_comment_from_wf_transition(obj, author_role, to_role, internal=False):
-    """Create a new Comment instance from the last workflow transition."""
+def create_comment_from_wf_transition(
+        obj: Item,
+        author_role: str,
+        to_role: str,
+        internal: bool=False,
+        prefix: str = ''
+) -> None:
+    """Create a new Comment instance from the last workflow transition.
+
+    :param obj: Object to be commented on.
+    :param author_role: Role of the author.
+    :param to_role: Role of the recipient.
+    :param internal: If this is an internal comment or not.
+    :param prefix: Prefix to be added to the comment content.
+    :return: None
+    """
     session = object_session(obj)
     last_transition = obj.state_history[-1]
     message = last_transition['message']
+    content = f'{prefix} {message}'.strip()
     actor = last_transition['actor']
     user_id = actor['id'] if isinstance(actor, dict) else actor
     # HACK: It is ugly, but worked
     comments = obj.comments.filter(
         Comment.author_id == user_id,
-        Comment.content == message,
+        Comment.content == content,
         Comment.to_role == to_role,
         Comment.author_role == author_role,
     ).count()
@@ -43,7 +59,7 @@ def create_comment_from_wf_transition(obj, author_role, to_role, internal=False)
             entity_id=obj.id,
             entity_type=obj.__class__.__name__,
             author_id=user_id,
-            content=message,
+            content=content,
             author_role=author_role,
             to_role=to_role,
             internal=internal,
