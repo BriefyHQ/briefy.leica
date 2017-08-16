@@ -33,8 +33,8 @@ import sqlalchemy_utils as sautils
 __summary_attributes__ = [
     'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
     'number_required_assets', 'approvable', 'total_assets', 'total_approvable_assets',
-    'category', 'scheduled_datetime', 'professional', 'timezone', 'professional_user',
-    'payout_value', 'payout_currency', 'travel_expenses', 'submission_path'
+    'category', 'scheduled_datetime', 'professional', 'timezone', 'payout_value',
+    'payout_currency', 'travel_expenses', 'submission_path'
 ]
 
 __listing_attributes__ = __summary_attributes__ + [
@@ -184,8 +184,7 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
         'excludes': [
             'state_history', 'state', 'order', 'comments',
             'professional', 'assets', 'project', 'location',
-            '_scout_manager', '_project_manager', '_qa_manager',
-            '_professional_user', 'pool', 'active_order'
+            'pool', 'active_order'
         ],
         'overrides': __colander_alchemy_config_overrides__
     }
@@ -652,7 +651,6 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
         data = super().to_dict(excludes=excludes, includes=includes)
 
         # local roles
-        data['professional_user'] = self.professional_user
         data['assignment_internal_scout'] = self.assignment_internal_scout
         data['assignment_internal_qa'] = self.assignment_internal_qa
         data['internal_pm'] = self.order.project.internal_pm
