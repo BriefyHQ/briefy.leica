@@ -1,4 +1,6 @@
 """User profile information."""
+from briefy.common.db.mixins.local_roles import add_local_role
+from briefy.common.db.mixins.local_roles import del_local_role
 from briefy.common.db.mixins.local_roles import set_local_roles_by_principal
 from briefy.common.db.models import Item
 from briefy.common.db.models.local_role import LocalRole
@@ -13,28 +15,8 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import UUIDType
 
 import colander
-import copy
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils
-
-
-__colander_alchemy_config_overrides__ = \
-    copy.copy(mixins.UserProfileRolesMixin.__colanderalchemy_config__['overrides'])
-
-__colander_alchemy_config_overrides__.update(
-    {
-        'customer_roles': {
-            'title': 'Customer Roles',
-            'missing': colander.drop,
-            'typ': colander.String()
-        },
-        'project_roles': {
-            'title': 'Project Roles',
-            'missing': colander.drop,
-            'typ': colander.List()
-        },
-    }
-)
 
 
 class UserProfile(mixins.UserProfileMixin, mixins.UserProfileRolesMixin, Item):
@@ -52,14 +34,6 @@ class UserProfile(mixins.UserProfileMixin, mixins.UserProfileRolesMixin, Item):
     __summary_attributes_relations__ = []
 
     __listing_attributes__ = __summary_attributes__ + ['internal', 'company_name']
-
-    __colanderalchemy_config__ = {
-        'excludes': [
-            'state_history', 'state', 'type', '_owner',
-
-        ],
-        'overrides': __colander_alchemy_config_overrides__
-    }
 
     messengers = sa.Column(
         'messengers',
@@ -129,6 +103,10 @@ class CustomerUserProfile(UserProfile):
         'internal', 'company_name',
     ]
 
+    __to_dict_additional_attributes__ = [
+        'project_customer_pm', 'project_customer_qa', 'customer_roles'
+    ]
+
     __raw_acl__ = (
         ('create', ('g:briefy_bizdev', 'g:briefy_finance', 'g:briefy_pm', 'g:system')),
         ('list', ('g:briefy', 'g:system')),
@@ -141,15 +119,22 @@ class CustomerUserProfile(UserProfile):
         'overrides': {
                 'customer_roles': {
                     'title': 'User roles in the customer',
-                    'default': '',
+                    'typ': colander.List()
+                },
+                'project_customer_pm': {
+                    'title': 'Projects with PM role',
                     'missing': colander.drop,
                     'typ': colander.List()
                 },
-                'project_roles': {
-                    'title': 'User roles in the projects',
-                    'default': '',
+                'project_customer_qa': {
+                    'title': 'Projects with QA role',
                     'missing': colander.drop,
-                    'typ': colander.Mapping()
+                    'typ': colander.List()
+                },
+                'owner': {
+                    'title': 'Owner IDs',
+                    'missing': colander.drop,
+                    'typ': colander.List()
                 },
         }
     }
@@ -192,11 +177,14 @@ class CustomerUserProfile(UserProfile):
         :type payload: dict
         """
         payload = deepcopy(payload)
-        project_roles = payload.pop('project_roles')
-        customer_roles = payload.pop('customer_roles')
+        pop_attrs = ['project_customer_qa', 'project_customer_pm', 'customer_roles']
+        update_kwargs = {}
+        for attr in pop_attrs:
+            value = payload.pop(attr, None)
+            if value:
+                update_kwargs[attr] = value
         obj = super().create(payload)
-        setattr(obj, 'project_roles', project_roles)
-        setattr(obj, 'customer_roles', customer_roles)
+        obj.update(update_kwargs)
         return obj
 
     @hybrid_property
@@ -205,15 +193,16 @@ class CustomerUserProfile(UserProfile):
         return Customer.get(self.customer_id)
 
     @property
-    def _customer_roles(self):
+    def _customer_roles(self) -> list:
         """Get customer roles for this user in the customer context."""
         customer = Customer.get(self.customer_id)
-        return {r.role_name for r in customer.local_roles if r.principal_id == self.id}
+        return [r.role_name for r in customer.local_roles
+                if str(r.principal_id) == str(self.id)]
 
     @hybrid_property
-    def customer_roles(self):
+    def customer_roles(self) -> list:
         """Return roles related to this customer user profile."""
-        return list(self._customer_roles)
+        return self._customer_roles
 
     @customer_roles.setter
     def customer_roles(self, roles: list):
@@ -258,6 +247,49 @@ class CustomerUserProfile(UserProfile):
         for project_id, new_roles in roles_map.items():
             project = Project.get(project_id)
             set_local_roles_by_principal(project, self.id, new_roles)
+
+    def _project_ids_by_role(self, role_name: str) -> list:
+        """Return the list of projects ids the user has a local role."""
+        roles = LocalRole.query().filter(
+            LocalRole.item_type == 'project',
+            LocalRole.principal_id == self.id,
+            LocalRole.role_name == role_name
+        )
+        return [str(lr.item_id) for lr in roles]
+
+    def _update_projects_by_role(self, role_name: str, new_project_ids: list) -> list:
+        """Update the list of projects the user has a local role."""
+        projects = self.customer.projects
+        current_project_ids = self._project_ids_by_role(role_name)
+        for project in projects:
+            project_id = str(project.id)
+            session = project.__session__
+            if project_id in new_project_ids and project_id not in current_project_ids:
+                add_local_role(session, project, role_name, self.id)
+            elif project_id not in new_project_ids and project_id in current_project_ids:
+                for lr in project.local_roles:
+                    if lr.role_name == role_name and lr.principal_id == self.id:
+                        del_local_role(session, project, lr)
+
+    @hybrid_property
+    def project_customer_pm(self) -> list:
+        """Return the list of projects ids the user has project_customer_pm local role."""
+        return self._project_ids_by_role('project_customer_pm')
+
+    @project_customer_pm.setter
+    def project_customer_pm(self, new_project_ids: list):
+        """Update the list of projects that this user has project_customer_pm role."""
+        self._update_projects_by_role('project_customer_pm', new_project_ids)
+
+    @hybrid_property
+    def project_customer_qa(self) -> list:
+        """Return the list of projects ids the user has project_customer_qa local role."""
+        return self._project_ids_by_role('project_customer_qa')
+
+    @project_customer_qa.setter
+    def project_customer_qa(self, new_project_ids: list):
+        """Update the list of projects that this user has project_customer_qa role."""
+        self._update_projects_by_role('project_customer_qa', new_project_ids)
 
     @property
     def projects(self):

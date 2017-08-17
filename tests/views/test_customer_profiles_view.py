@@ -21,8 +21,6 @@ class TestCustomerUserProfileslView(BaseTestView):
     ignore_validation_fields = [
         'state_history',
         'state',
-        'customer_roles',
-        'project_roles',
         'customers',
         'projects',
     ]
@@ -32,5 +30,8 @@ class TestCustomerUserProfileslView(BaseTestView):
         'company_name': 'Other',
         'internal': False,
         'partners': False,
+        'customer_roles': ['customer_manager'],
+        'project_customer_pm': [],
+        'project_customer_qa': [],
         'gender': 'm',
     }

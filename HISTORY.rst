@@ -65,7 +65,11 @@ History
     * Added _actors new key in the model to_dict payload when they are subclass of Item (rudaporto).
     * Card #501: Copy comment of client refusal from the Order to the Assignment as an internal note (ericof).
     * Fix issue with polymorphic type for Professional and Photographer (ericof).
-
+    * Remove professional_user local role from Assignment payload (rudaporto).
+    * Remove old local role attributes from Assignment colander schema excludes (rudaporto).
+    * Change CustomerUserProfile payload: remove project_roles, added project_customer_pm and project_customer_qa (rudaporto).
+    * Improve tests for CustomerUserProfile and improve validation of list fields in the view tests (rudaporto).
+    * When running in development environment never try to activate or create a user in rolleiflex (rudaporto).
 
 2.1.36 (2017-08-06)
 -------------------

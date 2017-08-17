@@ -386,7 +386,12 @@ class BaseTestView:
         # validate response payload against sent payload
         for key, value in payload.items():
             if key not in self.ignore_validation_fields:
-                assert result.get(key) == value
+                result_value = result.get(key)
+                if isinstance(value, list):
+                    for item in result_value:
+                        assert item in value
+                else:
+                    assert result_value == value
 
         # state can be automatic changed by after_insert event listener
         assert self.initial_wf_state == result.get('state')
@@ -397,7 +402,12 @@ class BaseTestView:
                 obj_value = getattr(db_obj, key)
                 if isinstance(obj_value, (date, datetime, uuid.UUID, enum.Enum, PhoneNumber)):
                     obj_value = to_serializable(obj_value)
-                assert obj_value == value
+
+                if isinstance(value, list):
+                    for item in obj_value:
+                        assert item in value
+                else:
+                    assert obj_value == value
 
         # state can be automatic changed by after_insert event listener
         assert self.initial_wf_state == getattr(db_obj, 'state')
@@ -417,7 +427,14 @@ class BaseTestView:
                     value = to_serializable(value)
                 elif key in self.serialize_attrs:
                     value = json.loads(json.dumps(value, default=to_serializable))
-                assert result.get(key) == value
+
+                result_value = result.get(key)
+
+                if isinstance(value, list):
+                    for item in result_value:
+                        assert item in value
+                else:
+                    assert result_value == value
 
         # state can be automatic changed by after_insert event listener
         assert self.initial_wf_state == getattr(db_obj, 'state')
@@ -462,7 +479,12 @@ class BaseTestView:
             obj_value = getattr(updated_obj, key)
             if isinstance(obj_value, (date, datetime, uuid.UUID, enum.Enum)):
                 obj_value = to_serializable(obj_value)
-            assert obj_value == value
+                assert obj_value == value
+            elif isinstance(obj_value, list):
+                for item in obj_value:
+                    assert item in value
+            else:
+                assert obj_value == value
 
         # state can be automatic changed by after_insert event listener
         assert self.initial_wf_state == getattr(updated_obj, 'state')
