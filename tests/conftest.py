@@ -387,12 +387,12 @@ class BaseTestView:
         for key, value in payload.items():
             if key not in self.ignore_validation_fields:
                 result_value = result.get(key)
-                if isinstance(value, list):
-                    for item in result_value:
-                        assert item in value
-                elif key in self.serialize_attrs:
+                if key in self.serialize_attrs:
                     value = json.loads(json.dumps(value, default=to_serializable))
                     assert result_value == value
+                elif isinstance(value, list):
+                    for item in result_value:
+                        assert item in value
                 else:
                     assert result_value == value
 

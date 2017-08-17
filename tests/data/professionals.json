@@ -24,12 +24,19 @@
     "mobile": "+49 176 37755722",
     "description": "Sebastião Salgado (born February 8, 1944) is a Brazilian social documentary photographer.",
     "email": "salgado@professional.briefy.co",
+    "links": [
+      {"state": "created",
+      "type": "facebook",
+      "url": "https://facebook.com/salgado"},
+      {"state": "created",
+       "type": "twitter",
+       "url": "https://twitter.com/salgado"}
+    ],
     "main_location": {
       "coordinates": {"coordinates": [9.732010400000036, 52.3758916],
                        "type": "Point"},
        "country": "DE",
        "created_at": "2017-06-01T11:02:42.334841+00:00",
-       "id": "9152cc50-94ef-46d2-9295-125e2ca92d36",
        "formatted_address": "Hanover, Germany",
        "info": {"coordinates": [52.3758916, 9.732010400000036],
                 "country": "DE",
@@ -72,6 +79,7 @@
     "mobile": "+4917637755722",
     "description": "Sebastião Salgado (born February 8, 1944) is a Brazilian social documentary photographer.",
     "email": "salgado1@professional.briefy.co",
+    "links": [{"type": "portfolio", "url": "https://test.com"}],
     "main_location": {
       "coordinates": {
         "coordinates": [
@@ -132,6 +140,7 @@
     "mobile": "+4917637754722",
     "description": "A genius.",
     "email": "steve@professional.briefy.co",
+    "links": [{"type": "portfolio", "url": "https://test.com"}],
     "main_location": {
       "coordinates": {"coordinates": [9.732010400000036, 52.3758916],
                        "type": "Point"},

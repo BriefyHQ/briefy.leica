@@ -74,6 +74,8 @@ History
     * Tests: added complex fields to the serialize_attrs list to be able to compare in the view tests (rudaporto).
     * Tests: remove updated_at attribute from json payloads (rudaporto).
     * Order and LeadOrder: fix creation subscriber to use price from payload when it is available and then use project.price as fallback (rudaporto).
+    * Card #538: fixing adding a new Professional with links (rudaporto).
+    * Card #541: when deleting a Professional link it is removed (rudaporto).
 
 2.1.36 (2017-08-06)
 -------------------

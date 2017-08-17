@@ -169,7 +169,8 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
     __to_dict_additional_attributes__ = [
         'title', 'description', 'briefing', 'assignment_date', 'last_approval_date',
         'last_submission_date', 'last_transition_message', 'closed_on_date', 'timezone',
-        'availability', 'external_state', 'set_type', 'category', 'tech_requirements'
+        'availability', 'external_state', 'set_type', 'category', 'tech_requirements',
+        'professional'
     ]
 
     __raw_acl__ = (
@@ -645,7 +646,8 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
         data = self._apply_actors_info(data)
         return data
 
-    @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
+    # TODO: invalidate is not working after professional assign
+    # @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
         data = super().to_dict(excludes=excludes, includes=includes)

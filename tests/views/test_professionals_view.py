@@ -14,7 +14,12 @@ class TestProfessionalView(BaseTestView):
     file_path = 'data/professionals.json'
     model = models.Professional
     initial_wf_state = 'pending'
-    serialize_attrs = ['path', '_roles', '_actors', 'intercom', 'main_location', 'locations']
+    serialize_attrs = [
+        'path', '_roles', '_actors', 'intercom'
+    ]
+    ignore_validation_fields = [
+        'state_history', 'state', 'locations', 'main_location', 'links'
+    ]
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {
