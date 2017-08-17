@@ -14,9 +14,7 @@ class TestProfessionalView(BaseTestView):
     file_path = 'data/professionals.json'
     model = models.Professional
     initial_wf_state = 'pending'
-    ignore_validation_fields = [
-        'state_history', 'state', 'intercom', 'locations', 'main_location'
-    ]
+    serialize_attrs = ['path', '_roles', '_actors', 'intercom', 'main_location', 'locations']
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {
@@ -25,7 +23,6 @@ class TestProfessionalView(BaseTestView):
             'skype': 'foo@bar.com'
         },
     }
-
     main_location_map = {
         'main_location':
             {

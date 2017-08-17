@@ -171,7 +171,7 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
     __exclude_attributes__ = ['comments']
 
     __to_dict_additional_attributes__ = [
-        'availability', 'delivery', 'tech_requirements'
+        'availability', 'delivery', 'tech_requirements', 'price'
     ]
 
     __raw_acl__ = (

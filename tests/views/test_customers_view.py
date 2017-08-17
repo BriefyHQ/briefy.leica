@@ -12,7 +12,6 @@ class TestCustomerView(BaseTestView):
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     initial_wf_state = 'pending'
-    ignore_validation_fields = ['updated_at', 'state', 'state_history']
     update_map = {
         'title': 'New Customer Name',
         'description': 'New Customer Description',

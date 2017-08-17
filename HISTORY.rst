@@ -70,6 +70,10 @@ History
     * Change CustomerUserProfile payload: remove project_roles, added project_customer_pm and project_customer_qa (rudaporto).
     * Improve tests for CustomerUserProfile and improve validation of list fields in the view tests (rudaporto).
     * When running in development environment never try to activate or create a user in rolleiflex (rudaporto).
+    * Tests: review and remove all unused ignore_validation_fields from view tests (rudaporto).
+    * Tests: added all possibile complex relationship fields to serialize_attrs to serialize them before compare in the view tests (rudaporto).
+    * Tests: remove updated_at attribute from json payloads (rudaporto).
+    * Order and LeadOrder: fix creation subscriber to use price from payload when it is available and then use project.price as fallback (rudaporto).
 
 2.1.36 (2017-08-06)
 -------------------

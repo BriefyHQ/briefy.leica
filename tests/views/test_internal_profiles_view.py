@@ -14,6 +14,7 @@ class TestCustomerUserProfileslView(BaseTestView):
     file_path = 'data/internal_profiles.json'
     model = models.InternalUserProfile
     initial_wf_state = 'active'
+    serialize_attrs = ['path', '_roles', '_actors', 'mobile']
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {
@@ -21,4 +22,5 @@ class TestCustomerUserProfileslView(BaseTestView):
         'internal': False,
         'partners': False,
         'gender': 'm',
+        'mobile': '+49 176 28697522'
     }

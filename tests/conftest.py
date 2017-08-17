@@ -390,6 +390,9 @@ class BaseTestView:
                 if isinstance(value, list):
                     for item in result_value:
                         assert item in value
+                elif key in self.serialize_attrs:
+                    value = json.loads(json.dumps(value, default=to_serializable))
+                    assert result_value == value
                 else:
                     assert result_value == value
 
@@ -402,10 +405,12 @@ class BaseTestView:
                 obj_value = getattr(db_obj, key)
                 if isinstance(obj_value, (date, datetime, uuid.UUID, enum.Enum, PhoneNumber)):
                     obj_value = to_serializable(obj_value)
-
                 if isinstance(value, list):
                     for item in obj_value:
                         assert item in value
+                elif key in self.serialize_attrs:
+                    obj_value = json.loads(json.dumps(value, default=to_serializable))
+                    assert obj_value == value
                 else:
                     assert obj_value == value
 
@@ -483,6 +488,9 @@ class BaseTestView:
             elif isinstance(obj_value, list):
                 for item in obj_value:
                     assert item in value
+            elif key in self.serialize_attrs:
+                obj_value = json.loads(json.dumps(obj_value, default=to_serializable))
+                assert obj_value == value
             else:
                 assert obj_value == value
 

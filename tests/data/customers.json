@@ -5,10 +5,9 @@
     "description": "Client 01 Description",
     "customer_qa": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
     "customer_pm": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
-    "customer_manager": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
+    "customer_manager": ["83c0ea60-1d60-4d4b-ac63-0e5bfad1ef9d"],
     "internal_account": ["a9d06928-0878-45a0-9380-8702965e79c1"],
     "id": "c2034c1b-0a40-4b84-9ace-54b958f64ed4",
-    "updated_at": "2016-09-18T18:55:18.907408+00:00",
     "state_history": [
       {
         "to": "created",
@@ -28,10 +27,9 @@
     "description": "Client 02 Description",
     "customer_qa": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
     "customer_pm": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
-    "customer_manager": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
+    "customer_manager": ["83c0ea60-1d60-4d4b-ac63-0e5bfad1ef9d"],
     "internal_account": ["a9d06928-0878-45a0-9380-8702965e79c1"],
     "id": "979191be-0412-4d70-8587-5df5beb1b4c6",
-    "updated_at": "2016-09-18T18:55:24.842881+00:00",
     "state_history": [
       {
         "to": "created",
@@ -51,10 +49,9 @@
     "description": "Client 03 Description",
     "customer_qa": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
     "customer_pm": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
-    "customer_manager": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
+    "customer_manager": ["83c0ea60-1d60-4d4b-ac63-0e5bfad1ef9d"],
     "internal_account": ["a9d06928-0878-45a0-9380-8702965e79c1"],
     "id": "f61437ce-ca13-4a64-8474-c43906267215",
-    "updated_at": "2016-09-18T18:55:27.599535+00:00",
     "state_history": [
       {
         "to": "created",
@@ -77,7 +74,6 @@
     "customer_manager": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
     "internal_account": ["a9d06928-0878-45a0-9380-8702965e79c1"],
     "id": "efd00ae0-55d2-4c63-a70b-cfc716d66a11",
-    "updated_at": "2016-09-18T18:55:30.296546+00:00",
     "state_history": [
       {
         "to": "created",
@@ -100,7 +96,6 @@
     "customer_manager": ["83c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d"],
     "internal_account": ["a9d06928-0878-45a0-9380-8702965e79c1"],
     "id": "51eaab79-1c05-44fa-b3cf-278ecf311978",
-    "updated_at": "2016-09-18T18:55:30.296546+00:00",
     "state_history": [
       {
         "to": "created",

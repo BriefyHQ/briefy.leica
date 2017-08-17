@@ -12,9 +12,6 @@ class TestPoolOrderView(BaseVersionedTestView):
     base_path = '/pools'
     dependencies = [
     ]
-    ignore_validation_fields = [
-        'state_history', 'state'
-    ]
     file_path = 'data/jpools.json'
     model = models.Pool
     initial_wf_state = 'created'

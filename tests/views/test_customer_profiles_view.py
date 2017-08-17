@@ -6,7 +6,7 @@ import pytest
 
 
 @pytest.mark.usefixtures('create_dependencies')
-class TestCustomerUserProfileslView(BaseTestView):
+class TestCustomerUserProfilesView(BaseTestView):
     """Test CustomerUserProfiles view."""
 
     base_path = '/profiles/customer'
@@ -18,12 +18,7 @@ class TestCustomerUserProfileslView(BaseTestView):
     ]
     model = models.CustomerUserProfile
     initial_wf_state = 'active'
-    ignore_validation_fields = [
-        'state_history',
-        'state',
-        'customers',
-        'projects',
-    ]
+    serialize_attrs = ['path', '_roles', '_actors', 'mobile', 'customers', 'projects']
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {
@@ -34,4 +29,5 @@ class TestCustomerUserProfileslView(BaseTestView):
         'project_customer_pm': [],
         'project_customer_qa': [],
         'gender': 'm',
+        'mobile': '+49 176 28697522'
     }

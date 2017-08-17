@@ -62,10 +62,11 @@ class UnaryRelationshipWrapper:
 
     def create_or_update_sub_object(self, obj, value):
         """"Create a new sub object o update an existing instance."""
-        if not value.get('id', None):
+        sub_object = None
+        if value.get('id', None):
+            sub_object = self.update_sub_object(obj, value)
+        if not sub_object:
             self.create_sub_object(obj, value)
-        else:
-            self.update_sub_object(obj, value)
 
     def create_sub_object(self, obj, value):
         """Create a new sub object instance."""
@@ -85,12 +86,14 @@ class UnaryRelationshipWrapper:
         else:
             setattr(obj, self._field_name, sub_object)
 
-    def update_sub_object(self, obj, values):
+    def update_sub_object(self, obj, values) -> object:
         """Update an existing sub object instance."""
+        sub_object = None
         if obj and isinstance(values, dict):
             sub_object = self.__get__(obj)
             if sub_object:
                 sub_object.update(values)
+        return sub_object
 
 
 class MultipleRelationshipWrapper(UnaryRelationshipWrapper):

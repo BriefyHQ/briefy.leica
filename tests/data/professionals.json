@@ -29,6 +29,7 @@
                        "type": "Point"},
        "country": "DE",
        "created_at": "2017-06-01T11:02:42.334841+00:00",
+       "id": "9152cc50-94ef-46d2-9295-125e2ca92d36",
        "formatted_address": "Hanover, Germany",
        "info": {"coordinates": [52.3758916, 9.732010400000036],
                 "country": "DE",

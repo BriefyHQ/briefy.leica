@@ -16,11 +16,14 @@ class TestLeadOrderView(BaseVersionedTestView):
         (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
+        (models.CustomerUserProfile, 'data/customer_profiles.json'),
+        (models.InternalUserProfile, 'data/internal_profiles.json')
+    ]
+    serialize_attrs = [
+        'path', '_roles', '_actors', 'customer', 'project', 'timezone', 'assignment', 'assignments'
     ]
     ignore_validation_fields = [
-        'state_history', 'state', 'updated_at', 'customer', 'project', 'timezone',
-        'customer_user', 'project_manager', 'scout_manager', 'location',
-        'external_id', 'assignment', 'assignments', 'price', 'versions'
+        'state_history', 'state', 'location'
     ]
     file_path = 'data/leadorders.json'
     model = models.LeadOrder

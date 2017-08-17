@@ -11,8 +11,6 @@
     "payable": true,
     "order_id": "011418fa-f450-4deb-b6ea-7f8e103a66d1",
     "id": "c04dc102-7d3b-4574-a261-4bf72db571db",
-    "updated_at": "2016-09-18T18:55:20.226722+00:00",
-    "created_at": "2016-09-18T18:55:20.226696+00:00",
     "state": "created",
     "professional_user": ["23d94a43-3947-42fc-958c-09245ecca5f2"],
     "professional_id": "23d94a43-3947-42fc-958c-09245ecca5f2",
@@ -39,8 +37,6 @@
     "payable": true,
     "order_id": "3a21070d-6c77-4239-91ab-7ba4e86dc909",
     "id": "fbf36c64-5ce0-499b-9f99-27b6979a86c5",
-    "updated_at": "2016-09-18T18:55:23.073140+00:00",
-    "created_at": "2016-09-18T18:55:23.073122+00:00",
     "state": "created",
     "state_history": [
       {
@@ -65,8 +61,6 @@
     "payable": false,
     "order_id": "7793d335-bfda-4ef5-becb-ed03cb2c13d0",
     "id": "d244238c-d789-45b2-803e-1a4f03167b08",
-    "updated_at": "2016-09-18T18:55:25.930638+00:00",
-    "created_at": "2016-09-18T18:55:25.930625+00:00",
     "state": "created",
     "state_history": [
       {
@@ -91,8 +85,6 @@
     "payable": false,
     "order_id": "4d1906ad-dacb-47fb-96f1-e1b07283cf96",
     "id": "fcc22009-5d02-4ea8-af83-2f9305aca255",
-    "updated_at": "2016-09-18T18:55:28.530461+00:00",
-    "created_at": "2016-09-18T18:55:28.530442+00:00",
     "state": "created",
     "state_history": [
       {
@@ -117,8 +109,6 @@
     "payable": false,
     "order_id": "cf0238de-93f9-4ff6-a80b-bd12ebb14701",
     "id": "c5904fb5-f589-4c5f-aecd-1cd2e20a5625",
-    "updated_at": "2016-09-18T18:55:31.213418+00:00",
-    "created_at": "2016-09-18T18:55:31.213394+00:00",
     "state": "created",
     "state_history": [
       {
