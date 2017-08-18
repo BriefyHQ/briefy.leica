@@ -49,8 +49,8 @@ class ProfessionalService(RESTService):
     model = Professional
     default_order_by = 'title'
     filter_related_fields = [
-        'title', '_main_location.formatted_address', '_main_location.country',
-        '_main_location.locality', 'pools.id', 'pools.title', 'pools.country'
+        'title', 'main_location.formatted_address', 'main_location.country',
+        'main_location.locality', 'pools.id', 'pools.title', 'pools.country'
     ]
 
     _validators = (

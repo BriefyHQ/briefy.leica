@@ -53,8 +53,8 @@ class OrderService(RESTService):
     model = Order
     default_order_by = 'created_at'
     filter_related_fields = [
-        'project._title', 'project.id', 'project.status', '_location.locality',
-        '_location.country', '_location.fullname', '_location.formatted_address',
+        'project._title', 'project.id', 'project.status', 'location.locality',
+        'location.country', 'location.fullname', 'location.formatted_address',
         'customer.title', 'assignment.id'
     ]
 
