@@ -666,7 +666,8 @@ def migrate_localroles():
         where o.project_id = p.id)
     ORDER BY p.id) as source
     '''
-    op.execute(insert_qa_scout_roles)
+    # disable this to run manually after since it's not mandatory
+    # op.execute(insert_qa_scout_roles)
 
     add_missing_owner_local_roles = '''
     INSERT INTO localroles (id, item_id, item_type, principal_id, role_name, updated_at, created_at)
