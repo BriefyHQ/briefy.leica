@@ -1,5 +1,6 @@
 """Views to handle Professionals creation."""
 from briefy.leica.events import professional as events
+from briefy.leica.models import Photographer
 from briefy.leica.models import Professional
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources import HistoryService
@@ -8,6 +9,7 @@ from briefy.ws.resources import VersionsService
 from briefy.ws.resources import WorkflowAwareResource
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
+from cornice.resource import view
 from pyramid.security import Allow
 
 
@@ -55,6 +57,16 @@ class ProfessionalService(RESTService):
         'GET': events.ProfessionalLoadedEvent,
         'DELETE': events.ProfessionalDeletedEvent,
     }
+
+    @view(validators='_run_validators', permission='create')
+    def collection_post(self, model=None):
+        """Add a new instance of a Professional.
+
+        For now all Professionals are Photographers, but this needs to change
+        :returns: Newly created instance of model Photographer.
+        """
+        model = Photographer
+        return super().collection_post(model=model)
 
 
 @resource(

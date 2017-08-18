@@ -79,9 +79,9 @@ class AllCustomers(BaseReport):
                 f'{billing_info.tax_id_status.value}' if billing_info.tax_id_status else ''
             )
 
-        bizdev = record.account_manager
+        bizdev = record.internal_account
         if bizdev:
-            data = profile_service.get_data(str(bizdev))
+            data = profile_service.get_data(str(bizdev[0]))
             bizdev_title = data['fullname']
             bizdev_email = data['email']
 

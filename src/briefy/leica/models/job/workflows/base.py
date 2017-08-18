@@ -167,7 +167,6 @@ class BaseOrderWorkflow(BriefyWorkflow):
     @received.transition(
         assigned,
         'can_assign',
-        required_fields=('scout_manager', )
     )
     def assign(self, **kwargs):
         """Transition: Assign a Professional to an Order."""

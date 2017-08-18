@@ -1,6 +1,6 @@
 """Custom descriptors to handle get, set and delete of special attributes."""
 from briefy.common.db import Base
-from sqlalchemy.orm.collections import InstrumentedList
+from briefy.leica import logger
 from sqlalchemy.orm.session import object_session
 
 
@@ -19,32 +19,32 @@ class UnaryRelationshipWrapper:
         self._fk_attr = fk_attr
         self._attr_created = {}
 
-    def __get__(self, obj, obj_type=None) -> Base:
+    def __get__(self, parent_obj, obj_type=None) -> Base:
         """Get the data from the field.
 
-        :param obj: instance of the model where the descriptor attribute is defined
+        :param parent_obj: instance of the model where the descriptor attribute is defined
         :param obj_type: not used
         :return: instance of the related object
         """
         value = None
-        if obj:
-            value = getattr(obj, self._field_name)
+        if parent_obj:
+            value = getattr(parent_obj, self._field_name)
             if not value:
-                attr_instance_id = self._attr_created.get(obj.id)
+                attr_instance_id = self._attr_created.get(parent_obj.id)
                 value = self._model.get(attr_instance_id) if attr_instance_id else None
         return value
 
-    def __set__(self, obj, value) -> None:
+    def __set__(self, parent_obj, value) -> None:
         """Set the new instance of the related object.
 
-        :param obj: instance of the model where the descriptor attribute is defined
+        :param parent_obj: instance of the model where the descriptor attribute is defined
         :param value: value received to
         :return: None
         """
         if isinstance(value, dict):
-            self.create_or_update_sub_object(obj, value)
+            self.create_or_update_sub_object(parent_obj, value)
         elif isinstance(value, self._model):
-            setattr(obj, self._field_name, value)
+            setattr(parent_obj, self._field_name, value)
         elif not value:
             pass
         else:
@@ -60,30 +60,31 @@ class UnaryRelationshipWrapper:
         msg = 'Value must be a map to create a new instance or an instance of {model_name}.'
         raise ValueError(msg.format(self._model.__name__))
 
-    def create_or_update_sub_object(self, obj, value):
+    def create_or_update_sub_object(self, parent_obj, value):
         """"Create a new sub object o update an existing instance."""
-        if not value.get('id', None):
-            self.create_sub_object(obj, value)
+        value_id = value.get('id', None)
+        if not value_id:
+            self.create_sub_object(parent_obj, value)
         else:
-            self.update_sub_object(obj, value)
+            self.update_sub_object(parent_obj, value)
 
-    def create_sub_object(self, obj, value):
+    def create_sub_object(self, parent_obj, value, collection=None):
         """Create a new sub object instance."""
-        session = object_session(obj)
-        if not obj.id or not session:
+        field_name = self._field_name
+        session = object_session(parent_obj)
+        if not parent_obj.id or not session:
             # do not try to add a new instance if the obj is not persisted yet.
             return
-        fk_id = obj.id
+        fk_id = parent_obj.id
         value[self._fk_attr] = fk_id
-        sub_object = self._model(**value)
-        session.add(sub_object)
-        session.flush()
-        self._attr_created[obj.id] = sub_object.id
-        actual_value = getattr(obj, self._field_name)
-        if isinstance(actual_value, InstrumentedList):
-            actual_value.append(sub_object)
+        sub_object = self._model.create(value)
+        self._attr_created[str(parent_obj.id)] = sub_object.id
+        if collection is not None:
+            collection.append(sub_object)
+            logger.debug(f'Item appended in collection {sub_object}')
         else:
-            setattr(obj, self._field_name, sub_object)
+            setattr(parent_obj, field_name, sub_object)
+            logger.debug(f'Attribute {field_name} updated with {sub_object}')
 
     def update_sub_object(self, obj, values):
         """Update an existing sub object instance."""
@@ -96,25 +97,49 @@ class UnaryRelationshipWrapper:
 class MultipleRelationshipWrapper(UnaryRelationshipWrapper):
     """Descriptor to wrap set and get values from a multiple relationship."""
 
-    def __set__(self, obj, values) -> None:
+    def __set__(self, parent_obj, values) -> None:
         """Set the new instance of the related object.
 
-        :param obj: instance of the model where the descriptor attribute is defined
+        :param parent_obj: instance of the model where the descriptor attribute is defined
         :param values: List of items to be created
         :return: None
         """
-        sub_model_instances = []
+        session = object_session(parent_obj)
+        collection = self.__get__(parent_obj) or []
+        update_value_ids = []
+        update_values = []
+        add_values = []
+
+        # get update and add list
         for value in values:
             if isinstance(value, dict):
-                self.create_or_update_sub_object(obj, value)
-            elif isinstance(value, self._model):
-                sub_model_instances.append(value)
-            elif not value:
-                pass
-            else:
-                self.raise_value_error()
-        if sub_model_instances:
-            setattr(obj, self._field_name, sub_model_instances)
+                value_id = value.get('id', None)
+                obj = self._model.get(value_id) if value_id else None
+                if not obj:
+                    add_values.append(value)
+                else:
+                    update_value_ids.append(value_id)
+                    update_values.append((obj, value))
+
+        # first delete from collection
+        if collection:
+            delete_ids = [str(item.id) for item in collection
+                          if str(item.id) not in update_value_ids]
+            for item_id in delete_ids:
+                item = self._model.get(item_id)
+                session.delete(item)
+                logger.debug(f'Item deleted {item}')
+
+        # update items in collection
+        for obj, value in update_values:
+            obj.update(value)
+
+        # add new items
+        for value in add_values:
+            self.create_sub_object(parent_obj, value, collection)
+
+        if session:
+            session.flush()
 
 
 class LocalRoleProxyDescriptor:

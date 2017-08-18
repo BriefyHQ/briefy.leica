@@ -10,7 +10,7 @@
     "state_history": [
       {
         "to": "created",
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "message": null,
         "date": "2016-09-18T18:55:21.144051+00:00",

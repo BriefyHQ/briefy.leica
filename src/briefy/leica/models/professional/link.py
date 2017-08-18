@@ -16,13 +16,15 @@ class Link(mixins.LeicaMixin, Base):
 
     _workflow = workflows.LinkWorkflow
 
-    __exclude_attributes__ = ['professional', ]
+    __default_exclude_attributes__ = ['request', 'versions', 'local_roles', 'path', 'can_view']
 
-    __summary_attributes_relations__ = ['professional']
+    __exclude_attributes__ = ['professional']
 
-    __colanderalchemy_config__ = {
-        'excludes': ['state_history', 'state']
-    }
+    __summary_attributes__ = ['id', 'url', 'type', 'state']
+
+    __summary_attributes_relations__ = []
+
+    __colanderalchemy_config__ = {'excludes': ['state_history', 'state']}
 
     professional_id = sa.Column(
         UUIDType(),

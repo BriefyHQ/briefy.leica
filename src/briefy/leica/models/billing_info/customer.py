@@ -22,6 +22,8 @@ class CustomerBillingInfo(BillingInfo):
         ]
     }
 
+    __exclude_attributes__ = ['customer']
+
     __raw_acl__ = (
         ('create', ('g:briefy_bizdev', 'g:briefy_finance', 'g:system')),
         ('list', ('g:briefy', 'g:system')),
@@ -29,13 +31,6 @@ class CustomerBillingInfo(BillingInfo):
         ('edit', ('g:briefy_bizdev', 'g:briefy_finance', 'g:system')),
         ('delete', ('g:briefy_finance', 'g:system')),
     )
-
-    __summary_attributes__ = [
-        'id', 'created_at', 'updated_at', 'state', 'billing_address',
-        'slug', 'legal_name', 'email',
-    ]
-
-    __listing_attributes__ = __summary_attributes__
 
     id = sa.Column(
         UUIDType(),
@@ -82,9 +77,3 @@ class CustomerBillingInfo(BillingInfo):
 
     Internal codes used by Finance to determine tax rates to be applied to this customer.
     """
-
-    def to_dict(self):
-        """Return a dict representation of this object."""
-        data = super().to_dict()
-        data['customer'] = self.customer.to_summary_dict()
-        return data

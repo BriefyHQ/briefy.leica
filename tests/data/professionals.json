@@ -2,9 +2,11 @@
   {
     "internal": true,
     "partners": true,
+    "owner": ["23d94a43-3947-42fc-958c-09245ecca5f2"],
+    "id": "23d94a43-3947-42fc-958c-09245ecca5f2",
     "state_history": [
       {
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "to": "created",
         "date": "2016-09-08T15:36:28.082599+00:00",
@@ -15,15 +17,21 @@
     "slug": "sebastiao-salgado",
     "gender": "m",
     "birth_date": "1944-02-08T00:00:00",
-    "title": "Sebastião Salgado",
     "last_name": "Salgado",
     "first_name": "Sebastião",
-    "id": "23d94a43-3947-42fc-958c-09245ecca5f2",
     "created_at": "2016-09-08T15:36:28.087112+00:00",
     "state": "created",
     "mobile": "+49 176 37755722",
     "description": "Sebastião Salgado (born February 8, 1944) is a Brazilian social documentary photographer.",
     "email": "salgado@professional.briefy.co",
+    "links": [
+      {"state": "created",
+      "type": "facebook",
+      "url": "https://facebook.com/salgado"},
+      {"state": "created",
+       "type": "twitter",
+       "url": "https://twitter.com/salgado"}
+    ],
     "main_location": {
       "coordinates": {"coordinates": [9.732010400000036, 52.3758916],
                        "type": "Point"},
@@ -51,7 +59,7 @@
     "partners": true,
     "state_history": [
       {
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "to": "created",
         "date": "2016-09-08T15:36:28.082599+00:00",
@@ -62,15 +70,16 @@
     "slug": "sebastiao-salgado",
     "gender": "m",
     "birth_date": "1944-02-08T00:00:00",
-    "title": "Sebastião Salgado",
     "last_name": "Salgado",
     "first_name": "Sebastião",
+    "owner": ["669a99c2-9bb3-443f-8891-e600a15e3c10"],
     "id": "669a99c2-9bb3-443f-8891-e600a15e3c10",
     "created_at": "2016-09-08T15:36:28.087112+00:00",
     "state": "created",
     "mobile": "+4917637755722",
     "description": "Sebastião Salgado (born February 8, 1944) is a Brazilian social documentary photographer.",
     "email": "salgado1@professional.briefy.co",
+    "links": [{"type": "portfolio", "url": "https://test.com"}],
     "main_location": {
       "coordinates": {
         "coordinates": [
@@ -111,7 +120,7 @@
     "partners": true,
     "state_history": [
       {
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "to": "created",
         "date": "2016-09-08T15:36:28.082599+00:00",
@@ -122,15 +131,16 @@
     "slug": "steve-mccurry",
     "gender": "m",
     "birth_date": "1950-02-24T00:00:00",
-    "title": "Steve McCurry",
     "last_name": "McCurry",
     "first_name": "Steve",
+    "owner": ["d39c07c6-7955-489a-afce-483dfc7c9c5b"],
     "id": "d39c07c6-7955-489a-afce-483dfc7c9c5b",
     "created_at": "2016-09-08T15:36:28.087112+00:00",
     "state": "created",
     "mobile": "+4917637754722",
     "description": "A genius.",
     "email": "steve@professional.briefy.co",
+    "links": [{"type": "portfolio", "url": "https://test.com"}],
     "main_location": {
       "coordinates": {"coordinates": [9.732010400000036, 52.3758916],
                        "type": "Point"},

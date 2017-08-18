@@ -1,9 +1,10 @@
 """Briefy Leica Customer model."""
-from briefy.leica.db import Base
+from briefy.common.db.models import Item
 from briefy.leica.models import mixins
 from briefy.leica.models.customer import workflows
 from briefy.leica.utils.user import add_user_info_to_state_history
 from sqlalchemy import orm
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 from zope.interface import implementer
 from zope.interface import Interface
@@ -18,8 +19,7 @@ class ICustomer(Interface):
 
 
 @implementer(ICustomer)
-class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
-               mixins.KLeicaVersionedMixin, Base):
+class Customer(mixins.CustomerRolesMixin, mixins.LeicaSubMixin, Item):
     """A Customer for Briefy."""
 
     _workflow = workflows.CustomerWorkflow
@@ -27,21 +27,19 @@ class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
     __exclude_attributes__ = ['contacts', 'orders', ]
 
     __summary_attributes__ = [
-        'id', 'slug', 'title', 'description', 'created_at', 'updated_at', 'state',
-        'tax_country', 'legal_name'
+        'id', 'slug', 'title', 'description', 'created_at', 'updated_at', 'state', 'legal_name',
+        'tax_country'
     ]
     __summary_attributes_relations__ = [
-        'billing_contact', 'business_contact', 'addresses', 'projects'
+        'billing_contact', 'business_contact', 'addresses', 'projects', 'customer_users'
     ]
-    __listing_attributes__ = __summary_attributes__
-
+    __listing_attributes__ = __summary_attributes__ + ['internal_account']
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', '_customer_user', '_account_manager',
-            '_customer_users', '_account_managers', 'business_contact',
-            'billing_contact', 'external_id', 'billing_info'
+            'state_history', 'state', 'business_contact',
+            'billing_contact', 'billing_info'
         ],
-        'overrides': mixins.CustomerBriefyRoles.__colanderalchemy_config__['overrides']
+        'overrides': mixins.CustomerRolesMixin.__colanderalchemy_config__['overrides']
     }
 
     __raw_acl__ = (
@@ -70,23 +68,28 @@ class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
     Auto reference to represent composed companies :class:`briefy.leica.models.customer.Customer`.
     """
 
-    legal_name = sa.Column(
-        sa.String(255),
-        nullable=True,
-        info={
-            'colanderalchemy': {
-                'title': 'Customer Legal name',
-                'missing': None,
-                'typ': colander.String
-            }
-        }
+    billing_info = orm.relationship(
+        'CustomerBillingInfo',
+        lazy='joined',
+        uselist=False
     )
+    """Billing Information.
+
+    Financial info about this customer
+    :class:`briefy.leica.models.billing_info.customer.CustomerBillingInfo`.
+    """
+
+    legal_name = association_proxy('billing_info', 'title')
     """Legal name of the company.
 
     i.e.: Insta Stock GmbH
     """
 
-    billing_info = orm.relationship('CustomerBillingInfo', uselist=False)
+    tax_country = association_proxy('billing_info', 'tax_country')
+    """Tax country for this customer.
+
+    i.e.: DE
+    """
 
     addresses = orm.relationship(
         'CustomerBillingAddress',
@@ -164,6 +167,7 @@ class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
 
     projects = orm.relationship(
         'Project',
+        foreign_keys='Project.customer_id',
         backref=orm.backref('customer'),
         lazy='dynamic',
         info={
@@ -180,6 +184,7 @@ class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
 
     orders = orm.relationship(
         'Order',
+        foreign_keys='Order.customer_id',
         backref=orm.backref('customer'),
         lazy='dynamic',
         info={
@@ -192,6 +197,22 @@ class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
     """List of Orders of this Customer.
 
     Returns a collection of :class:`briefy.leica.models.job.order.Orders`.
+    """
+
+    customer_users = orm.relationship(
+        'CustomerUserProfile',
+        foreign_keys='CustomerUserProfile.customer_id',
+        lazy='dynamic',
+        info={
+            'colanderalchemy': {
+                'title': 'Customer User Profiles',
+                'missing': colander.drop,
+            }
+        }
+    )
+    """List of customer user profiles connected to this customer.
+
+    Returns a collection of :class:`briefy.leica.models.user.CustomerUserProfile`.
     """
 
     @declared_attr
@@ -213,12 +234,12 @@ class Customer(mixins.TaxInfo, mixins.PolaroidMixin, mixins.CustomerBriefyRoles,
         """Return a dict representation of this object."""
         excludes = list(excludes) if excludes else []
         data = super().to_dict(excludes=excludes, includes=includes)
-        data['slug'] = self.slug
         data['projects'] = [p.to_summary_dict() for p in self.projects]
         data['billing_info_id'] = self.billing_info.id if self.billing_info else ''
         if includes and 'state_history' in includes:
             # Workflow history
             add_user_info_to_state_history(self.state_history)
         # Apply actor information to data
+        data['internal_account'] = self.internal_account
         data = self._apply_actors_info(data)
         return data

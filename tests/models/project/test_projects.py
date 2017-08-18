@@ -11,6 +11,7 @@ class TestProjectModel(BaseModelTest):
 
     dependencies = [
         (models.Customer, 'data/customers.json'),
+        (models.InternalUserProfile, 'data/internal_profiles.json'),
     ]
     file_path = 'data/projects.json'
     model = models.Project

@@ -72,11 +72,10 @@ class TestMoveOrderToAccepted(BaseTaskTest):
 
     def test_wrong_assignment_state(self, instance_obj):
         """Will not move the order because an Assignment is not in a correct state."""
-        assignment = models.Assignment()
-        assignment.state = 'created'
-
         order = instance_obj
         order_id = order.id
+        assignment = models.Assignment.create({'order_id': order.id})
+        assignment.state = 'created'
         project = order.project
         project.approval_window = 1  # 1 day
         order.state = 'delivered'

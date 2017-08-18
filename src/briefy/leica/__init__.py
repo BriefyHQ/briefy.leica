@@ -1,6 +1,5 @@
 """Briefy Leica."""
 from briefy import leica
-from briefy.common.db.model import Base
 from briefy.leica.db import get_db
 from briefy.leica.db import get_engine
 from briefy.leica.db import Session
@@ -45,6 +44,7 @@ def main(global_config, debug=False, **settings):
     settings['config_file'] = (
         getattr(global_config, '__file__', None) or global_config.get('__file__', '')
     )
+    from briefy.common.db.model import Base
     Session.configure(bind=engine)
     Base.metadata.bind = engine
     config = Configurator(

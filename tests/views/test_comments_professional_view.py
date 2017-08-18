@@ -17,7 +17,6 @@ class TestProfessionalComments(BaseTestView):
     model = models.Comment
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
-    ignore_validation_fields = ['entity', 'state', 'state_history']
     payload_position = 0
     update_map = {
         'content': 'new message content',

@@ -81,13 +81,16 @@ class OrderService(RESTService):
 
         if project.order_type.value == 'leadorder':
             model = LeadOrder
+            current_type = 'leadorder'
         else:
             model = model if model else Order
+            current_type = 'order'
 
         if len(set(add_order_roles) & set(user_groups)) == 0:
             model_name = 'lead' if model == LeadOrder else 'order'
             raise HTTPForbidden(f'You are not allowed to add a new {model_name} to this project')
 
+        payload['current_type'] = current_type
         request.validated = payload
         return super().collection_post(model=model)
 

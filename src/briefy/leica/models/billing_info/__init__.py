@@ -62,29 +62,18 @@ class BillingInfo(TaxInfo, mixins.BillingAddress, mixins.LeicaVersionedMixin, Ba
 
     __tablename__ = 'billing_infos'
 
+    __summary_attributes__ = [
+        'id', 'created_at', 'updated_at', 'state', 'billing_address',
+        'slug', 'email', 'title',
+    ]
+
+    __listing_attributes__ = __summary_attributes__
+
     __colanderalchemy_config__ = {
         'excludes': [
             'state_history', 'state', 'type'
         ]
     }
-
-    title = sa.Column(
-        'title',
-        sa.String(255),
-        nullable=True,
-        default='',
-        info={
-            'colanderalchemy': {
-                'title': 'Company Legal name',
-                'missing': colander.drop,
-                'typ': colander.String
-            }
-        }
-    )
-    """Legal name of the company.
-
-    i.e.: Insta Stock GmbH
-    """
 
     first_name = sa.Column(
         sa.String(255),
@@ -140,9 +129,3 @@ class BillingInfo(TaxInfo, mixins.BillingAddress, mixins.LeicaVersionedMixin, Ba
         if cls_name == 'billinginfo':
             args['polymorphic_on'] = cls.type
         return args
-
-    def to_dict(self):
-        """Return a dict representation of this object."""
-        data = super().to_dict()
-        data['slug'] = self.slug
-        return data

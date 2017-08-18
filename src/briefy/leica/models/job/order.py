@@ -1,4 +1,5 @@
 """Briefy Leica Order to a Job."""
+from briefy.common.db.models import Item
 from briefy.common.db.types import AwareDateTime
 from briefy.common.utils import schema
 from briefy.common.vocabularies.categories import CategoryChoices
@@ -6,7 +7,6 @@ from briefy.leica import logger
 from briefy.leica.cache import cache_manager
 from briefy.leica.cache import cache_region
 from briefy.leica.cache import enable_cache
-from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.descriptors import UnaryRelationshipWrapper
 from briefy.leica.models.job import workflows
@@ -24,7 +24,7 @@ from dateutil.parser import parse
 from sqlalchemy import event
 from sqlalchemy import orm
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy_utils import TimezoneType
@@ -47,11 +47,11 @@ __summary_attributes__ = [
 
 __listing_attributes__ = __summary_attributes__ + [
     'accept_date', 'availability', 'assignment', 'requirements', 'project',
-    'customer', 'refused_times', 'asset_types', 'type', 'current_type'
+    'customer', 'refused_times', 'asset_types', 'current_type'
 ]
 
 __colander_alchemy_config_overrides__ = \
-    copy.copy(mixins.OrderBriefyRoles.__colanderalchemy_config__['overrides'])
+    copy.copy(mixins.OrderRolesMixin.__colanderalchemy_config__['overrides'])
 
 # added to be able pass professional_id to the Order reassign transition
 __colander_alchemy_config_overrides__.update(
@@ -115,12 +115,15 @@ def get_category_from_project(context):
 
 def default_actual_order_price(context):
     """Get category for Order from the Project.category."""
-    order_type = context.current_parameters.get('type')
+    current_type = context.current_parameters.get('current_type')
+    default_price = 0
     actual_order_price = 0
-    if order_type == 'order':
-        # TODO: this can be zero if price not informed
-        # The subscriber also take care of this on the order and leadorder creation
-        actual_order_price = context.current_parameters.get('price', 0)
+    if current_type == 'order':
+        project_id = context.current_parameters.get('project_id', None)
+        if project_id:
+            project = Project.get(project_id)
+            default_price = project.price if project else default_price
+        actual_order_price = context.current_parameters.get('price', default_price)
     return actual_order_price
 
 
@@ -154,17 +157,22 @@ class OrderCharges(colander.SequenceSchema):
     charge = OrderCharge()
 
 
-class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
-            mixins.KLeicaVersionedMixin, Base):
+class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.OrderRolesMixin, Item):
     """An Order from the customer."""
 
     _workflow = workflows.OrderWorkflow
 
     __summary_attributes__ = __summary_attributes__
     __summary_attributes_relations__ = [
-        'project', 'comments', 'customer', 'assignment', 'assignments', 'location'
+        'project', 'customer', 'assignment', 'assignments', 'location'
     ]
     __listing_attributes__ = __listing_attributes__
+
+    __exclude_attributes__ = ['comments']
+
+    __to_dict_additional_attributes__ = [
+        'availability', 'delivery', 'tech_requirements', 'price'
+    ]
 
     __raw_acl__ = (
         ('create', ('g:briefy_pm', 'g:briefy_finance', 'g:briefy_bizdev', 'g:system')),
@@ -179,7 +187,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     __colanderalchemy_config__ = {
         'excludes': [
             'state_history', 'state', 'project', 'comments', 'customer', 'type',
-            '_project_manager', '_scout_manager', '_customer_user', 'external_id',
+            '_project_manager', '_scout_manager', '_customer_user',
             'assignment', 'assignments', '_project_managers', '_scout_managers',
             '_customer_users', 'total_order_price'
         ],
@@ -195,19 +203,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     By default we do not keep track of state_history and helper columns.
     """
 
-    type = sa.Column(sa.String(50))
-    """Polymorphic type name."""
-
-    @declared_attr
-    def __mapper_args__(cls):
-        """Return polymorphic identity."""
-        cls_name = cls.__name__.lower()
-        args = {
-            'polymorphic_identity': cls_name,
-        }
-        if cls_name == 'order':
-            args['polymorphic_on'] = cls.type
-        return args
+    __parent_attr__ = 'project_id'
 
     current_type = sa.Column(
         sa.String(50),
@@ -215,20 +211,6 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         default=default_current_type,
     )
     """Type of the Order during its life cycle."""
-
-    _slug = sa.Column('slug',
-                      sa.String(255),
-                      nullable=True,
-                      index=True,
-                      default=create_order_slug,
-                      info={'colanderalchemy': {
-                          'title': 'Description',
-                          'typ': colander.String}}
-                      )
-    """Slug -- friendly id -- for the object.
-
-    To be used in url and as human readable ID. (this should be generated by an Order)
-    """
 
     @hybrid_property
     def slug(self) -> str:
@@ -242,14 +224,14 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     def slug(self, value: str):
         """Set a new slug for this object.
 
-        If the value is None, we generate a new one using
-        :func:`briefy.common.utils.data.generate_contextual_slug`
-        :param value: Value of the new slug
+        Generate a slug using :func:`create_order_slug`
+        :param value: Value of the new slug, if passed, will raise an Exception.
         """
-        if self._slug:
-            raise Exception('Slug should not be changed.')
-        else:
+        if not value:
+            value = create_order_slug()
             self._slug = value
+        else:
+            raise Exception('Slug should not be changed.')
 
     customer_order_id = sa.Column(
         sa.String,
@@ -321,6 +303,15 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         }
     )
     """Project ID.
+
+    Relationship with :class:`briefy.leica.models.project.Project`.
+    """
+
+    project = orm.relationship(
+        'Project',
+        foreign_keys='Order.project_id'
+    )
+    """Project.
 
     Relationship with :class:`briefy.leica.models.project.Project`.
     """
@@ -481,6 +472,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
     # Assignments
     assignments = orm.relationship(
         'Assignment',
+        foreign_keys='Assignment.order_id',
         order_by='asc(Assignment.created_at)',
         backref=orm.backref('order')
     )
@@ -525,7 +517,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     _availability = sa.Column(
         'availability',
-        sautils.JSONType,
+        JSONB,
         info={
             'colanderalchemy': {
                 'title': 'Availability for scheduling this Order.',
@@ -691,7 +683,7 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
 
     _delivery = sa.Column(
         'delivery',
-        sautils.JSONType,
+        JSONB,
         info={
             'colanderalchemy': {
                 'title': 'Delivery information.',
@@ -747,18 +739,8 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         )
         return query
 
-    @property
-    def tech_requirements(self) -> dict:
-        """Tech requirements for this Order.
-
-        IMPORTANT: This difers from project tech_requirements - those
-        are wrapped in the 'asset' key issued from here.
-
-        :return: A dictionary with technical requirements for an Order.
-        """
-        project = self.project
-        requirements = project.tech_requirements or {}
-        return requirements
+    tech_requirements = association_proxy('project', 'tech_requirements')
+    """Project tech requirements."""
 
     timezone = sa.Column(TimezoneType(backend='pytz'), default='UTC')
     """Timezone in which this address is located.
@@ -773,6 +755,13 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
             self.timezone = timezone
             for assignment in self.assignments:
                 assignment.timezone = timezone
+
+    @sautils.observes('project_id')
+    def _project_id_observer(self, project_id):
+        """Update path when project id changes."""
+        if project_id:
+            project = Item.get(project_id)
+            self.path = project.path + [self.id]
 
     def _update_dates_from_history(self, keep_updated_at: bool = False):
         """Update dates from history."""
@@ -834,9 +823,6 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_summary_dict()
-        data['category'] = self.category.value \
-            if isinstance(self.category, CategoryChoices) else self.category
-        data = self._apply_actors_info(data)
         return data
 
     @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
@@ -847,40 +833,25 @@ class Order(mixins.OrderFinancialInfo, mixins.OrderBriefyRoles,
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_listing_dict()
-        data['category'] = self.category.value \
-            if isinstance(self.category, CategoryChoices) else self.category
-        data = self._apply_actors_info(data)
         return data
 
-    @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
+    # TODO: find way this breaks when try to serialize
+    # @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
         data = super().to_dict(excludes=excludes, includes=includes)
-        assignment_data = None
         if self.assignments:
             assignment = self.assignments[-1]
             assignment_data = assignment.to_summary_dict()
-            assignment_data = self._apply_actors_info(assignment_data, assignment)
+            assignment_data = assignment._apply_actors_info(assignment_data)
+        else:
+            assignment_data = None
 
-        data['description'] = self.description
         data['briefing'] = self.project.briefing
-        data['availability'] = self.availability
-        data['price'] = self.price
-        data['slug'] = self.slug
-        data['source'] = self.source.value \
-            if isinstance(self.source, OrderInputSource) else self.source
-        data['category'] = self.category.value \
-            if isinstance(self.category, CategoryChoices) else self.category
-        data['deliver_date'] = self.deliver_date
         data['scheduled_datetime'] = self.deliver_date
-        data['delivery'] = self.delivery
-        data['location'] = self.location.to_summary_dict() if self.location else None
-        data['timezone'] = self.timezone
         data['assignment'] = assignment_data
-        data['assignments'] = [item.to_summary_dict() for item in self.assignments]
-        data['tech_requirements'] = self.tech_requirements
 
-        add_user_info_to_state_history(self.state_history)
+        # add_user_info_to_state_history(self.state_history)
         if includes and 'state_history' in includes:
             # Workflow history
             add_user_info_to_state_history(self.state_history)

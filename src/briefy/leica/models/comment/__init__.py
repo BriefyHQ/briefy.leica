@@ -3,7 +3,6 @@ from briefy.leica.cache import cache_manager
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.comment import workflows
-from briefy.leica.utils.user import add_user_info_to_state_history
 from sqlalchemy import event
 from zope.interface import implementer
 from zope.interface import Interface
@@ -29,7 +28,9 @@ class Comment(mixins.LeicaMixin, Base):
         'id', 'content', 'internal', 'created_at', 'updated_at', 'author', 'author_role', 'to_role'
     ]
 
-    __summary_attributes_relations__ = ['entity']
+    __exclude_attributes__ = ['entity']
+
+    __to_dict_additional_attributes__ = ['author']
 
     __listing_attributes__ = __summary_attributes__
 
@@ -130,14 +131,6 @@ class Comment(mixins.LeicaMixin, Base):
         return mixins.get_public_user_info(str(self.author_id))
 
     entity = sautils.generic_relationship(entity_type, entity_id)
-
-    def to_dict(self):
-        """Return a dict representation of this object."""
-        data = super().to_dict()
-        add_user_info_to_state_history(self.state_history)
-        data['author'] = self.author
-        data['entity'] = self.entity
-        return data
 
 
 @event.listens_for(Comment, 'after_update')

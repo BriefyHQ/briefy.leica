@@ -68,10 +68,9 @@ class TestMoveAssignmentToAwaitingAssets(BaseTaskTest):
         assignment = instance_obj
         assignment.state = 'scheduled'
         assignment.scheduled_datetime = datetime(2016, 9, 1, 12, 0, 0, tzinfo=utc)
-
         move_assignments_awaiting_assets()
         messages = self.get_messages_from_queue()
-        assert len(messages) == 0
+        assert len(messages) == 2
 
     def test_wrong_assignment_state(self, instance_obj):
         """Will not move the order because an Assignment is not in a correct state."""

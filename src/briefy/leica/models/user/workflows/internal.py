@@ -4,10 +4,10 @@ from briefy.common.workflow import Permission
 from briefy.leica.models.user.workflows.base import UserProfileWorkflow
 
 
-class BriefyUserProfileWorkflow(UserProfileWorkflow):
+class InternalUserProfileWorkflow(UserProfileWorkflow):
     """Workflow for a Briefy user profile."""
 
-    entity = 'briefyuserprofile'
+    entity = 'internaluserprofile'
 
     @Permission(groups=[G['system'], G['support']])
     def can_activate(self):

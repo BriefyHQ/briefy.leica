@@ -2,10 +2,82 @@
 History
 =======
 
-2.1.37 (Unreleased)
--------------------
+2.2.0 (Unreleased)
+------------------
 
-    * TODO
+    * Remove scout_manager as a required field for Order.assign transition (rudaporto).
+    * Added back external_id column to Professional model (rudaporto).
+    * Update Professional tests to use the classmethod `created` to create new model instances (rudaporto).
+    * Added tests for finance and bizdev dashboards and group all dashboards tests in a folder (rudaporto).
+    * Removed the sqlalchemy continuum make_versioned call since this is already execute in briefy.common init (rudaporto).
+    * Removed BillingInfo.title field and turn it to a computed field on first and last name (rudaporto).
+    * Removed deprecated TaxInfo mixin from Customer model (rudaporto).
+    * Clean up to_dict from all models that inherit from BaseMetadata since it will take care of adding these fields (rudaporto).
+    * Remove all override code from BillingInfo and ProfessionalBillingInfo that is already in BaseMetadata now (rudaporto).
+    * Remove Order.type field since Item.type is already used and Order.current_type should store the current order type (rudaporto).
+    * Fix: UserProfile.owner actor colander definition should be a list (rudaporto).
+    * Override UserProfile.title setter and getter to compute from first and last name and also update Item.title using an observer (rudaporto).
+    * Avoiding to create or activate a new user in Rolleiflex internal API if running in test or development ENV (rudaporto).
+    * Update description field on Image model payload (rudaporto).
+    * Remove title from InternalUserProfile model payload (rudaporto).
+    * Added asset_types field to LeadOrder model payload (rudaporto).
+    * Remove title from Professional model payload (rudaporto).
+    * Added database migration: (rudaporto)
+        * migrate data to items and items_version
+        * migrate external_id from userprofiles to professional (intercom still need it)
+        * migrate local roles from the old table to the new table format
+    * Final query to create localroles in the project level for internal_qa and internal_scout based on the assignments roles for each project. (rudaporto)
+    * Move to postgresql 9.6 container (rudaporto).
+    * Added __parent_attr__ attribute to the models: Project, Order, Assignment, Asset (rudaporto).
+    * Added migration to update items.path using parent items.path (rudaporto).
+    * Added observer to update Project, Order, Assignment and Asset path when foreign key to parent model changes (rudaporto).
+    * Update CustomerUserProfile to support read and write customer_roles and project_roles with the new format (rudaporto).
+    * Added tests to InternalUserProfile view (rudaporto).
+    * Use correct InstrumentedList api do update professional_user in the Assignment assign transition (rudaporto).
+    * Added migration to set Item.can_view list of roles for each model (rudaporto).
+    * Added default local roles attribute to all Models based on Item (rudaporto).
+    * Fixed local roles migration to set Item.can_view using _default_can_view class method from each model (rudaporto).
+    * Fixed migration of data to localroles table: added created_at and updated_at (rudaporto).
+    * Added new migration to populate from Customer local roles CustomerUserProfile.customer_id attribute (rudaporto).
+    * Added customer_users relationship attribute (summarized) to Customer and Project models (rudaporto).
+    * Fix CustomerUserProfile customer_roles and project_roles attributes (rudaporto).
+    * Remove comments from to_dict of Order, LeadOrder, Assignment, Professional (ericof).
+    * Add tests to to_dict, to_summary_dict (ericof).
+    * Change sautils.JSONType to postgres dialect JSONB in all models (rudaporto).
+    * Added new migration step to migrate all fields from json to jsonb (rudaporto).
+    * Fixed localroles migration step: importing intenal_qa and internal_scout on the project level (rudaporto).
+    * Project: added new relationship to leadorders and also fix the orders relationship using the current_type in the join condition (rudaporto).
+    * Added new aggregator attribute to keep the total of leadorders and return this on the listing (rudaporto).
+    * Fix state_history entries, removing serialized actor information from some transitions (ericof).
+    * Refactor dashboards: PM, Customer, Professional, Bizdev, QA, Scout, Finance (rudaporto).
+    * Added Order.current_type as a field in the Assignment model and listing and as a filter in the assignments view (rudaporto).
+    * Comments endpoint now filter internal notes based on user groups (ericof).
+    * Changed Assignment.to_dict by removing additional fields that will be now handled by to_dict and new class attribute (rudaporto).
+    * Remove from Comments and CustomerBillingInfo attributes from the payload (rudaporto).
+    * Remove unnecessary to_dict customizations from models (rudaporto).
+    * Added tech_requirements to the assignment as an association proxy to be serialized in the to_dict payload (rudaporto).
+    * Update BaseLeicaMixin:._apply_actors_info to accept additional_actors to also add actors info roles from parent levels (rudaporto).
+    * Changed Order.tech_requirements to be an association proxy (rudaporto).
+    * Project.tech_requirements has an empty dict as default (rudaporto).
+    * Explicit remove from Pool.to_dict payload assignments, projects and professionals (rudaporto).
+    * Clean up Order to_dict, to_listing_dict and to_summary_dict (rudaporto).
+    * Temporary disable cache on Order to_dict until we found the why it fail to serialize (rudaporto).
+    * Added _actors new key in the model to_dict payload when they are subclass of Item (rudaporto).
+    * Card #501: Copy comment of client refusal from the Order to the Assignment as an internal note (ericof).
+    * Fix issue with polymorphic type for Professional and Photographer (ericof).
+    * Remove professional_user local role from Assignment payload (rudaporto).
+    * Remove old local role attributes from Assignment colander schema excludes (rudaporto).
+    * Change CustomerUserProfile payload: remove project_roles, added project_customer_pm and project_customer_qa (rudaporto).
+    * Improve tests for CustomerUserProfile and improve validation of list fields in the view tests (rudaporto).
+    * When running in development environment never try to activate or create a user in rolleiflex (rudaporto).
+    * Tests: review and remove all unused ignore_validation_fields from view tests (rudaporto).
+    * Tests: added complex fields to the serialize_attrs list to be able to compare in the view tests (rudaporto).
+    * Tests: remove updated_at attribute from json payloads (rudaporto).
+    * Order and LeadOrder: fix creation subscriber to use price from payload when it is available and then use project.price as fallback (rudaporto).
+    * Card #538: fixing adding a new Professional with links (rudaporto).
+    * Card #541: when deleting a Professional link it is removed (rudaporto).
+    * Added migration for userprofiles without owner local role (rudaporto).
+    * In the Professionals subscriber set the owner attribute using the created user id (rudaporto).
 
 2.1.36 (2017-08-06)
 -------------------
@@ -27,6 +99,7 @@ History
 
     * Change python3 container to 1.4.2 and add pylibmc as dependency (rudaporto).
     * Card #484: Leads can be confirmed without adding availability (ericof).
+
 
 2.1.32 (2017-07-25)
 -------------------
@@ -59,6 +132,7 @@ History
     * Fix documentation generation (ericof).
     * Added upper limit number of days to notify about late submission (rudaporto).
     * Added flags to enable before shooting and late submission notification tasks (default False) (rudaporto).
+
 
 
 2.1.27 (2017-07-12)

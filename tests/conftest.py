@@ -11,6 +11,7 @@ from briefy.ws.config import JWT_EXPIRATION
 from briefy.ws.config import JWT_SECRET
 from datetime import date
 from datetime import datetime
+from octopus.lens import EasyUUID
 from prettyconf import config
 from pyramid.paster import get_app
 from pyramid.testing import DummyRequest
@@ -198,6 +199,35 @@ class BaseModelTest:
         assert objs[0].created_at == obj.created_at
         assert objs[0].updated_at == obj.updated_at
 
+    def test_to_dict_respects_excludes(self, instance_obj):
+        """Test to_dict will respect __exclude_attributes__ ."""
+        not_expected_attributes = set(self.model.__exclude_attributes__)
+        obj_dict = instance_obj.to_dict(excludes=[], includes=[])
+        intersection = [k for k in obj_dict.keys() if k in not_expected_attributes]
+        assert len(intersection) == 0
+
+    def test_to_dict_additional_attr(self, instance_obj):
+        """Test to_dict will respect __to_dict_additional_attributes__ ."""
+        additional_attributes = set(self.model.__to_dict_additional_attributes__)
+        obj_dict = instance_obj.to_dict(excludes=[], includes=[])
+        keys = obj_dict.keys()
+        missing = [k for k in additional_attributes if k not in keys]
+        assert len(missing) == 0
+
+    def test_to_dict_respects__summary_attributes_relations(self, instance_obj):
+        """Test to_dict will respect __summary_attributes_relations__ ."""
+        to_summary_relations = set(self.model.__summary_attributes_relations__)
+        obj_dict = instance_obj.to_dict(excludes=[], includes=[])
+        intersection = [k for k in obj_dict.keys() if k in to_summary_relations]
+        assert len(intersection) == len(to_summary_relations)
+
+    def test_to_summary_dict(self, instance_obj):
+        """Test to_summary_dict for this model."""
+        expected_attributes = set(self.model.__summary_attributes__)
+        summary_dict = instance_obj.to_summary_dict()
+        item_attributes = {k for k in summary_dict.keys()}
+        assert item_attributes == expected_attributes
+
     def test_workflow(self, instance_obj):
         """Test if we have a workflow setup in here, some objects d'ont have."""
         wf = instance_obj.workflow
@@ -230,7 +260,7 @@ class BaseLinkTest(BaseModelTest):
         assert instance_obj.is_social is self.social
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope='function')
 def instance_obj(request, session, obj_payload):
     """Create instance object an dependencies using hook methods.
 
@@ -244,16 +274,19 @@ def instance_obj(request, session, obj_payload):
         cls.create_dependencies(session)
 
     payload = obj_payload
+
     obj_id = payload['id']
+    obj_id = EasyUUID(obj_id) if not isinstance(obj_id, list) else obj_id
     obj = model.get(obj_id)
     if not obj:
         # composed primary keys
         if isinstance(obj_id, list):
             new_payload = dict(payload.items())
             new_payload.pop('id')
-            obj = cls.model(**new_payload)
+            obj = cls.model.create(new_payload)
         else:
-            obj = cls.model(**payload)
+            payload['id'] = obj_id
+            obj = cls.model.create(payload)
         session.add(obj)
         session.flush()
     return obj
@@ -297,7 +330,7 @@ def create_dependencies(request, session):
         for payload in data:
             obj = model.get(payload['id'])
             if not obj:
-                obj = model(**payload)
+                obj = model.create(payload)
                 session.add(obj)
     session.flush()
 
@@ -315,6 +348,7 @@ class BaseTestView:
     NOT_FOUND_MESSAGE = ''
     payload_position = 0
     update_map = {}
+    serialize_attrs = ['path', '_roles', '_actors']
     initial_wf_state = 'created'
     ignore_validation_fields = ['state_history', 'state']
 
@@ -346,12 +380,21 @@ class BaseTestView:
         assert 'application/json' == request.content_type
         result = request.json
 
-        db_obj = self.model.query().get(payload['id'])
+        db_obj = self.model.get(payload['id'])
+        self.ignore_validation_fields.extend(self.model.__actors__)
 
         # validate response payload against sent payload
         for key, value in payload.items():
             if key not in self.ignore_validation_fields:
-                assert result.get(key) == value
+                result_value = result.get(key)
+                if key in self.serialize_attrs:
+                    value = json.loads(json.dumps(value, default=to_serializable))
+                    assert result_value == value
+                elif isinstance(value, list):
+                    for item in result_value:
+                        assert item in value
+                else:
+                    assert result_value == value
 
         # state can be automatic changed by after_insert event listener
         assert self.initial_wf_state == result.get('state')
@@ -362,7 +405,14 @@ class BaseTestView:
                 obj_value = getattr(db_obj, key)
                 if isinstance(obj_value, (date, datetime, uuid.UUID, enum.Enum, PhoneNumber)):
                     obj_value = to_serializable(obj_value)
-                assert obj_value == value
+                if isinstance(value, list):
+                    for item in obj_value:
+                        assert item in value
+                elif key in self.serialize_attrs:
+                    obj_value = json.loads(json.dumps(value, default=to_serializable))
+                    assert obj_value == value
+                else:
+                    assert obj_value == value
 
         # state can be automatic changed by after_insert event listener
         assert self.initial_wf_state == getattr(db_obj, 'state')
@@ -380,12 +430,21 @@ class BaseTestView:
             if key not in self.ignore_validation_fields:
                 if isinstance(value, (date, datetime, uuid.UUID, enum.Enum, PhoneNumber)):
                     value = to_serializable(value)
-                assert result.get(key) == value
+                elif key in self.serialize_attrs:
+                    value = json.loads(json.dumps(value, default=to_serializable))
+
+                result_value = result.get(key)
+
+                if isinstance(value, list):
+                    for item in result_value:
+                        assert item in value
+                else:
+                    assert result_value == value
 
         # state can be automatic changed by after_insert event listener
         assert self.initial_wf_state == getattr(db_obj, 'state')
 
-    def test_get_collection(self, app, obj_payload):
+    def test_get_collection(self, app):
         """Test get a collection of items."""
         request = app.get('{base}'.format(base=self.base_path),
                           headers=self.headers, status=200)
@@ -393,6 +452,15 @@ class BaseTestView:
         assert 'data' in result
         assert 'total' in result
         assert result['total'] == len(result['data'])
+
+    def test_get_collection_item_attributes(self, app):
+        """Test item attributes on a collection."""
+        request = app.get(f'{self.base_path}', headers=self.headers, status=200)
+        result = request.json
+        item = result['data'][0]
+        expected_attributes = set(self.model.__listing_attributes__)
+        item_attributes = {k for k in item.keys()}
+        assert item_attributes == expected_attributes
 
     def test_successful_update(self, obj_payload, app):
         """Teste put Data to existing object."""
@@ -416,7 +484,15 @@ class BaseTestView:
             obj_value = getattr(updated_obj, key)
             if isinstance(obj_value, (date, datetime, uuid.UUID, enum.Enum)):
                 obj_value = to_serializable(obj_value)
-            assert obj_value == value
+                assert obj_value == value
+            elif isinstance(obj_value, list):
+                for item in obj_value:
+                    assert item in value
+            elif key in self.serialize_attrs:
+                obj_value = json.loads(json.dumps(obj_value, default=to_serializable))
+                assert obj_value == value
+            else:
+                assert obj_value == value
 
         # state can be automatic changed by after_insert event listener
         assert self.initial_wf_state == getattr(updated_obj, 'state')
@@ -442,7 +518,7 @@ class BaseTestView:
         assert result['status'] == 'error'
         assert error['name'] == 'id'
         assert error['location'] == 'path'
-        assert error['description'] == 'The id informed is not 16 byte uuid valid.'
+        assert 'uuid' in error['description'].lower()
 
     def test_put_invalid_id(self, app, obj_payload):
         """Confirm failure when try to use invalid UUID as id."""
@@ -456,14 +532,14 @@ class BaseTestView:
         assert result['status'] == 'error'
         assert error['name'] == 'id'
         assert error['location'] == 'path'
-        assert error['description'] == 'The id informed is not 16 byte uuid valid.'
+        assert 'uuid' in error['description'].lower()
 
 
 @pytest.mark.usefixtures('db_transaction', 'login')
 class BaseVersionedTestView(BaseTestView):
     """Test resources with versions."""
 
-    check_versions_field = 'title'
+    check_versions_field = '_title'
 
     def test_versions_get_item(self, app, obj_payload):
         """Test get a item."""
@@ -479,10 +555,12 @@ class BaseVersionedTestView(BaseTestView):
         )
         result = request.json
         db_obj = self.model.query().get(obj_id)
-        field = self.check_versions_field
-        assert getattr(db_obj, field) != result[field]
+        obj_field = self.check_versions_field
+        result_field = obj_field[1:] if obj_field.startswith('_') else obj_field
         version = db_obj.versions[0]
-        assert getattr(version, field) == result[field]
+        assert to_serializable(getattr(version, obj_field)) == result[result_field]
+        version = db_obj.versions[1]
+        assert to_serializable(getattr(version, obj_field)) != result[result_field]
 
     def test_versions_get_item_wrong_id(self, app, obj_payload):
         """Test get a item passing the wrong id."""
@@ -628,6 +706,7 @@ def login(request):
             'g:briefy_bizdev',
             'g:briefy_scout',
             'g:briefy_finance',
+            'g:briefy_support',
             'g:briefy'
         ]
     }

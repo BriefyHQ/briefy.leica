@@ -21,7 +21,7 @@ requires = [
     'newrelic',
     'phonenumbers',
     'pycountry',
-    'pyramid==1.8.3',
+    'pyramid==1.9.1',
     'pyramid_tm',
     'pyramid_zcml',
     'requests',
@@ -45,7 +45,7 @@ test_requirements = [
 
 setup(
     name='briefy.leica',
-    version='2.1.37',
+    version='2.2.0',
     description='Image Handling System',
     long_description=README + '\n\n' + CHANGES,
     classifiers=[

@@ -1,10 +1,12 @@
 """Briefy Leica Customer Contact information."""
 from briefy.common.db.mixins import BaseMetadata
 from briefy.common.db.mixins import NameMixin
+from briefy.common.db.mixins.person import _validate_phone
 from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.customer import workflows
 from briefy.leica.vocabularies import ContactTypes
+from sqlalchemy import orm
 
 import colander
 import sqlalchemy as sa
@@ -62,3 +64,13 @@ class CustomerContact(NameMixin, BaseMetadata, mixins.LeicaMixin, Base):
 
     mobile = sa.Column(sautils.types.PhoneNumberType(), nullable=True, unique=False)
     """Mobile phone number of the contact person."""
+
+    @orm.validates('mobile')
+    def validate_phone_attribute(self, key: str, value: str) -> str:
+        """Validate if phone attribute is in the correct format.
+
+        :param key: Attribute name.
+        :param value: Phone number
+        :return: Cleansed phone number
+        """
+        return _validate_phone(key, value)

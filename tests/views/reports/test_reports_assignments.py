@@ -10,6 +10,7 @@ class TestAssignmentReports:
 
     dependencies = [
         (models.Professional, 'data/professionals.json'),
+        (models.InternalUserProfile, 'data/internal_profiles.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
         (models.Order, 'data/orders.json'),

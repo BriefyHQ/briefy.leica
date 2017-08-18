@@ -64,9 +64,10 @@ delivered_orders_pm = select([
             Order.state == 'delivered'
         ),
         Project.id == Order.project_id,
+        Project.can_view.in_(['{internal_pm}']),
         or_(
-            Project.local_roles.any(user_id=':user_id', can_view=True),
-            Customer.local_roles.any(user_id=':user_id', can_view=True)
+            Project.local_roles.any(principal_id=':user_id'),
+            Customer.local_roles.any(principal_id=':user_id')
         )
     )
 ).alias('delivered_orders_pm')
@@ -115,9 +116,10 @@ all_leads_pm = select(
         Project.id == Order.project_id,
         Project.order_type == 'leadorder',
         LeadOrder.id == Order.id,
+        Project.can_view.in_(['{internal_pm}']),
         or_(
-            Project.local_roles.any(user_id=':user_id', can_view=True),
-            Customer.local_roles.any(user_id=':user_id', can_view=True)
+            Project.local_roles.any(principal_id=':user_id'),
+            Customer.local_roles.any(principal_id=':user_id')
         )
     )
 ).alias('all_leads_pm')

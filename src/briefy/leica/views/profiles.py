@@ -1,7 +1,7 @@
 """Views to handle User Profile management."""
 from briefy.leica.events import userprofile as events
-from briefy.leica.models import BriefyUserProfile
 from briefy.leica.models import CustomerUserProfile
+from briefy.leica.models import InternalUserProfile
 from briefy.leica.models import UserProfile
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources import HistoryService
@@ -188,7 +188,7 @@ class CustomerProfileHistory(HistoryService):
 class InternalProfileFactory(BaseFactory):
     """InternalProfile context factory."""
 
-    model = BriefyUserProfile
+    model = InternalUserProfile
 
     @property
     def __base_acl__(self) -> list:
@@ -214,7 +214,7 @@ PATH = COLLECTION_PATH + '/{id}'
 class InternalProfileService(RESTService):
     """InternalUserProfile Service."""
 
-    model = BriefyUserProfile
+    model = InternalUserProfile
     default_order_by = 'title'
     filter_related_fields = ['title']
 
@@ -246,7 +246,7 @@ class InternalProfileService(RESTService):
 class InternalProfileWorkflowService(WorkflowAwareResource):
     """InternalProfile workflow resource."""
 
-    model = BriefyUserProfile
+    model = InternalUserProfile
 
 
 @resource(
@@ -258,7 +258,7 @@ class InternalProfileWorkflowService(WorkflowAwareResource):
 class InternalProfileVersionsService(VersionsService):
     """Versioning of InternalProfiles."""
 
-    model = BriefyUserProfile
+    model = InternalUserProfile
 
 
 @resource(
@@ -270,4 +270,4 @@ class InternalProfileVersionsService(VersionsService):
 class InternalProfileHistory(HistoryService):
     """Workflow history of InternalProfiles."""
 
-    model = BriefyUserProfile
+    model = InternalUserProfile

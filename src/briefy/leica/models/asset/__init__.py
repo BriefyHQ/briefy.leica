@@ -1,12 +1,13 @@
 """Briefy Leica Asset model."""
 from briefy.common.db.mixins import asset
-from briefy.leica.db import Base
+from briefy.common.db.models import Item
 from briefy.leica.models import mixins
 from briefy.leica.models.asset import workflows
 from briefy.leica.models.mixins import get_public_user_info
 from briefy.leica.utils import imaging
 from briefy.leica.utils.user import add_user_info_to_state_history
 from sqlalchemy import orm
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy_utils import UUIDType
 
@@ -22,17 +23,19 @@ __summary_attributes__ = [
 
 __listing_attributes__ = [
     'id', 'title', 'filename', 'created_at', 'updated_at', 'state', 'uploaded_by',
-    'professional_id', 'size', 'width', 'height', 'is_valid', 'image', 'version', 'history'
+    'professional_id', 'size', 'width', 'height', 'is_valid', 'image', 'metadata'
 ]
 
 
-class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
+class Asset(asset.Asset, mixins.LeicaSubVersionedMixin, Item):
     """A deliverable asset from an Assignment."""
 
     _workflow = workflows.AssetWorkflow
 
     __summary_attributes__ = __summary_attributes__
     __listing_attributes__ = __listing_attributes__
+
+    __summary_attributes_relations__ = ['assignment']
 
     __raw_acl__ = (
         ('list', ('g:briefy', 'g:system')),
@@ -42,24 +45,12 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
         ('delete', ('g:briefy_qa', 'g:system')),
     )
 
-    __actors__ = (
-        'professional_id',
-        'uploaded_by'
-    )
-
     __colanderalchemy_config__ = {'excludes': [
         'state_history', 'state', 'history', 'raw_metadata', 'professional',
         'comments', 'assignment'
     ]}
 
-    type = sa.Column(
-        sa.String(50), nullable=False,
-        info={'colanderalchemy': {
-            'title': 'Type',
-            'missing': 'image',
-            'typ': colander.String}
-        },
-    )
+    __parent_attr__ = 'assignment_id'
 
     owner = sa.Column(sa.String(255), nullable=False)
     """Denormalized string with the name of the OWNER of an asset.
@@ -117,7 +108,7 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
     Assignment shooting under which this asset has been generated.
     """
 
-    history = sa.Column(sautils.JSONType, nullable=True)
+    history = sa.Column(JSONB, nullable=True)
     """History.
 
     An unified list of comments and transitions and modifications.
@@ -140,6 +131,13 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
         primaryjoin='Comment.entity_id == Asset.id'
     )
     """Comments."""
+
+    @sautils.observes('assignment_id')
+    def _assignment_id_observer(self, assignment_id):
+        """Update path when assignment id changes."""
+        if assignment_id:
+            assignment = Item.get(assignment_id)
+            self.path = assignment.path + [self.id]
 
     @property
     def tech_requirements(self) -> dict:
@@ -172,20 +170,7 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
 
         :return: ID of the qa_manager.
         """
-        return self.assignment.qa_manager
-
-    def _apply_actors_info(self, data: dict) -> dict:
-        """Apply actors information for a given data dictionary.
-
-        :param data: Data dictionary.
-        :return: Data dictionary.
-        """
-        actors = [(k, k) for k in self.__actors__]
-        info = self._actors_info()
-        for key, attr in actors:
-            value = info.get(attr, None)
-            data[key] = get_public_user_info(value) if value else None
-        return data
+        return self.assignment.assignment_internal_qa
 
     def to_listing_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
@@ -213,17 +198,6 @@ class Asset(asset.Asset, mixins.LeicaVersionedMixin, Base):
             c['check'] for c in self.check_requirements
         ]
         return data
-
-    @declared_attr
-    def __mapper_args__(cls):
-        """Return polymorphic identity."""
-        cls_name = cls.__name__.lower()
-        args = {
-            'polymorphic_identity': cls_name,
-        }
-        if cls_name == 'asset':
-            args['polymorphic_on'] = cls.type
-        return args
 
 
 class Image(asset.ImageMixin, Asset):

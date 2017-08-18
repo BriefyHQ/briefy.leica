@@ -1,21 +1,123 @@
 [
   {
-    "title": "Emma Shön",
-    "email": "emma@briefy.co",
-    "birth_date": "2012-03-16T00:00:00",
-    "company_name": "Briefy",
+    "email": "mo@briefy.co",
+    "birth_date": "1975-03-16T00:00:00",
+    "company_name": "Octopus",
     "mobile": "+49 176 23456788",
-    "external_id": null,
     "additional_phone": null,
-    "first_name": "Emma",
+    "first_name": "Mo",
     "internal": true,
-    "last_name": "Shön",
-    "id": "93c0ea60-1d60-4d4b-2c63-0e5bfad1ef9d",
+    "last_name": "Hamed",
+    "id": "a9d06928-0878-45a0-9380-8702965e79c1",
+    "owner": ["a9d06928-0878-45a0-9380-8702965e79c1"],
+    "partners": true,
+    "description": "Internal User",
+    "gender": "f",
+    "fullname": "Mo Hamed",
+    "state": "active",
+    "state_history": [
+      {
+        "message": "User created",
+        "date": "2017-03-16T09:42:16.299392+00:00",
+        "actor": "05ecb76c-870b-4f2e-9932-93e4bfec82dd",
+        "from": "created",
+        "to": "active",
+        "transition": "activate"
+      }
+    ]
+  },
+  {
+    "email": "grace@briefy.co",
+    "birth_date": "1975-03-16T00:00:00",
+    "company_name": "Octopus",
+    "mobile": "+49 176 23456788",
+    "additional_phone": null,
+    "first_name": "Grace",
+    "internal": true,
+    "last_name": "",
+    "id": "dd96235d-aeda-4c63-83dc-7d0e7deb1c62",
     "partners": true,
     "description": null,
-    "created_at": "2017-03-16T09:42:15.985786+00:00",
     "gender": "f",
-    "fullname": "Emma Shön",
+    "fullname": "Grace",
+    "state": "active",
+    "state_history": [
+      {
+        "message": "User created",
+        "date": "2017-03-16T09:42:16.299392+00:00",
+        "actor": "05ecb76c-870b-4f2e-9932-93e4bfec82dd",
+        "from": "created",
+        "to": "active",
+        "transition": "activate"
+      }
+    ]
+  },
+  {
+    "email": "flora@briefy.co",
+    "birth_date": "1975-03-16T00:00:00",
+    "company_name": "Octopus",
+    "mobile": "+49 176 23456788",
+    "additional_phone": null,
+    "first_name": "Flora",
+    "internal": true,
+    "last_name": "",
+    "id": "ccf85be2-b0a9-42bd-bf80-46a68ea13097",
+    "partners": true,
+    "description": null,
+    "gender": "f",
+    "fullname": "Flora",
+    "state": "active",
+    "state_history": [
+      {
+        "message": "User created",
+        "date": "2017-03-16T09:42:16.299392+00:00",
+        "actor": "05ecb76c-870b-4f2e-9932-93e4bfec82dd",
+        "from": "created",
+        "to": "active",
+        "transition": "activate"
+      }
+    ]
+  },
+  {
+    "email": "ansgar@briefy.co",
+    "birth_date": "1975-03-16T00:00:00",
+    "company_name": "Octopus",
+    "mobile": "+49 176 23456788",
+    "additional_phone": null,
+    "first_name": "Ansgar",
+    "internal": true,
+    "last_name": "",
+    "id": "d0a01ec8-8f6c-462d-a061-6998195a3e03",
+    "partners": true,
+    "description": null,
+    "gender": "f",
+    "fullname": "Ansgar",
+    "state": "active",
+    "state_history": [
+      {
+        "message": "User created",
+        "date": "2017-03-16T09:42:16.299392+00:00",
+        "actor": "05ecb76c-870b-4f2e-9932-93e4bfec82dd",
+        "from": "created",
+        "to": "active",
+        "transition": "activate"
+      }
+    ]
+  },
+  {
+    "email": "franco@briefy.co",
+    "birth_date": "1975-03-16T00:00:00",
+    "company_name": "Octopus",
+    "mobile": "+49 176 23456788",
+    "additional_phone": null,
+    "first_name": "Franco",
+    "internal": true,
+    "last_name": "",
+    "id": "f5c2199f-6ed7-4ff8-90df-d1a98249f5e7",
+    "partners": true,
+    "description": null,
+    "gender": "f",
+    "fullname": "Franco",
     "state": "active",
     "state_history": [
       {

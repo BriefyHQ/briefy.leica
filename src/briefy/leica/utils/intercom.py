@@ -55,7 +55,7 @@ def get_project_managers(projects: t.Sequence['m.Project']) -> t.Sequence[dict]:
     project_managers = []
     project_managers_ids = set()
     for project in projects:
-        for pm in project.project_managers:
+        for pm in project.internal_pm:
             if pm not in project_managers_ids:
                 project_managers_ids.add(pm)
                 project_managers.append(get_public_user_info(str(pm)))

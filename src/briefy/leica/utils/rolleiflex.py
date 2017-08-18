@@ -39,7 +39,8 @@ def _get_headers(authenticated: bool=False, username: str=ROLLEIFLEX_USERNAME) -
         payload = json.dumps({'username': username})
         request = requests.post(ROLLEIFLEX_LOGIN, headers=headers, data=payload)
         if request.status_code not in (200, 201):
-            raise ValueError('Rolleiflex authentication failed')
+            body = request.content
+            raise ValueError(f'Rolleiflex authentication failed. Result: {body}')
         data = request.json()
         token = data['token']
         headers['Authorization'] = f'JWT {token}'
