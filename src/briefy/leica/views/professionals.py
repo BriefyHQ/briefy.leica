@@ -2,6 +2,8 @@
 from briefy.leica.events import professional as events
 from briefy.leica.models import Photographer
 from briefy.leica.models import Professional
+from briefy.leica.views import email_in_use
+from briefy.leica.views import EMAIL_IN_USE_MESSAGE
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources import HistoryService
 from briefy.ws.resources import RESTService
@@ -51,12 +53,23 @@ class ProfessionalService(RESTService):
         '_main_location.locality', 'pools.id', 'pools.title', 'pools.country'
     ]
 
+    _validators = (
+        ('GET', ('validate_id', )),
+        ('PUT', ('validate_id', )),
+        ('POST', ('email_in_use', ))
+    )
+
     _default_notify_events = {
         'POST': events.ProfessionalCreatedEvent,
         'PUT': events.ProfessionalUpdatedEvent,
         'GET': events.ProfessionalLoadedEvent,
         'DELETE': events.ProfessionalDeletedEvent,
     }
+
+    def email_in_use(self, request):
+        """Email validation."""
+        if not email_in_use(request):
+            self.raise_invalid(name='email', description=EMAIL_IN_USE_MESSAGE)
 
     @view(validators='_run_validators', permission='create')
     def collection_post(self, model=None):

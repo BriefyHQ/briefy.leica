@@ -78,6 +78,7 @@ History
     * Card #541: when deleting a Professional link it is removed (rudaporto).
     * Added migration for userprofiles without owner local role (rudaporto).
     * In the Professionals subscriber set the owner attribute using the created user id (rudaporto).
+    * Added unique email validation when creating new Professional. Internal and Customer profiles already had it (rudaporto).
 
 2.1.36 (2017-08-06)
 -------------------

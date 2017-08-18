@@ -9,6 +9,7 @@ from briefy.leica.models import Customer
 from briefy.leica.models import mixins
 from briefy.leica.models.user import workflows
 from briefy.leica.utils.user import add_user_info_to_state_history
+from briefy.ws.errors import ValidationError
 from copy import deepcopy
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property

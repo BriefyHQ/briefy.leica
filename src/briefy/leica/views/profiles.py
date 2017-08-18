@@ -3,6 +3,8 @@ from briefy.leica.events import userprofile as events
 from briefy.leica.models import CustomerUserProfile
 from briefy.leica.models import InternalUserProfile
 from briefy.leica.models import UserProfile
+from briefy.leica.views import email_in_use
+from briefy.leica.views import EMAIL_IN_USE_MESSAGE
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources import HistoryService
 from briefy.ws.resources import RESTService
@@ -15,22 +17,6 @@ from pyramid.security import Allow
 
 COLLECTION_PATH = '/profiles/me'
 PATH = COLLECTION_PATH + '/{id}'
-
-EMAIL_IN_USE_MESSAGE = 'This email is already associated with another user.'
-
-
-def email_in_use(request):
-    """Validate if email is used by another user.
-
-    :param request: pyramid request.
-    """
-    email = request.json.get('email')
-    user_id = request.json.get('id')
-    db_user = UserProfile.query().filter_by(email=email).one_or_none()
-    if db_user and not str(db_user.id) == user_id:
-        return False
-    else:
-        return True
 
 
 class ProfileFactory(BaseFactory):
