@@ -1,5 +1,6 @@
 """Custom descriptors to handle get, set and delete of special attributes."""
 from briefy.common.db import Base
+from briefy.leica import logger
 from sqlalchemy.orm.session import object_session
 
 
@@ -69,6 +70,7 @@ class UnaryRelationshipWrapper:
 
     def create_sub_object(self, parent_obj, value, collection=None):
         """Create a new sub object instance."""
+        field_name = self._field_name
         session = object_session(parent_obj)
         if not parent_obj.id or not session:
             # do not try to add a new instance if the obj is not persisted yet.
@@ -79,8 +81,10 @@ class UnaryRelationshipWrapper:
         self._attr_created[str(parent_obj.id)] = sub_object.id
         if collection is not None:
             collection.append(sub_object)
+            logger.debug(f'Item appended in collection {sub_object}')
         else:
-            setattr(parent_obj, self._field_name, sub_object)
+            setattr(parent_obj, field_name, sub_object)
+            logger.debug(f'Attribute {field_name} updated with {sub_object}')
 
     def update_sub_object(self, obj, values):
         """Update an existing sub object instance."""
@@ -115,14 +119,16 @@ class MultipleRelationshipWrapper(UnaryRelationshipWrapper):
                     add_values.append(value)
                 else:
                     update_value_ids.append(value_id)
-                    update_values.append(obj, value)
+                    update_values.append((obj, value))
 
         # first delete from collection
         if collection:
             delete_ids = [str(item.id) for item in collection
                           if str(item.id) not in update_value_ids]
             for item_id in delete_ids:
-                session.delete(self._model.get(item_id))
+                item = self._model.get(item_id)
+                session.delete(item)
+                logger.debug(f'Item deleted {item}')
 
         # update items in collection
         for obj, value in update_values:
