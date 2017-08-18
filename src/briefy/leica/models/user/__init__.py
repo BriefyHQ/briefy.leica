@@ -54,23 +54,6 @@ class UserProfile(mixins.UserProfileMixin, mixins.UserProfileRolesMixin, Item):
         """User id."""
         return self.id
 
-    @hybrid_property
-    def title(self):
-        """Return the User fullname."""
-        return self.fullname
-
-    @title.setter
-    def title(self, value: str):
-        """Set the User fullname."""
-        raise ValueError(
-            'You can not set the user profile title. Please update first_name and last_name.'
-        )
-
-    @title.expression
-    def title(cls):
-        """Return the User fullname."""
-        return cls.first_name + ' ' + cls.last_name
-
     @sautils.observes('first_name', 'last_name')
     def _title_observer(self, first_name, last_name):
         """Calculate dates on a change of a state."""

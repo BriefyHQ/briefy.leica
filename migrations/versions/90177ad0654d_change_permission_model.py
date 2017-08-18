@@ -594,6 +594,17 @@ def copy_userprofiles_external_id():
     )
 
 
+def update_items_title_from_userprofiles():
+    op.execute(
+        '''
+        UPDATE items SET title=other.title
+        from
+        (SELECT id, first_name || ' ' || last_name as title from userprofiles) as other
+        WHERE items.id = other.id;
+        '''
+    )
+
+
 def migrate_localroles():
     """Migration of localroles from the old table to the new one."""
     type_roles_mappping = {
@@ -807,6 +818,8 @@ def upgrade():
     create_indexes()
     print('Update Internal User Profile')
     update_type_internaluserprofile()
+    print('Update Items title from User Profile')
+    update_items_title_from_userprofiles()
     print('Update User Profile external ID')
     copy_userprofiles_external_id()
     print('Migrate local roles')
