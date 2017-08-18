@@ -8,16 +8,25 @@ def professional_created_handler(event):
     """Handle UserProfile created event."""
     obj = event.obj
     request = event.request
+    payload = request.validated
+    update_kwargs = {}
 
-    location = request.validated.get('main_location', None)
-    if not obj.main_location and location:
+    main_location = payload.get('main_location', None)
+    if not obj.main_location and main_location:
         # force this because sometimes the obj.id is not available before the flush
-        obj.main_location = location
+        update_kwargs['main_location'] = main_location
 
-    links = request.validated.get('links', None)
+    links = payload.get('links', None)
     if not obj.links and links:
         # force this because sometimes the obj.id is not available before the flush
-        obj.links = links
+        update_kwargs['links'] = links
+
+    # in most of the cases the owner value will not be in the payload
+    value = payload.get('owner')
+    if not value:
+        update_kwargs['owner'] = [obj.id]
+
+    obj.update(update_kwargs)
 
     # submit for QA validation after creation
     obj.workflow.submit()

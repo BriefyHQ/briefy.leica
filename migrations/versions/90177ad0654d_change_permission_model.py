@@ -668,6 +668,26 @@ def migrate_localroles():
     '''
     op.execute(insert_qa_scout_roles)
 
+    add_missing_owner_local_roles = '''
+    INSERT INTO localroles (id, item_id, item_type, principal_id, role_name, updated_at, created_at)
+    SELECT
+    gen_random_uuid() as id,
+    source.item_id,
+    'userprofile' as item_type,
+    source.item_id as principal_id,
+    'owner' as role_name,
+    now() as updated_at,
+    now() as created_at
+    FROM
+    (SELECT id as item_id FROM professionals
+    WHERE id NOT IN (
+    select item_id FROM localroles as l
+    JOIN professionals as p
+    on l.item_id = p.id
+    WHERE l.role_name='owner')) as source
+    '''
+    op.execute(add_missing_owner_local_roles)
+
 
 def update_items_path():
     """Update items.path column with data from the parent models."""

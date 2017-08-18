@@ -76,6 +76,8 @@ History
     * Order and LeadOrder: fix creation subscriber to use price from payload when it is available and then use project.price as fallback (rudaporto).
     * Card #538: fixing adding a new Professional with links (rudaporto).
     * Card #541: when deleting a Professional link it is removed (rudaporto).
+    * Added migration for userprofiles without owner local role (rudaporto).
+    * In the Professionals subscriber set the owner attribute using the created user id (rudaporto).
 
 2.1.36 (2017-08-06)
 -------------------
