@@ -97,8 +97,7 @@ class TestProfessionalView(BaseTestView):
 
         assert 'links' in result.keys()
         obj_results = result.get('links')
-        # TODO: fix this (testing using the frontend works)
-        # assert len(obj_results) == 1
+        assert len(obj_results) == 1
         obj_result = obj_results[0]
         result_keys = list(obj_result.keys())
         result_values = list(obj_result.values())
@@ -109,5 +108,4 @@ class TestProfessionalView(BaseTestView):
 
         updated_obj = self.model.get(obj_id)
         assert updated_obj.links is not None
-        # TODO: fix this (testing using the frontend works)
-        # assert len(links) == 1
+        assert len(updated_obj.links) == 1

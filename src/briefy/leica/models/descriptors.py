@@ -127,6 +127,7 @@ class MultipleRelationshipWrapper(UnaryRelationshipWrapper):
                           if str(item.id) not in update_value_ids]
             for item_id in delete_ids:
                 item = self._model.get(item_id)
+                collection.remove(item)
                 session.delete(item)
                 logger.debug(f'Item deleted {item}')
 
