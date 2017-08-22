@@ -1,13 +1,29 @@
 """Billing information for a customer."""
+from briefy.common.db.comparator import BaseComparator
 from briefy.leica.models.billing_info import BillingInfo
 from briefy.leica.models.billing_info import workflows
 from briefy.leica.vocabularies import TaxIdStatusCustomers
 from sqlalchemy import orm
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import UUIDType
 
 import colander
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils
+
+
+class LegalNameComparator(BaseComparator):
+    """Customized comparator to lookup in the country key inside the billing_address json field."""
+
+    def operate(self, op, other, escape=None):
+        """Custom operate method."""
+        def transform(q):
+            """Transform the query applying a filter."""
+            cls = self.__clause_element__()
+            q = q.join(cls).filter(op(BillingInfo.title, other))
+            return q
+
+        return transform
 
 
 class CustomerBillingInfo(BillingInfo):
@@ -77,3 +93,19 @@ class CustomerBillingInfo(BillingInfo):
 
     Internal codes used by Finance to determine tax rates to be applied to this customer.
     """
+
+    @hybrid_property
+    def legal_name(self) -> str:
+        """Company legal name.
+
+        :return: legal name from title.
+        """
+        return self.title
+
+    @legal_name.comparator
+    def legal_name(cls) -> LegalNameComparator:
+        """Billing address legal_name comparator.
+
+        :return: _title class attribute.
+        """
+        return LegalNameComparator(cls)

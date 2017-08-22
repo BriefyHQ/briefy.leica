@@ -7,6 +7,7 @@ from briefy.leica.models.asset import Asset
 from briefy.leica.models.asset import Image
 from briefy.leica.models.asset import ThreeSixtyImage
 from briefy.leica.models.asset import Video
+from briefy.leica.models.billing_info import BillingInfo
 from briefy.leica.models.billing_info.customer import CustomerBillingInfo
 from briefy.leica.models.billing_info.professional import ProfessionalBillingInfo
 from briefy.leica.models.comment import Comment
@@ -55,6 +56,7 @@ ALL_MODELS = [
     AdditionalWorkingLocation,
     Asset,
     Assignment,
+    BillingInfo,
     Comment,
     Customer,
     CustomerUserProfile,

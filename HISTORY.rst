@@ -79,6 +79,8 @@ History
     * Added migration for userprofiles without owner local role (rudaporto).
     * In the Professionals subscriber set the owner attribute using the created user id (rudaporto).
     * Added unique email validation when creating new Professional. Internal and Customer profiles already had it (rudaporto).
+    * Created new comparator classes to filter Customer.tax_country and Customer.legal_name (rudaporto).
+    * Created new comparator class to filter Assignment.title based on Order.title value (rudaporto).
 
 2.1.36 (2017-08-06)
 -------------------

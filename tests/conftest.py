@@ -323,16 +323,32 @@ def obj_payload_other(file_path, position):
 @pytest.fixture(scope='class')
 def create_dependencies(request, session):
     cls = request.cls
+    cls_model = getattr(cls, 'model', None)
     for model, file_path in cls.dependencies:
+        # avoid to create the first instance if this test case is for the same model
+        if model == cls_model:
+            start = 1
+        else:
+            start = 0
         abs_path = os.path.join(__file__.rsplit('/', 1)[0], file_path)
         with open(abs_path) as file:
             data = json.load(file)
-        for payload in data:
-            obj = model.get(payload['id'])
-            if not obj:
-                obj = model.create(payload)
-                session.add(obj)
+        for position, payload in enumerate(data):
+            if position >= start:
+                obj = model.get(payload['id'])
+                if not obj:
+                    obj = model.create(payload)
+                    session.add(obj)
     session.flush()
+
+
+@pytest.fixture(scope='function')
+def get_file_payload(file_path, position):
+    """Return file payload using file_path."""
+    abs_path = os.path.join(__file__.rsplit('/', 1)[0], file_path)
+    with open(abs_path) as file:
+        data = json.load(file)
+    return data[position]
 
 
 @pytest.mark.usefixtures('db_transaction', 'login')
@@ -446,8 +462,7 @@ class BaseTestView:
 
     def test_get_collection(self, app):
         """Test get a collection of items."""
-        request = app.get('{base}'.format(base=self.base_path),
-                          headers=self.headers, status=200)
+        request = app.get(f'{self.base_path}', headers=self.headers, status=200)
         result = request.json
         assert 'data' in result
         assert 'total' in result
@@ -466,8 +481,9 @@ class BaseTestView:
         """Teste put Data to existing object."""
         payload = self.update_map
         obj_id = obj_payload['id']
-        request = app.put_json('{base}/{id}'.format(base=self.base_path, id=obj_id),
-                               payload, headers=self.headers, status=200)
+        request = app.put_json(
+            f'{self.base_path}/{obj_id}', payload, headers=self.headers, status=200
+        )
         result = request.json
         assert 'application/json' == request.content_type
 

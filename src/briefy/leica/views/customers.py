@@ -44,8 +44,9 @@ class CustomersService(RESTService):
     model = Customer
     default_order_by = 'title'
     filter_related_fields = [
-        'customer_user', 'account_manager', 'business_contact.email', 'business_contact.fullname',
-        'billing_contact.email', 'billing_contact.fullname'
+        'customer_users', 'internal_account', 'business_contact.email',
+        'business_contact.fullname', 'billing_contact.email', 'billing_contact.fullname',
+        'legal_name', 'tax_country', 'billing_info.title'
     ]
 
     _default_notify_events = {

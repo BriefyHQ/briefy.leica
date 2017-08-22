@@ -1,4 +1,5 @@
 """Briefy Leica mixins."""
+from briefy.common.db.comparator import BaseComparator
 from briefy.common.db.mixins import BaseMetadata
 from briefy.common.db.mixins import ContactInfoMixin
 from briefy.common.db.mixins import KnackMixin
@@ -466,6 +467,20 @@ class TaxInfo:
     """
 
 
+class TaxCountryComparator(BaseComparator):
+    """Customized comparator to lookup in the country key inside the billing_address json field."""
+
+    def operate(self, op, other, escape=None):
+        """Custom operate method."""
+        def transform(q):
+            """Transform the query applying a filter."""
+            cls = self.__clause_element__()
+            q = q.filter(op(cls.billing_address['country'].astext, other))
+            return q
+
+        return transform
+
+
 class BillingAddress:
     """BillingAddress information.
 
@@ -511,3 +526,11 @@ class BillingAddress:
         if info and 'country' in info:
             country = info.get('country', '')
         return country
+
+    @tax_country.comparator
+    def tax_country(cls) -> TaxCountryComparator:
+        """Billing address tax_country comparator.
+
+        :return: TaxCountryTransformer instance.
+        """
+        return TaxCountryComparator(cls)

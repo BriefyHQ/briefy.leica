@@ -1,4 +1,5 @@
 """Briefy Leica Assignment model."""
+from briefy.common.db.comparator import BaseComparator
 from briefy.common.db.models import Item
 from briefy.common.db.types import AwareDateTime
 from briefy.common.utils import schema
@@ -150,6 +151,25 @@ class AssignmentDates:
         }
     )
     """Last submission date date for this Assignment."""
+
+
+class AssignmentTitleComparator(BaseComparator):
+    """Customized comparator to filter the title from the Order."""
+
+    def operate(self, op, other, escape=None):
+        """Custom operate method."""
+        def transform(q):
+            """Transform the query applying a filter."""
+            cls = self.__clause_element__()
+            order_cls = cls.order.mapper.class_
+            q = q.join(
+                Order, cls.order_id == order_cls.id
+            ).filter(
+                op(order_cls._title, other)
+            )
+            return q
+
+        return transform
 
 
 @implementer(IAssignment)
@@ -467,10 +487,15 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
         check_images = self.order.number_required_assets <= approvable_assets_count
         return check_images
 
-    @declared_attr
+    @hybrid_property
+    def title(self) -> str:
+        """Return the title of an Order."""
+        return self.order.title
+
+    @title.comparator
     def title(cls) -> str:
         """Return the title of an Order."""
-        return association_proxy('order', 'title')
+        return AssignmentTitleComparator(cls)
 
     @declared_attr
     def delivery(cls) -> str:

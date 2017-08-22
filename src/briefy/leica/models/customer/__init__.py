@@ -79,7 +79,7 @@ class Customer(mixins.CustomerRolesMixin, mixins.LeicaSubMixin, Item):
     :class:`briefy.leica.models.billing_info.customer.CustomerBillingInfo`.
     """
 
-    legal_name = association_proxy('billing_info', 'title')
+    legal_name = association_proxy('billing_info', 'legal_name')
     """Legal name of the company.
 
     i.e.: Insta Stock GmbH
@@ -89,6 +89,12 @@ class Customer(mixins.CustomerRolesMixin, mixins.LeicaSubMixin, Item):
     """Tax country for this customer.
 
     i.e.: DE
+    """
+
+    billing_address = association_proxy('billing_info', 'billing_address')
+    """Billing Address for this customer.
+
+    See :class:`briefy.leica.models.billing_info.customer.CustomerBillingInfo`
     """
 
     addresses = orm.relationship(

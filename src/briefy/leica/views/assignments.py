@@ -47,7 +47,7 @@ class AssignmentService(RESTService):
     model = Assignment
     default_order_by = 'updated_at'
     filter_related_fields = [
-        'project._title', 'title', 'professional.title', 'professional.email',
+        'project.title', 'title', 'professional.title', 'professional.email',
         'project.id', 'description', 'location.locality', 'location.country',
         'location.formatted_address', 'location.fullname', 'location.email',
         'professional_user', 'project_manager', 'scout_manager', 'qa_manager',
