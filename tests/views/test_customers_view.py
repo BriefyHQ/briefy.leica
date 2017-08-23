@@ -6,6 +6,16 @@ import pytest
 import uuid
 
 
+LISTING_FILTERS_PAYLOADS = [
+    ({'ilike_legal_name': 'Delivery',
+      'tax_country': 'DE',
+      'customer_id': 'c2034c1b-0a40-4b84-9ace-54b958f64ed4'}, 1),
+    ({'ilike_legal_name': 'Agoda',
+      'tax_country': 'SG',
+      'customer_id': 'f61437ce-ca13-4a64-8474-c43906267215'}, 1)
+]
+
+
 @pytest.mark.usefixtures('create_dependencies')
 class TestCustomerView(BaseTestView):
     """Test CustomerService view."""
@@ -25,14 +35,12 @@ class TestCustomerView(BaseTestView):
     }
 
     @pytest.mark.parametrize('file_path, position', [('data/customer_billing_infos.json', 0)])
-    @pytest.mark.parametrize('legal_name, country, total, customer_id',
-                             [('Delivery', 'DE', 1, 'c2034c1b-0a40-4b84-9ace-54b958f64ed4'),
-                              ('Agoda', 'SG', 1, 'f61437ce-ca13-4a64-8474-c43906267215')])
-    def test_collection_get_with_filters(
-            self, app, get_file_payload, legal_name, country, total, customer_id
-    ):
+    @pytest.mark.parametrize('filter_payload, total', LISTING_FILTERS_PAYLOADS)
+    def test_collection_get_with_filters(self, app, get_file_payload, filter_payload, total):
         """Test collection_get endpoint with special filters."""
-        customer = self.model.get(customer_id)
+        customer = self.model.get(filter_payload.pop('customer_id'))
+        country = filter_payload.get('tax_country')
+        legal_name = filter_payload.get('ilike_legal_name')
         billing_info_payload = get_file_payload
         billing_info_payload['id'] = uuid.uuid4()
         billing_info_payload['title'] = f'The {legal_name} Inc.'
@@ -41,10 +49,8 @@ class TestCustomerView(BaseTestView):
 
         # create new billing info instance
         models.CustomerBillingInfo.create(billing_info_payload)
-        import transaction
-        transaction.commit()
 
-        base_path = f'{self.base_path}?ilike_legal_name={legal_name}&tax_country={country}'
+        base_path = self.get_base_path_with_query_str(filter_payload)
         request = app.get(base_path, headers=self.headers, status=200)
         result = request.json
         assert 'data' in result

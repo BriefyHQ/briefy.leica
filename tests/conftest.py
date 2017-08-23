@@ -373,6 +373,14 @@ class BaseTestView:
         return {'X-Locale': 'en_GB',
                 'Authorization': 'JWT {token}'.format(token=self.token)}
 
+    def get_base_path_with_query_str(self, filter_payload):
+        """Create query string based on the filter payload."""
+        query_items = []
+        for key, value in filter_payload.items():
+            query_items.append(f'{key}={value}')
+        query_str = '&'.join(query_items)
+        return f'{self.base_path}?{query_str}'
+
     def test_options(self, app):
         """Test OPTIONS verb."""
         req = app.options(

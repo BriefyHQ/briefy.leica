@@ -163,7 +163,7 @@ class AssignmentTitleComparator(BaseComparator):
             cls = self.__clause_element__()
             order_cls = cls.order.mapper.class_
             q = q.join(
-                Order, cls.order_id == order_cls.id
+                order_cls, cls.order_id == order_cls.id
             ).filter(
                 op(order_cls._title, other)
             )

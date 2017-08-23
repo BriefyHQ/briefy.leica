@@ -7,6 +7,21 @@ from datetime import timedelta
 import pytest
 
 
+LISTING_FILTERS_PAYLOADS = [
+    ({'ilike_title': 'Job Title',
+      'current_type': 'order',
+      'ilike_slug': 'job-title'}, 5),
+    ({'ilike_title': 'Job Title',
+      'current_type': 'order',
+      'ilike_project.title': 'Project',
+      'location.country': 'DE'}, 1),
+    ({'ilike_title': '1',
+      'current_type': 'order',
+      'ilike_project.title': '1',
+      'ilike_location.locality': 'Berlin'}, 1)
+]
+
+
 @pytest.mark.usefixtures('create_dependencies')
 class TestOrderView(BaseVersionedTestView):
     """Test OrderService view."""
@@ -16,6 +31,7 @@ class TestOrderView(BaseVersionedTestView):
         (models.Professional, 'data/professionals.json'),
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
+        (models.Order, 'data/orders.json'),
     ]
     serialize_attrs = [
         'path', '_roles', '_actors', 'customer', 'project', 'timezone',
@@ -175,3 +191,20 @@ class TestOrderView(BaseVersionedTestView):
         result = request.json
         assert result['status'] == 'error'
         assert result['message'] == 'Unauthorized'
+
+    @pytest.mark.parametrize('file_path, position', [('data/orders.json', 0)])
+    @pytest.mark.parametrize('filter_payload, total', LISTING_FILTERS_PAYLOADS)
+    def test_collection_get_with_filters(self, app, get_file_payload, filter_payload, total):
+        """Test collection_get endpoint with special filters."""
+        order_payload = get_file_payload
+        location_payload = order_payload['location']
+        location_payload.pop('id')
+        # create new order location instance
+        models.OrderLocation.create(location_payload)
+
+        base_path = self.get_base_path_with_query_str(filter_payload)
+        request = app.get(base_path, headers=self.headers, status=200)
+        result = request.json
+        assert 'data' in result
+        assert 'total' in result
+        assert result['total'] == len(result['data']) == total

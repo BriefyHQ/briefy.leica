@@ -5,14 +5,24 @@ from conftest import BaseTestView
 import pytest
 
 
+LISTING_FILTERS_PAYLOADS = [
+    ({'like_main_location.country': 'DE',
+      'ilike_main_location.locality': 'Hanover',
+      'ilike_title': 'salgado',
+      'ilike_email': 'professional.briefy.co'}, 1),
+]
+
+
 @pytest.mark.usefixtures('create_dependencies')
 class TestProfessionalView(BaseTestView):
     """Test ProfessionalService view."""
 
     base_path = '/professionals'
-    dependencies = []
     file_path = 'data/professionals.json'
     model = models.Professional
+    dependencies = [
+        (models.Professional, 'data/professionals.json'),
+    ]
     initial_wf_state = 'pending'
     serialize_attrs = [
         'path', '_roles', '_actors', 'intercom'
@@ -109,3 +119,20 @@ class TestProfessionalView(BaseTestView):
         updated_obj = self.model.get(obj_id)
         assert updated_obj.links is not None
         assert len(updated_obj.links) == 1
+
+    @pytest.mark.parametrize('file_path, position', [('data/professionals.json', 0)])
+    @pytest.mark.parametrize('filter_payload, total', LISTING_FILTERS_PAYLOADS)
+    def test_collection_get_with_filters(self, app, get_file_payload, filter_payload, total):
+        """Test collection_get endpoint with special filters."""
+        professional_payload = get_file_payload
+        location_payload = professional_payload['main_location']
+        location_payload.pop('latlng')
+        # create new main working location instance
+        models.MainWorkingLocation.create(location_payload)
+
+        base_path = self.get_base_path_with_query_str(filter_payload)
+        request = app.get(base_path, headers=self.headers, status=200)
+        result = request.json
+        assert 'data' in result
+        assert 'total' in result
+        assert result['total'] == len(result['data']) == total
