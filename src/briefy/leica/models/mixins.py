@@ -475,7 +475,7 @@ class TaxCountryComparator(BaseComparator):
         def transform(q):
             """Transform the query applying a filter."""
             cls = self.__clause_element__()
-            q = q.filter(op(cls.billing_address['country'].astext, other))
+            q = q.join(cls).filter(op(cls.billing_address['country'].astext, other))
             return q
 
         return transform

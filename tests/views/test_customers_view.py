@@ -12,7 +12,9 @@ LISTING_FILTERS_PAYLOADS = [
       'customer_id': 'c2034c1b-0a40-4b84-9ace-54b958f64ed4'}, 1),
     ({'ilike_legal_name': 'Agoda',
       'tax_country': 'SG',
-      'customer_id': 'f61437ce-ca13-4a64-8474-c43906267215'}, 1)
+      'customer_id': 'f61437ce-ca13-4a64-8474-c43906267215'}, 1),
+    ({'tax_country': 'SG',
+      'customer_id': '51eaab79-1c05-44fa-b3cf-278ecf311978'}, 2)
 ]
 
 
@@ -40,7 +42,7 @@ class TestCustomerView(BaseTestView):
         """Test collection_get endpoint with special filters."""
         customer = self.model.get(filter_payload.pop('customer_id'))
         country = filter_payload.get('tax_country')
-        legal_name = filter_payload.get('ilike_legal_name')
+        legal_name = filter_payload.get('ilike_legal_name', 'Company')
         billing_info_payload = get_file_payload
         billing_info_payload['id'] = uuid.uuid4()
         billing_info_payload['title'] = f'The {legal_name} Inc.'
