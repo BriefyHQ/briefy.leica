@@ -39,7 +39,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['created'])
     @pytest.mark.parametrize('role_name', ['customer', 'qa', 'system', 'support'])
     def test_workflow_submit(
-        self, instance_obj, web_request, session, roles, role_name, origin_state
+        self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow submit transition."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -57,7 +57,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['pending'])
     @pytest.mark.parametrize('role_name', ['customer', 'pm', 'scout', 'system'])
     def test_workflow_publish(
-        self, instance_obj, web_request, session, roles, role_name, origin_state
+        self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow publish transition."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -84,7 +84,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['published'])
     @pytest.mark.parametrize('role_name', ['customer', 'pm', 'scout'])
     def test_workflow_retract(
-        self, instance_obj, web_request, session, roles, role_name, origin_state
+        self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow retract transition."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -132,7 +132,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['published'])
     @pytest.mark.parametrize('role_name', ['pm', 'scout', 'system'])
     def test_workflow_assign_pool(
-        self, instance_obj, web_request, session, roles, role_name, origin_state
+        self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow assign_pool transition."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -163,7 +163,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['pending'])
     @pytest.mark.parametrize('role_name', ['scout', 'qa', 'pm', 'system'])
     def test_workflow_assign(
-        self, instance_obj, web_request, session, roles, role_name, origin_state
+        self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow assign transition."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -191,7 +191,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['assigned'])
     @pytest.mark.parametrize('role_name', ['customer', ])
     def test_workflow_cancel_from_assigned(
-        self, instance_obj, web_request, session, roles, role_name, origin_state
+        self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow cancel transition from assigned."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -210,7 +210,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['assigned'])
     @pytest.mark.parametrize('role_name', ['professional', ])
     def test_workflow_scheduling_issues(
-        self, instance_obj, web_request, session, roles, role_name, origin_state
+        self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow scheduling_issues transition."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -235,7 +235,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['assigned'])
     @pytest.mark.parametrize('role_name', ['professional', 'pm', 'scout', 'system'])
     def test_workflow_schedule(
-        self, instance_obj, web_request, session, roles, role_name, origin_state
+        self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow schedule transition."""
         now = datetime_utcnow()
@@ -261,7 +261,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['scheduled'])
     @pytest.mark.parametrize('role_name', ['professional', 'pm'])
     def test_workflow_reschedule(
-        self, instance_obj, web_request, session, roles, role_name, origin_state
+        self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow reschedule transition."""
         now = datetime_utcnow()
@@ -292,7 +292,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['scheduled', 'awaiting_assets'])
     @pytest.mark.parametrize('role_name', ['pm', 'customer'])
     def test_workflow_remove_schedule(
-        self, instance_obj, web_request, session, roles, role_name, origin_state
+        self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow remove_schedule transition."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -322,7 +322,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['scheduled'])
     @pytest.mark.parametrize('role_name', ['customer', ])
     def test_workflow_cancel_from_scheduled(
-        self, instance_obj, web_request, session, roles, role_name, origin_state
+        self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow cancel transition from scheduled."""
         now = datetime_utcnow()
@@ -345,7 +345,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['scheduled'])
     @pytest.mark.parametrize('role_name', ['system', ])
     def test_workflow_ready_for_upload(
-        self, instance_obj, web_request, session, roles, role_name, origin_state
+        self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow ready_for_upload transition from scheduled.
 
@@ -374,7 +374,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['awaiting_assets'])
     @pytest.mark.parametrize('role_name', ['customer', ])
     def test_workflow_cancel_from_awaiting_assets(
-        self, instance_obj, web_request, session, roles, role_name, origin_state
+        self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow cancel transition from awaiting_assets.
 
@@ -392,7 +392,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['awaiting_assets'])
     @pytest.mark.parametrize('role_name', ['professional', 'pm', ])
     def test_workflow_upload(
-        self, instance_obj, web_request, session, roles, role_name, origin_state
+        self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow upload transition."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -412,7 +412,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['asset_validation'])
     @pytest.mark.parametrize('role_name', ['system', 'qa', ])
     def test_workflow_invalidate_assets(
-        self, instance_obj, web_request, session, roles, role_name, origin_state
+        self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow invalidate_assets transition."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -429,7 +429,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['asset_validation'])
     @pytest.mark.parametrize('role_name', ['system', 'qa', ])
     def test_workflow_validate_assets(
-        self, instance_obj, web_request, session, roles, role_name, origin_state
+        self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow validate_assets transition."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -447,7 +447,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['in_qa'])
     @pytest.mark.parametrize('role_name', ['customer', ])
     def test_workflow_cancel_from_in_qa(
-            self, instance_obj, web_request, session, roles, role_name, origin_state
+            self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow cancel transition from in_qa.
 
@@ -465,7 +465,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['in_qa'])
     @pytest.mark.parametrize('role_name', ['qa', ])
     def test_workflow_assign_qa_manager(
-            self, instance_obj, web_request, session, roles, role_name, origin_state
+            self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow assign_qa_manager transition."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -477,15 +477,16 @@ class TestAssignmentModel(BaseModelTest):
 
         wf.assign_qa_manager(
             message='Setting a new QA Manager',
-            fields={'qa_manager': '44f57cff-3db4-4b10-b9dc-8cd8761a6c7e'}
+            fields={'assignment_internal_qa': ['44f57cff-3db4-4b10-b9dc-8cd8761a6c7e']}
         )
         assert assignment.state == 'in_qa'
-        assert assignment.qa_manager == '44f57cff-3db4-4b10-b9dc-8cd8761a6c7e'
+        assert '44f57cff-3db4-4b10-b9dc-8cd8761a6c7e' in assignment.assignment_internal_qa
+        assert len(assignment.assignment_internal_qa) == 1
 
     @pytest.mark.parametrize('origin_state', ['in_qa'])
     @pytest.mark.parametrize('role_name', ['qa', ])
     def test_workflow_reject(
-            self, instance_obj, web_request, session, roles, role_name, origin_state
+            self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow reject transition."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -503,7 +504,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['awaiting_assets'])
     @pytest.mark.parametrize('role_name', ['qa', ])
     def test_workflow_retract_rejection(
-            self, instance_obj, web_request, session, roles, role_name, origin_state
+            self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow retract_rejection transition."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -524,7 +525,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['in_qa'])
     @pytest.mark.parametrize('role_name', ['qa', ])
     def test_workflow_start_post_process(
-            self, instance_obj, web_request, session, roles, role_name, origin_state
+            self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow start_post_process transition."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -541,7 +542,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['in_qa'])
     @pytest.mark.parametrize('role_name', ['qa', 'pm', 'system'])
     def test_workflow_perm_reject(
-            self, instance_obj, web_request, session, roles, role_name, origin_state
+            self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow perm_reject transition."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -563,7 +564,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['post_processing'])
     @pytest.mark.parametrize('role_name', ['qa', ])
     def test_workflow_retract_post_process(
-            self, instance_obj, web_request, session, roles, role_name, origin_state
+            self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow retract_post_process transition."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -580,7 +581,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['in_qa', 'post_processing'])
     @pytest.mark.parametrize('role_name', ['qa', ])
     def test_workflow_approve(
-            self, instance_obj, web_request, session, roles, role_name, origin_state
+            self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow approve transition."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -611,7 +612,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['approved'])
     @pytest.mark.parametrize('role_name', ['qa', ])
     def test_workflow_retract_approval(
-            self, instance_obj, web_request, session, roles, role_name, origin_state
+            self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow retract_approval transition."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -628,7 +629,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['approved'])
     @pytest.mark.parametrize('role_name', ['system', 'pm'])
     def test_workflow_complete(
-            self, instance_obj, web_request, session, roles, role_name, origin_state
+            self, instance_obj, web_request,  roles, role_name, origin_state
     ):
         """Test Assignment workflow complete transition."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -645,7 +646,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['approved'])
     @pytest.mark.parametrize('role_name', ['customer', ])
     def test_workflow_refuse(
-            self, instance_obj, web_request, session, roles, role_name, origin_state
+            self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow refuse transition."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -662,7 +663,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['refused'])
     @pytest.mark.parametrize('role_name', ['pm'])
     def test_workflow_complete_from_refused(
-            self, instance_obj, web_request, session, roles, role_name, origin_state
+            self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow complete transition from refused."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -679,7 +680,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['refused'])
     @pytest.mark.parametrize('role_name', ['pm'])
     def test_workflow_return_to_qa(
-            self, instance_obj, web_request, session, roles, role_name, origin_state
+            self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow return_to_qa transition."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -697,7 +698,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['cancelled', 'completed', 'perm_rejected'])
     @pytest.mark.parametrize('role_name', ['finance', 'system', 'support'])
     def test_workflow_edit_compensation_from_final_states(
-            self, instance_obj, web_request, session, roles, role_name, origin_state
+            self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow edit_compensation transition during final states."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -717,7 +718,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['assigned', 'in_qa'])
     @pytest.mark.parametrize('role_name', ['pm'])
     def test_workflow_edit_compensation_from_pending_states(
-            self, instance_obj, web_request, session, roles, role_name, origin_state
+            self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow edit_compensation transition during pending states."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -737,7 +738,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['pending', 'published'])
     @pytest.mark.parametrize('role_name', ['scout', 'pm'])
     def test_workflow_edit_payout_from_scout_states(
-            self, instance_obj, web_request, session, roles, role_name, origin_state
+            self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow edit_payout transition during scout states."""
         assignment, wf, request = self.prepare_obj_wf(
@@ -758,7 +759,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['cancelled', 'completed', 'perm_rejected'])
     @pytest.mark.parametrize('role_name', ['finance', 'system', 'support'])
     def test_workflow_edit_payout_from_final_states(
-            self, instance_obj, web_request, session, roles, role_name, origin_state
+            self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow edit_payout transition during final states."""
         assignment, wf, request = self.prepare_obj_wf(

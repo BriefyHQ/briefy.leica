@@ -82,6 +82,8 @@ History
     * Created new comparator classes to filter Customer.tax_country and Customer.legal_name (rudaporto).
     * Created new comparator class to filter Assignment.title based on Order.title value (rudaporto).
     * Added new test method in all the main view resources to query collection_get with one or more filters (rudaporto).
+    * Fix: assignment workflow.assign_qa_manager to use the new role name as required field (rudaporto).
+    * Tests: remove unused session parameter from test methods signature (rudaporto).
 
 2.1.36 (2017-08-06)
 -------------------

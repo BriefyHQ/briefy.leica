@@ -383,7 +383,7 @@ class AssignmentWorkflow(BriefyWorkflow):
         in_qa,
         'can_approve',
         require_message=True,
-        required_fields=('qa_manager', )
+        required_fields=('assignment_internal_qa', )
     )
     def assign_qa_manager(self, **kwargs):
         """Set a QA manager for this assignment."""
