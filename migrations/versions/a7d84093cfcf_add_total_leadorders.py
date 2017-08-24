@@ -22,7 +22,7 @@ def upgrade():
     update_total_orders = """
     UPDATE projects set total_orders = source.total FROM
     (SELECT 
-    count(orders.id) as total, 
+    count(distinct orders.id) as total,
     orders.project_id as project_id
     FROM orders WHERE orders.current_type = 'order'
     GROUP BY project_id
@@ -34,7 +34,7 @@ def upgrade():
     update_total_leadorders = """
     UPDATE projects set total_leadorders = source.total FROM
     (SELECT 
-    count(orders.id) as total, 
+    count(distinct orders.id) as total,
     orders.project_id as project_id
     FROM orders WHERE orders.current_type = 'leadorder'
     GROUP BY project_id
