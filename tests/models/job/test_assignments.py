@@ -629,7 +629,7 @@ class TestAssignmentModel(BaseModelTest):
     @pytest.mark.parametrize('origin_state', ['approved'])
     @pytest.mark.parametrize('role_name', ['system', 'pm'])
     def test_workflow_complete(
-            self, instance_obj, web_request,  roles, role_name, origin_state
+            self, instance_obj, web_request, roles, role_name, origin_state
     ):
         """Test Assignment workflow complete transition."""
         assignment, wf, request = self.prepare_obj_wf(
