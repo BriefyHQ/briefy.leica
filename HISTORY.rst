@@ -84,6 +84,7 @@ History
     * Added new test method in all the main view resources to query collection_get with one or more filters (rudaporto).
     * Fix: assignment workflow.assign_qa_manager to use the new role name as required field (rudaporto).
     * Tests: remove unused session parameter from test methods signature (rudaporto).
+    * Integrate changes on briefy.ws about sqs event not being triggered for creation and update event (rudaporto).
 
 2.1.36 (2017-08-06)
 -------------------
