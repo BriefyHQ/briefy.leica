@@ -70,7 +70,7 @@ class DashboardFinanceOrderService(SQLQueryService):
     sum(
     CASE WHEN active_orders.state IN ('delivered', 'accepted')
     THEN 1 ELSE 0
-    END) as completed
+    END) as delivered
 
     FROM
 
