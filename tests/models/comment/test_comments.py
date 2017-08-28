@@ -29,3 +29,4 @@ class TestCommentModel(BaseModelTest):
         entity_data = comment.entity.to_dict()
         assert data['_roles'] == entity_data['_roles']
         assert data['_actors'] == entity_data['_actors']
+        assert data['entity'] == comment.entity.to_summary_dict()

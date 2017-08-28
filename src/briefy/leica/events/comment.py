@@ -23,6 +23,7 @@ def to_dict_with_entity_lr(comment: Item, excludes: Attributes=None, includes: A
     if isinstance(entity, Item):
         data['_roles'] = entity_data.get('_roles')
         data['_actors'] = entity_data.get('_actors')
+    data['entity'] = entity.to_summary_dict()
     return data
 
 
