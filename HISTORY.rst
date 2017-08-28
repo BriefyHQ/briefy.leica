@@ -86,6 +86,7 @@ History
     * Tests: remove unused session parameter from test methods signature (rudaporto).
     * Integrate changes on briefy.ws about sqs event not being triggered for creation and update event (rudaporto).
     * New customized to_dict method for Comment created and updated events to add local roles from commented entity instance to the payload (rudaporto).
+    * Card #456: added back the finance/delivered dashboard delivered (rudaporto).
 
 2.1.36 (2017-08-06)
 -------------------
