@@ -90,6 +90,8 @@ History
     * Card #571: fixed Lead workflow transition remove_confirmation to update current_type to 'leadorder' (rudaporto).
     * Card #573: fixed Order creation to generated and set the correct auto generated slug, aka: Briefy ID (rudaporto).
     * Card #576: make sure a customer user can only see and add orders to projects if: has customer_manager role on customer or has any role on the project (rudaporto).
+    * Card #577: it was fixed as a side effect of the #576 (rudaporto).
+    * Fixed permission filter for customer orders dashboards (rudaporto).
 
 2.1.36 (2017-08-06)
 -------------------

@@ -121,15 +121,20 @@ class DashboardCustomerDeliveredOrderService(SQLQueryService):
     i.state IN ('delivered', 'accepted', 'in_qa', 'refused')
     ) as orders JOIN
 
-    (SELECT i.id, i.state, i.title, p.customer_id
-    FROM items as i JOIN projects as p on i.id = p.id) as projects
+    (SELECT i.id, i.state, i.title, p.customer_id, l.principal_id, l.role_name
+    FROM items as i JOIN projects as p on i.id = p.id
+    JOIN localroles as l on p.id = l.item_id) as projects
     on orders.project_id = projects.id JOIN
 
-    (SELECT i.id, i.state, i.title
+    (SELECT i.id, i.state, i.title, l.principal_id, l.role_name
     FROM items as i JOIN customers as c on i.id = c.id
-    JOIN localroles as l on c.id = l.item_id
-    WHERE l.principal_id = '{principal_id}') as customers
+    JOIN localroles as l on c.id = l.item_id) as customers
     on projects.customer_id = customers.id
+
+    WHERE
+    (customers.role_name = 'customer_manager'
+    AND customers.principal_id = '{principal_id}')
+    OR projects.principal_id = '{principal_id}'
 
     ) as active_orders GROUP BY
     active_orders.title,
@@ -218,16 +223,21 @@ class DashboardCustomerAllLeadsService(SQLQueryService):
     'delivered', 'accepted', 'in_qa', 'refused', 'perm_refused')
     ) as orders JOIN
 
-    (SELECT i.id, i.state, i.title, p.customer_id
+    (SELECT i.id, i.state, i.title, p.customer_id, l.principal_id, l.role_name
     FROM items as i JOIN projects as p on i.id = p.id
+    JOIN localroles as l on p.id = l.item_id
     WHERE p.order_type = '{type}') as projects
     on orders.project_id = projects.id JOIN
 
-    (SELECT i.id, i.state, i.title
+    (SELECT i.id, i.state, i.title, l.principal_id, l.role_name
     FROM items as i JOIN customers as c on i.id = c.id
-    JOIN localroles as l on c.id = l.item_id
-    WHERE l.principal_id = '{principal_id}') as customers
+    JOIN localroles as l on c.id = l.item_id) as customers
     on projects.customer_id = customers.id
+
+    WHERE
+    (customers.role_name = 'customer_manager'
+    AND customers.principal_id = '{principal_id}')
+    OR projects.principal_id = '{principal_id}'
 
     ) as active_orders GROUP BY
     active_orders.title,
