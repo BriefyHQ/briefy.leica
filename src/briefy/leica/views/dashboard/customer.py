@@ -202,20 +202,22 @@ class DashboardCustomerAllLeadsService(SQLQueryService):
 
     sum(
     CASE WHEN active_orders.state = 'cancelled'
+    AND active_orders.current_type = 'leadorder'
     THEN 1 ELSE 0
     END) as cancelled,
 
     sum(
     CASE WHEN active_orders.state NOT IN ('new', 'cancelled')
+    AND active_orders.current_type = 'order'
     THEN 1 ELSE 0
     END) as confirmed
 
     FROM
 
-    (SELECT DISTINCT orders.id, orders.project_id,
+    (SELECT DISTINCT orders.id, orders.project_id, orders.current_type,
     projects.title, orders.state, orders.accept_date FROM
 
-    (SELECT i.id, i.state, i.title, o.accept_date, o.project_id
+    (SELECT i.id, i.state, i.title, o.accept_date, o.project_id, o.current_type
     FROM items as i JOIN orders as o on i.id = o.id
     JOIN leadorders as l on l.id = o.id
     WHERE i.type = '{type}' AND
