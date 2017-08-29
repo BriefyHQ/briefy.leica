@@ -87,7 +87,8 @@ History
     * Integrate changes on briefy.ws about sqs event not being triggered for creation and update event (rudaporto).
     * New customized to_dict method for Comment created and updated events to add local roles from commented entity instance to the payload (rudaporto).
     * Card #456: added back the finance/delivered dashboard delivered (rudaporto).
-    * Card #571: fixed lead workflow transition remove_confirmation to update current_type to 'leadorder' (rudaporto).
+    * Card #571: fixed Lead workflow transition remove_confirmation to update current_type to 'leadorder' (rudaporto).
+    * Card #573: fixed Order creation to generated and set the correct auto generated slug, aka: Briefy ID (rudaporto).
 
 2.1.36 (2017-08-06)
 -------------------

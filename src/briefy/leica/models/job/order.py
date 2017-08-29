@@ -1,4 +1,4 @@
-"""Briefy Leica Order to a Job."""
+"""Briefy Leica Order model."""
 from briefy.common.db.models import Item
 from briefy.common.db.types import AwareDateTime
 from briefy.common.utils import schema
@@ -212,26 +212,27 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
     )
     """Type of the Order during its life cycle."""
 
-    @hybrid_property
-    def slug(self) -> str:
-        """Return a slug for an object.
+    @classmethod
+    def create(cls, payload: dict) -> 'Item':
+        """Factory that creates a new instance of this object.
 
-        :return: A slug to be added to an url.
+        :param payload: Dictionary containing attributes and values
+        :type payload: dict
         """
-        return self._slug
+        payload['slug'] = create_order_slug()
+        return super().create(payload)
 
-    @slug.setter
+    @Item.slug.setter
     def slug(self, value: str):
         """Set a new slug for this object.
 
         Generate a slug using :func:`create_order_slug`
         :param value: Value of the new slug, if passed, will raise an Exception.
         """
-        if not value:
-            value = create_order_slug()
+        if value and self.slug:
+            raise Exception('Order slug should never be updated.')
+        elif value:
             self._slug = value
-        else:
-            raise Exception('Slug should not be changed.')
 
     customer_order_id = sa.Column(
         sa.String,
