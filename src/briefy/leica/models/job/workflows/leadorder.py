@@ -106,8 +106,7 @@ class LeadOrderWorkflow(BaseOrderWorkflow):
         """Remove LeadOrder confirmation and clean availability dates."""
         order = self.document
         order.availability = None
-
-        # Set actual_order_price
+        order.current_type = 'leadorder'
         order.actual_order_price = 0
 
     @Permission(groups=[
