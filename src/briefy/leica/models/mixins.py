@@ -92,7 +92,7 @@ class ProjectRolesMixin:
         'project_customer_qa',
     )
 
-    __additional_can_view_lr__ = list(CustomerRolesMixin.__actors__)
+    __additional_can_view_lr__ = ['customer_manager', 'internal_account']
 
     __colanderalchemy_config__ = {
         'overrides': {

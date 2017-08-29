@@ -89,6 +89,7 @@ History
     * Card #456: added back the finance/delivered dashboard delivered (rudaporto).
     * Card #571: fixed Lead workflow transition remove_confirmation to update current_type to 'leadorder' (rudaporto).
     * Card #573: fixed Order creation to generated and set the correct auto generated slug, aka: Briefy ID (rudaporto).
+    * Card #576: make sure a customer user can only see and add orders to projects if: has customer_manager role on customer or has any role on the project (rudaporto).
 
 2.1.36 (2017-08-06)
 -------------------
