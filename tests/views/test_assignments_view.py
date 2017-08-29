@@ -11,8 +11,7 @@ import transaction
 LISTING_FILTERS_PAYLOADS = [
     ({'ilike_title': 'Job Title',
       'current_type': 'order',
-      'ilike_professional.title': 'Salgado',
-      'ilike_order.slug': 'job-title'}, 1),
+      'ilike_professional.title': 'Salgado'}, 1),
     ({'ilike_title': 'Job Title',
       'current_type': 'order',
       'ilike_project.title': 'Project',

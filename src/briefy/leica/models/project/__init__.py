@@ -474,17 +474,17 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
     """
 
     leadorders = orm.relationship(
-        'Order',
-        foreign_keys='Order.project_id',
+        'LeadOrder',
+        foreign_keys='LeadOrder.project_id',
         primaryjoin="""and_(
             Order.current_type=='leadorder',
-            foreign(Order.project_id)==Project.id,
+            foreign(LeadOrder.project_id)==Project.id,
         )""",
         lazy='dynamic'
     )
-    """List of Orders of this project.
+    """List of LeadOrders of this project.
 
-    Returns a collection of :class:`briefy.leica.models.job.order.Order`.
+    Returns a collection of :class:`briefy.leica.models.job.leadorder.LeadOrder`.
     """
 
     @sautils.aggregated('orders', sa.Column(sa.Integer, default=0))
@@ -494,6 +494,7 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
         This attribute uses the Aggregated funcion of SQLAlchemy Utils, meaning the column
         should be updated on each change on any contained Order.
         """
+        cache_region.invalidate(self)
         return sa.func.count('1')
 
     @sautils.aggregated('leadorders', sa.Column(sa.Integer, default=0))
@@ -503,6 +504,7 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
         This attribute uses the Aggregated funcion of SQLAlchemy Utils, meaning the column
         should be updated on each change on any contained Order.
         """
+        cache_region.invalidate(self)
         return sa.func.count('1')
 
     # Formerly known as brief
@@ -607,4 +609,5 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
 @event.listens_for(Project, 'after_update')
 def project_after_update(mapper, connection, target):
     """Invalidate Project cache after instance update."""
-    cache_region.invalidate(target)
+    project = target
+    cache_region.invalidate(project)

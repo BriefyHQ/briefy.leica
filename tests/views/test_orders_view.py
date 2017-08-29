@@ -9,8 +9,7 @@ import pytest
 
 LISTING_FILTERS_PAYLOADS = [
     ({'ilike_title': 'Job Title',
-      'current_type': 'order',
-      'ilike_slug': 'job-title'}, 5),
+      'current_type': 'order'}, 5),
     ({'ilike_title': 'Job Title',
       'current_type': 'order',
       'ilike_project.title': 'Project',
