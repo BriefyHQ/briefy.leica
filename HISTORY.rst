@@ -92,6 +92,8 @@ History
     * Card #576: make sure a customer user can only see and add orders to projects if: has customer_manager role on customer or has any role on the project (rudaporto).
     * Card #577: it was fixed as a side effect of the #576 (rudaporto).
     * Fixed permission filter for customer orders dashboards (rudaporto).
+    * Remove unnecessary customization in the Project model methods: to_listing_dict, to_summary_dict and to_dict (rudaporto).
+    * Change the query to compute total_orders and total_leadorders (rudaporto).
 
 2.1.36 (2017-08-06)
 -------------------
