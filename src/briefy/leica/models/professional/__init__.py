@@ -31,9 +31,9 @@ class Professional(UserProfile):
 
     __exclude_attributes__ = ['comments', 'assets', 'assignments']
 
-    __listing_attributes__ = __summary_attributes__ + [
-        'main_location'
-    ]
+    __listing_attributes__ = __summary_attributes__ + ['main_location']
+
+    __to_dict_additional_attributes__ = ['locations', 'links']
 
     __colanderalchemy_config__ = {
         'excludes': [

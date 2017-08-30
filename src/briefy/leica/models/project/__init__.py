@@ -15,6 +15,7 @@ from briefy.ws.errors import ValidationError
 from sqlalchemy import event
 from sqlalchemy import orm
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.ext.hybrid import hybrid_property
 from zope.interface import implementer
 from zope.interface import Interface
 
@@ -96,7 +97,7 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
 
     __exclude_attributes__ = ['orders', 'leadorders']
 
-    __to_dict_additional_attributes__ = ['price']
+    __to_dict_additional_attributes__ = ['price', 'total_orders', 'total_leadorders']
 
     __raw_acl__ = (
         ('create', ('g:briefy_pm', 'g:briefy_bizdev', 'g:briefy_finance', 'g:system')),
@@ -489,25 +490,25 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
     Returns a collection of :class:`briefy.leica.models.job.leadorder.LeadOrder`.
     """
 
-    @sautils.aggregated('orders', sa.Column(sa.Integer, default=0))
-    def total_orders(self):
-        """Total Orders in this project.
+    @hybrid_property
+    def total_orders(self) -> int:
+        """Return the Project total number of orders."""
+        return self.orders.count()
 
-        This attribute uses the Aggregated funcion of SQLAlchemy Utils, meaning the column
-        should be updated on each change on any contained Order.
-        """
-        cache_region.invalidate(self)
-        return sa.func.count('Project.orders')
+    @total_orders.expression
+    def total_orders(cls) -> int:
+        """Return the Project total number of orders."""
+        return sa.func.count(cls.orders)
 
-    @sautils.aggregated('leadorders', sa.Column(sa.Integer, default=0))
-    def total_leadorders(self):
-        """Total LeadOrders in this project.
+    @hybrid_property
+    def total_leadorders(self) -> sa.sql.func:
+        """Return the Project total number of leadorders."""
+        return self.leadorders.count()
 
-        This attribute uses the Aggregated funcion of SQLAlchemy Utils, meaning the column
-        should be updated on each change on any contained Order.
-        """
-        cache_region.invalidate(self)
-        return sa.func.count('Project.leadorders')
+    @total_leadorders.expression
+    def total_leadorders(cls) -> sa.sql.func:
+        """Return the Project total number of leadorders."""
+        return sa.func.count(cls.leadorders)
 
     # Formerly known as brief
     briefing = sa.Column(
@@ -590,7 +591,6 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
         """Return a dict representation of this object."""
         data = super().to_dict(excludes=excludes, includes=includes)
         data['settings'] = self.settings._get()
-        data = self._apply_actors_info(data)
         if includes and 'state_history' in includes:
             # Workflow history
             add_user_info_to_state_history(self.state_history)

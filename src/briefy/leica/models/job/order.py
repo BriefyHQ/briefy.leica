@@ -164,7 +164,7 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
 
     __summary_attributes__ = __summary_attributes__
     __summary_attributes_relations__ = [
-        'project', 'customer', 'assignment', 'assignments', 'location'
+        'assignment', 'assignments', 'customer', 'project', 'location'
     ]
     __listing_attributes__ = __listing_attributes__
 
@@ -836,21 +836,21 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
         data = super().to_listing_dict()
         return data
 
-    # TODO: find way this breaks when try to serialize
-    # @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
+    @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
         data = super().to_dict(excludes=excludes, includes=includes)
-        if self.assignments:
-            assignment = self.assignments[-1]
+        data['assignments'] = []
+        for assignment in self.assignments:
             assignment_data = assignment.to_summary_dict()
             assignment_data = assignment._apply_actors_info(assignment_data)
-        else:
-            assignment_data = None
+            data['assignments'].append(assignment_data)
+
+        if data['assignments']:
+            data['assignment'] = data['assignments'][-1]
 
         data['briefing'] = self.project.briefing
         data['scheduled_datetime'] = self.deliver_date
-        data['assignment'] = assignment_data
 
         # add_user_info_to_state_history(self.state_history)
         if includes and 'state_history' in includes:

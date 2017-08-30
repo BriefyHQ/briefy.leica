@@ -182,15 +182,17 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
     __exclude_attributes__ = ['assets', 'comments', 'approvable_assets', 'active_order']
 
     __summary_attributes__ = __summary_attributes__
+
     __summary_attributes_relations__ = [
-        'project', 'location', 'professional', 'customer', 'pool', 'order', 'location'
+        'project', 'location', 'professional', 'pool', 'location', 'order'
     ]
     __listing_attributes__ = __listing_attributes__
+
     __to_dict_additional_attributes__ = [
         'title', 'description', 'briefing', 'assignment_date', 'last_approval_date',
         'last_submission_date', 'last_transition_message', 'closed_on_date', 'timezone',
         'availability', 'external_state', 'set_type', 'category', 'tech_requirements',
-        'professional'
+        'assignment_internal_scout', 'assignment_internal_qa'
     ]
 
     __raw_acl__ = (
@@ -671,16 +673,10 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
         data = self._apply_actors_info(data)
         return data
 
-    # TODO: invalidate is not working after professional assign
-    # @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
+    @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
         data = super().to_dict(excludes=excludes, includes=includes)
-
-        # local roles
-        data['assignment_internal_scout'] = self.assignment_internal_scout
-        data['assignment_internal_qa'] = self.assignment_internal_qa
-        data['internal_pm'] = self.order.project.internal_pm
 
         if data['project']:
             # Project delivery data used on the 'approve' transition
@@ -693,6 +689,7 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
             add_user_info_to_state_history(self.state_history)
 
         # Apply actor information to data
+        data['internal_pm'] = self.order.project.internal_pm
         data = self._apply_actors_info(data, additional_actors=['internal_pm'])
         return data
 

@@ -94,6 +94,8 @@ History
     * Fixed permission filter for customer orders dashboards (rudaporto).
     * Remove unnecessary customization in the Project model methods: to_listing_dict, to_summary_dict and to_dict (rudaporto).
     * Change the query to compute total_orders and total_leadorders (rudaporto).
+    * Review list of fields to be serialized in Professional, Assignment, Order and Project (rudaporto).
+    * Fix all to_dict methods so now they can be cached without pickle errors (rudaporto).
 
 2.1.36 (2017-08-06)
 -------------------
