@@ -96,6 +96,8 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
 
     __exclude_attributes__ = ['orders', 'leadorders']
 
+    __to_dict_additional_attributes__ = ['price']
+
     __raw_acl__ = (
         ('create', ('g:briefy_pm', 'g:briefy_bizdev', 'g:briefy_finance', 'g:system')),
         ('list', ('g:briefy_qa', 'g:briefy_bizdev',
@@ -477,7 +479,7 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
         'LeadOrder',
         foreign_keys='LeadOrder.project_id',
         primaryjoin="""and_(
-            Order.current_type=='leadorder',
+            LeadOrder.current_type=='leadorder',
             foreign(LeadOrder.project_id)==Project.id,
         )""",
         lazy='dynamic'
@@ -495,7 +497,7 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
         should be updated on each change on any contained Order.
         """
         cache_region.invalidate(self)
-        return sa.func.count('1')
+        return sa.func.count('Project.orders')
 
     @sautils.aggregated('leadorders', sa.Column(sa.Integer, default=0))
     def total_leadorders(self):
@@ -505,7 +507,7 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
         should be updated on each change on any contained Order.
         """
         cache_region.invalidate(self)
-        return sa.func.count('1')
+        return sa.func.count('Project.leadorders')
 
     # Formerly known as brief
     briefing = sa.Column(
@@ -580,22 +582,12 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_listing_dict()
-        data['category'] = self.category.value \
-            if isinstance(self.category, CategoryChoices) else self.category
-        data['order_type'] = self.order_type.value \
-            if isinstance(self.order_type, OrderTypeChoices) else self.order_type
-        data = self._apply_actors_info(data)
         return data
 
     @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
         data = super().to_dict(excludes=excludes, includes=includes)
-        data['price'] = self.price
-        data['category'] = self.category.value \
-            if isinstance(self.category, CategoryChoices) else self.category
-        data['order_type'] = self.order_type.value \
-            if isinstance(self.order_type, OrderTypeChoices) else self.order_type
         data['settings'] = self.settings._get()
         data = self._apply_actors_info(data)
         if includes and 'state_history' in includes:
