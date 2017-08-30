@@ -582,6 +582,7 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_listing_dict()
+        data = self._apply_actors_info(data)
         return data
 
     @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
