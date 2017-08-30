@@ -67,9 +67,9 @@ __colander_alchemy_config_overrides__.update(
 )
 
 
-def create_slug_from_order(context):
+def create_slug_from_order(payload: dict) -> str:
     """Create a slug for Assignment from the Order slug."""
-    order_id = context.current_parameters.get('order_id')
+    order_id = payload.get('order_id')
     order = Order.get(order_id)
     total = len(order.assignments) + 1
     return '{slug}_{total:02d}'.format(slug=order.slug, total=total)
@@ -214,25 +214,26 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
 
     __parent_attr__ = 'order_id'
 
-    @hybrid_property
-    def slug(self) -> str:
-        """Return a slug for an object.
+    @classmethod
+    def create(cls, payload: dict) -> 'Item':
+        """Factory that creates a new instance of this object.
 
-        :return: A slug to be added to an url.
+        :param payload: Dictionary containing attributes and values
+        :type payload: dict
         """
-        return self._slug
+        payload['slug'] = create_slug_from_order(payload)
+        return super().create(payload)
 
-    @slug.setter
+    @Item.slug.setter
     def slug(self, value: str):
         """Set a new slug for this object.
 
-        If the value is None, we generate a new one using
-        :func:`briefy.common.utils.data.generate_contextual_slug`
-        :param value: Value of the new slug
+        Generate a slug using :func:`create_slug_from_order`
+        :param value: Value of the new slug, if passed, will raise an Exception.
         """
-        if self._slug:
-            raise Exception('Slug should not be changed.')
-        else:
+        if value and self.slug:
+            raise Exception('Assignment slug should never be updated.')
+        elif value:
             self._slug = value
 
     refused_times = sa.Column(
