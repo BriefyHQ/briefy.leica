@@ -97,6 +97,7 @@ History
     * Review list of fields to be serialized in Professional, Assignment, Order and Project (rudaporto).
     * Fix all to_dict methods so now they can be cached without pickle errors (rudaporto).
     * Card #582: fix assignment slug creation based on the order slug (rudaporto).
+    * Card #583: fix leadorder confirm transition to create a new assignment only if there is no one (rudaporto).
 
 2.1.36 (2017-08-06)
 -------------------
