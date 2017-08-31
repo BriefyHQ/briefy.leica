@@ -1,22 +1,24 @@
 -e git+git@github.com:BriefyHQ/octopus.checkstyle.git@master#egg=octopus.checkstyle
 -r prod.txt
-appdirs==1.4.0
+appdirs==1.4.3
 alabaster==0.7.10
-coverage==4.4b1
-httmock==1.2.5
-Jinja2==2.8
+coverage==4.4.1
+httmock==1.2.6
+Jinja2==2.9.6
 moto==0.4.27
-pyramid-debugtoolbar==2.4.2
+pyramid-debugtoolbar
 pyramid_ipython
-pytest-cov==2.4.0
-pytest==3.0.7
+pytest-cov==2.5.1
+pytest==3.2.1
+pytest-catchlog
 requests_mock
 snowballstemmer==1.2.1
 sphinx-autodoc-typehints
 sphinx-bootstrap-theme==0.4.14
 sphinx-rtd-theme==0.1.9
-Sphinx==1.5.5
+Sphinx==1.6.3
 sphinxcontrib-plantuml
 sphinxcontrib-sadisplay
-tox==2.3.1
-WebTest==2.0.20
+tox==2.7.0
+WebTest==2.0.27
+sqlalchemy==1.2.0b2

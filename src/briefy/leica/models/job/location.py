@@ -29,6 +29,8 @@ class OrderLocation(ContactInfoMixin, AddressMixin,
         'formatted_address', 'info', 'order_id'
     ]
 
+    __exclude_attributes__ = ['order', 'assignments']
+
     __colanderalchemy_config__ = {
         'excludes': [
             'state_history', 'state', 'timezone', 'versions',
@@ -82,8 +84,8 @@ class OrderLocation(ContactInfoMixin, AddressMixin,
         if lat and lng:
             self.timezone = timezone_from_coordinates(lat, lng)
 
-    def to_dict(self):
-        """Custom to_dict method."""
-        data = super().to_dict()
+    def to_dict(self, excludes: list=None, includes: list=None):
+        """Return a dict representation of this object."""
+        data = super().to_dict(excludes=excludes, includes=includes)
         data['coordinates'] = self.coordinates
         return data

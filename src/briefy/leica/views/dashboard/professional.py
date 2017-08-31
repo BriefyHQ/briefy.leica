@@ -1,7 +1,7 @@
 """Views to handle Professional Dashboards."""
 from briefy.leica.models.dashboard.professional import DashboardProfessionalAssignment
 from briefy.ws import CORS_POLICY
-from briefy.ws.resources import RESTService
+from briefy.ws.resources import SQLQueryService
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
 from pyramid.security import Allow
@@ -25,11 +25,8 @@ PATH = COLLECTION_PATH + '/{id}'
           path=PATH,
           cors_policy=CORS_POLICY,
           factory=DashboardProfessionalFactory)
-class DashboardProfessionalAssignmentService(RESTService):
+class DashboardProfessionalAssignmentService(SQLQueryService):
     """Dashboard Professional: Assignment Service."""
-
-    model = DashboardProfessionalAssignment
-    default_order_by = 'total'
 
     _columns_map = (
         {
@@ -59,12 +56,61 @@ class DashboardProfessionalAssignmentService(RESTService):
         }
     )
 
-    def default_filters(self, query) -> object:
-        """Default filters to be applied to every query.
+    _collection_query = """
+    SELECT
+    count(active_assignments.id) as total,
+
+    sum(
+    CASE WHEN
+    active_assignments.state = 'assigned'
+    THEN 1 ELSE 0
+    END) as assigned,
+
+    sum(
+    CASE WHEN active_assignments.state = 'scheduled'
+    THEN 1 ELSE 0
+    END) as scheduled,
+
+    sum(
+    CASE WHEN active_assignments.state = 'awaiting_assets'
+    THEN 1 ELSE 0
+    END) as awaiting_submission_resubmission,
+
+    sum(
+    CASE WHEN active_assignments.state IN ('in_qa', 'asset_validation')
+    THEN 1 ELSE 0
+    END) as in_qa,
+
+    sum(
+    CASE WHEN
+    active_assignments.state IN ('approved', 'completed', 'perm_rejected', 'cancelled', 'refused')
+    THEN 1 ELSE 0
+    END) as completed_inactive
+
+    FROM
+
+    (SELECT DISTINCT assignments.id, assignments.state FROM
+
+    (SELECT i.id, i.state, i.title
+    FROM items as i
+    JOIN assignments as a on i.id = a.id
+    JOIN localroles as l on l.item_id = a.id
+    WHERE i.state IN ('assigned', 'scheduled', 'in_qa', 'approved', 'completed',
+    'perm_rejected', 'refused', 'cancelled', 'awaiting_assets', 'asset_validation')
+    AND l.principal_id = '{principal_id}'
+    AND l.role_name = 'professional_user'
+    ) as assignments
+
+    ) as active_assignments ORDER BY total
+    """
+
+    def query_params(self, query: str) -> str:
+        """Apply query parameters based on request.
 
         This is supposed to be specialized by resource classes.
-        :returns: A tuple of default filters to be applied to queries.
+
+        :query: string with a query to be parametrized
+        :returns: string with a query after adding parameters
         """
-        user = self.request.user
-        query = query.params(professional_id_1=user.id)
-        return query
+        principal_id = self.request.user.id
+        return query.format(principal_id=principal_id)

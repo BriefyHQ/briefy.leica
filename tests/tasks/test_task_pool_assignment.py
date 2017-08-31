@@ -168,4 +168,4 @@ class TestMoveAssignmentToPool(BaseTaskTest):
         project.pool_id = pool.id
         move_assignments_to_pool()
         messages = self.get_messages_from_queue()
-        assert len(messages) == 0
+        assert len(messages) == 1

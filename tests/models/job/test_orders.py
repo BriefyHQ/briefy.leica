@@ -35,9 +35,10 @@ class TestOrderModel(BaseModelTest):
     @staticmethod
     def delete_assigment_created(assignment, session):
         """Delete assignment created."""
-        session.execute("DELETE from assignments_version where id = '{0}'".format(assignment.id))
-        session.flush()
-        session.query(models.Assignment).filter_by(id=assignment.id).delete()
+        # TODO: improve performance deleting assignments
+        # session.flush()
+        # session.execute("DELETE from assignments_version where id = '{0}'".format(assignment.id))
+        # session.query(models.Assignment).filter_by(id=assignment.id).delete()
 
     @staticmethod
     def notify_assigment_created(assignment, request, session):
@@ -248,7 +249,6 @@ class TestOrderModel(BaseModelTest):
         assert assignment.state == 'pending'
         assert assignment.state_history[-1]['transition'] == 'submit'
         assert assignment.asset_types == order.asset_types
-        self.delete_assigment_created(assignment, session)
 
     @pytest.mark.parametrize('file_path', ['data/order_locations.json'])
     @pytest.mark.parametrize('position', [0])
@@ -278,7 +278,7 @@ class TestOrderModel(BaseModelTest):
         # add a new location to the order
         location_payload['order_id'] = order.id
         location_payload['id'] = str(uuid.uuid4())
-        location = models.OrderLocation(**location_payload)
+        location = models.OrderLocation.create(location_payload)
         order.location = location
         session.add(location)
         session.flush()
@@ -287,7 +287,7 @@ class TestOrderModel(BaseModelTest):
                 'first_name': 'J.  ',
                 'last_name': 'Hartman-Zwiers',
                 'order_id': str(order.id),
-                'mobile': '+33 31356240391',
+                'mobile': '+4917635573242',
                 'email': 'info@sdlyonne.com',
                 'timezone': 'Europe/Berlin',
                 'formatted_address': 'Nansenstraße 17, 12047 Berlin, Germany',
@@ -517,21 +517,13 @@ class TestOrderModel(BaseModelTest):
             roles[role_name],
             'received',
         )
-        scout_manager = {}
-        with pytest.raises(WorkflowTransitionException) as excinfo:
-            wf.assign(fields=scout_manager)
 
-        assert 'Field scout_manager is required for this transition' in str(excinfo)
-
-        scout_manager = {'scout_manager': uuid.uuid4()}
-        wf.assign(fields=scout_manager)
+        # this transition will be triggered only from the Assignment
+        wf.assign()
         session.flush()
 
         assert order.state == 'assigned'
         assert order.state_history[-1]['transition'] == 'assign'
-
-        for key, value in scout_manager.items():
-            assert getattr(order, key) == value
 
     @pytest.mark.parametrize('origin_state', ['assigned', 'scheduled'])
     @pytest.mark.parametrize('role_name', ['pm', 'system'])
@@ -827,7 +819,7 @@ class TestOrderModel(BaseModelTest):
 
         assert assignment.state == 'completed'
         assert assignment.state_history[-1]['transition'] == 'complete'
-        assert assignment.state_history[-1]['message'] is None
+        assert assignment.state_history[-1]['message'] == ''
 
     @pytest.mark.parametrize('origin_state', ['in_qa', 'refused', ])
     @pytest.mark.parametrize('ass_origin_state', ['in_qa', 'refused', 'approved', ])

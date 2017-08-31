@@ -1,5 +1,4 @@
 """A Professional for Briefy."""
-from briefy.leica.db import Base
 from briefy.leica.models.descriptors import MultipleRelationshipWrapper
 from briefy.leica.models.descriptors import UnaryRelationshipWrapper
 from briefy.leica.models.professional.link import Link
@@ -16,7 +15,7 @@ import colander
 import sqlalchemy as sa
 
 
-class Professional(UserProfile, Base):
+class Professional(UserProfile):
     """A Professional on our system."""
 
     __tablename__ = 'professionals'
@@ -25,14 +24,16 @@ class Professional(UserProfile, Base):
 
     __summary_attributes__ = [
         'id', 'title', 'description', 'created_at', 'updated_at', 'state',
-        'email', 'mobile', 'type', 'photo_path', 'slug', 'first_name', 'last_name',
+        'email', 'mobile', 'photo_path', 'slug', 'first_name', 'last_name',
     ]
 
     __summary_attributes_relations__ = ['links', 'main_location', 'locations', 'pools']
 
-    __listing_attributes__ = __summary_attributes__ + [
-        'main_location'
-    ]
+    __exclude_attributes__ = ['comments', 'assets', 'assignments']
+
+    __listing_attributes__ = __summary_attributes__ + ['main_location']
+
+    __to_dict_additional_attributes__ = ['locations', 'links']
 
     __colanderalchemy_config__ = {
         'excludes': [
@@ -79,10 +80,17 @@ class Professional(UserProfile, Base):
     accept_travel = sa.Column(sa.Boolean(), default=False, index=True)
     """Accept travel to other locations to work."""
 
-    @declared_attr
-    def title(cls):
-        """Return the Professional fullname."""
-        return orm.column_property(cls.first_name + ' ' + cls.last_name)
+    external_id = sa.Column(
+        sa.String(255),
+        nullable=True,
+        info={'colanderalchemy': {
+              'title': 'External ID',
+              'missing': colander.drop,
+              'typ': colander.String}}
+    )
+    """External ID from knack.
+
+    Used as key in the Intercom integration for professionals created on Knack."""
 
     # Profile information
     photo_path = sa.Column(
@@ -97,6 +105,7 @@ class Professional(UserProfile, Base):
     # assignments
     assignments = orm.relationship(
         'Assignment',
+        foreign_keys='Assignment.professional_id',
         lazy='dynamic'
     )
 
@@ -184,7 +193,8 @@ class Professional(UserProfile, Base):
     pools = orm.relationship(
         'Pool',
         secondary='professionals_in_pool',
-        back_populates='professionals'
+        back_populates='professionals',
+        lazy='dynamic',
     )
 
     billing_info = orm.relationship('ProfessionalBillingInfo', uselist=False)
@@ -196,13 +206,7 @@ class Professional(UserProfile, Base):
 
     def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
-        excludes = list(excludes) if excludes else []
-        excludes.extend(['assets', 'assignments'])
         data = super().to_dict(excludes=excludes, includes=includes)
-        data['slug'] = self.slug
-        data['locations'] = [c.to_dict() for c in self.locations or []]
-        data['links'] = [c.to_dict() for c in self.links or []]
-        data['comments'] = [c.to_summary_dict() for c in self.comments]
         data['billing_info_id'] = self.billing_info.id if self.billing_info else ''
         data['intercom'] = intercom_payload_professional(self)
         return data
@@ -216,7 +220,7 @@ class Photographer(Professional):
     __table_args__ = {'extend_existing': True}
 
     __mapper_args__ = {
-        'polymorphic_identity': 'photographers',
+        'polymorphic_identity': 'photographer',
     }
 
     id = sa.Column(
@@ -241,7 +245,7 @@ class Videographer(Professional):
     __table_args__ = {'extend_existing': True}
 
     __mapper_args__ = {
-        'polymorphic_identity': 'videographers',
+        'polymorphic_identity': 'videographer',
     }
 
     id = sa.Column(

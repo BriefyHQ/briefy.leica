@@ -28,19 +28,18 @@ class TestProfessionalModel(BaseModelTest):
             wf.context = role
         return obj, wf, web_request
 
-    def test_add_pool_to_professional(self, instance_obj, session):
+    def test_add_pool_to_professional(self, instance_obj):
         """Add job pools to the professional."""
         pools = models.Pool.query().all()
         assert len(pools) == 3
-        assert len(instance_obj.pools) == 0
+        assert instance_obj.pools.count() == 0
 
         for item in pools:
             instance_obj.pools.append(item)
-            assert instance_obj.id == str(item.professionals[0].id)
+            assert instance_obj in item.professionals
             assert len(item.professionals) == 1
 
-        session.flush()
-        assert len(instance_obj.pools) == 3
+        assert instance_obj.pools.count() == 3
 
     @pytest.mark.parametrize('origin_state', ['pending'])
     @pytest.mark.parametrize('role_name', ['qa', 'scout'])
@@ -187,15 +186,14 @@ class TestProfessionalModel(BaseModelTest):
 
         obj_payload['id'] = uuid4()
         obj_payload['email'] = str(obj_payload['id'])[6] + obj_payload['email']
-        professional = models.Professional(**obj_payload)
-        session.add(professional)
-
+        models.Professional.create(obj_payload)
         pool_id = uuid4()
-        pool = models.Pool(id=pool_id, title='Pool fake', country='br')
-        session.add(pool)
-
-        session.flush()
-
+        pool_payload = dict(
+            id=pool_id,
+            title='Pool fake',
+            country='br'
+        )
+        models.Pool.create(pool_payload)
         instance_obj = models.Professional.get(obj_payload['id'])
 
         obj, wf, request = self.prepare_obj_wf(
@@ -205,6 +203,5 @@ class TestProfessionalModel(BaseModelTest):
             origin_state
         )
         wf.assign(fields={'pools_ids': [pool_id, ]})
-        session.flush()
         assert obj.state == origin_state
         assert obj.state_history[-1]['transition'] == 'assign'

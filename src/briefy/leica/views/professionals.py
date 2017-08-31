@@ -1,6 +1,9 @@
 """Views to handle Professionals creation."""
 from briefy.leica.events import professional as events
+from briefy.leica.models import Photographer
 from briefy.leica.models import Professional
+from briefy.leica.views import email_in_use
+from briefy.leica.views import EMAIL_IN_USE_MESSAGE
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources import HistoryService
 from briefy.ws.resources import RESTService
@@ -8,6 +11,7 @@ from briefy.ws.resources import VersionsService
 from briefy.ws.resources import WorkflowAwareResource
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
+from cornice.resource import view
 from pyramid.security import Allow
 
 
@@ -45,9 +49,15 @@ class ProfessionalService(RESTService):
     model = Professional
     default_order_by = 'title'
     filter_related_fields = [
-        'title', '_main_location.formatted_address', '_main_location.country',
-        '_main_location.locality', 'pools.id', 'pools.title', 'pools.country'
+        'title', 'main_location.formatted_address', 'main_location.country',
+        'main_location.locality', 'pools.id', 'pools.title', 'pools.country'
     ]
+
+    _validators = (
+        ('GET', ('validate_id', )),
+        ('PUT', ('validate_id', )),
+        ('POST', ('email_in_use', ))
+    )
 
     _default_notify_events = {
         'POST': events.ProfessionalCreatedEvent,
@@ -55,6 +65,21 @@ class ProfessionalService(RESTService):
         'GET': events.ProfessionalLoadedEvent,
         'DELETE': events.ProfessionalDeletedEvent,
     }
+
+    def email_in_use(self, request):
+        """Email validation."""
+        if not email_in_use(request):
+            self.raise_invalid(name='email', description=EMAIL_IN_USE_MESSAGE)
+
+    @view(validators='_run_validators', permission='create')
+    def collection_post(self, model=None):
+        """Add a new instance of a Professional.
+
+        For now all Professionals are Photographers, but this needs to change
+        :returns: Newly created instance of model Photographer.
+        """
+        model = Photographer
+        return super().collection_post(model=model)
 
 
 @resource(

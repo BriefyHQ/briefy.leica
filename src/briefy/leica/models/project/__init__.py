@@ -1,12 +1,11 @@
 """Briefy Leica Project model."""
-from briefy.common.db.mixins import BriefyRoles
+from briefy.common.db.models import Item
 from briefy.common.utils import schema
 from briefy.common.utils.data import Objectify
 from briefy.common.vocabularies.categories import CategoryChoices
 from briefy.common.vocabularies.roles import Groups
 from briefy.leica.cache import cache_region
 from briefy.leica.cache import enable_cache
-from briefy.leica.db import Base
 from briefy.leica.models import mixins
 from briefy.leica.models.project import workflows
 from briefy.leica.utils.user import add_user_info_to_state_history
@@ -16,6 +15,7 @@ from briefy.ws.errors import ValidationError
 from sqlalchemy import event
 from sqlalchemy import orm
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.ext.hybrid import hybrid_property
 from zope.interface import implementer
 from zope.interface import Interface
 
@@ -59,7 +59,7 @@ class IProject(Interface):
     """Marker interface for Project."""
 
 
-class CommercialInfoMixin(mixins.ProfessionalPayoutInfo, mixins.ProjectBriefyRoles,
+class CommercialInfoMixin(mixins.ProfessionalPayoutInfo, mixins.ProjectRolesMixin,
                           mixins.OrderFinancialInfo):
     """Commercial details about a project."""
 
@@ -79,7 +79,8 @@ class CommercialInfoMixin(mixins.ProfessionalPayoutInfo, mixins.ProjectBriefyRol
 
 
 @implementer(IProject)
-class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Base):
+class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
+              mixins.LeicaSubMixin, Item):
     """A Project in Briefy."""
 
     _workflow = workflows.ProjectWorkflow
@@ -88,12 +89,15 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         'id', 'title', 'description', 'created_at', 'updated_at', 'state', 'slug', 'asset_types'
     ]
 
-    __summary_attributes_relations__ = ['customer', 'pool']
+    __summary_attributes_relations__ = ['customer', 'pool', 'customer_users']
 
-    __listing_attributes__ = [
-        'id', 'title', 'description', 'created_at', 'updated_at', 'state',
-        'external_id', 'total_orders', 'slug', 'customer', 'asset_types'
+    __listing_attributes__ = __summary_attributes__ + [
+        'total_orders', 'total_leadorders', 'customer', 'category', 'order_type', 'internal_pm'
     ]
+
+    __exclude_attributes__ = ['orders', 'leadorders']
+
+    __to_dict_additional_attributes__ = ['price', 'total_orders', 'total_leadorders']
 
     __raw_acl__ = (
         ('create', ('g:briefy_pm', 'g:briefy_bizdev', 'g:briefy_finance', 'g:system')),
@@ -107,11 +111,12 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
 
     __colanderalchemy_config__ = {
         'excludes': [
-            'state_history', 'state', 'customer', '_customer_user', 'pool',
-            '_project_manager', 'external_id', '_customer_users', '_project_managers'
+            'state_history', 'state', 'customer', 'pool',
         ],
-        'overrides': mixins.ProjectBriefyRoles.__colanderalchemy_config__['overrides']
+        'overrides': mixins.ProjectRolesMixin.__colanderalchemy_config__['overrides']
     }
+
+    __parent_attr__ = 'customer_id'
 
     customer_id = sa.Column(sautils.UUIDType,
                             sa.ForeignKey('customers.id'),
@@ -125,6 +130,25 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     """Customer ID.
 
     Builds the relation with :class:`briefy.leica.models.customer.Customer`.
+    """
+
+    customer_users = orm.relationship(
+        'CustomerUserProfile',
+        primaryjoin='and_('
+                    'foreign(CustomerUserProfile.customer_id)==Project.customer_id,'
+                    'LocalRole.principal_id==foreign(CustomerUserProfile.id),'
+                    'LocalRole.item_id==Project.id)',
+        lazy='dynamic',
+        info={
+            'colanderalchemy': {
+                'title': 'Customer User Profiles',
+                'missing': colander.drop,
+            }
+        }
+    )
+    """List of customer user profiles connected to this project.
+
+    Returns a collection of :class:`briefy.leica.models.user.CustomerUserProfile`.
     """
 
     abstract = sa.Column(
@@ -211,7 +235,8 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     """
 
     tech_requirements = sa.Column(
-        sautils.JSONType,
+        JSONB,
+        default=dict,
         info={
             'colanderalchemy': {
                 'title': 'Technical Requirements for this project.',
@@ -287,7 +312,7 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     """
 
     delivery = sa.Column(
-        sautils.JSONType,
+        JSONB,
         default=DEFAULT_DELIVERY_CONFIG,
         info={
             'colanderalchemy': {
@@ -439,7 +464,11 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
 
     orders = orm.relationship(
         'Order',
-        backref=orm.backref('project'),
+        foreign_keys='Order.project_id',
+        primaryjoin="""and_(
+            Order.current_type=='order',
+            foreign(Order.project_id)==Project.id,
+        )""",
         lazy='dynamic'
     )
     """List of Orders of this project.
@@ -447,14 +476,39 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     Returns a collection of :class:`briefy.leica.models.job.order.Order`.
     """
 
-    @sautils.aggregated('orders', sa.Column(sa.Integer, default=0))
-    def total_orders(self):
-        """Total Orders in this project.
+    leadorders = orm.relationship(
+        'LeadOrder',
+        foreign_keys='LeadOrder.project_id',
+        primaryjoin="""and_(
+            LeadOrder.current_type=='leadorder',
+            foreign(LeadOrder.project_id)==Project.id,
+        )""",
+        lazy='dynamic'
+    )
+    """List of LeadOrders of this project.
 
-        This attribute uses the Aggregated funcion of SQLAlchemy Utils, meaning the column
-        should be updated on each change on any contained Order.
-        """
-        return sa.func.count('1')
+    Returns a collection of :class:`briefy.leica.models.job.leadorder.LeadOrder`.
+    """
+
+    @hybrid_property
+    def total_orders(self) -> int:
+        """Return the Project total number of orders."""
+        return self.orders.count()
+
+    @total_orders.expression
+    def total_orders(cls) -> int:
+        """Return the Project total number of orders."""
+        return sa.func.count(cls.orders)
+
+    @hybrid_property
+    def total_leadorders(self) -> sa.sql.func:
+        """Return the Project total number of leadorders."""
+        return self.leadorders.count()
+
+    @total_leadorders.expression
+    def total_leadorders(cls) -> sa.sql.func:
+        """Return the Project total number of leadorders."""
+        return sa.func.count(cls.leadorders)
 
     # Formerly known as brief
     briefing = sa.Column(
@@ -504,6 +558,13 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
     Relationship between a project and a Pool.
     """
 
+    @sautils.observes('customer_id')
+    def _customer_id_observer(self, customer_id):
+        """Update path when customer id changes."""
+        if customer_id:
+            customer = Item.get(customer_id)
+            self.path = customer.path + [self.id]
+
     @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_summary_dict(self) -> dict:
         """Return a summarized version of the dict representation of this Class.
@@ -522,27 +583,14 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
         :returns: Dictionary with fields and values used by this Class
         """
         data = super().to_listing_dict()
-        data['category'] = self.category.value \
-            if isinstance(self.category, CategoryChoices) else self.category
-        data['order_type'] = self.order_type.value \
-            if isinstance(self.order_type, OrderTypeChoices) else self.order_type
         data = self._apply_actors_info(data)
         return data
 
     @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_dict(self, excludes: list=None, includes: list=None):
         """Return a dict representation of this object."""
-        excludes = list(excludes) if excludes else []
-        excludes.append('orders')
         data = super().to_dict(excludes=excludes, includes=includes)
-        data['slug'] = self.slug
-        data['price'] = self.price
-        data['category'] = self.category.value \
-            if isinstance(self.category, CategoryChoices) else self.category
-        data['order_type'] = self.order_type.value \
-            if isinstance(self.order_type, OrderTypeChoices) else self.order_type
         data['settings'] = self.settings._get()
-        data = self._apply_actors_info(data)
         if includes and 'state_history' in includes:
             # Workflow history
             add_user_info_to_state_history(self.state_history)
@@ -554,4 +602,5 @@ class Project(CommercialInfoMixin, BriefyRoles, mixins.KLeicaVersionedMixin, Bas
 @event.listens_for(Project, 'after_update')
 def project_after_update(mapper, connection, target):
     """Invalidate Project cache after instance update."""
-    cache_region.invalidate(target)
+    project = target
+    cache_region.invalidate(project)

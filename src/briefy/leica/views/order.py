@@ -53,8 +53,8 @@ class OrderService(RESTService):
     model = Order
     default_order_by = 'created_at'
     filter_related_fields = [
-        'project.title', 'project.id', 'project.status', '_location.locality',
-        '_location.country', '_location.fullname', '_location.formatted_address',
+        'project.title', 'project.id', 'project.status', 'location.locality',
+        'location.country', 'location.fullname', 'location.formatted_address',
         'customer.title', 'assignment.id'
     ]
 
@@ -81,13 +81,16 @@ class OrderService(RESTService):
 
         if project.order_type.value == 'leadorder':
             model = LeadOrder
+            current_type = 'leadorder'
         else:
             model = model if model else Order
+            current_type = 'order'
 
         if len(set(add_order_roles) & set(user_groups)) == 0:
             model_name = 'lead' if model == LeadOrder else 'order'
             raise HTTPForbidden(f'You are not allowed to add a new {model_name} to this project')
 
+        payload['current_type'] = current_type
         request.validated = payload
         return super().collection_post(model=model)
 

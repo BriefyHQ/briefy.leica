@@ -21,7 +21,7 @@ def leadorder_created_handler(event):
     request = event.request
     project = leadorder.project
     # First set price and price_currency based on the project
-    price = project.price
+    price = request.validated.get('price') or project.price
     leadorder.price = price
     leadorder.actual_order_price = 0
     price_currency = project.price_currency

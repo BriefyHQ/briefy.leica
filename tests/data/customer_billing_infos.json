@@ -2,7 +2,7 @@
   {
     "state_history": [
       {
-        "transition": "",
+        "transition": "create",
         "actor": null,
         "to": "created",
         "date": "2016-09-08T15:36:28.082599+00:00",
@@ -10,8 +10,8 @@
       }
     ],
     "slug": "e9fc4d9a",
-    "title": "Delivery Hero GmbH",
     "customer_id": "c2034c1b-0a40-4b84-9ace-54b958f64ed4",
+    "title": "Delivery Hero GmbH",
     "first_name": "John",
     "last_name": "Doe",
     "id": "e9fc4d9a-b623-495b-9a07-ba7bd0c2789e",

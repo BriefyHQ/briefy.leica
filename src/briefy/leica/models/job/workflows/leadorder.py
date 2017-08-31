@@ -85,12 +85,11 @@ class LeadOrderWorkflow(BaseOrderWorkflow):
                 except ValidationError as exc:
                     raise WorkflowTransitionException(exc.message)
 
-        state_history = leadorder.state_history
         # Set actual_order_price
         leadorder.actual_order_price = leadorder.price
         # Set the current type to order
         leadorder.current_type = 'order'
-        if state_history[-1]['from'] == 'created':
+        if not leadorder.assignments:
             create_new_assignment_from_order(leadorder, leadorder.request)
 
     @Permission(groups=[G['customers'], G['pm'], G['bizdev'], G['system'], ])
@@ -106,8 +105,7 @@ class LeadOrderWorkflow(BaseOrderWorkflow):
         """Remove LeadOrder confirmation and clean availability dates."""
         order = self.document
         order.availability = None
-
-        # Set actual_order_price
+        order.current_type = 'leadorder'
         order.actual_order_price = 0
 
     @Permission(groups=[

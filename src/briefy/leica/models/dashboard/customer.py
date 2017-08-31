@@ -63,7 +63,7 @@ all_orders_customer = select([
             )
         ),
         Project.id == Order.project_id,
-        Project.local_roles.any(role_name='customer_user', user_id=':user_id'),
+        Project.local_roles.any(role_name='customer_user', principal_id=':user_id'),
     )
 ).alias('all_orders_customer')
 
@@ -116,7 +116,7 @@ delivered_orders_customer = select([
             Order.state == 'delivered'
         ),
         Project.id == Order.project_id,
-        Project.local_roles.any(role_name='customer_user', user_id=':user_id')
+        Project.local_roles.any(role_name='customer_user', principal_id=':user_id')
     )
 ).alias('delivered_orders_customer')
 
@@ -164,7 +164,7 @@ all_leads_customer = select(
         Project.id == Order.project_id,
         Project.order_type == 'leadorder',
         LeadOrder.id == Order.id,
-        Project.local_roles.any(role_name='customer_user', user_id=':user_id'),
+        Project.local_roles.any(role_name='customer_pm', principal_id=':user_id'),
     )
 ).alias('all_leads_customer')
 

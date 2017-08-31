@@ -92,6 +92,26 @@ def assignment_cancel(event):
         )
 
 
+def assignment_refuse(event):
+    """Handle Assignment refusal workflow event."""
+    assignment = event.obj
+    author_role = 'project_manager'
+    to_role = 'project_manager'
+    user = assignment.workflow.context
+
+    if G['customers'].value in user.groups:
+        # this should not create a comment on the assignment only on the order
+        author_role = 'customer_user'
+
+    create_comment_from_wf_transition(
+        assignment,
+        author_role,
+        to_role,
+        internal=True,
+        prefix='This is the customer feedback'
+    )
+
+
 def assignment_remove_schedule(event):
     """Handle Assignment remove_schedule workflow event."""
     assignment = event.obj
@@ -300,6 +320,7 @@ def transition_handler(event):
         'assignment.workflow.upload': assignment_upload,
         'assignment.workflow.invalidate_assets': assignment_invalidate_assets,
         'assignment.workflow.return_to_qa': assignment_return_to_qa,
+        'assignment.workflow.refuse': assignment_refuse,
         'assignment.workflow.remove_schedule': assignment_remove_schedule,
         'assignment.workflow.reschedule': assignment_reschedule,
         'assignment.workflow.schedule': assignment_schedule,

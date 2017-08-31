@@ -4,15 +4,10 @@ from briefy.leica import config
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy_continuum import make_versioned
 from zope.sqlalchemy import ZopeTransactionExtension
 
 
 Session = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
-
-# As our users are not in here, it is not easy to keep track
-# of changes using this
-make_versioned(user_cls=None)
 
 
 def get_db(request):

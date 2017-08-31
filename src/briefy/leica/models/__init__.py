@@ -1,19 +1,21 @@
 """Database models to work within the briefy.leica system."""
-
-from briefy.common.db.models.roles import LocalRole
+from briefy.common.db.models.item import Item
+from briefy.common.db.models.local_role import LocalRole
+from briefy.common.db.models.roles import LocalRoleDeprecated
 from briefy.leica.db import Session
 from briefy.leica.models.asset import Asset
 from briefy.leica.models.asset import Image
 from briefy.leica.models.asset import ThreeSixtyImage
 from briefy.leica.models.asset import Video
+from briefy.leica.models.billing_info import BillingInfo
 from briefy.leica.models.billing_info.customer import CustomerBillingInfo
 from briefy.leica.models.billing_info.professional import ProfessionalBillingInfo
 from briefy.leica.models.comment import Comment
 from briefy.leica.models.customer import Customer
 from briefy.leica.models.customer.address import CustomerBillingAddress
 from briefy.leica.models.customer.contact import CustomerContact
-from briefy.leica.models.job import Assignment
-from briefy.leica.models.job import IAssignment  # noQA
+from briefy.leica.models.job.assignment import Assignment
+from briefy.leica.models.job.assignment import IAssignment  # noQA
 from briefy.leica.models.job.leadorder import LeadOrder
 from briefy.leica.models.job.location import OrderLocation
 from briefy.leica.models.job.order import Order
@@ -37,21 +39,24 @@ from briefy.leica.models.professional.location import AdditionalWorkingLocation
 from briefy.leica.models.professional.location import MainWorkingLocation
 from briefy.leica.models.professional.location import WorkingLocation  # noQA
 from briefy.leica.models.project import Project
-from briefy.leica.models.user import BriefyUserProfile
 from briefy.leica.models.user import CustomerUserProfile
+from briefy.leica.models.user import InternalUserProfile
 from briefy.leica.models.user import UserProfile
 from briefy.ws.listeners import register_workflow_context_listeners
 
 import sqlalchemy as sa
 
 
+# force session in these models
+Item.__session__ = Session
 LocalRole.__session__ = Session
+LocalRoleDeprecated.__session__ = Session
 
 ALL_MODELS = [
     AdditionalWorkingLocation,
     Asset,
     Assignment,
-    BriefyUserProfile,
+    BillingInfo,
     Comment,
     Customer,
     CustomerUserProfile,
@@ -59,6 +64,7 @@ ALL_MODELS = [
     CustomerBillingInfo,
     CustomerContact,
     Image,
+    InternalUserProfile,
     Facebook,
     FiveHundred,
     Flickr,
@@ -67,7 +73,7 @@ ALL_MODELS = [
     LeadOrder,
     Link,
     Linkedin,
-    LocalRole,
+    LocalRoleDeprecated,
     MainWorkingLocation,
     Order,
     OrderLocation,

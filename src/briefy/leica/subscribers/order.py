@@ -23,7 +23,7 @@ def order_created_handler(event):
     request = event.request
     project = order.project
     # First set price and price_currency based on the project
-    price = project.price
+    price = request.validated.get('price') or project.price
     order.price = price
     order.actual_order_price = price
     price_currency = project.price_currency

@@ -76,33 +76,29 @@ class TestImageModel(BaseModelTest):
         obj_id = 'fc1ceab8-6c2a-4b19-8f96-cf8c6e56ca88'
         payload['id'] = obj_id
         # Create the object using a new transaction
-        with transaction.manager:
-            asset = models.Image(**payload)
-            session.add(asset)
-            session.flush()
-
+        self.model.create(payload)
+        transaction.commit()
         obj = models.Image.get(obj_id)
         obj_source_path = obj.source_path
+        obj = models.Image.get(obj_id)
 
         assert count_versions(obj) == 1
         assert obj.version == 0
 
         # now we change the source_path using a new transaction
-        with transaction.manager:
-            obj.source_path = 'foo_bar.jpg'
-            session.add(obj)
-            session.flush()
+        obj.source_path = 'foo_bar.jpg'
+        transaction.commit()
 
-        obj = models.Image.get(obj_id)
+        obj = self.model.get(obj_id)
         assert obj.version == 1
         assert count_versions(obj) == 2
         assert obj.source_path == 'foo_bar.jpg'
         assert obj.versions[0].source_path != 'foo_bar.jpg'
         assert obj.versions[0].source_path == obj_source_path
 
-    def test_workflow(self, instance_obj, roles):
+    def test_workflow(self, obj_payload, roles):
         """Test workflow for this model."""
-        asset = instance_obj
+        asset = self.model.get(obj_payload['id'])
         assignment = asset.assignment
         assignment.state = 'awaiting_assets'
 

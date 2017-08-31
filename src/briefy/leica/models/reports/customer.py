@@ -23,7 +23,7 @@ orders_project = select([
     and_(
         Order.project_id == ':project_id',
         Order.project_id == Project.id,
-        Project.local_roles.any(user_id=':user_id')
+        Project.local_roles.any(principal_id=':user_id')
     )
 ).order_by(
     Order.created_at.asc()

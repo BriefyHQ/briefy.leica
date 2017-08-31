@@ -54,6 +54,14 @@ class ProjectService(RESTService):
         'customer_user', 'customer.id', 'project_manager', 'customer.title',
     ]
 
+    def default_filters(self, query) -> object:
+        """Default filters to be applied to every query.
+
+        This is supposed to be specialized by resource classes.
+        :returns: A tuple of default filters to be applied to queries.
+        """
+        return query
+
 
 @resource(
     collection_path=PATH + '/transitions',

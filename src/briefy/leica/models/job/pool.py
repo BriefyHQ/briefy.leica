@@ -1,5 +1,7 @@
 """Briefy Leica Pool."""
 from briefy.common.db.mixins import Timestamp
+from briefy.common.db.mixins import VersionMixin
+from briefy.common.db.models import Item
 from briefy.leica.db import Base
 from briefy.leica.db import Session
 from briefy.leica.models import Assignment
@@ -17,8 +19,8 @@ import sqlalchemy as sa
 import sqlalchemy_utils as sautils
 
 
-class ProfessionalsInPool(mixins.VersionMixin, Timestamp, Base):
-    """Relationshiop between Professional and Pool."""
+class ProfessionalsInPool(VersionMixin, Timestamp, Base):
+    """Relationship between Professional and Pool."""
 
     __session__ = Session
     __tablename__ = 'professionals_in_pool'
@@ -27,7 +29,7 @@ class ProfessionalsInPool(mixins.VersionMixin, Timestamp, Base):
 
     pool_id = sa.Column(
         sautils.UUIDType,
-        sa.ForeignKey('pools.id'),
+        sa.ForeignKey('pools.id', ondelete='CASCADE'),
         index=True,
         primary_key=True,
         info={
@@ -45,7 +47,7 @@ class ProfessionalsInPool(mixins.VersionMixin, Timestamp, Base):
 
     professional_id = sa.Column(
         sautils.UUIDType,
-        sa.ForeignKey('professionals.id'),
+        sa.ForeignKey('professionals.id', ondelete='CASCADE'),
         primary_key=True,
         info={
             'colanderalchemy': {
@@ -77,21 +79,22 @@ class ProfessionalsInPool(mixins.VersionMixin, Timestamp, Base):
     """
 
 
-class Pool(mixins.KLeicaVersionedMixin, Base):
+class Pool(mixins.LeicaSubVersionedMixin, Item):
     """A Pool."""
 
     _workflow = workflows.PoolWorkflow
 
     __summary_attributes__ = [
-        'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
-        'country',
+        'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state', 'country',
     ]
     __listing_attributes__ = __summary_attributes__ + [
         'total_assignments', 'total_professionals', 'live_assignments'
     ]
 
+    __exclude_attributes__ = ['professionals', 'assignments', 'projects']
+
     __colanderalchemy_config__ = {'excludes': [
-        'state_history', 'state', 'external_id'
+        'state_history', 'state'
     ]}
 
     __raw_acl__ = (
@@ -112,6 +115,7 @@ class Pool(mixins.KLeicaVersionedMixin, Base):
     # Assignments
     assignments = orm.relationship(
         'Assignment',
+        foreign_keys='Assignment.pool_id',
         backref=orm.backref('pool')
     )
     """Assignments.
@@ -122,12 +126,14 @@ class Pool(mixins.KLeicaVersionedMixin, Base):
     professionals = orm.relationship(
         'Professional',
         secondary='professionals_in_pool',
-        back_populates='pools'
+        back_populates='pools',
+        lazy='subquery',
     )
 
     # Projects
     projects = orm.relationship(
         'Project',
+        foreign_keys='Project.pool_id',
         backref=orm.backref('pool')
     )
     """Projects.
@@ -169,9 +175,3 @@ class Pool(mixins.KLeicaVersionedMixin, Base):
             )
         ).as_scalar()
         return orm.column_property(stmt)
-
-    def to_dict(self):
-        """Return a dict representation of this object."""
-        data = super().to_dict()
-        data['slug'] = self.slug
-        return data

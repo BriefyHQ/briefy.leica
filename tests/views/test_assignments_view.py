@@ -1,9 +1,26 @@
 """Test Assignments Service view."""
+from briefy.common.db import datetime_utcnow
 from briefy.leica import models
 from conftest import BaseVersionedTestView
 
+import datetime
 import pytest
 import transaction
+
+
+LISTING_FILTERS_PAYLOADS = [
+    ({'ilike_title': 'Job Title',
+      'current_type': 'order',
+      'ilike_professional.title': 'Salgado'}, 1),
+    ({'ilike_title': 'Job Title',
+      'current_type': 'order',
+      'ilike_project.title': 'Project',
+      'location.country': 'DE'}, 1),
+    ({'ilike_title': '1',
+      'current_type': 'order',
+      'ilike_project.title': '1',
+      'ilike_location.locality': 'Berlin'}, 1)
+]
 
 
 @pytest.mark.usefixtures('create_dependencies')
@@ -16,19 +33,20 @@ class TestAssignmentView(BaseVersionedTestView):
         (models.Customer, 'data/customers.json'),
         (models.Project, 'data/projects.json'),
         (models.Order, 'data/orders.json'),
+        (models.Assignment, 'data/assignments.json'),
     ]
-    # TODO: local role attributes are not in the colander schema and so ignored on add or update
-    ignore_validation_fields = [
-        'state_history', 'state', 'order', 'updated_at', 'customer', 'project', 'timezone',
-        'qa_manager', 'project_manager', 'scout_manager', 'professional', 'location', 'versions'
+    serialize_attrs = [
+        'path', '_roles', '_actors', 'order', 'customer', 'project', 'timezone',
+        'professional', 'location'
     ]
     file_path = 'data/assignments.json'
     model = models.Assignment
     initial_wf_state = 'pending'
-    check_versions_field = 'payout_currency'
+    check_versions_field = 'updated_at'
     UPDATE_SUCCESS_MESSAGE = ''
     NOT_FOUND_MESSAGE = ''
     update_map = {
+        'updated_at': (datetime_utcnow() + datetime.timedelta(minutes=10)).isoformat(),
         'payable': False,
         'travel_expenses': 1000,
         'payout_currency': 'USD'
@@ -103,18 +121,16 @@ class TestAssignmentView(BaseVersionedTestView):
         assert error['location'] == 'body'
         assert 'Invalid number of type of assets' in error['description']
 
-    def test_workflow(self, app, session, instance_obj):
+    def test_workflow(self, app, instance_obj):
         """Test workflow endpoints."""
         payload = {
-            'owner': 'Professional Name',
             'id': '264b3e66-c327-4bbd-9cc7-271716fce178',
             'professional_id': '23d94a43-3947-42fc-958c-09245ecca5f2',
-            'uploaded_by': '23d94a43-3947-42fc-958c-09245ecca5f2',
+            'owner': '23d94a43-3947-42fc-958c-09245ecca5f2',
+            'uploaded_by': 'f5c2199f-6ed7-4ff8-90df-d1a98249f5e7',
             'description': '',
-            'updated_at': '2016-09-18T18:55:20.696061+00:00',
             'filename': '2345.jpg',
             'source_path': 'source/files/assignments/2345.jpg',
-            'created_at': '2016-09-18T18:55:20.696043+00:00',
             'state': 'pending',
             'width': 5760,
             'height': 3840,
@@ -143,9 +159,7 @@ class TestAssignmentView(BaseVersionedTestView):
         }
         # Create the object using a new transaction
         with transaction.manager:
-            asset = models.Asset(**payload)
-            session.add(asset)
-            session.flush()
+            models.Image.create(payload)
 
         obj_id = instance_obj.id
         state = instance_obj.state
@@ -167,3 +181,20 @@ class TestAssignmentView(BaseVersionedTestView):
         assert 'cancel' in result['transitions']
         assert 'publish' in result['transitions']
         assert 'assign' in result['transitions']
+
+    @pytest.mark.parametrize('file_path, position', [('data/orders.json', 0)])
+    @pytest.mark.parametrize('filter_payload, total', LISTING_FILTERS_PAYLOADS)
+    def test_collection_get_with_filters(self, app, get_file_payload, filter_payload, total):
+        """Test collection_get endpoint with special filters."""
+        order_payload = get_file_payload
+        location_payload = order_payload['location']
+        location_payload.pop('id')
+        # create new order location instance
+        models.OrderLocation.create(location_payload)
+
+        base_path = self.get_base_path_with_query_str(filter_payload)
+        request = app.get(base_path, headers=self.headers, status=200)
+        result = request.json
+        assert 'data' in result
+        assert 'total' in result
+        assert result['total'] == len(result['data']) == total
