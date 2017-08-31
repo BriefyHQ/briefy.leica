@@ -146,7 +146,7 @@ DASHBOARD_ALL_ORDERS_CUSTOMER_QUERY = """
 
     (SELECT i.id, i.state, i.title, o.accept_date, o.project_id
     FROM items as i JOIN orders as o on i.id = o.id
-    WHERE i.type = '{type}' AND
+    WHERE o.current_type = '{type}' AND
     i.state IN ('received', 'assigned', 'scheduled', 'cancelled',
     'delivered', 'accepted', 'in_qa', 'refused', 'perm_refused')
     ) as orders JOIN

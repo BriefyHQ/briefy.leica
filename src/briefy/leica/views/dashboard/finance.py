@@ -78,7 +78,7 @@ class DashboardFinanceOrderService(SQLQueryService):
 
     (SELECT i.id, i.state, i.title, o.project_id
     FROM items as i JOIN orders as o on i.id = o.id
-    WHERE i.type = '{type}' AND
+    WHERE o.current_type = '{type}' AND
     i.state IN ('received', 'assigned', 'scheduled', 'cancelled',
     'delivered', 'accepted', 'in_qa', 'refused')
     ) as orders JOIN
@@ -163,7 +163,7 @@ class DashboardFinanceDeliveredOrdersService(SQLQueryService):
 
     (SELECT i.id, i.state, i.title, o.accept_date, o.project_id
     FROM items as i JOIN orders as o on i.id = o.id
-    WHERE i.type = '{type}' AND
+    WHERE o.current_type = '{type}' AND
     i.state IN ('delivered', 'accepted', 'in_qa', 'refused')
     ) as orders JOIN
 
