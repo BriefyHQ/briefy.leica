@@ -2,7 +2,7 @@
 History
 =======
 
-2.2.0 (Unreleased)
+2.2.0 (2017-08-31)
 ------------------
 
     * Remove scout_manager as a required field for Order.assign transition (rudaporto).
