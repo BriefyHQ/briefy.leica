@@ -158,7 +158,8 @@ DASHBOARD_ALL_ORDERS_CUSTOMER_QUERY = """
 
     (SELECT i.id, i.state, i.title, l.principal_id, l.role_name
     FROM items as i JOIN customers as c on i.id = c.id
-    JOIN localroles as l on c.id = l.item_id) as customers
+    JOIN localroles as l on c.id = l.item_id
+    WHERE l.principal_id = '{principal_id}') as customers
     on projects.customer_id = customers.id
 
     WHERE

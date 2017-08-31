@@ -99,6 +99,7 @@ History
     * Card #582: fix assignment slug creation based on the order slug (rudaporto).
     * Card #583: fix leadorder confirm transition to create a new assignment only if there is no one (rudaporto).
     * Card #590: fixed total of orders / leads in the dashboards for customer, bizdev, pm and finance (rudaporto).
+    * Card #585: improve performance of leads dashboard (rudaporto).
 
 2.1.36 (2017-08-06)
 -------------------

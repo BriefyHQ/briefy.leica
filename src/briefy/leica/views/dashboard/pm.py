@@ -276,7 +276,7 @@ class DashboardPMAllLeadsService(SQLQueryService):
     (SELECT i.id, i.state, i.title, o.accept_date, o.project_id
     FROM items as i JOIN orders as o on i.id = o.id
     JOIN leadorders as l on l.id = o.id
-    WHERE o.current_type = '{type}' AND
+    WHERE o.type = '{type}' AND
     i.state IN ('new', 'received', 'assigned', 'scheduled', 'cancelled',
     'delivered', 'accepted', 'in_qa', 'refused', 'perm_refused')
     ) as orders JOIN
