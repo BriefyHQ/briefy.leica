@@ -2,6 +2,10 @@
 History
 =======
 
+2.2.2 (2017-09-01)
+------------------
+    * Card #594: fix Assignment local roles for QA and Scout managers, they were mixed in the migration (rudaporto).
+
 2.2.1 (2017-09-01)
 ------------------
 
