@@ -617,8 +617,8 @@ def migrate_localroles():
             ('customer_user', 'project_customer_pm', 'Project'),
         ),
         'assignment': (
-            ('qa_manager', 'assignment_internal_qa', 'Assignment'),
-            ('scout_manager', 'assignment_internal_scout', 'Assignment'),
+            ('qa_manager', 'assignment_internal_scout', 'Assignment'),
+            ('scout_manager', 'assignment_internal_qa', 'Assignment'),
             ('professional_user', 'professional_user', 'Assignment')
         ),
         'userprofile': (
