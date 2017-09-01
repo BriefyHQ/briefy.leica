@@ -188,6 +188,10 @@ class TestAssignmentModel(BaseModelTest):
         for key, value in fields_payload.items():
             assert getattr(assignment, key) == value
 
+        assert fields_payload.get('professional_id') in assignment.professional_user
+        assert assignment.professional is not None
+        assert roles[role_name].id in assignment.assignment_internal_scout
+
     @pytest.mark.parametrize('origin_state', ['assigned'])
     @pytest.mark.parametrize('role_name', ['customer', ])
     def test_workflow_cancel_from_assigned(

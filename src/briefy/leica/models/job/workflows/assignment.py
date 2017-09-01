@@ -128,6 +128,7 @@ class AssignmentWorkflow(BriefyWorkflow):
     )
     def assign(self, **kwargs):
         """Define a Professional to the Assignment."""
+        from briefy.leica.models import Professional
         user_id = str(self.context.id)
         assignment = self.document
         order = assignment.order
@@ -135,11 +136,13 @@ class AssignmentWorkflow(BriefyWorkflow):
             order.workflow.assign()
         # set local roles
         fields = kwargs['fields']
-        assignment.assingment_internal_scout = [user_id]
         professional_id = fields.get('professional_id')
-        assignment.update({'professional_user': [professional_id]})
-        # force explicit here but it will also be set by the workflow engine
-        assignment.professional_id = professional_id
+        assignment.update(
+            {'professional_user': [professional_id],
+             'assignment_internal_scout': [user_id]}
+        )
+        # force this here to make sure it will be returned in the to_dict
+        assignment.professional = Professional.get(professional_id)
 
     @Permission(groups=[G['scout'], G['pm'], G['qa'], G['system'], ])
     def can_assign(self):
