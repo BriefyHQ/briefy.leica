@@ -18,12 +18,16 @@ def to_dict_with_entity_lr(comment: Item, excludes: Attributes=None, includes: A
     :returns: Dictionary with fields and values of the comment instance plus entity lr.
     """
     data = comment.to_dict(excludes=excludes, includes=includes)
-    entity = comment.entity
-    entity_data = comment.entity.to_dict()
-    if isinstance(entity, Item):
-        data['_roles'] = entity_data.get('_roles')
-        data['_actors'] = entity_data.get('_actors')
-    data['entity'] = entity.to_summary_dict()
+    entity = comment.entity if comment.entity else Item.get(comment.entity_id)
+    if entity:
+        entity_data = entity.to_dict()
+        data['entity'] = entity.to_summary_dict()
+        if isinstance(entity, Item):
+            data['_roles'] = entity_data.get('_roles')
+            data['_actors'] = entity_data.get('_actors')
+    else:
+        raise ValueError('Could not find the entity instance for this comment. '
+                         f'Entity ID: {comment.entity_id}')
     return data
 
 

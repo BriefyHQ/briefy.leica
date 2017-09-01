@@ -2,6 +2,11 @@
 History
 =======
 
+2.2.1 (2017-09-01)
+------------------
+
+    * Card #592: fix to make sure we get the entity connect to the new comment to append in the comment payload (rudaporto).
+
 2.2.0 (2017-08-31)
 ------------------
 
