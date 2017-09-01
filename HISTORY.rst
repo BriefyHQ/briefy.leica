@@ -100,6 +100,7 @@ History
     * Card #583: fix leadorder confirm transition to create a new assignment only if there is no one (rudaporto).
     * Card #590: fixed total of orders / leads in the dashboards for customer, bizdev, pm and finance (rudaporto).
     * Card #585: improve performance of leads dashboard (rudaporto).
+    * Card #592: fix to make sure we get the entity connect to the new comment to append in the comment payload (rudaporto).
 
 2.1.36 (2017-08-06)
 -------------------
