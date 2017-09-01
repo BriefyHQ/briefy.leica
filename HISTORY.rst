@@ -2,6 +2,10 @@
 History
 =======
 
+2.2.3 (2017-09-01)
+------------------
+    * Card #596: fix assignment assign workflow transition to correct set the scout manager based in the current user (rudaporto).
+
 2.2.2 (2017-09-01)
 ------------------
     * Card #594: fix Assignment local roles for QA and Scout managers, they were mixed in the migration (rudaporto).
