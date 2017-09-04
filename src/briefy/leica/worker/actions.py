@@ -70,6 +70,7 @@ def validate_assignment(laure_data: object, session: object) -> (bool, dict):
         logger.info('Assignment {0} state set to {1}'.format(assignment.slug, assignment.state))
 
         cache_region.invalidate(assignment)
+        cache_region.invalidate(assignment.order)
 
     return True, {}
 
@@ -109,6 +110,7 @@ def ignored_assignment(laure_data: object, session: object) -> (bool, dict):
         logger.info('Assignment {0} state set to {1}'.format(assignment.slug, assignment.state))
 
         cache_region.invalidate(assignment)
+        cache_region.invalidate(assignment.order)
 
     return True, {}
 
@@ -151,6 +153,9 @@ def invalidate_assignment(laure_data: object, session: object) -> (bool, dict):
             message=feedback_text
         )
         logger.info('Assignment {0} state set to {1}'.format(assignment.slug, assignment.state))
+
+        cache_region.invalidate(assignment)
+        cache_region.invalidate(assignment.order)
 
         return True, {}
 
@@ -258,5 +263,6 @@ def asset_copy_malfunction(laure_data: object, session: object) -> (bool, dict):
         assignment.comments.append(comment)
 
         cache_region.invalidate(assignment)
+        cache_region.invalidate(assignment.order)
 
     return True, {}

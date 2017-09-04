@@ -2,9 +2,10 @@
 History
 =======
 
-2.2.4 (2017-09-04)
+2.2.4 (2017-09-05)
 ------------------
     * Card #604: moved Project.order_type to the summary payload (rudaporto).
+    * Added cache invalidation to the order to all worker actions based in ms.laure validation / invalidation (rudaporto).
 
 2.2.3 (2017-09-01)
 ------------------
