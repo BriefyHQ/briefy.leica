@@ -86,13 +86,14 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
     _workflow = workflows.ProjectWorkflow
 
     __summary_attributes__ = [
-        'id', 'title', 'description', 'created_at', 'updated_at', 'state', 'slug', 'asset_types'
+        'id', 'title', 'description', 'created_at', 'updated_at',
+        'state', 'slug', 'asset_types', 'order_type'
     ]
 
     __summary_attributes_relations__ = ['customer', 'pool', 'customer_users']
 
     __listing_attributes__ = __summary_attributes__ + [
-        'total_orders', 'total_leadorders', 'customer', 'category', 'order_type', 'internal_pm'
+        'total_orders', 'total_leadorders', 'customer', 'category', 'internal_pm'
     ]
 
     __exclude_attributes__ = ['orders', 'leadorders']

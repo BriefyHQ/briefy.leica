@@ -2,6 +2,10 @@
 History
 =======
 
+2.2.4 (2017-09-04)
+------------------
+    * Card #604: moved Project.order_type to the summary payload (rudaporto).
+
 2.2.3 (2017-09-01)
 ------------------
     * Card #596: fix assignment assign workflow transition to correct set the scout manager based in the current user (rudaporto).
