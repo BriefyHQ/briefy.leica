@@ -1,6 +1,7 @@
 """Move Assignment to Pool."""
 from briefy.common.db import datetime_utcnow
 from briefy.common.users import SystemUser
+from briefy.leica.cache import cache_region
 from briefy.leica.events.task import LeicaTaskEvent
 from briefy.leica.log import tasks_logger as logger
 from briefy.leica.models import Assignment
@@ -52,6 +53,9 @@ def _move_assignment_to_pool(assignment: Assignment, pool: Pool, has_availabilit
 
             status = True
             msg = 'Assignment {id} moved to published.'
+
+            cache_region.invalidate(assignment)
+            cache_region.invalidate(assignment.order)
 
         # Trigger task event
         event = LeicaTaskEvent(task_name=task_name, success=status, obj=assignment)

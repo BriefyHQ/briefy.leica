@@ -85,6 +85,7 @@ def move_assignments_awaiting_assets():
         status = _move_assignment_awaiting_assets(assignment)
         total_moved += 1 if status else 0
         cache_region.invalidate(assignment)
+        cache_region.invalidate(assignment.order)
 
     logger.info('Total assignments moved to awaiting assets: {total}'.format(total=total_moved))
 
@@ -134,6 +135,7 @@ def _notify_late_submissions(assignment: Assignment) -> bool:
         logger.error(msg.format(id=assignment.id, exc=str(exc)))
     else:
         cache_region.invalidate(assignment)
+        cache_region.invalidate(assignment.order)
         status = True
 
     task_name = 'leica.task.notify_late_submission'
@@ -215,6 +217,7 @@ def _notify_before_shooting(assignment: Assignment) -> bool:
         logger.error(msg.format(id=assignment.id, exc=str(exc)))
     else:
         cache_region.invalidate(assignment)
+        cache_region.invalidate(assignment.order)
         status = True
 
     task_name = 'leica.task.notify_before_shooting'
