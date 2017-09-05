@@ -2,6 +2,13 @@
 History
 =======
 
+2.2.4 (2017-09-05)
+------------------
+    * Card #604: moved Project.order_type to the summary payload (rudaporto).
+    * Added cache invalidation to the order for all worker actions based in ms.laure validation / invalidation (rudaporto).
+    * Added cache invalidation to the order for all tasks that changes the assignment (rudaporto).
+    * Added cache invalidation to the assignments for all tasks that changes the order (rudaporto).
+
 2.2.3 (2017-09-01)
 ------------------
     * Card #596: fix assignment assign workflow transition to correct set the scout manager based in the current user (rudaporto).

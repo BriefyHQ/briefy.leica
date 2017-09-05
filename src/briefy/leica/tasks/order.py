@@ -24,7 +24,7 @@ def _move_order_accepted(order: Order) -> bool:
     status = False
     state = order.state
     last_deliver_date = order.last_deliver_date
-    if (state == 'delivered' and last_deliver_date):
+    if state == 'delivered' and last_deliver_date:
         now = datetime_utcnow()
         project = order.project
         approval_window = project.approval_window
@@ -46,6 +46,8 @@ def _move_order_accepted(order: Order) -> bool:
 
             # Trigger task event
             cache_region.invalidate(order)
+            for assignment in order.assignments:
+                cache_region.invalidate(assignment)
             event = LeicaTaskEvent(task_name=task_name, success=status, obj=order)
             event()
             logger.info(msg)
@@ -62,6 +64,5 @@ def move_orders_accepted():
     for order in orders:
         status = _move_order_accepted(order)
         total_moved += 1 if status else 0
-        cache_region.invalidate(order)
 
     logger.info('Total orders moved to accepted state: {total}'.format(total=total_moved))
