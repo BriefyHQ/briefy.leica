@@ -11,6 +11,7 @@ from briefy.leica.models import Order
 from briefy.leica.models import Photographer
 from briefy.leica.models import Pool
 from briefy.leica.models import Project
+from dateutil.parser import parse
 from operator import itemgetter
 
 import transaction
@@ -24,11 +25,14 @@ def get_all_items(types: tuple) -> t.List[t.Tuple]:
     ).filter(Item.type.in_(types))
 
 
-def count_wrong(state_history: t.List[dict], state: str) -> int:
+def count_wrong(state_history: t.List[dict], state: str, knack_check: bool=True) -> int:
     """Count the total of transitions in the wrong position."""
     total = len(state_history)
     total_wrong = 0
     for i, transition in enumerate(state_history):
+        tdate = parse(transition.get('date'), ignoretz=True)
+        if tdate < parse('2017-02-12') and knack_check is False:
+            continue
         if i == 0 and transition.get('to') != 'created':
             total_wrong = total_wrong + 1
             continue
@@ -43,11 +47,14 @@ def count_wrong(state_history: t.List[dict], state: str) -> int:
     return total_wrong
 
 
-def find_wrong(state_history: t.List[dict], state: str, skip: list) -> int:
+def find_wrong(state_history: t.List[dict], state: str, skip: list, knack_check: bool=True) -> int:
     """Find transition in the wrong position."""
     wrong_position = None
     total = len(state_history)
     for i, transition in enumerate(state_history):
+        tdate = parse(transition.get('date'), ignoretz=True)
+        if tdate < parse('2017-02-12') and knack_check is False:
+            continue
         if i in skip:
             continue
         if i == 0 and transition.get('to') != 'created':
@@ -79,8 +86,9 @@ def fix_transition_position(
     fixed = False
     for i, transition in enumerate(state_history):
         tto = transition.get('to')
-        tdate = transition.get('date')
-        if to_fix.get('from') == tto and to_fix.get('date') >= tdate:
+        tdate = parse(transition.get('date'), ignoretz=True)
+        fix_date = parse(to_fix.get('date'), ignoretz=True)
+        if to_fix.get('from') == tto and fix_date >= tdate:
             state_history.insert(i + 1, to_fix)
             fixed = True
             break
@@ -92,7 +100,8 @@ def fix_transition_position(
 def fix_state_history(
         types: tuple,
         model: Item,
-        debug: bool=False
+        debug: bool=False,
+        knack_check: bool=True,
 ) -> t.Tuple[list, list, list, int]:
     """Fix state history."""
     model_name = model.__name__
@@ -104,12 +113,12 @@ def fix_state_history(
     for id_, type_, state, state_history in all_items:
         skip = []
         number_fixed = 0
-        total_wrong = count_wrong(state_history, state)
+        total_wrong = count_wrong(state_history, state, knack_check)
         if not total_wrong:
             continue
         new_state_history = sort_state_history(state_history)
         number_transitions = len(new_state_history)
-        wrong_position = find_wrong(new_state_history, state, skip)
+        wrong_position = find_wrong(new_state_history, state, skip, knack_check)
         while wrong_position is not None and number_fixed < number_transitions:
             if debug:
                 logger.debug(f'Starting fixing model {model_name} id: {id_}')
@@ -121,7 +130,7 @@ def fix_state_history(
                 skip.append(wrong_position)
             else:
                 number_fixed = number_fixed + 1
-            wrong_position = find_wrong(new_state_history, state, skip)
+            wrong_position = find_wrong(new_state_history, state, skip, knack_check)
         if number_fixed >= number_transitions:
             items_loop.append(id_)
             logger.debug(f'Loop detected for {model_name} id: {id_}')
@@ -221,17 +230,17 @@ def report_issues(types: tuple):
 def main():
     """Verify and fix the state history for all the main types."""
     models = [
-        ('customer', Customer, fix_customers_wrong_transition, False),
-        ('photographer', Photographer, None, False),
-        ('project', Project, None, False),
-        ('customeruserprofile', CustomerUserProfile, None, False),
-        ('pool', Pool, None, None),
-        ('internaluserprofile', InternalUserProfile, None, False),
-        ('leadorder', LeadOrder, fix_leads_wrong_transition, False),
-        ('order', Order, None, False),
-        ('assignment', Assignment, None, False),
+        ('customer', Customer, fix_customers_wrong_transition, False, True),
+        ('photographer', Photographer, None, False, True),
+        ('project', Project, None, False, True),
+        ('customeruserprofile', CustomerUserProfile, None, False, True),
+        ('pool', Pool, None, None, True),
+        ('internaluserprofile', InternalUserProfile, None, False, True),
+        ('leadorder', LeadOrder, fix_leads_wrong_transition, False, True),
+        ('order', Order, None, False, True),
+        ('assignment', Assignment, None, False, True),
     ]
-    for type_, model, fix_before, debug in models:
+    for type_, model, fix_before, debug, knack_check in models:
         with transaction.manager:
             model_name = model.__name__
             print(f'Fixing model: {model_name}')
