@@ -65,7 +65,7 @@ def find_wrong(state_history: t.List[dict], state: str, skip: list) -> int:
 
 
 def sort_state_history(state_history: t.List[dict]) -> t.List[dict]:
-    """Sort by date state history"""
+    """Sort by date state history."""
     return sorted(state_history, key=itemgetter('date'))
 
 
@@ -159,8 +159,7 @@ def fix_leads_wrong_transition():
                     if item['from'] != previous_to:
                         item['from'] = previous_to
                         fixed = True
-                        logger.debug\
-                            (f'Fixing for LeadOder id: {id_} transition to new.')
+                        logger.debug(f'Fixing for LeadOder id: {id_} transition to new.')
             if fixed:
                 obj = LeadOrder.get(id_)
                 obj.state_history = new_state_history
@@ -247,6 +246,7 @@ def main():
             print(f'Total skip: {total_skip}')
             print(f'Total loop: {total_loop}')
             print('\n')
+
 
 if __name__ == '__main__':
     main()
