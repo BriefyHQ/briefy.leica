@@ -1,4 +1,5 @@
 """Briefy Leica Order model."""
+from briefy.common.db import datetime_utcnow
 from briefy.common.db.models import Item
 from briefy.common.db.types import AwareDateTime
 from briefy.common.utils import schema
@@ -155,6 +156,24 @@ class OrderCharges(colander.SequenceSchema):
     """Collection of charges for an Order."""
 
     charge = OrderCharge()
+
+
+class RequirementItem(colander.MappingSchema):
+    """Specific requirement item of an Order."""
+
+    id = colander.SchemaNode(colander.String(), validator=colander.uuid, missing='')
+    category = colander.SchemaNode(colander.String())
+    min_number_assets = colander.SchemaNode(colander.Int())
+    description = colander.SchemaNode(colander.String(), missing='')
+    tags = colander.SchemaNode(colander.List())
+    created_at = colander.SchemaNode(colander.DateTime(), missing='')
+    created_by = colander.SchemaNode(colander.String(), validator=colander.uuid)
+
+
+class RequirementItems(colander.SequenceSchema):
+    """Collection of specific requirement items of an Order."""
+
+    items = RequirementItem()
 
 
 class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.OrderRolesMixin, Item):
@@ -339,10 +358,29 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
     """
 
     number_required_assets = sa.Column(
+        'number_required_assets',
         sa.Integer(),
         default=10
     )
     """Number of required assets of an Order."""
+
+    @orm.validates('number_required_assets')
+    def validate_number_required_assets(self, key: str, value: int) -> int:
+        """Validate number_required_assets checking if the order is using requirement_items.
+
+        :param key: Attribute name.
+        :param value: Number of required assets value.
+        :return: Number of required after validation.
+        """
+        if value and self.requirement_items:
+            logger.warn('Number of required assets will not be set when using requirement items.')
+
+        if self.requirement_items:
+            value = 0
+            for item in self.requirement_items:
+                value += item.get('min_number_assets')
+
+        return value
 
     refused_times = sa.Column(
         sa.Integer(),
@@ -350,8 +388,101 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
     )
     """Number times the Order was refused."""
 
-    requirements = sa.Column(sa.Text, default='')
+    requirements = sa.Column(
+        'requirements',
+        sa.Text,
+        default=''
+    )
     """Human-readable requirements for an Order."""
+
+    @orm.validates('requirements')
+    def validate_requirements(self, key: str, value: str) -> str:
+        """Validate requirements checking if the order is using requirement_items.
+
+        :param key: Attribute name.
+        :param value: Requirements value.
+        :return: Requirements after validation.
+        """
+        if value and self.requirement_items:
+            logger.warn('Requirements will not be set when using requirement items.')
+
+        if self.requirement_items:
+            value = ''
+            for item in self.requirement_items:
+                category = item.get('category')
+                description = item.get('description')
+                min_number_assets = item.get('min_number_assets')
+                tags = item.get('tags')
+                value += f'Category: {category}: {min_number_assets} ({tags})\n' \
+                         f'Descrition: {description}\n\n'
+
+        return value
+
+    requirement_items = sa.Column(
+        JSONB,
+        nullable=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Requirement Items',
+                'typ': colander.List,
+                'missing': None,
+            }
+        }
+    )
+    """Structured list of specific with all the requirement by category.
+
+    This list of maps have the following structure:
+
+        [
+            {
+                "id": "18a1d349-e432-4ca9-9617-81bb005d26bc",
+                "category": "Room 47",
+                "min_number_assets": 15,
+                "description": "Shoot the television and the bed",
+                "tags": ["room", "luxury", "double"]
+            },
+            {
+                "id": "33261769-20e6-4ec6-b793-d1147de98a90",
+                "category": "Bathroom 47",
+                "min_number_assets": 15,
+                "description": "",
+                "tags": ["bathroom"]
+            },
+            {
+                "id": "48401f9a-a243-4606-a29c-cb1514fae722",
+                "category": "Room 32",
+                "min_number_assets": 15,
+                "description": "Shoot the ceiling",
+                "tags": ["room", "standard", "single"]
+            },
+        ]
+    """
+
+    @orm.validates('requirement_items')
+    def validate_requirement_items(self, key: str, values: t.Sequence) -> t.Sequence:
+        """Validate if requirement_items payload is in the correct format.
+
+        :param key: Attribute name.
+        :param values: Requirement items payload.
+        :return: Validated payload.
+        """
+        request = self.request
+        user_id = str(request.user.id) if request else None
+        current_value = list(self.requirement_items) if self.requirement_items else []
+        for item in values:
+            if not item.get('created_by') and user_id:
+                item['created_by'] = user_id
+            if not item.get('created_at'):
+                item['created_at'] = datetime_utcnow().isoformat()
+
+        if values or current_value:
+            requirements_schema = RequirementItems()
+            try:
+                values = requirements_schema.deserialize(values)
+            except colander.Invalid as exc:
+                raise ValidationError(message='Invalid payload for requirement_items', name=key)
+
+        return values
 
     actual_order_price = sa.Column(
         'actual_order_price',
@@ -360,7 +491,7 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
         default=default_actual_order_price,
         info={
             'colanderalchemy': {
-                'title': 'Acutal Order Price',
+                'title': 'Actual Order Price',
                 'missing': None,
                 'typ': colander.Integer
             }
@@ -380,6 +511,7 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
         nullable=True,
         info={
             'colanderalchemy': {
+                'title': 'Additional Charges',
                 'typ': colander.List,
                 'missing': None,
             }

@@ -34,7 +34,7 @@ class TestOrderView(BaseVersionedTestView):
     ]
     serialize_attrs = [
         'path', '_roles', '_actors', 'customer', 'project', 'timezone',
-        'assignment', 'assignments'
+        'assignment', 'assignments', 'requirement_items'
     ]
     ignore_validation_fields = [
         'state_history', 'state', 'location'

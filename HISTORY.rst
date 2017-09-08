@@ -2,6 +2,12 @@
 History
 =======
 
+2.2.5 (Unreleased)
+------------------
+    * Added a new field to Order and LeadOrder to store the structure requirement items values (rudaporto).
+    * Validate and set number_required_assets and requirements text based on requirement items when available (rudaporto).
+
+
 2.2.4 (2017-09-05)
 ------------------
     * Card #604: moved Project.order_type to the summary payload (rudaporto).
