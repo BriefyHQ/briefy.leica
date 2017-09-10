@@ -8,6 +8,7 @@ from briefy.leica.subscribers.leadorder import leadorder_created_handler
 from conftest import BaseModelTest
 from datetime import timedelta
 
+import mock
 import pytest
 import pytz
 import uuid
@@ -217,6 +218,30 @@ class TestLeadOrderModel(BaseModelTest):
 
         wf.confirm()
         assert leadorder.state == 'received'
+
+    @pytest.mark.parametrize('origin_state', ['new'])
+    @pytest.mark.parametrize('role_name', ['pm'])
+    def test_workflow_confirm_not_enabled(
+        self, instance_obj, web_request, session, roles, role_name, now_utc, origin_state
+    ):
+        """Test LeadOrder workflow confirm transition not enabled."""
+        leadorder, wf, request = self.prepare_obj_wf(
+            instance_obj,
+            web_request,
+            roles[role_name],
+            origin_state
+        )
+        leadorder.actual_order_price = 0
+        # Remove the need for availability to be provided for a confirmed lead order
+        project = leadorder.project
+        project.leadorder_confirmation_fields = []
+
+        method = 'briefy.leica.models.job.workflows.leadorder.lead_confirmation_enabled'
+        with mock.patch(method) as mock_creation:
+            mock_creation.return_value = False
+            with pytest.raises(WorkflowTransitionException) as exc:
+                wf.confirm()
+            assert 'Lead order confirmation is not enabled' in str(exc)
 
     @pytest.mark.parametrize('origin_state', ['new'])
     @pytest.mark.parametrize('role_name', ['pm', 'customer', 'system'])
