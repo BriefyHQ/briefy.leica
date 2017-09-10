@@ -2,6 +2,12 @@
 History
 =======
 
+2.2.5 (2017-09-10)
+------------------
+
+    * Add configuration do disable Order creation (ericof).
+    * Add configuration do disable Lead confirmation (ericof).
+
 2.2.4 (2017-09-05)
 ------------------
     * Card #604: moved Project.order_type to the summary payload (rudaporto).

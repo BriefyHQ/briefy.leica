@@ -3,12 +3,21 @@ from briefy.common.vocabularies.roles import Groups as G
 from briefy.common.workflow import WorkflowState as WS
 from briefy.common.workflow import Permission
 from briefy.common.workflow import WorkflowTransitionException
+from briefy.leica.config import ENABLE_LEAD_CONFIRMATION
 from briefy.leica.events.leadorder import LeadOrderUpdatedEvent
 from briefy.leica.models.job.workflows.base import BaseOrderWorkflow
 from briefy.leica.models.job.workflows.base import REQUIREMENTS_REQUIRED_FIELDS
 from briefy.leica.subscribers.utils import create_new_assignment_from_order
 from briefy.leica.utils.transitions import get_transition_date_from_history
 from briefy.ws.errors import ValidationError
+
+
+def lead_confirmation_enabled() -> bool:
+    """Flag indicating if we are accepting new Orders.
+
+    :return: Boolean
+    """
+    return ENABLE_LEAD_CONFIRMATION
 
 
 class LeadOrderWorkflow(BaseOrderWorkflow):
@@ -68,6 +77,8 @@ class LeadOrderWorkflow(BaseOrderWorkflow):
     )
     def confirm(self, **kwargs):
         """Confirm LeadOrder and set availability dates."""
+        if not lead_confirmation_enabled():
+            raise WorkflowTransitionException('Lead order confirmation is not enabled')
         leadorder = self.document
         project = leadorder.project
         needed_fields = project.leadorder_confirmation_fields or []
