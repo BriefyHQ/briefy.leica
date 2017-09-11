@@ -25,11 +25,11 @@ def upgrade():
     op.add_column('orders_version',
                   sa.Column('requirement_items', postgresql.JSONB(astext_type=sa.Text()),
                             autoincrement=False, nullable=True))
-    op.add_column('projects', sa.Column('package_type', types.ChoiceType(choices=ProjectTypeChoices,
+    op.add_column('projects', sa.Column('project_type', types.ChoiceType(choices=ProjectTypeChoices,
                                                                          impl=sa.String()),
                                         autoincrement=False, nullable=False,
                                         server_default='on-demand'))
-    op.add_column('projects_version', sa.Column('package_type',
+    op.add_column('projects_version', sa.Column('project_type',
                                                 types.ChoiceType(choices=ProjectTypeChoices,
                                                                  impl=sa.String()),
                                                 autoincrement=False, nullable=True))
@@ -46,11 +46,11 @@ def downgrade():
                   sa.Column('total_leadorders', sa.INTEGER(), autoincrement=False, nullable=True))
     op.add_column('projects_version',
                   sa.Column('total_orders', sa.INTEGER(), autoincrement=False, nullable=True))
-    op.drop_column('projects_version', 'package_type')
+    op.drop_column('projects_version', 'project_type')
     op.add_column('projects',
                   sa.Column('total_leadorders', sa.INTEGER(), autoincrement=False, nullable=True))
     op.add_column('projects',
                   sa.Column('total_orders', sa.INTEGER(), autoincrement=False, nullable=True))
-    op.drop_column('projects', 'package_type')
+    op.drop_column('projects', 'project_type')
     op.drop_column('orders_version', 'requirement_items')
     op.drop_column('orders', 'requirement_items')
