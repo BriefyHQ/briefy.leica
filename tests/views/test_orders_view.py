@@ -4,6 +4,7 @@ from briefy.leica import models
 from conftest import BaseVersionedTestView
 from datetime import timedelta
 
+import mock
 import pytest
 
 
@@ -185,6 +186,21 @@ class TestOrderView(BaseVersionedTestView):
         # Use a project that does not allow creation of new orders
         payload['project_id'] = '4a068a1b-3646-4acf-937d-15563853e388'
         request = app.post_json(self.base_path, payload, headers=self.headers, status=403)
+
+        assert request.status_code == 403
+        result = request.json
+        assert result['status'] == 'error'
+        assert result['message'] == 'Unauthorized'
+
+    def test_creation_disabled(self, obj_payload, app):
+        """Test unsuccessful creation of a new model as creation is disabled."""
+        payload = obj_payload.copy()
+        del(payload['availability'])
+        payload['id'] = 'e93b5902-c15e-4b47-8e01-a93df6ea7211'
+        method = 'briefy.leica.views.order.order_creation_enabled'
+        with mock.patch(method) as mock_creation:
+            mock_creation.return_value = False
+            request = app.post_json(self.base_path, payload, headers=self.headers, status=403)
 
         assert request.status_code == 403
         result = request.json
