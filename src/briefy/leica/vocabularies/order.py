@@ -19,13 +19,13 @@ order_type = [
 OrderTypeChoices = LabeledEnum('OrderTypeChoices', order_type)
 
 
-package_type = [
+project_type = [
     ('on-demand', 'on-demand', 'On-demand'),
     ('city', 'city', 'City'),
 ]
 
 
-PackageTypeChoices = LabeledEnum('PackageTypeChoices', package_type)
+ProjectTypeChoices = LabeledEnum('ProjectTypeChoices', project_type)
 
 
 order_options = [

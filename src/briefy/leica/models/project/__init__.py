@@ -11,7 +11,7 @@ from briefy.leica.models.project import workflows
 from briefy.leica.utils.user import add_user_info_to_state_history
 from briefy.leica.vocabularies import AssetTypes
 from briefy.leica.vocabularies import OrderTypeChoices
-from briefy.leica.vocabularies import PackageTypeChoices
+from briefy.leica.vocabularies import ProjectTypeChoices
 from briefy.ws.errors import ValidationError
 from sqlalchemy import event
 from sqlalchemy import orm
@@ -88,7 +88,7 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
 
     __summary_attributes__ = [
         'id', 'title', 'description', 'created_at', 'updated_at',
-        'state', 'slug', 'asset_types', 'order_type', 'package_type'
+        'state', 'slug', 'asset_types', 'order_type', 'project_type'
     ]
 
     __summary_attributes_relations__ = ['customer', 'pool', 'customer_users']
@@ -185,13 +185,13 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
     )
     """Type of order the project support."""
 
-    package_type = sa.Column(
-        sautils.ChoiceType(PackageTypeChoices, impl=sa.String()),
-        default='city',
+    project_type = sa.Column(
+        sautils.ChoiceType(ProjectTypeChoices, impl=sa.String()),
+        default='on-demand',
         nullable=False,
         info={
             'colanderalchemy': {
-                'title': 'Type of Package',
+                'title': 'Type of Project',
                 'missing': colander.drop,
                 'typ': colander.String
             }
@@ -455,7 +455,7 @@ class Project(CommercialInfoMixin, mixins.ProjectRolesMixin,
                 'add_order': self.add_order_roles
             },
             'order_type': self.order_type,
-            'package_type': self.package_type
+            'project_type': self.project_type
         })
 
     @settings.setter

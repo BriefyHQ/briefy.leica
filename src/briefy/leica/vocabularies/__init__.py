@@ -10,4 +10,4 @@ from briefy.leica.vocabularies.order import OrderChargesChoices  # noQA
 from briefy.leica.vocabularies.order import OrderInputSource  # noQA
 from briefy.leica.vocabularies.order import OrderStatusChoices  # noQA
 from briefy.leica.vocabularies.order import OrderTypeChoices  # noQA
-from briefy.leica.vocabularies.order import PackageTypeChoices  # noQA
+from briefy.leica.vocabularies.order import ProjectTypeChoices  # noQA

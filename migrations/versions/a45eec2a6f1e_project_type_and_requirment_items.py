@@ -9,7 +9,7 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 from sqlalchemy_utils import types
 
-from briefy.leica.vocabularies import PackageTypeChoices
+from briefy.leica.vocabularies import ProjectTypeChoices
 
 revision = 'a45eec2a6f1e'
 down_revision = 'c8aa72b4d1c9'
@@ -25,12 +25,12 @@ def upgrade():
     op.add_column('orders_version',
                   sa.Column('requirement_items', postgresql.JSONB(astext_type=sa.Text()),
                             autoincrement=False, nullable=True))
-    op.add_column('projects', sa.Column('package_type', types.ChoiceType(choices=PackageTypeChoices,
+    op.add_column('projects', sa.Column('package_type', types.ChoiceType(choices=ProjectTypeChoices,
                                                                          impl=sa.String()),
                                         autoincrement=False, nullable=False,
                                         server_default='on-demand'))
     op.add_column('projects_version', sa.Column('package_type',
-                                                types.ChoiceType(choices=PackageTypeChoices,
+                                                types.ChoiceType(choices=ProjectTypeChoices,
                                                                  impl=sa.String()),
                                                 autoincrement=False, nullable=True))
     # drop columns since this is now computed on the fly
