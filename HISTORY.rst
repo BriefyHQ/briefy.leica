@@ -2,6 +2,11 @@
 History
 =======
 
+2.2.6 (2017-09-11)
+------------------
+
+    * Allow bypass of Order/Lead creation and Lead confirmation by setting ORDER_CREATION_BYPASS_PROJECTS and LEAD_CONFIRMATION_BYPASS_PROJECTS env vars (ericof).
+
 2.2.5 (2017-09-10)
 ------------------
 
