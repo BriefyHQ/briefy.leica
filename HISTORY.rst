@@ -2,11 +2,16 @@
 History
 =======
 
-2.2.5 (Unreleased)
+2.2.6 (Unreleased)
 ------------------
     * Added a new field to Order and LeadOrder to store the structure requirement items values (rudaporto).
     * Validate and set number_required_assets and requirements text based on requirement items when available (rudaporto).
 
+2.2.5 (2017-09-10)
+------------------
+
+    * Add configuration do disable Order creation (ericof).
+    * Add configuration do disable Lead confirmation (ericof).
 
 2.2.4 (2017-09-05)
 ------------------
