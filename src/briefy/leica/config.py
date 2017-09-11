@@ -80,12 +80,16 @@ ENABLE_BEFORE_SHOOTING_NOTIFY = config(
 
 # ORDER CREATION FLAG
 ENABLE_ORDER_CREATION = config('ENABLE_ORDER_CREATION', casts.Boolean(), default=True)
+# Bypass order creation check for some projects
+# ORDER_CREATION_BYPASS_PROJECTS=c671c038-6cf9-4e21-beaa-f534d9413a99,3d29cef3-f4c4-4e0d-bfb7-d4ada9711911
 ORDER_CREATION_BYPASS_PROJECTS = config(
     'ORDER_CREATION_BYPASS_PROJECTS', casts.List(), default=[]
 )
 
 # LEAD CONFIRMATION FLAG
 ENABLE_LEAD_CONFIRMATION = config('ENABLE_LEAD_CONFIRMATION', casts.Boolean(), default=True)
+# Bypass lead confirmation check for some projects
+# LEAD_CONFIRMATION_BYPASS_PROJECTS=c671c038-6cf9-4e21-beaa-f534d9413a99,3d29cef3-f4c4-4e0d-bfb7-d4ada9711911
 LEAD_CONFIRMATION_BYPASS_PROJECTS = config(
     'LEAD_CONFIRMATION_BYPASS_PROJECTS', casts.List(), default=[]
 )
