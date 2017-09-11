@@ -161,6 +161,7 @@ class LeadOrderWorkflow(BaseOrderWorkflow):
         optional_fields=REQUIREMENTS_REQUIRED_FIELDS
     )
     def edit_requirements(self, **kwargs):
+        """Update requirements in a LeadOrder."""
         project_type = self.document.project.project_type
         fields = kwargs.get('fields', {})
         requirements = fields.get('requirements', None)
