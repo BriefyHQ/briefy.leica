@@ -158,8 +158,23 @@ class LeadOrderWorkflow(BaseOrderWorkflow):
     @new.transition(
         new,
         'can_edit_requirements',
-        required_fields=REQUIREMENTS_REQUIRED_FIELDS
+        optional_fields=REQUIREMENTS_REQUIRED_FIELDS
     )
     def edit_requirements(self, **kwargs):
-        """Update requirements in an LeadOrder."""
-        pass
+        project_type = self.document.project.project_type
+        fields = kwargs.get('fields', {})
+        requirements = fields.get('requirements', None)
+        number_required_assets = fields.get('number_required_assets', None)
+        requirement_items = fields.get('requirement_items', None)
+        if (project_type == 'on-demand') and not number_required_assets:
+            raise WorkflowTransitionException(
+                f'Field number_required_assets is required for this transition'
+            )
+        elif (project_type == 'on-demand') and not requirements:
+            raise WorkflowTransitionException(
+                f'Field requirements is required for this transition'
+            )
+        elif (project_type == 'city') and not requirement_items:
+            raise WorkflowTransitionException(
+                f'Field requirement_items is required for this transition'
+            )

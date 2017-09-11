@@ -363,6 +363,7 @@ class TestLeadOrderModel(BaseModelTest):
         )
         # TODO: improve this with requirement items, for now disable it
         leadorder.requirement_items = []
+        leadorder.project.project_type = 'on-demand'
         session.flush()
 
         new_requirements = {}

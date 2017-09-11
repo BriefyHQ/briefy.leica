@@ -350,6 +350,7 @@ class TestOrderModel(BaseModelTest):
         )
         # TODO: improve this with requirement items, for now disable it
         order.requirement_items = []
+        order.project.project_type = 'on-demand'
         session.flush()
 
         new_requirements = {}
