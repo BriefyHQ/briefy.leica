@@ -2,6 +2,7 @@
 from briefy.common.db import datetime_utcnow
 from briefy.leica.config import ENABLE_ORDER_CREATION
 from briefy.leica.config import LATE_SUBMISSION_SECONDS
+from briefy.leica.config import ORDER_CREATION_BYPASS_PROJECTS
 from briefy.leica.events import order as events
 from briefy.leica.models import Assignment
 from briefy.leica.models import LeadOrder
@@ -26,12 +27,13 @@ COLLECTION_PATH = '/orders'
 PATH = COLLECTION_PATH + '/{id}'
 
 
-def order_creation_enabled() -> bool:
+def order_creation_enabled(project_id: str) -> bool:
     """Flag indicating if we are accepting new Orders.
 
     :return: Boolean
     """
-    return ENABLE_ORDER_CREATION
+    project_bypass = project_id in ORDER_CREATION_BYPASS_PROJECTS
+    return ENABLE_ORDER_CREATION or project_bypass
 
 
 class OrderFactory(BaseFactory):
@@ -95,7 +97,9 @@ class OrderService(RESTService):
             model = model if model else Order
             current_type = 'order'
 
-        if (len(set(add_order_roles) & set(user_groups)) == 0) or (not order_creation_enabled()):
+        user_has_roles = True if len(set(add_order_roles) & set(user_groups)) > 0 else False
+
+        if not (user_has_roles and order_creation_enabled(str(project.id))):
             model_name = 'lead' if model == LeadOrder else 'order'
             raise HTTPForbidden(f'You are not allowed to add a new {model_name} to this project')
 
