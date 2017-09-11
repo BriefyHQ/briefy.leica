@@ -2,6 +2,12 @@
 History
 =======
 
+2.2.6 (Unreleased)
+------------------
+    * Added a new field to Order and LeadOrder to store the structure requirement items values (rudaporto).
+    * Validate and set number_required_assets and requirements text based on requirement items when available (rudaporto).
+    * Added a new field to the Project do set the type of package: on-demand or city (rudaporto).
+
 2.2.5 (2017-09-10)
 ------------------
 

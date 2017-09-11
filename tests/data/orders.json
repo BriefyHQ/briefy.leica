@@ -53,7 +53,36 @@
         "country": "DE",
         "postal_code": "10997"
       }
-    }
+    },
+    "requirement_items": [
+            {
+                "id": "18a1d349-e432-4ca9-9617-81bb005d26bc",
+                "category": "Room 47",
+                "min_number_assets": 15,
+                "description": "Shoot the television and the bed",
+                "tags": ["room", "luxury", "double"],
+                "created_at": "2017-09-08T09:19:40.670050+00:00",
+                "created_by": "669a99c2-9bb3-443f-8891-e600a15e3c10"
+            },
+            {
+                "id": "33261769-20e6-4ec6-b793-d1147de98a90",
+                "category": "Bathroom 47",
+                "min_number_assets": 15,
+                "description": "",
+                "tags": ["bathroom"],
+                "created_at": "2017-09-08T09:19:40.670050+00:00",
+                "created_by": "669a99c2-9bb3-443f-8891-e600a15e3c10"
+            },
+            {
+                "id": "48401f9a-a243-4606-a29c-cb1514fae722",
+                "category": "Room 32",
+                "min_number_assets": 15,
+                "description": "Shoot the ceiling",
+                "tags": ["room", "standard", "single"],
+                "created_at": "2017-09-08T09:19:40.670050+00:00",
+                "created_by": "669a99c2-9bb3-443f-8891-e600a15e3c10"
+            }
+        ]
   },
   {
     "asset_types": ["Image"],
