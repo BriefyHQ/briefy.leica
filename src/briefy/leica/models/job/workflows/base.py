@@ -13,7 +13,7 @@ from briefy.leica.subscribers.utils import create_new_assignment_from_order
 ASSIGN_AFTER_RENEWSHOOT = 'Creative automatically assigned due to a re  shoot.'
 
 # required fields
-REQUIREMENTS_REQUIRED_FIELDS = ('number_required_assets', 'requirements')
+REQUIREMENTS_REQUIRED_FIELDS = ('number_required_assets', 'requirements', 'requirement_items')
 ASSIGN_REQUIRED_FIELDS = (
     'payout_value',
     'payout_currency',
