@@ -2,11 +2,17 @@
 History
 =======
 
-2.2.6 (Unreleased)
+
+2.2.7 (Unreleased)
 ------------------
     * Added a new field to Order and LeadOrder to store the structure requirement items values (rudaporto).
     * Validate and set number_required_assets and requirements text based on requirement items when available (rudaporto).
     * Added a new field to the Project do set the type of package: on-demand or city (rudaporto).
+
+2.2.6 (2017-09-11)
+------------------
+
+    * Allow bypass of Order/Lead creation and Lead confirmation by setting ORDER_CREATION_BYPASS_PROJECTS and LEAD_CONFIRMATION_BYPASS_PROJECTS env vars (ericof).
 
 2.2.5 (2017-09-10)
 ------------------
