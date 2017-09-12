@@ -29,6 +29,7 @@ import colander
 import copy
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils
+import typing as t
 
 
 __summary_attributes__ = [
@@ -192,7 +193,7 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
         'title', 'description', 'briefing', 'assignment_date', 'last_approval_date',
         'last_submission_date', 'last_transition_message', 'closed_on_date', 'timezone',
         'availability', 'external_state', 'set_type', 'category', 'tech_requirements',
-        'assignment_internal_scout', 'assignment_internal_qa'
+        'assignment_internal_scout', 'assignment_internal_qa', 'requirement_items'
     ]
 
     __raw_acl__ = (
@@ -524,6 +525,11 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
     def requirements(cls) -> str:
         """Return the requirements of an Order."""
         return association_proxy('order', 'requirements')
+
+    @declared_attr
+    def requirement_items(cls) -> t.List[dict]:
+        """Return the requirement items of an Order."""
+        return association_proxy('order', 'requirement_items')
 
     @declared_attr
     def category(cls) -> str:

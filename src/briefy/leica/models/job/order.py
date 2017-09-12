@@ -357,65 +357,11 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
     Options come from :mod:`briefy.leica.vocabularies`.
     """
 
-    number_required_assets = sa.Column(
-        'number_required_assets',
-        sa.Integer(),
-        default=10
-    )
-    """Number of required assets of an Order."""
-
-    @orm.validates('number_required_assets')
-    def validate_number_required_assets(self, key: str, value: int) -> int:
-        """Validate number_required_assets checking if the order is using requirement_items.
-
-        :param key: Attribute name.
-        :param value: Number of required assets value.
-        :return: Number of required after validation.
-        """
-        if value and self.requirement_items:
-            logger.warn('Number of required assets will not be set when using requirement items.')
-
-        if self.requirement_items:
-            value = 0
-            for item in self.requirement_items:
-                value += item.get('min_number_assets')
-
-        return value
-
     refused_times = sa.Column(
         sa.Integer(),
         default=0
     )
     """Number times the Order was refused."""
-
-    requirements = sa.Column(
-        'requirements',
-        sa.Text,
-        default=''
-    )
-    """Human-readable requirements for an Order."""
-
-    @orm.validates('requirements')
-    def validate_requirements(self, key: str, value: str) -> str:
-        """Validate requirements checking if the order is using requirement_items.
-
-        :param key: Attribute name.
-        :param value: Requirements value.
-        :return: Requirements after validation.
-        """
-        if value and self.requirement_items:
-            logger.warn('Requirements will not be set when using requirement items.')
-
-        if self.requirement_items:
-            value = ''
-            for item in self.requirement_items:
-                category = item.get('category')
-                description = item.get('description')
-                min_number_assets = item.get('min_number_assets')
-                value += f'Category: {category}: {min_number_assets}\n' \
-                         f'Descrition: {description}\n\n'
-
-        return value
 
     requirement_items = sa.Column(
         JSONB,
@@ -468,11 +414,12 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
         request = self.request
         user_id = str(request.user.id) if request else None
         current_value = list(self.requirement_items) if self.requirement_items else []
-        for item in values:
-            if not item.get('created_by') and user_id:
-                item['created_by'] = user_id
-            if not item.get('created_at'):
-                item['created_at'] = datetime_utcnow().isoformat()
+        if values:
+            for item in values:
+                if not item.get('created_by') and user_id:
+                    item['created_by'] = user_id
+                if not item.get('created_at'):
+                    item['created_at'] = datetime_utcnow().isoformat()
 
         if values or current_value:
             requirements_schema = RequirementItems()
@@ -482,6 +429,62 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
                 raise ValidationError(message='Invalid payload for requirement_items', name=key)
 
         return values
+
+    number_required_assets = sa.Column(
+        'number_required_assets',
+        sa.Integer(),
+        default=10
+    )
+    """Number of required assets of an Order."""
+
+    @orm.validates('number_required_assets')
+    def validate_number_required_assets(self, key: str, value: int) -> int:
+        """Validate number_required_assets checking if the order is using requirement_items.
+
+        :param key: Attribute name.
+        :param value: Number of required assets value.
+        :return: Number of required after validation.
+        """
+        if value and self.requirement_items:
+            logger.warn('Number of required assets will not be set when using requirement items.')
+
+        if self.requirement_items:
+            value = 0
+            for item in self.requirement_items:
+                value += item.get('min_number_assets')
+
+        return value
+
+    requirements = sa.Column(
+        'requirements',
+        sa.Text,
+        default=''
+    )
+    """Human-readable requirements for an Order."""
+
+    @orm.validates('requirements')
+    def validate_requirements(self, key: str, value: str) -> str:
+        """Validate requirements checking if the order is using requirement_items.
+
+        :param key: Attribute name.
+        :param value: Requirements value.
+        :return: Requirements after validation.
+        """
+        if value or self.requirement_items:
+            logger.warn('Requirements will not be set when using requirement items.')
+
+        if self.requirement_items:
+            value = ''
+            for item in self.requirement_items:
+                category = item.get('category')
+                description = item.get('description')
+                min_number_assets = item.get('min_number_assets')
+                value += f'Category: {category}: {min_number_assets}\n' \
+                         f'Descrition: {description}\n\n'
+
+        flag_modified(self, 'requirements')
+        cache_region.invalidate(self)
+        return value
 
     actual_order_price = sa.Column(
         'actual_order_price',
@@ -946,6 +949,17 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
         """Calculate dates on a change of a state."""
         # Update all dates
         self._update_dates_from_history()
+
+    def update(self, values: dict):
+        """Custom update method to handle special case.
+
+        :param values: Dictionary containing attributes and values
+        :type values: dict
+        """
+        if 'requirement_items' in values:
+            # force update requirement items before all other fields
+            self.requirement_items = values.pop('requirement_items')
+        super().update(values)
 
     @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_summary_dict(self) -> dict:

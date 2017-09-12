@@ -8,6 +8,8 @@ History
     * Added a new field to Order and LeadOrder to store the structure requirement items values (rudaporto).
     * Validate and set number_required_assets and requirements text based on requirement items when available (rudaporto).
     * Added a new field to the Project do set the type of package: on-demand or city (rudaporto).
+    * Make sure Order.requirement_items is always updated before any other field (rudaporto).
+    * Added requirement_items as an attribute of the Assignment (proxy) and return it in the to_dict payload (rudaporto).
 
 2.2.6 (2017-09-11)
 ------------------
