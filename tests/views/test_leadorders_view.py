@@ -40,7 +40,7 @@ class TestLeadOrderView(BaseVersionedTestView):
         'assignments', 'requirement_items'
     ]
     ignore_validation_fields = [
-        'state_history', 'state', 'location'
+        'state_history', 'state', 'location', 'requirements', 'number_required_assets'
     ]
     file_path = 'data/leadorders.json'
     model = models.LeadOrder

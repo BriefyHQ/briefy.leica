@@ -482,8 +482,6 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
                 value += f'Category: {category}: {min_number_assets}\n' \
                          f'Descrition: {description}\n\n'
 
-        flag_modified(self, 'requirements')
-        cache_region.invalidate(self)
         return value
 
     actual_order_price = sa.Column(

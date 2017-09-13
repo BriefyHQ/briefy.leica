@@ -3,9 +3,11 @@ from briefy.ws.resources import BaseResource
 from datetime import datetime
 from io import StringIO
 from pyramid.request import Response
+from sqlalchemy.orm import Query
 
 import csv
 import newrelic.agent
+import typing as t
 
 
 class BaseReport(BaseResource):
@@ -36,7 +38,7 @@ class BaseReport(BaseResource):
         """Apply some basic type conversions."""
         raise NotImplementedError('Need to be implemented by subclass')
 
-    def default_filters(self, query) -> object:
+    def default_filters(self, query: Query) -> t.Iterator:
         """Default filters to be applied to every query.
 
         This is supposed to be specialized by resource classes.
@@ -44,16 +46,18 @@ class BaseReport(BaseResource):
         """
         raise NotImplementedError('Need to be implemented by subclass')
 
+    def results(self) -> t.Iterator:
+        """Return an iterator with all results from the query."""
+        return self.default_filters(self.model.query())
+
     def get_report_data(self, filename: str):
         """Execute the report, return a tuple with data and metadata."""
         content_type = self.mime_type
-        query = self.default_filters(self.model.query())
-        results = query.all()
         csv_file = StringIO()
         header = [c for c in self.column_order]
         writer = csv.DictWriter(csv_file, fieldnames=header, quoting=csv.QUOTE_ALL)
         writer.writeheader()
-        for row in results:
+        for row in self.results():
             row = self.convert_data(row)
             writer.writerow(row)
         data = csv_file.getvalue()
