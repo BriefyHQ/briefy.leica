@@ -11,6 +11,7 @@ History
     * Card #634: Make sure Order.requirement_items is always updated before any other field (rudaporto).
     * Added requirement_items as an attribute of the Assignment (proxy) and return it in the to_dict payload (rudaporto).
     * Card #635: fixed the CSV export of orders per project available in the project view (rudaporto).
+    * Card #636: workaround to fix coercion error of timezone types when move orders from accepted to completed (rudaporto).
 
 2.2.6 (2017-09-11)
 ------------------

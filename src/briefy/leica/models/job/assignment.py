@@ -9,6 +9,7 @@ from briefy.leica.cache import enable_cache
 from briefy.leica.models import mixins
 from briefy.leica.models.job import workflows
 from briefy.leica.models.job.order import Order
+from briefy.leica.models.types import TimezoneType
 from briefy.leica.utils.transitions import get_transition_date_from_history
 from briefy.leica.utils.user import add_user_info_to_state_history
 from briefy.leica.vocabularies import AssetTypes
@@ -21,7 +22,6 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy_utils import TimezoneType
 from zope.interface import implementer
 from zope.interface import Interface
 

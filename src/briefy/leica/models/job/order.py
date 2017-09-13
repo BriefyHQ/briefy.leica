@@ -13,6 +13,7 @@ from briefy.leica.models.descriptors import UnaryRelationshipWrapper
 from briefy.leica.models.job import workflows
 from briefy.leica.models.job.location import OrderLocation
 from briefy.leica.models.project import Project
+from briefy.leica.models.types import TimezoneType
 from briefy.leica.utils.charges import order_charges_update
 from briefy.leica.utils.transitions import get_transition_date_from_history
 from briefy.leica.utils.user import add_user_info_to_state_history
@@ -28,7 +29,6 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm.attributes import flag_modified
-from sqlalchemy_utils import TimezoneType
 
 import colander
 import copy
