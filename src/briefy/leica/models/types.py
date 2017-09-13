@@ -11,6 +11,6 @@ class TimezoneType(BaseTimezoneType):
                 value = str(value)
             obj = self._to(value)
             if obj is None:
-                raise ValueError("unknown time zone '%s'" % value)
+                raise ValueError(f"unknown time zone '{value}'")
             return obj
         return value
