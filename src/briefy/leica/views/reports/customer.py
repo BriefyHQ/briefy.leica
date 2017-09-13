@@ -4,7 +4,11 @@ from briefy.leica.views.reports import BaseReport
 from briefy.ws import CORS_POLICY
 from briefy.ws.resources.factory import BaseFactory
 from cornice.resource import resource
+from datetime import datetime
 from pyramid.security import Allow
+from pytz import timezone
+
+import typing as t
 
 
 STATES = {
@@ -21,12 +25,12 @@ STATES = {
 }
 
 
-def get_label_for_order_status(data: OrdersByProjectReport) -> str:
+def get_label_for_order_status(raw_state: str, accept_date: datetime) -> str:
     """Return the label for the Order state."""
-    state = STATES.get(data.state, data.state)
-    if data.state == 'in_qa' and data.accept_date:
+    state = STATES.get(raw_state, raw_state)
+    if raw_state == 'in_qa' and accept_date:
         state = 'In Further Revision'
-    elif data.state == 'delivered' and data.accept_date:
+    elif raw_state == 'delivered' and accept_date:
         state = 'Re-delivered'
     return state
 
@@ -62,34 +66,59 @@ class CustomerReports(BaseReport):
         'Delivery Date',
     )
 
-    def convert_data(self, data: OrdersByProjectReport):
+    def convert_data(self, data: tuple):
         """Apply some basic type conversions."""
-        created_at = data.created_at
-        scheduled_datetime = data.scheduled_datetime
-        deliver_date = data.deliver_date
-        timezone = data.timezone
+        slug, customer_order_id, title, project_title, \
+            state, created_at, scheduled_datetime, deliver_date, \
+            accept_date, timezone_str = data
+
+        timezone_obj = timezone(timezone_str)
         response = {
-            'Briefy ID': data.briefy_id,
-            'Order ID': data.customer_order_id,
-            'Order Name': data.title,
-            'Project Name': data.project_title,
-            'Status': get_label_for_order_status(data),
-            'Input Date': self._format_datetime(created_at, timezone, False),
-            'Shooting Date': self._format_datetime(scheduled_datetime, timezone, True),
-            'Delivery Date': self._format_datetime(deliver_date, timezone, False),
+            'Briefy ID': slug,
+            'Order ID': customer_order_id,
+            'Order Name': title,
+            'Project Name': project_title,
+            'Status': get_label_for_order_status(state, accept_date),
+            'Input Date': self._format_datetime(created_at, timezone_obj, False),
+            'Shooting Date': self._format_datetime(scheduled_datetime, timezone_obj, True),
+            'Delivery Date': self._format_datetime(deliver_date, timezone_obj, False),
         }
         return response
 
-    def default_filters(self, query) -> object:
-        """Default filters to be applied to every query.
+    def results(self) -> t.Iterator:
+        """Return the results iterator."""
+        session = self.request.db
+        raw_query = """
+        SELECT DISTINCT
+        orders.slug,
+        orders.customer_order_id,
+        orders.title,
+        projects.title,
+        orders.state,
+        orders.created_at,
+        orders.scheduled_datetime,
+        orders.deliver_date,
+        orders.accept_date,
+        orders.timezone
 
-        This is supposed to be specialized by resource classes.
-        :returns: A tuple of default filters to be applied to queries.
+        FROM
+
+        (SELECT i.slug, i.state, i.title, o.accept_date, o.project_id,
+        o.customer_order_id, i.created_at, o.scheduled_datetime,
+        o.deliver_date, o.timezone
+        FROM items as i JOIN orders as o on i.id = o.id
+        ) as orders JOIN
+
+        (SELECT i.id, i.state, i.title, p.customer_id, l.principal_id, l.role_name
+        FROM items as i JOIN projects as p on i.id = p.id
+        JOIN localroles as l on p.id = l.item_id
+        WHERE l.principal_id = '{principal_id}') as projects
+        on orders.project_id = projects.id
+
+        WHERE projects.id = '{project_id}'
+        ORDER BY orders.created_at
         """
         user = self.request.user
         project_id = self.request.matchdict.get('id', '')
-        query = query.params(
-            user_id_1=user.id,
-            project_id_1=project_id,
-        )
-        return query
+        query = raw_query.format(principal_id=user.id, project_id=project_id)
+        return session.execute(query)

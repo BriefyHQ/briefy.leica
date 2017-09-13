@@ -361,6 +361,10 @@ class TestLeadOrderModel(BaseModelTest):
             roles[role_name],
             origin_state
         )
+        # TODO: improve this with requirement items, for now disable it
+        leadorder.requirement_items = []
+        leadorder.project.project_type = 'on-demand'
+        session.flush()
 
         new_requirements = {}
         with pytest.raises(WorkflowTransitionException) as excinfo:
@@ -375,6 +379,7 @@ class TestLeadOrderModel(BaseModelTest):
         assert 'Field requirements is required for this transition' in str(excinfo)
 
         new_requirements['requirements'] = 'New requirements for this order!'
+        new_requirements['number_required_assets'] = 25
         wf.edit_requirements(fields=new_requirements)
         session.flush()
 

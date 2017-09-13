@@ -15,7 +15,18 @@ order_type = [
     ('leadorder', 'leadorder', 'LeadOrder'),
 ]
 
+
 OrderTypeChoices = LabeledEnum('OrderTypeChoices', order_type)
+
+
+project_type = [
+    ('on-demand', 'on-demand', 'On-demand'),
+    ('city', 'city', 'City'),
+]
+
+
+ProjectTypeChoices = LabeledEnum('ProjectTypeChoices', project_type)
+
 
 order_options = [
     ('undefined', 'undefined', 'undefined'),

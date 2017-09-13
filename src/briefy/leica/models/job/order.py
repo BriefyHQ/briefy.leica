@@ -1,4 +1,5 @@
 """Briefy Leica Order model."""
+from briefy.common.db import datetime_utcnow
 from briefy.common.db.models import Item
 from briefy.common.db.types import AwareDateTime
 from briefy.common.utils import schema
@@ -12,6 +13,7 @@ from briefy.leica.models.descriptors import UnaryRelationshipWrapper
 from briefy.leica.models.job import workflows
 from briefy.leica.models.job.location import OrderLocation
 from briefy.leica.models.project import Project
+from briefy.leica.models.types import TimezoneType
 from briefy.leica.utils.charges import order_charges_update
 from briefy.leica.utils.transitions import get_transition_date_from_history
 from briefy.leica.utils.user import add_user_info_to_state_history
@@ -27,7 +29,6 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm.attributes import flag_modified
-from sqlalchemy_utils import TimezoneType
 
 import colander
 import copy
@@ -47,7 +48,7 @@ __summary_attributes__ = [
 
 __listing_attributes__ = __summary_attributes__ + [
     'accept_date', 'availability', 'assignment', 'requirements', 'project',
-    'customer', 'refused_times', 'asset_types', 'current_type'
+    'customer', 'refused_times', 'asset_types', 'current_type', 'scheduled_datetime'
 ]
 
 __colander_alchemy_config_overrides__ = \
@@ -155,6 +156,24 @@ class OrderCharges(colander.SequenceSchema):
     """Collection of charges for an Order."""
 
     charge = OrderCharge()
+
+
+class RequirementItem(colander.MappingSchema):
+    """Specific requirement item of an Order."""
+
+    id = colander.SchemaNode(colander.String(), validator=colander.uuid, missing='')
+    category = colander.SchemaNode(colander.String())
+    min_number_assets = colander.SchemaNode(colander.Int())
+    description = colander.SchemaNode(colander.String(), missing='')
+    tags = colander.SchemaNode(colander.List())
+    created_at = colander.SchemaNode(colander.DateTime(), missing='')
+    created_by = colander.SchemaNode(colander.String(), validator=colander.uuid)
+
+
+class RequirementItems(colander.SequenceSchema):
+    """Collection of specific requirement items of an Order."""
+
+    items = RequirementItem()
 
 
 class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.OrderRolesMixin, Item):
@@ -338,20 +357,132 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
     Options come from :mod:`briefy.leica.vocabularies`.
     """
 
-    number_required_assets = sa.Column(
-        sa.Integer(),
-        default=10
-    )
-    """Number of required assets of an Order."""
-
     refused_times = sa.Column(
         sa.Integer(),
         default=0
     )
     """Number times the Order was refused."""
 
-    requirements = sa.Column(sa.Text, default='')
+    requirement_items = sa.Column(
+        JSONB,
+        nullable=True,
+        info={
+            'colanderalchemy': {
+                'title': 'Requirement Items',
+                'typ': colander.List,
+                'missing': None,
+            }
+        }
+    )
+    """Structured list of specific with all the requirement by category.
+
+    This list of maps have the following structure:
+
+        [
+            {
+                "id": "18a1d349-e432-4ca9-9617-81bb005d26bc",
+                "category": "Room 47",
+                "min_number_assets": 15,
+                "description": "Shoot the television and the bed",
+                "tags": ["room", "luxury", "double"]
+            },
+            {
+                "id": "33261769-20e6-4ec6-b793-d1147de98a90",
+                "category": "Bathroom 47",
+                "min_number_assets": 15,
+                "description": "",
+                "tags": ["bathroom"]
+            },
+            {
+                "id": "48401f9a-a243-4606-a29c-cb1514fae722",
+                "category": "Room 32",
+                "min_number_assets": 15,
+                "description": "Shoot the ceiling",
+                "tags": ["room", "standard", "single"]
+            },
+        ]
+    """
+
+    @orm.validates('requirement_items')
+    def validate_requirement_items(self, key: str, values: t.Sequence) -> t.Sequence:
+        """Validate if requirement_items payload is in the correct format.
+
+        :param key: Attribute name.
+        :param values: Requirement items payload.
+        :return: Validated payload.
+        """
+        request = self.request
+        user_id = str(request.user.id) if request else None
+        current_value = list(self.requirement_items) if self.requirement_items else []
+        if values:
+            for item in values:
+                if not item.get('created_by') and user_id:
+                    item['created_by'] = user_id
+                if not item.get('created_at'):
+                    item['created_at'] = datetime_utcnow().isoformat()
+
+        if values or current_value:
+            requirements_schema = RequirementItems()
+            try:
+                values = requirements_schema.deserialize(values)
+            except colander.Invalid as exc:
+                raise ValidationError(message='Invalid payload for requirement_items', name=key)
+
+        return values
+
+    number_required_assets = sa.Column(
+        'number_required_assets',
+        sa.Integer(),
+        default=10
+    )
+    """Number of required assets of an Order."""
+
+    @orm.validates('number_required_assets')
+    def validate_number_required_assets(self, key: str, value: int) -> int:
+        """Validate number_required_assets checking if the order is using requirement_items.
+
+        :param key: Attribute name.
+        :param value: Number of required assets value.
+        :return: Number of required after validation.
+        """
+        if value and self.requirement_items:
+            logger.warn('Number of required assets will not be set when using requirement items.')
+
+        if self.requirement_items:
+            value = 0
+            for item in self.requirement_items:
+                value += item.get('min_number_assets')
+
+        return value
+
+    requirements = sa.Column(
+        'requirements',
+        sa.Text,
+        default=''
+    )
     """Human-readable requirements for an Order."""
+
+    @orm.validates('requirements')
+    def validate_requirements(self, key: str, value: str) -> str:
+        """Validate requirements checking if the order is using requirement_items.
+
+        :param key: Attribute name.
+        :param value: Requirements value.
+        :return: Requirements after validation.
+        """
+        if value or self.requirement_items:
+            logger.warn('Requirements will not be set when using requirement items.')
+
+        if self.requirement_items:
+            value = ''
+            for item in self.requirement_items:
+                category = item.get('category')
+                description = item.get('description')
+                min_number_assets = item.get('min_number_assets')
+                value += f'Category: {category}: {min_number_assets}\n' \
+                         f'Descrition: {description}\n\n'
+
+        return value
 
     actual_order_price = sa.Column(
         'actual_order_price',
@@ -360,7 +491,7 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
         default=default_actual_order_price,
         info={
             'colanderalchemy': {
-                'title': 'Acutal Order Price',
+                'title': 'Actual Order Price',
                 'missing': None,
                 'typ': colander.Integer
             }
@@ -380,6 +511,7 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
         nullable=True,
         info={
             'colanderalchemy': {
+                'title': 'Additional Charges',
                 'typ': colander.List,
                 'missing': None,
             }
@@ -815,6 +947,17 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
         """Calculate dates on a change of a state."""
         # Update all dates
         self._update_dates_from_history()
+
+    def update(self, values: dict):
+        """Custom update method to handle special case.
+
+        :param values: Dictionary containing attributes and values
+        :type values: dict
+        """
+        if 'requirement_items' in values:
+            # force update requirement items before all other fields
+            self.requirement_items = values.pop('requirement_items')
+        super().update(values)
 
     @cache_region.cache_on_arguments(should_cache_fn=enable_cache)
     def to_summary_dict(self) -> dict:

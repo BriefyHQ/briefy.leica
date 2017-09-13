@@ -9,6 +9,7 @@ from briefy.leica.cache import enable_cache
 from briefy.leica.models import mixins
 from briefy.leica.models.job import workflows
 from briefy.leica.models.job.order import Order
+from briefy.leica.models.types import TimezoneType
 from briefy.leica.utils.transitions import get_transition_date_from_history
 from briefy.leica.utils.user import add_user_info_to_state_history
 from briefy.leica.vocabularies import AssetTypes
@@ -21,7 +22,6 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy_utils import TimezoneType
 from zope.interface import implementer
 from zope.interface import Interface
 
@@ -29,6 +29,7 @@ import colander
 import copy
 import sqlalchemy as sa
 import sqlalchemy_utils as sautils
+import typing as t
 
 
 __summary_attributes__ = [
@@ -192,7 +193,7 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
         'title', 'description', 'briefing', 'assignment_date', 'last_approval_date',
         'last_submission_date', 'last_transition_message', 'closed_on_date', 'timezone',
         'availability', 'external_state', 'set_type', 'category', 'tech_requirements',
-        'assignment_internal_scout', 'assignment_internal_qa'
+        'assignment_internal_scout', 'assignment_internal_qa', 'requirement_items'
     ]
 
     __raw_acl__ = (
@@ -524,6 +525,11 @@ class Assignment(AssignmentDates, mixins.AssignmentRolesMixin, mixins.Assignment
     def requirements(cls) -> str:
         """Return the requirements of an Order."""
         return association_proxy('order', 'requirements')
+
+    @declared_attr
+    def requirement_items(cls) -> t.List[dict]:
+        """Return the requirement items of an Order."""
+        return association_proxy('order', 'requirement_items')
 
     @declared_attr
     def category(cls) -> str:

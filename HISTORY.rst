@@ -2,6 +2,17 @@
 History
 =======
 
+
+2.2.7 (2017-09-13)
+------------------
+    * Card #634: Added a new field to Order and LeadOrder to store the structure requirement items values (rudaporto).
+    * Card #634: Validate and set number_required_assets and requirements text based on requirement items when available (rudaporto).
+    * Card #634: Added a new field to the Project do set the type of package: on-demand or city (rudaporto).
+    * Card #634: Make sure Order.requirement_items is always updated before any other field (rudaporto).
+    * Added requirement_items as an attribute of the Assignment (proxy) and return it in the to_dict payload (rudaporto).
+    * Card #635: fixed the CSV export of orders per project available in the project view (rudaporto).
+    * Card #636: workaround to fix coercion error of timezone types when move orders from accepted to completed (rudaporto).
+
 2.2.6 (2017-09-11)
 ------------------
 
