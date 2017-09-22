@@ -1,5 +1,9 @@
+.. _orderlocation:
+
 Order Location
 --------------
+
+.. _orderlocation-inheritance:
 
 Inheritance
 +++++++++++
@@ -9,11 +13,16 @@ Inheritance diagram for the OrderLocation class:
 .. inheritance-diagram:: briefy.leica.models.job.location.OrderLocation
 
 
+.. _orderlocation-workflow:
+
 Workflow
 ++++++++
 
 .. workflow::
    :class: briefy.leica.models.job.workflows.OrderLocationWorkflow
+
+
+.. _orderlocation-database:
 
 Database model
 ++++++++++++++
