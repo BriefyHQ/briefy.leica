@@ -1,5 +1,9 @@
+.. _order:
+
 Order
 -----
+
+.. _order-inheritance:
 
 Inheritance
 +++++++++++
@@ -9,12 +13,16 @@ Inheritance diagram for the Order class:
 .. inheritance-diagram:: briefy.leica.models.job.order.Order
 
 
+.. _order-workflow:
+
 Workflow
 ++++++++
 
 .. workflow::
    :class: briefy.leica.models.job.workflows.OrderWorkflow
 
+
+.. _order-database:
 
 Database model
 ++++++++++++++

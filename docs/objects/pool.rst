@@ -1,5 +1,9 @@
+.. _pool:
+
 Job Pool
 --------
+
+.. _pool-inheritance:
 
 Inheritance
 +++++++++++
@@ -12,11 +16,16 @@ Inheritance diagram for the ProfessionalsInPool class:
 
 .. inheritance-diagram:: briefy.leica.models.job.pool.ProfessionalsInPool
 
+.. _pool-workflow:
+
 Workflow
 ++++++++
 
 .. workflow::
    :class: briefy.leica.models.job.workflows.PoolWorkflow
+
+
+.. _pool-database:
 
 Database model
 ++++++++++++++
