@@ -168,6 +168,9 @@ class RequirementItem(colander.MappingSchema):
     tags = colander.SchemaNode(colander.List())
     created_at = colander.SchemaNode(colander.DateTime(), missing='')
     created_by = colander.SchemaNode(colander.String(), validator=colander.uuid)
+    folder_id = colander.SchemaNode(colander.String(), missing=colander.drop)
+    parent_folder_id = colander.SchemaNode(colander.String(), missing=colander.drop)
+    folder_name = colander.SchemaNode(colander.String(), missing=colander.drop)
 
 
 class RequirementItems(colander.SequenceSchema):
