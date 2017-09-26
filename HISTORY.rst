@@ -5,7 +5,6 @@ History
 2.2.8 (Unreleased)
 ------------------
     * Card #653: added more fields to requirement_items colander schema to save google drive folder info (rudaporto).
-    * Card #655: change worker get the validation data from ms.laure as a collection (rudaporto).
 
 2.2.7 (2017-09-13)
 ------------------
