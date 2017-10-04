@@ -4,10 +4,15 @@ History
 
 2.2.8 (Unreleased)
 ------------------
+
     * Card #653: added more fields to requirement_items colander schema to save google drive folder info (rudaporto).
+    * Update configuration for postgresql docker containers setting a different port to avoid collision (rudaporto).
+    * Add Order.requirement_items to summary payload (rudaporto).
+
 
 2.2.7 (2017-09-13)
 ------------------
+
     * Card #634: Added a new field to Order and LeadOrder to store the structure requirement items values (rudaporto).
     * Card #634: Validate and set number_required_assets and requirements text based on requirement items when available (rudaporto).
     * Card #634: Added a new field to the Project do set the type of package: on-demand or city (rudaporto).

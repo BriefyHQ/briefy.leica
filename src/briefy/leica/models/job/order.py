@@ -43,7 +43,8 @@ import typing as t
 __summary_attributes__ = [
     'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
     'price_currency', 'price', 'number_required_assets', 'location', 'category',
-    'timezone', 'scheduled_datetime', 'delivery', 'deliver_date', 'customer_order_id'
+    'timezone', 'scheduled_datetime', 'delivery', 'deliver_date', 'customer_order_id',
+    'requirement_items'
 ]
 
 __listing_attributes__ = __summary_attributes__ + [
