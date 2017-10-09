@@ -2,12 +2,13 @@
 History
 =======
 
-2.2.8 (Unreleased)
+2.2.8 (2017-10-09)
 ------------------
 
     * Card #653: added more fields to requirement_items colander schema to save google drive folder info (rudaporto).
     * Update configuration for postgresql docker containers setting a different port to avoid collision (rudaporto).
     * Add Order.requirement_items to summary payload (rudaporto).
+    * Fixed typo and add tags field in the specific requirements text generated from in Order.requirement_items (rudaporto).
 
 
 2.2.7 (2017-09-13)
