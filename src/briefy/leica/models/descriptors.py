@@ -12,7 +12,7 @@ class UnaryRelationshipWrapper:
 
         :param field_name: string with the name of the real relationship field
         :param model: class object of the model to be used as related field
-        :param fk_attr: string with the name of the foreign ky attribute to the parent model
+        :param fk_attr: string with the name of the foreign key attribute to the parent model
         """
         self._model = model
         self._field_name = field_name
