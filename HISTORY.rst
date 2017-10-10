@@ -2,7 +2,13 @@
 History
 =======
 
-2.2.8 (2017-10-09)
+2.2.9 (2017-10-10)
+------------------
+
+    * Improve tags formatting in the order specific requirements text (rudaporto).
+
+
+2.2.8 (2017-10-10)
 ------------------
 
     * Card #653: added more fields to requirement_items colander schema to save google drive folder info (rudaporto).
