@@ -1,5 +1,11 @@
+.. _userprofile:
+
+
 UserProfile
 ------------
+
+.. _userprofile-inheritance:
+
 
 Inheritance
 +++++++++++
@@ -17,11 +23,17 @@ Inheritance diagram for the InternalProfile class:
 .. inheritance-diagram:: briefy.leica.models.user.InternalUserProfile
 
 
+.. _userprofile-workflow:
+
+
 Workflow
 ++++++++
 
 .. workflow::
    :class: briefy.leica.models.user.workflows.UserProfileWorkflow
+
+
+.. _userprofile-database:
 
 
 Database model

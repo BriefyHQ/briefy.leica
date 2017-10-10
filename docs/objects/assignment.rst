@@ -1,3 +1,5 @@
+.. _assignment:
+
 Assignment
 ----------
 
@@ -8,6 +10,7 @@ Inheritance diagram for the Assignment class:
 
 .. inheritance-diagram:: briefy.leica.models.job.assignment.Assignment
 
+.. _assignment-workflow:
 
 Workflow
 ++++++++
@@ -15,6 +18,8 @@ Workflow
 .. workflow::
    :class: briefy.leica.models.job.workflows.AssignmentWorkflow
 
+
+.. _assignment-database:
 
 Database model
 ++++++++++++++

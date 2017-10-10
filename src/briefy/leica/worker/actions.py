@@ -136,8 +136,8 @@ def invalidate_assignment(laure_data: object, session: object) -> (bool, dict):
             ))
             return False, {}
 
-        feedback_text = '{0}'.format(
-            laure_data.validation.complete_feedback
+        feedback_text = '\n'.join(
+            [item.complete_feedback for item in laure_data.validation]
         )
 
         logger.info(

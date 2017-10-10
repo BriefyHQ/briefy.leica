@@ -43,7 +43,8 @@ import typing as t
 __summary_attributes__ = [
     'id', 'title', 'description', 'slug', 'created_at', 'updated_at', 'state',
     'price_currency', 'price', 'number_required_assets', 'location', 'category',
-    'timezone', 'scheduled_datetime', 'delivery', 'deliver_date', 'customer_order_id'
+    'timezone', 'scheduled_datetime', 'delivery', 'deliver_date', 'customer_order_id',
+    'requirement_items'
 ]
 
 __listing_attributes__ = __summary_attributes__ + [
@@ -168,6 +169,9 @@ class RequirementItem(colander.MappingSchema):
     tags = colander.SchemaNode(colander.List())
     created_at = colander.SchemaNode(colander.DateTime(), missing='')
     created_by = colander.SchemaNode(colander.String(), validator=colander.uuid)
+    folder_id = colander.SchemaNode(colander.String(), missing=colander.drop)
+    parent_folder_id = colander.SchemaNode(colander.String(), missing=colander.drop)
+    folder_name = colander.SchemaNode(colander.String(), missing=colander.drop)
 
 
 class RequirementItems(colander.SequenceSchema):
@@ -479,8 +483,10 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
                 category = item.get('category')
                 description = item.get('description')
                 min_number_assets = item.get('min_number_assets')
+                tags = item.get('tags')
                 value += f'Category: {category}: {min_number_assets}\n' \
-                         f'Descrition: {description}\n\n'
+                         f'Description: {description}\n' \
+                         f'Tags: {tags}\n\n'
 
         return value
 
