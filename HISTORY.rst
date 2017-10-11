@@ -2,15 +2,11 @@
 History
 =======
 
-2.2.10 (2017-10-11)
--------------------
-
-    * Removing tags from specific requirements text since it can confuse the professionals (rudaporto).
-
-2.2.9 (2017-10-10)
+2.2.9 (2017-10-11)
 ------------------
 
     * Improve tags formatting in the order specific requirements text (rudaporto).
+    * Removing tags from specific requirements text since it can confuse the professionals (rudaporto).
 
 
 2.2.8 (2017-10-10)
