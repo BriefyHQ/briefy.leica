@@ -483,10 +483,8 @@ class Order(mixins.OrderFinancialInfo, mixins.LeicaSubVersionedMixin, mixins.Ord
                 category = item.get('category')
                 description = item.get('description')
                 min_number_assets = item.get('min_number_assets')
-                tags = ', '.join(['#' + tag for tag in item.get('tags')])
                 value += f'Category: {category}: {min_number_assets}\n' \
-                         f'Description: {description}\n' \
-                         f'Tags: {tags}\n\n'
+                         f'Description: {description}\n\n'
 
         return value
 
