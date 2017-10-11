@@ -5,9 +5,7 @@ History
 2.2.9 (2017-10-11)
 ------------------
 
-    * Improve tags formatting in the order specific requirements text (rudaporto).
     * Removing tags from specific requirements text since it can confuse the professionals (rudaporto).
-
 
 2.2.8 (2017-10-10)
 ------------------
@@ -16,7 +14,6 @@ History
     * Update configuration for postgresql docker containers setting a different port to avoid collision (rudaporto).
     * Add Order.requirement_items to summary payload (rudaporto).
     * Fixed typo and add tags field in the specific requirements text generated from in Order.requirement_items (rudaporto).
-
 
 2.2.7 (2017-09-13)
 ------------------
