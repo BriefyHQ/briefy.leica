@@ -144,6 +144,46 @@ class ActiveAssignments(AllAssignments):
         )
 
 
+class CurrentAssignments(AllAssignments):
+    """Report dumping Assignments for current assignments."""
+
+    fieldnames = (
+        'project_name',
+        'category',
+        'uid',
+        'briefy_id',
+        'assignment_name',
+        'locality',
+        'country',
+        'asset_type',
+        'number_required_assets',
+        'responsible_professional',
+        'assignment_status',
+        'set_type',
+        'first_submission_date',
+        'last_submission_date',
+        'last_approval_date',
+        'complete_date',
+        'assignment_price_currency',
+        'actual_assignment_price',
+        'actual_assignment_travel_expenses',
+        'actual_assignment_additional_compensation',
+        'reason_additional_compensation'
+    )
+
+    @property
+    def _query_(self) -> Query:
+        """Return the query for this report.
+
+        :return: Query object.
+        """
+        return Assignment.query().filter(
+            Assignment.order.has(current_type='order'),
+        ).options(
+            joinedload('order').joinedload('project')
+        )
+
+
 class AssignmentsQAFollowUP(ActiveAssignments):
     """Report QA Assignments for active projects."""
 
