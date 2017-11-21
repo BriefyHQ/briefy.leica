@@ -4,8 +4,10 @@ from briefy.leica.db import db_configure
 from briefy.leica.db import Session
 from briefy.leica.models import Order
 from briefy.leica.models import Project
+from pytz import country_timezones
 
 import csv
+import pycountry
 import transaction
 import uuid
 
@@ -19,7 +21,8 @@ PROJECTS_TO_IMPORT = [
             'id': '4edab976-d299-422f-4f0d-16291b5693e7',
             'country': 'ES',
             'timezone': 'Europe/Madrid',
-        }
+        },
+        'imported': True,
     },
     {
         'file_name': 'booking-rio.tsv',
@@ -27,9 +30,121 @@ PROJECTS_TO_IMPORT = [
             'id': 'd51dc611-180c-4a27-03cf-513ce7df77ac',
             'country': 'BR',
             'timezone': 'America/Sao_Paulo',
-        }
+        },
+        'imported': True,
 
     },
+    # change imported to False on all bellow items before commit
+    {
+        'file_name': 'holiday-lettings_north-america.tsv',
+        'project': {
+            'id': '08eb3ef6-ea26-4850-ac1d-d179949725dd',
+            'country': 'US',
+            'timezone': 'America/NewYork',  # TODO: get timezone from order location
+        },
+        'imported': True,
+
+    },
+    {
+        'file_name': 'holiday-lettings_europe.csv',
+        'project': {
+            'id': 'c3142f54-19ee-4926-2d4a-02d32f40753d',
+            'country': 'DE',
+            'timezone': 'Europe/Central',  # TODO: get timezone from order location
+        },
+        'imported': True,
+    },
+    {
+        'file_name': 'holiday-lettings_caribbean.tsv',
+        'project': {
+            'id': 'f3dfcd3f-94f8-4628-02f1-88245b732231',
+            'country': 'PR',
+            'timezone': 'America/Puerto_Rico',  # TODO: get timezone from order location
+        },
+        'imported': True,
+    },
+    {
+        'file_name': 'holiday-lettings_africa.tsv',
+        'project': {
+            'id': 'a8cb3daa-3e7e-4acd-96a5-f3bf5c437fb7',
+            'country': 'ZA',
+            'timezone': 'Africa/Casablanca',  # TODO: get timezone from order location
+        },
+        'imported': True,
+    },
+    {
+        'file_name': 'holiday-lettings_asia.tsv',
+        'project': {
+            'id': '5d2cbc76-b876-4a45-5499-deba9b795570',
+            'country': 'ID',
+            'timezone': 'Africa/Casablanca',
+        },
+        'imported': True,
+    },
+    {
+        'file_name': 'doordash_project-monitor.tsv',
+        'project': {
+            'id': '413a0ebc-f2e0-4962-82aa-f03404c67ca7',
+            'country': 'US',
+            'timezone': 'America/NewYork',
+        },
+        'imported': True,
+    },
+    {
+        'file_name': 'holiday-lettings_oceania.tsv',
+        'project': {
+            'id': '3af64007-9298-4fe5-f84d-17c3b898627a',
+            'country': 'AU',
+            'timezone': 'Australia/Sydney',
+        },
+        'imported': True,
+    },
+    {
+        'file_name': 'opentable_project-monitoring.tsv',
+        'project': {
+            'id': 'd589c324-aa17-47a9-8b9b-59ab90550c34',
+            'country': 'DE',
+            'timezone': 'Europe/Central',
+        },
+        'imported': True,
+    },
+    {
+        'file_name': 'traveloka_project-monitor.csv',
+        'project': {
+            'id': '296c3c3f-368f-470a-ac0f-2e80bec3c373',
+            'country': 'ID',
+            'timezone': 'Asia/Bangkok',
+        },
+        'imported': True,
+    },
+    {
+        'file_name': 'justeat_london.csv',
+        'project': {
+            'id': '79fbb63a-77a0-456b-160f-41070bd816e9',
+            'country': 'UK',
+            'timezone': 'UTC',
+        },
+        'imported': True,
+    },
+    {
+        'file_name': 'hostelworkd_50-properties-laura.csv',
+        'project': {
+            'id': '6ef17640-4175-4057-d90f-2c2f399b1637',
+            'country': 'US',
+            'timezone': 'America/NewYork',
+        },
+        'imported': True,
+    },
+    {
+        'file_name': 'holiday-lettings_testimonial.csv',
+        'project': {
+            'id': '07ec7979-3b10-428c-0363-a9364933163a',
+            'country': 'UK',
+            'timezone': 'UTC',
+        },
+        'imported': True,
+    },
+
 ]
 
 
@@ -53,8 +168,9 @@ class OrderImporter:
     def records(self):
         """Return records iterator from file."""
         file_name = f'{BASE_PATH}/{self.file_name}'
+        delimiter = '\t' if file_name[-3:] == 'tsv' else ','
         with open(file_name, 'r') as fin:
-            reader = csv.DictReader(fin, delimiter='\t')
+            reader = csv.DictReader(fin, delimiter=delimiter)
             for item in reader:
                 yield item
 
@@ -74,7 +190,14 @@ class OrderImporter:
         else:
             last_name = ''
 
-        formatted_address = f'{record.address}, {record.district}, {record.country}, ' \
+        # parse country code based on the country name
+        country = pycountry.countries.get(name=record.country.strip(' '))
+        if not country:
+            print(f'Country not found {record.country}')
+
+        country = country.alpha_2 if country else project.country
+
+        formatted_address = f'{record.address}, {record.district}, {record.locality}, ' \
                             f'{record.postal_code}, {project.country}'
         new_data = {
             'id': order_id,
@@ -101,12 +224,12 @@ class OrderImporter:
                 'order_id': order_id,
                 'state': 'created',
                 'locality': record.locality,
-                'country': project.country,
+                'country': country,
                 'email': record.email,
                 'formatted_address': formatted_address,
                 'coordinates': [0, 0],
                 'additional_phone': None,
-                'timezone': project.timezone,
+                'timezone': country_timezones.get(country, [project.timezone])[0],
                 'first_name': first_name,
                 'last_name': last_name,
                 'mobile': record.mobile,
@@ -142,14 +265,15 @@ class OrderImporter:
 def main():
     """Execute import script."""
     for item in PROJECTS_TO_IMPORT:
-        session = db_configure(Session)
-        importer = OrderImporter(
-            item.get('file_name'),
-            Objectify(item.get('project')),
-            session
-        )
-        with transaction.manager:
-            importer()
+        if not item.get('imported', False):
+            session = db_configure(Session)
+            importer = OrderImporter(
+                item.get('file_name'),
+                Objectify(item.get('project')),
+                session
+            )
+            with transaction.manager:
+                importer()
 
 
 if __name__ == '__main__':
