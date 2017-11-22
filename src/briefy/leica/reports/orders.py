@@ -149,3 +149,39 @@ class ActiveOrders(AllOrders):
             Order.project.has(state='ongoing'),
             Order.current_type == 'order'
         )
+
+
+class CurrentOrders(AllOrders):
+    """Report dumping orders for Active Projects."""
+
+    fieldnames = (
+        'customer_name',
+        'project_name',
+        'category',
+        'uid',
+        'briefy_id',
+        'customer_order_id',
+        'order_name',
+        'locality',
+        'country',
+        'asset_type',
+        'number_required_assets',
+        'order_status',
+        'first_delivery_date',
+        'last_deliver_date',
+        'last_refusal_date',
+        'accept_date',
+        'order_price_currency',
+        'default_order_price',
+        'actual_order_price'
+    )
+
+    @property
+    def _query_(self) -> Query:
+        """Return the query for this report.
+
+        :return: Query object.
+        """
+        return Order.query().filter(
+            Order.current_type == 'order'
+        )
