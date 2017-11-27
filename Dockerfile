@@ -15,6 +15,6 @@ RUN cp docker/docker_entrypoint.sh / && chmod +x /docker_entrypoint.sh
 
 RUN pip3 install -r requirements.txt
 
-CMD ["/docker_entrypoint.sh"]
+CMD ["/app/docker/api.sh"]
 
 EXPOSE 8000
