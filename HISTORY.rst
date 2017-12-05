@@ -5,6 +5,10 @@ History
 2.2.10 (unreleased)
 -------------------
 
+    * Upgrade python3 docker image version 1.4.5 (rudaporto).
+    * Change to use gunicorn + gevent workers to run serve the REST api in the docker container (rudaporto).
+    * New script to import orders from the csv files of the old projects (rudaporto).
+    * Update reports (ericof).
     * Updated briefy.common to version 2.1.7 (rudaporto).
 
 2.2.9 (2017-10-11)

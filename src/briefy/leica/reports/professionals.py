@@ -1,7 +1,7 @@
 """Professionalss reports."""
 from briefy.leica.models import Professional
-from briefy.leica.models import WorkingLocation
 from briefy.leica.models import ProfessionalBillingInfo
+from briefy.leica.models import WorkingLocation
 from briefy.leica.reports.base import BaseReport
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.query import Query
@@ -134,7 +134,6 @@ class AllProfessionals(BaseReport):
                 'professional_location_2_country': location_2.get('country', ''),
             }
             return response
-
 
         legal_name = ''
         address = {}

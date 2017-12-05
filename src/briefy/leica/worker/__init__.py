@@ -173,7 +173,7 @@ def main():
     try:
         worker.Session = ignite_database_session()
         worker()
-
-    except:
-        logger.exception('{name} exiting due to an exception.'.format(name=Worker.name))
+    except Exception as error:
+        worker_name = Worker.name
+        logger.exception(f'{worker_name} exiting due to an exception. error: {error}')
         raise
