@@ -2,6 +2,11 @@
 History
 =======
 
+2.2.10 (unreleased)
+-------------------
+
+    * Updated briefy.common to version 2.1.7 (rudaporto).
+
 2.2.9 (2017-10-11)
 ------------------
 
