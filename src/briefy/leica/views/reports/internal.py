@@ -2,9 +2,11 @@
 from briefy.leica.reports.assignments import ActiveAssignments
 from briefy.leica.reports.assignments import AllAssignments
 from briefy.leica.reports.assignments import AssignmentsQAFollowUP
+from briefy.leica.reports.assignments import CurrentAssignments
 from briefy.leica.reports.customers import AllCustomers
 from briefy.leica.reports.orders import ActiveOrders
 from briefy.leica.reports.orders import AllOrders
+from briefy.leica.reports.orders import CurrentOrders
 from briefy.leica.reports.professionals import AllProfessionals
 from briefy.leica.views.reports import BaseReport
 from briefy.ws import CORS_POLICY
@@ -18,6 +20,7 @@ from pyramid.security import Everyone
 ASSIGNMENT_REPORTS = {
     'all': AllAssignments,
     'active': ActiveAssignments,
+    'current': CurrentAssignments,
     'qa': AssignmentsQAFollowUP
 }
 
@@ -30,6 +33,7 @@ CUSTOMER_REPORTS = {
 ORDER_REPORTS = {
     'all': AllOrders,
     'active': ActiveOrders,
+    'current': CurrentOrders,
 }
 
 PROFESSIONAL_REPORTS = {

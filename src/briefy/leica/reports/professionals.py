@@ -1,9 +1,12 @@
 """Professionalss reports."""
 from briefy.leica.models import Professional
 from briefy.leica.models import ProfessionalBillingInfo
+from briefy.leica.models import WorkingLocation
 from briefy.leica.reports.base import BaseReport
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.query import Query
+
+import typing as t
 
 
 ASSIGNMENT_CSV = '/tmp/professionals.csv'
@@ -40,6 +43,13 @@ class AllProfessionals(BaseReport):
         'professional_payment_bank_street_address',
         'professional_payment_bank_city',
         'professional_payment_bank_country',
+        'professional_id',
+        'professional_location_1_city',
+        'professional_location_1_region',
+        'professional_location_1_country',
+        'professional_location_2_city',
+        'professional_location_2_region',
+        'professional_location_2_country',
     )
 
     @property
@@ -107,6 +117,24 @@ class AllProfessionals(BaseReport):
 
             return response
 
+        def extract_location_info(info: t.Sequence[WorkingLocation]) -> dict:
+            """Extract payment information from a Professional Billing Information.
+
+            :param info: Professional working location information.
+            :return: Dictionary with location information.
+            """
+            location_1 = info[0].info if info and len(info) > 0 else {}
+            location_2 = info[1].info if info and len(info) > 1 else {}
+            response = {
+                'professional_location_1_city': location_1.get('locality', ''),
+                'professional_location_1_region': location_1.get('province', ''),
+                'professional_location_1_country': location_1.get('country', ''),
+                'professional_location_2_city': location_2.get('locality', ''),
+                'professional_location_2_region': location_2.get('province', ''),
+                'professional_location_2_country': location_2.get('country', ''),
+            }
+            return response
+
         legal_name = ''
         address = {}
         address_street = ''
@@ -119,6 +147,7 @@ class AllProfessionals(BaseReport):
         tax_id_name = ''
         tax_id_status = ''
         billing_info = record.billing_info
+        locations = record.locations
         if billing_info:
             legal_name = billing_info.title
             address = billing_info.billing_address
@@ -139,6 +168,7 @@ class AllProfessionals(BaseReport):
             )
 
         payload = {
+            'professional_id': record.id,
             'professional_display_name': record.title,
             'professional_legal_company_name': legal_name,
             'professional_full_name': contact_name,
@@ -156,4 +186,5 @@ class AllProfessionals(BaseReport):
             'professional_tax_id': tax_id,
         }
         payload.update(extract_payment_info(billing_info))
+        payload.update(extract_location_info(locations))
         return payload

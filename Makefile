@@ -132,14 +132,17 @@ uploaddb_live_to_stg:
 	scp live:/tmp/production-leica.dump /tmp/production-leica.dump
 	scp /tmp/production-leica.dump stg:/tmp/production-leica.dump
 
-	
+uploaddb_live_to_dev:
+	scp live:/tmp/briefy-services-leica-live.sql.bz2 /tmp/briefy-services-leica-live.sql.bz2
+	scp /tmp/briefy-services-leica-live.sql.bz2 devkube:/tmp/briefy-services-leica-dev.sql.bz2
+
 restoredb_prod_local: clean_dockers create_dockers
 	scp live:/tmp/production-leica.dump /tmp/production-leica.dump
-	pg_restore --no-owner -x -h localhost -p 9999 -U briefy -W -d briefy-leica /tmp/production-leica.dump
+	pg_restore --no-owner -x -h localhost -p 9979 -U briefy -W -d briefy-leica /tmp/production-leica.dump
 
 restoredb_stg_local: clean_dockers create_dockers
 	scp stg:/tmp/staging-leica.dump /tmp/staging-leica.dump
-	pg_restore --no-owner -x -h localhost -p 9999 -U briefy -W -d briefy-leica /tmp/staging-leica.dump
+	pg_restore --no-owner -x -h localhost -p 9979 -U briefy -W -d briefy-leica /tmp/staging-leica.dump
 
 start_dockers:
 	docker start redis
